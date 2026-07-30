@@ -1,15 +1,15 @@
 import { BrowserWindow } from 'electron';
 
-import { OAuthDiscoveryResponse } from '../../../shared/types/domain-types';
-import { discoverIssuer } from '../../../shared/utils/oauth';
+import { IssuerDiscoveryResponse } from '../../../shared/types/domain-types';
 import log from '../../logger';
+import { discoverIssuer } from './oauth-oidc-discover-issuer';
 
 const DISCOVERY_TIMEOUT = 5 * 1000; //5 seconds
 
-export const discoverIssuerFromRedirects = async (
+export const autoDiscoverIssuerFromServerUrl = async (
     _event: any,
     url: string,
-): Promise<OAuthDiscoveryResponse> => {
+): Promise<IssuerDiscoveryResponse> => {
     const discoveryWindow = new BrowserWindow({ show: false });
     log.info(`Auto-discovering OIDC configuration for URL: ${url}`);
 
@@ -20,11 +20,7 @@ export const discoverIssuerFromRedirects = async (
                 discoveryWindow.close();
                 resolve(configResponse);
             } else {
-                reject(
-                    new Error(
-                        'Failed to auto discover OIDC/OAuth2 issuer, please provide the issuer URL manually',
-                    ),
-                );
+                reject(new Error('Could not auto-discover OIDC/OAuth2 configuration.'));
             }
         };
         log.info('loading url');

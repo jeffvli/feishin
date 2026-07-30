@@ -251,6 +251,8 @@
         "serverNotSelectedError": "No server selected",
         "serverRequired": "Server required",
         "sessionExpiredError": "Your session has expired",
+        "ssoError": "An error occurred when signing in with SSO",
+        "ssoDiscoveryFailureError": "Failed to discover OIDC/OAuth2 metadata. Please provide a valid Issuer URL.",
         "systemFontError": "An error occurred when trying to get system fonts",
         "settingsSyncError": "Discrepancies were found between the settings in the renderer and the main process. Restart the application to apply the changes"
     },
@@ -342,7 +344,6 @@
     },
     "form": {
         "addServer": {
-            "advancedSSOOptions": "Advanced SSO Options",
             "cancelSSO": "Cancel Sign-in with SSO",
             "error_savePassword": "An error occurred when trying to save the password",
             "ignoreCors": "Ignore CORS ($t(common.restartRequired))",

@@ -1,10 +1,11 @@
 import { closeAllModals } from '@mantine/modals';
 import isElectron from 'is-electron';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
+import { useSSO } from '/@/renderer/hooks/use-sso';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { getServerById, useAuthStoreActions } from '/@/renderer/store';
 import { Accordion } from '/@/shared/components/accordion/accordion';
@@ -60,8 +61,14 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
     const { setCurrentServer, updateServer } = useAuthStoreActions();
     const focusTrapRef = useFocusTrap();
     const [isLoading, setIsLoading] = useState(false);
+    const { cancelSSOLogin, externalSSOPageOpen } = useSSO(setIsLoading);
 
-    console.log(server?.authType || AuthType.BASIC, server?.authType);
+    useEffect(() => {
+        return () => {
+            cancelSSOLogin(); // Clean up SSO if component unmounts while SSO is in progress
+        };
+    }, [cancelSSOLogin]);
+
     const form = useForm({
         initialValues: {
             authType: server?.authType || AuthType.BASIC,
@@ -84,6 +91,8 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
     const isSubsonic = form.values.type === ServerType.SUBSONIC;
     const isNavidrome = form.values.type === ServerType.NAVIDROME;
     const isBasicAuth = (form.values.authType === AuthType.BASIC && isNavidrome) || !isNavidrome;
+    const isOAuth =
+        form.values.type === ServerType.NAVIDROME && form.values.authType === AuthType.OAUTH;
 
     const handleSubmit = form.onSubmit(async (values) => {
         try {
@@ -133,10 +142,8 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 };
             } else {
                 // Need to authenticate
-                const useOAuth =
-                    values.type === ServerType.NAVIDROME && values.authType === AuthType.OAUTH;
 
-                let authFunction = useOAuth
+                let authFunction = isOAuth
                     ? api.controller.authenticateOAuth
                     : api.controller.authenticate;
 
@@ -146,7 +153,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     });
                 }
 
-                if (useOAuth) {
+                if (isOAuth) {
                     authFunction = api.controller.authenticateOAuth;
                     data = await authFunction?.(
                         values.url,
@@ -356,7 +363,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                             <Accordion.Item value="options">
                                 <Accordion.Control>
                                     <Text isMuted size="md">
-                                        {t('form.addServer.advancedSSOOptions')}
+                                        {t('table.config.general.advancedSettings')}
                                     </Text>
                                 </Accordion.Control>
                                 <Accordion.Panel>
@@ -380,6 +387,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                                             label={t('form.addServer.input', {
                                                 context: 'clientId',
                                             })}
+                                            required
                                             {...form.getInputProps('clientId')}
                                         />
                                     </Stack>
@@ -412,7 +420,13 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     />
                 )}
                 <Group justify="flex-end">
-                    <ModalButton onClick={onCancel}>{t('common.cancel')}</ModalButton>
+                    {!externalSSOPageOpen ? (
+                        <ModalButton onClick={onCancel}>{t('common.cancel')}</ModalButton>
+                    ) : (
+                        <ModalButton onClick={cancelSSOLogin} variant="default">
+                            {t('form.addServer.cancelSSO')}
+                        </ModalButton>
+                    )}
                     <ModalButton loading={isLoading} type="submit" variant="filled">
                         {t('common.save')}
                     </ModalButton>

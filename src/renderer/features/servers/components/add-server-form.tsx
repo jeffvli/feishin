@@ -13,6 +13,7 @@ import JellyfinIcon from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeIcon from '/@/renderer/features/servers/assets/navidrome.png';
 import SubsonicIcon from '/@/renderer/features/servers/assets/opensubsonic.png';
 import { IgnoreCorsSslSwitches } from '/@/renderer/features/servers/components/ignore-cors-ssl-switches';
+import { useSSO } from '/@/renderer/hooks/use-sso';
 import { useAuthStoreActions, useServerList } from '/@/renderer/store';
 import { Accordion } from '/@/shared/components/accordion/accordion';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
@@ -114,31 +115,13 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const { addServer, setCurrentServer } = useAuthStoreActions();
     const serverList = useServerList();
     const { servers: discovered } = useAutodiscovery();
-    const [externalSSOPageOpen, setExternalSSOPageOpen] = useState(false);
-
+    const { cancelSSOLogin, externalSSOPageOpen } = useSSO(setIsLoading);
     const serverLock = isServerLock();
-
     useEffect(() => {
-        const pageOpened = () => {
-            setExternalSSOPageOpen(true);
+        return () => {
+            cancelSSOLogin(); // Clean up SSO if component unmounts while SSO is in progress
         };
-        const gotSSOResponse = () => {
-            setExternalSSOPageOpen(false);
-        };
-        const gotSSOError = () => {
-            if (!externalSSOPageOpen) return;
-
-            setExternalSSOPageOpen(false);
-            setIsLoading(false);
-            toast.error({
-                message: t('error.ssoError'),
-            });
-        };
-
-        window.api.oauth.externalPageOpenedCallback(pageOpened);
-        window.api.oauth.oauthCallback(gotSSOResponse);
-        window.api.oauth.oauthCallbackError(gotSSOError);
-    }, []);
+    }, [cancelSSOLogin]);
 
     const form = useForm({
         initialValues: {
@@ -162,14 +145,15 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         },
     });
 
-    const useOAuth =
+    const isOAuth =
         form.values.type === ServerType.NAVIDROME && form.values.authType === AuthType.OAUTH;
     const isBasicAuth =
         (form.values.authType === AuthType.BASIC && form.values.type === ServerType.NAVIDROME) ||
         form.values.type !== ServerType.NAVIDROME;
 
     const usernameRequired = !form.values.username && isBasicAuth;
-    const isSubmitDisabled = !form.values.name || usernameRequired;
+    const clientIdRequired = !form.values.clientId && isOAuth;
+    const isSubmitDisabled = !form.values.name || usernameRequired || clientIdRequired;
 
     const fillServerDetails = (server: DiscoveredServerItem) => {
         form.setValues({ ...server });
@@ -183,9 +167,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             return;
         }
 
-        let authFunction = useOAuth
-            ? api.controller.authenticateOAuth
-            : api.controller.authenticate;
+        let authFunction = isOAuth ? api.controller.authenticateOAuth : api.controller.authenticate;
         if (!authFunction) {
             return toast.error({
                 message: t('error.invalidServer'),
@@ -195,7 +177,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         try {
             setIsLoading(true);
             let data: AuthenticationResponse | undefined;
-            if (useOAuth) {
+            if (isOAuth) {
                 authFunction = api.controller.authenticateOAuth;
                 data = await authFunction?.(
                     values.url,
@@ -281,12 +263,6 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
         return setIsLoading(false);
     });
-
-    const cancelSSOLogin = () => {
-        setExternalSSOPageOpen(false);
-        setIsLoading(false);
-        window.api.oauth.cancelSSOLogin();
-    };
 
     return (
         <>
@@ -407,7 +383,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                                 <Accordion.Item value="options">
                                     <Accordion.Control>
                                         <Text isMuted size="md">
-                                            {t('form.addServer.advancedSSOOptions')}
+                                            {t('table.config.general.advancedSettings')}
                                         </Text>
                                     </Accordion.Control>
                                     <Accordion.Panel>
@@ -431,6 +407,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                                                 label={t('form.addServer.input', {
                                                     context: 'clientId',
                                                 })}
+                                                required
                                                 {...form.getInputProps('clientId')}
                                             />
                                         </Stack>
@@ -468,8 +445,13 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             <Divider />
                         </>
                     )}
+                    {externalSSOPageOpen && (
+                        <ModalButton onClick={cancelSSOLogin} variant="default">
+                            {t('form.addServer.cancelSSO')}
+                        </ModalButton>
+                    )}
                     <Group grow justify="flex-end">
-                        {onCancel && (
+                        {onCancel && !externalSSOPageOpen && (
                             <ModalButton onClick={onCancel}>{t('common.cancel')}</ModalButton>
                         )}
                         <ModalButton
@@ -481,11 +463,6 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             {t('common.add')}
                         </ModalButton>
                     </Group>
-                    {externalSSOPageOpen && (
-                        <ModalButton onClick={cancelSSOLogin} variant="default">
-                            {t('form.addServer.cancelSSO')}
-                        </ModalButton>
-                    )}
                 </Stack>
             </form>
         </>

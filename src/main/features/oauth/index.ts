@@ -2,13 +2,14 @@ import { app, ipcMain, shell } from 'electron';
 import path from 'node:path';
 import { CreateSigninRequestArgs, OidcClient, OidcClientSettings } from 'oidc-client-ts';
 
-import { discoverIssuerFromRedirects } from './oauth-oidc-wellknown-discovery';
+import { autoDiscoverIssuerFromServerUrl as autoDiscoverIssuerUrl } from './oauth-oidc-wellknown-discovery';
 import {
     deleteRefreshToken,
     getRefreshToken,
     storeRefreshToken,
 } from './oauth-refresh-token-store';
 
+import { discoverIssuer } from '/@/main/features/oauth/oauth-oidc-discover-issuer';
 import { getMainWindow } from '/@/main/index';
 import log from '/@/main/logger';
 import { OAuthRedirectScheme } from '/@/shared/types/domain-types';
@@ -19,23 +20,19 @@ let oidcClient: OidcClient;
 
 const openUrlListener = async (_event: Electron.Event, url: string) => {
     if (url.startsWith(`${OAuthRedirectScheme}://`)) {
-        log.info(`Received OIDC/OAuth2 callback URL`);
-        app.removeListener('second-instance', secondInstanceListener);
-        const signinResponse = await oidcClient.processSigninResponse(url);
-        getMainWindow()?.webContents.send('oauth:callback', signinResponse);
+        processSigninResponse(url);
     }
 };
 const secondInstanceListener = async (_event: Electron.Event, argv: string[]) => {
     const url = argv.find((arg) => arg.startsWith(`${OAuthRedirectScheme}://`));
     if (url) {
-        log.info(`Received OIDC/OAuth2 callback URL`);
-        app.removeListener('open-url', openUrlListener);
-        const signinResponse = await oidcClient.processSigninResponse(url);
-        getMainWindow()?.webContents.send('oauth:callback', signinResponse);
+        processSigninResponse(url);
     }
 };
 
 const processSigninResponse = async (url: string) => {
+    log.info(`Received OIDC/OAuth2 callback URL`);
+    clearListeners();
     try {
         const signinResponse = await oidcClient.processSigninResponse(url);
         getMainWindow()?.webContents.send('oauth:callback', signinResponse);
@@ -95,11 +92,16 @@ ipcMain.handle(
 
 ipcMain.handle('oauth:cancel-sso-login', () => {
     log.info('Cancelling SSO login');
+    getMainWindow()?.webContents.send('oauth:callbackError');
     // Remove all listeners for 'open-url' and 'second-instance' events
     clearListeners();
 });
 
-ipcMain.handle('oauth:discover', discoverIssuerFromRedirects);
+ipcMain.handle('oauth:discover', async (_event, url: string) => {
+    return await discoverIssuer(url);
+});
+
+ipcMain.handle('oauth:auto-discover-issuer-url', autoDiscoverIssuerUrl);
 
 ipcMain.handle('oauth:store-refresh-token', (_event, serverId: string, refreshToken: string) => {
     storeRefreshToken(serverId, refreshToken);

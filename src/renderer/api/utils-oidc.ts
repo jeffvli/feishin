@@ -1,7 +1,6 @@
 import { OidcClientSettings, SigninResponse } from 'oidc-client-ts';
 
-import { discoverIssuer } from '../../shared/utils/oauth';
-
+import i18n from '/@/i18n/i18n';
 import { OAuthRedirectScheme } from '/@/shared/types/domain-types';
 
 export const handleOAuth = async (
@@ -9,14 +8,10 @@ export const handleOAuth = async (
     issuerUrl: string,
     clientId: string,
 ): Promise<SigninResponse> => {
-    const issuerDetails = issuerUrl
-        ? await discoverIssuer(issuerUrl)
-        : await window.api.oauth.discover(url);
+    const issuerDetails = await getIssuerDetails(url, issuerUrl);
 
     if (!issuerDetails.found) {
-        throw new Error(
-            'Failed to discover OIDC/OAuth2 metadata. Please provide a valid Issuer URL.',
-        );
+        throw new Error(i18n.t('error.ssoDiscoveryFailureError'));
     }
 
     const clientSettings: OidcClientSettings = {
@@ -29,9 +24,13 @@ export const handleOAuth = async (
     };
 
     function onOauthCallback(): Promise<SigninResponse> {
-        return new Promise<SigninResponse>((resolve) => {
+        return new Promise<SigninResponse>((resolve, reject) => {
             window.api.oauth.oauthCallback((signinResponse) => {
                 resolve(signinResponse);
+            });
+
+            window.api.oauth.oauthCallbackError(() => {
+                reject(new Error(i18n.t('error.ssoError')));
             });
         });
     }
@@ -41,9 +40,18 @@ export const handleOAuth = async (
     await window.api.oauth.login(clientSettings);
 
     if (!signinResponse) {
-        throw new Error('Failed to sign-in with SSO');
+        throw new Error(i18n.t('error.ssoError'));
     }
     return signinResponse;
+};
+
+const getIssuerDetails = async (url: string, issuerUrl?: string): Promise<any> => {
+    try {
+        if (issuerUrl) return await window.api.oauth.discoverIssuer(issuerUrl);
+        return await window.api.oauth.autoDiscoverIssuerUrl(url);
+    } catch {
+        throw new Error(i18n.t('error.ssoDiscoveryFailureError'));
+    }
 };
 
 export const storeRefreshToken = async (serverId: string, refreshToken: string): Promise<void> => {

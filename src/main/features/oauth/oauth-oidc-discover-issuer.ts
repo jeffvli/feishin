@@ -1,4 +1,6 @@
-import { OAuthDiscoveryResponse as IssuerDiscoveryResponse } from '../types/domain-types';
+import axios from 'axios';
+
+import { IssuerDiscoveryResponse } from '../../../shared/types/domain-types';
 
 type issuerMetadata = {
     issuer: string;
@@ -14,8 +16,8 @@ export async function discoverIssuer(url: string): Promise<IssuerDiscoveryRespon
     if (issuerURL.pathname !== '') {
         wellKnownUrls.push(
             // RFC 8414 convetions for paths
-            `${issuerURL.origin}/${issuerURL.pathname}/.well-known/openid-configuration`,
-            `${issuerURL.origin}/.well-known/oauth-authorization-server/${issuerURL.pathname}`,
+            `${issuerURL.origin}${issuerURL.pathname}/.well-known/openid-configuration`,
+            `${issuerURL.origin}/.well-known/oauth-authorization-server${issuerURL.pathname}`,
         );
     }
     console.info(`Attempting to discover OIDC/OAuth2 metadata`);
@@ -25,7 +27,7 @@ export async function discoverIssuer(url: string): Promise<IssuerDiscoveryRespon
             if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
                 const jsonResponse: issuerMetadata = await res.json();
                 console.info(`Successfully discovered OIDC/OAuth2 metadata`);
-                return formatOAuthDiscoveryResponse(jsonResponse, wellKnownUrl);
+                return formatIssuerDiscoveryResponse(jsonResponse, wellKnownUrl);
             }
         } catch {
             //Ignore and try next URL
@@ -42,7 +44,7 @@ export async function discoverIssuer(url: string): Promise<IssuerDiscoveryRespon
     };
 }
 
-export function formatOAuthDiscoveryResponse(
+export function formatIssuerDiscoveryResponse(
     jsonResponse: issuerMetadata,
     metadataEndpoint: string,
 ): IssuerDiscoveryResponse {
