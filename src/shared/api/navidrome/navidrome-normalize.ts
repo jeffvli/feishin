@@ -93,44 +93,6 @@ const normalizeNavidromeOriginalDate = (item: {
     return { date: null, year: 0 };
 };
 
-const normalizeTrackYearRange = (
-    songs: z.infer<typeof ndType._response.songList>,
-): null | { max: number; min: number } => {
-    if (!songs || songs.length === 0) {
-        return null;
-    }
-
-    let minYear = Number.MAX_SAFE_INTEGER;
-    let maxYear = Number.MIN_SAFE_INTEGER;
-
-    for (const song of songs) {
-        const fromSongDate = parsePartialIsoDate(song.date);
-        const songApiYear = coerceYear(song.year);
-        const year =
-            fromSongDate.year > 0 ? fromSongDate.year : songApiYear > 0 ? songApiYear : null;
-
-        if (!year) continue;
-
-        if (year < minYear) {
-            minYear = year;
-        }
-
-        if (year > maxYear) {
-            maxYear = year;
-        }
-    }
-
-    if (minYear === Number.MAX_SAFE_INTEGER || maxYear === Number.MIN_SAFE_INTEGER) {
-        return null;
-    }
-
-    if (minYear === maxYear) {
-        return null;
-    }
-
-    return { max: maxYear, min: minYear };
-};
-
 const getArtists = (
     item:
         | z.infer<typeof ndType._response.album>
@@ -381,7 +343,7 @@ const normalizeAlbum = (
 ): Album => {
     const releaseDate = normalizeNavidromeReleaseDate(item);
     const originalDate = normalizeNavidromeOriginalDate(item);
-    const trackYearRange = normalizeTrackYearRange(item.songs || []);
+    const trackYearRange = { max: item.maxYear, min: item.minYear };
 
     return {
         ...parseAlbumTags(item),
