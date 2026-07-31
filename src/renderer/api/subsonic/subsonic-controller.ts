@@ -496,7 +496,7 @@ export const SubsonicController: InternalControllerEndpoint = {
     getAlbumArtistInfo: async (args) => {
         const { apiClientProps, query } = args;
 
-        const artistInfoRes = await ssApiClient(apiClientProps).getArtistInfo({
+        const artistInfoRes = await ssApiClient(apiClientProps).getArtistInfo2({
             query: {
                 id: query.id,
                 ...(query.limit != null && { count: query.limit }),
@@ -507,14 +507,14 @@ export const SubsonicController: InternalControllerEndpoint = {
             return null;
         }
 
-        const artistInfo = artistInfoRes.body.artistInfo;
+        const artistInfo = artistInfoRes.body.artistInfo2;
 
         return {
             biography: artistInfo?.biography || null,
             similarArtists:
                 artistInfo?.similarArtist?.map((artist) => ({
-                    id: artist.id,
-                    imageId: artist.coverArt ?? artist.id,
+                    id: String(artist.id),
+                    imageId: artist.coverArt ?? String(artist.id),
                     imageUrl: null,
                     name: artist.name,
                     userFavorite: Boolean(artist.starred) || false,

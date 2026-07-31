@@ -245,14 +245,14 @@ const normalizeSong = (
 const normalizeAlbumArtist = (
     item:
         | (z.infer<typeof ssType._response.albumArtist> & {
-              similarArtists?: z.infer<
-                  typeof ssType._response.artistInfo
-              >['artistInfo']['similarArtist'];
+              similarArtists?: NonNullable<
+                  z.infer<typeof ssType._response.artistInfo2>['artistInfo2']
+              >['similarArtist'];
           })
         | (z.infer<typeof ssType._response.artistListEntry> & {
-              similarArtists?: z.infer<
-                  typeof ssType._response.artistInfo
-              >['artistInfo']['similarArtist'];
+              similarArtists?: NonNullable<
+                  z.infer<typeof ssType._response.artistInfo2>['artistInfo2']
+              >['similarArtist'];
           }),
     server?: null | ServerListItemWithCredential,
 ): AlbumArtist => {
@@ -273,8 +273,8 @@ const normalizeAlbumArtist = (
         playCount: null,
         similarArtists:
             item.similarArtists?.map((artist) => ({
-                id: artist.id,
-                imageId: artist.coverArt ?? artist.id,
+                id: String(artist.id),
+                imageId: artist.coverArt ?? String(artist.id),
                 imageUrl: null,
                 name: artist.name,
                 userFavorite: Boolean(artist.starred) || false,

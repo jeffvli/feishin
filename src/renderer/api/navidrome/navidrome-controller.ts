@@ -289,7 +289,7 @@ export const NavidromeController: InternalControllerEndpoint = {
     getAlbumArtistInfo: async (args) => {
         const { apiClientProps, query } = args;
 
-        const artistInfoRes = await ssApiClient(apiClientProps).getArtistInfo({
+        const artistInfoRes = await ssApiClient(apiClientProps).getArtistInfo2({
             query: {
                 id: query.id,
                 ...(query.limit != null && { count: query.limit }),
@@ -300,7 +300,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             return null;
         }
 
-        const artistInfo = artistInfoRes.body.artistInfo;
+        const artistInfo = artistInfoRes.body.artistInfo2;
         const imageUrl =
             artistInfo?.largeImageUrl ||
             artistInfo?.mediumImageUrl ||
@@ -312,8 +312,8 @@ export const NavidromeController: InternalControllerEndpoint = {
             imageUrl,
             similarArtists:
                 artistInfo?.similarArtist?.map((artist) => ({
-                    id: artist.id,
-                    imageId: artist.id,
+                    id: String(artist.id),
+                    imageId: String(artist.id),
                     imageUrl: null,
                     name: artist.name,
                     userFavorite: Boolean(artist.starred) || false,

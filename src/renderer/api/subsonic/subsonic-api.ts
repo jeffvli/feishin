@@ -98,12 +98,12 @@ export const contract = c.router({
             200: ssType._response.getArtist,
         },
     },
-    getArtistInfo: {
+    getArtistInfo2: {
         method: 'GET',
-        path: 'getArtistInfo.view',
+        path: 'getArtistInfo2.view',
         query: ssType._parameters.artistInfo,
         responses: {
-            200: ssType._response.artistInfo,
+            200: ssType._response.artistInfo2,
         },
     },
     getArtists: {
