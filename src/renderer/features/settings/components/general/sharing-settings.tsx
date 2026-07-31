@@ -24,31 +24,31 @@ export const SharingSettings = memo(() => {
     const unitOptions = useMemo(
         () => [
             {
-                label: t('setting.shareExpiration', { context: 'optionSecond' }),
+                label: t('datetime.secondLong'),
                 value: ShareExpirationUnit.SECOND,
             },
             {
-                label: t('setting.shareExpiration', { context: 'optionMinute' }),
+                label: t('datetime.minuteLong'),
                 value: ShareExpirationUnit.MINUTE,
             },
             {
-                label: t('setting.shareExpiration', { context: 'optionHour' }),
+                label: t('datetime.hourLong'),
                 value: ShareExpirationUnit.HOUR,
             },
             {
-                label: t('setting.shareExpiration', { context: 'optionDay' }),
+                label: t('datetime.dayLong'),
                 value: ShareExpirationUnit.DAY,
             },
             {
-                label: t('setting.shareExpiration', { context: 'optionWeek' }),
+                label: t('datetime.weekLong'),
                 value: ShareExpirationUnit.WEEK,
             },
             {
-                label: t('setting.shareExpiration', { context: 'optionMonth' }),
+                label: t('datetime.monthLong'),
                 value: ShareExpirationUnit.MONTH,
             },
             {
-                label: t('setting.shareExpiration', { context: 'optionYear' }),
+                label: t('datetime.yearLong'),
                 value: ShareExpirationUnit.YEAR,
             },
         ],
