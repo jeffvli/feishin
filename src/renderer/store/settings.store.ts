@@ -2758,20 +2758,10 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     }
                 }
 
-                if (version < 34) {
-                    if (state.general.shareExpiration === undefined) {
-                        state.general.shareExpiration = {
-                            amount: 1,
-                            unit: ShareExpirationUnit.YEAR,
-                            useServerDefault: false,
-                        };
-                    }
-                }
-
                 return persistedState;
             },
             name: 'store_settings',
-            version: 34,
+            version: 33,
         },
     ),
 );
