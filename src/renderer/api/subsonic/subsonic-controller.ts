@@ -979,9 +979,8 @@ export const SubsonicController: InternalControllerEndpoint = {
     getFavoriteSongs: async (args) => {
         const { apiClientProps, query } = args;
 
-        const type = query.type === 'favorite' ? 'favorite' : 'rating';
-
-        if (type === 'rating') {
+        // if user selects 'rating'
+        if (query.type === 'rating') {
             const res = await SubsonicController.getSongList({
                 apiClientProps,
                 query: {
@@ -1005,6 +1004,7 @@ export const SubsonicController: InternalControllerEndpoint = {
             };
         }
 
+        // else if user selects 'favorites'
         const res = await SubsonicController.getSongList({
             apiClientProps,
             query: {

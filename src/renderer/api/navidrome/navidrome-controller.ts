@@ -560,9 +560,8 @@ export const NavidromeController: InternalControllerEndpoint = {
     getFavoriteSongs: async (args) => {
         const { apiClientProps, query } = args;
 
-        const type = query.type === 'favorite' ? 'favorite' : 'rating';
-
-        if (type === 'rating') {
+        // if user selects 'rating'
+        if (query.type === 'rating') {
             const res = await NavidromeController.getSongList({
                 apiClientProps,
                 query: {
@@ -586,6 +585,7 @@ export const NavidromeController: InternalControllerEndpoint = {
             };
         }
 
+        // else if user selects 'favorite'
         const res = await NavidromeController.getSongList({
             apiClientProps,
             query: {
@@ -595,6 +595,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 startIndex: 0,
             },
         });
+
         const songsWithFavorite = orderBy(
             res.items.filter((song) => song.userFavorite),
             ['userFavorite', 'userRating', 'playCount', 'albumId', 'trackNumber'],
