@@ -164,8 +164,8 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
             isInitializedRef.current = false;
             hasPopulatedQueueRef.current = false;
         };
-        // Note: volume, speed, and transcode are intentionally not in dependencies.
-        // Volume and speed changes are handled by separate useEffects below to avoid
+        // Note: volume, speed, preservePitch, and transcode are intentionally not in dependencies.
+        // Volume speed, and preservePitch changes are handled by separate useEffects below to avoid
         // reinitializing the entire player. Transcode changes are handled by queue
         // update callbacks in usePlayerEvents.
         // reloadTrigger is included to allow manual reload via MPV_RELOAD event.
