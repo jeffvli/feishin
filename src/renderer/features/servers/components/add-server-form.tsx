@@ -204,7 +204,6 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 credential: data.credential,
                 id: nanoid(),
                 isAdmin: data.isAdmin,
-                issuerUrl: values.issuerUrl,
                 name: values.name,
                 type: values.type as ServerType,
                 url: values.url.replace(/\/$/, ''),
@@ -212,6 +211,9 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 username: data.username,
             };
 
+            if (isOAuth && data.issuerUrl) {
+                serverItem.issuerUrl = data.issuerUrl;
+            }
             if (isOAuth && data.accessToken) {
                 // Test API Access Token and store it in the server item if valid
                 serverItem.accessToken = data.accessToken;

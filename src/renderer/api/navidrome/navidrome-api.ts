@@ -376,7 +376,11 @@ axiosClient.interceptors.response.use(
         if (error.response && error.response.status === 401) {
             const currentServer = useAuthStore.getState().currentServer;
 
-            if (localSettings && currentServer?.savePassword) {
+            if (
+                localSettings &&
+                currentServer?.savePassword &&
+                currentServer?.authType === AuthType.BASIC
+            ) {
                 return localSettings
                     .passwordGet(currentServer.id)
                     .then(async (password: null | string) => {
@@ -463,7 +467,6 @@ axiosClient.interceptors.response.use(
             }
 
             if (currentServer?.authType === AuthType.OAUTH) {
-                console.log(error);
                 // If OAuth login, refresh access token or SSO login on expired refresh token.
                 try {
                     return refreshOAuth({

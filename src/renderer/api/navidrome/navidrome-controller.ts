@@ -174,6 +174,7 @@ export const NavidromeController: InternalControllerEndpoint = {
         return {
             accessToken: signinResponse.access_token,
             credential: '',
+            issuerUrl: signinResponse.profile.iss,
             userId: signinResponse.profile.sub,
             username: signinResponse.profile.sub,
         };

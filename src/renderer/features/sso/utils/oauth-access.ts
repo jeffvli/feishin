@@ -103,7 +103,7 @@ const createClientSettingsAndKey = (
     currentServer: ServerListItem,
 ): { clientSettings: OidcClientSettings; refreshTokenKey: string } => {
     if (!currentServer.issuerUrl || !currentServer.clientId || !currentServer.userId) {
-        throw new Error(i18n.t('error.ssoDetailsMissingError'));
+        throw new Error(i18n.t('error.invalidServer'));
     }
     const refreshTokenKey = formatRefreshTokenKey(
         currentServer.userId,

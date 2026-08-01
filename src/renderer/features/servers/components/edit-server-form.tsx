@@ -192,7 +192,6 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     credential: data.credential,
                     id: server.id,
                     isAdmin: data.isAdmin,
-                    issuerUrl: values.issuerUrl,
                     name: values.name,
                     type: values.type,
                     url: values.url,
@@ -204,7 +203,11 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     serverItem.ndCredential = data.ndCredential;
                 }
 
-                if (isOAuth && data.accessToken !== undefined) {
+                if (isOAuth && data.issuerUrl) {
+                    serverItem.issuerUrl = data.issuerUrl;
+                }
+
+                if (isOAuth && data.accessToken) {
                     // Test API Access Token and store it in the server item if valid
                     const testResponse = await api.controller.testOAuthAccessToken({
                         apiClientProps: { server: serverItem, serverId: serverItem.id },

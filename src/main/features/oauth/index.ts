@@ -32,8 +32,8 @@ ipcMain.handle(
     async (
         _event,
         refreshTokenKey: string,
-        audienceEndpoint: string,
         clientSettings: OidcClientSettings,
+        audienceEndpoint: string,
     ) => {
         return await refreshAccessToken(refreshTokenKey, clientSettings, audienceEndpoint);
     },

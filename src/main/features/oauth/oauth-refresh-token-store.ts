@@ -21,15 +21,14 @@ export const refreshAccessToken = async (
     clientSettings: OidcClientSettings,
     audienceEndpoint: string,
 ): Promise<null | string> => {
-    const client = new OidcClient(clientSettings);
-    const refreshToken = await getRefreshToken(refreshTokenKey);
-
-    if (!refreshToken) {
-        log.warn(`No refresh token found for server ${refreshTokenKey}.`);
-        return null;
-    }
-
     try {
+        const client = new OidcClient(clientSettings);
+        const refreshToken = await getRefreshToken(refreshTokenKey);
+
+        if (!refreshToken) {
+            log.warn(`No refresh token found for server ${refreshTokenKey}.`);
+            return null;
+        }
         const tokenResponse = await client.useRefreshToken({
             state: {
                 // Dummy values required but aren't used to refresh the access token
@@ -49,8 +48,8 @@ export const refreshAccessToken = async (
         }
         attachAccessTokenToAssetRequests(audienceEndpoint, tokenResponse.access_token);
         return tokenResponse.access_token;
-    } catch {
-        log.error('Failed to refresh access token');
+    } catch (error) {
+        log.error('Failed to refresh access token: ', error);
         return null;
     }
 };

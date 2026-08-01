@@ -248,6 +248,7 @@ export type AuthenticationResponse = {
     accessToken?: string;
     credential: string;
     isAdmin?: boolean;
+    issuerUrl?: string;
     ndCredential?: string;
     userId: null | string;
     username: string;
