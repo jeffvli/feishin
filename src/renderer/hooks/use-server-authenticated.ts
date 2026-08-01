@@ -136,19 +136,20 @@ export const useServerAuthenticated = () => {
                         userId: userInfo.id,
                     });
 
-                    const elapsedTime = Date.now() - authStartTime;
-                    const remainingDelay = Math.max(0, MIN_AUTH_DELAY_MS - elapsedTime);
-
-                    if (remainingDelay > 0) {
-                        await new Promise((resolve) => setTimeout(resolve, remainingDelay));
-                    }
-
+                    // Auth successful, attach access token for asset requests if using OAuth
                     if (serverWithAuth.authType === AuthType.OAUTH && serverWithAuth.accessToken) {
                         // Access token is valid, Need to attach for asset requests i.e images, audio
                         window.api.oauth.attachAccessTokenToRequests(
                             serverWithAuth.url,
                             serverWithAuth.accessToken,
                         );
+                    }
+
+                    const elapsedTime = Date.now() - authStartTime;
+                    const remainingDelay = Math.max(0, MIN_AUTH_DELAY_MS - elapsedTime);
+
+                    if (remainingDelay > 0) {
+                        await new Promise((resolve) => setTimeout(resolve, remainingDelay));
                     }
 
                     setReady(AuthState.VALID);

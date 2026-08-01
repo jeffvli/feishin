@@ -1,9 +1,11 @@
 import { safeStorage } from 'electron';
 import ElectronStore from 'electron-store';
-import { OidcClient, OidcClientSettings } from 'oidc-client-ts';
+import { discovery, None, refreshTokenGrant, tokenRevocation } from 'openid-client';
 
 import log from '../../logger';
 import { attachAccessTokenToAssetRequests } from './intercept_http_request';
+
+import { OAuthAuthenticationConfig } from '/@/shared/types/domain-types';
 
 const refreshTokenStore = new ElectronStore({
     name: 'refresh-tokens',
@@ -21,36 +23,29 @@ export const storeRefreshToken = async (key: string, refreshToken: string) => {
 
 export const refreshAccessToken = async (
     refreshTokenKey: string,
-    clientSettings: OidcClientSettings,
+    authConfig: OAuthAuthenticationConfig,
     audienceEndpoint: string,
 ): Promise<null | string> => {
     try {
-        const client = new OidcClient(clientSettings);
+        const config = await discovery(
+            new URL(authConfig.issuerUrl),
+            authConfig.clientId,
+            undefined,
+            None(),
+        );
         const refreshToken = await getRefreshToken(refreshTokenKey);
 
         if (!refreshToken) {
             log.warn(`No refresh token found for server ${refreshTokenKey}.`);
             return null;
         }
-        const tokenResponse = await client.useRefreshToken({
-            state: {
-                // Dummy values required but aren't used to refresh the access token
-                profile: {
-                    aud: '',
-                    exp: 0,
-                    iat: 0,
-                    iss: '',
-                    sub: 'user-sub',
-                },
-                refresh_token: refreshToken,
-                session_state: null,
-            },
-        });
-        if (!tokenResponse || !tokenResponse.access_token) {
+
+        const response = await refreshTokenGrant(config, refreshToken);
+        if (!response || !response.access_token) {
             return null;
         }
-        attachAccessTokenToAssetRequests(audienceEndpoint, tokenResponse.access_token);
-        return tokenResponse.access_token;
+        attachAccessTokenToAssetRequests(audienceEndpoint, response.access_token);
+        return response.access_token;
     } catch (error) {
         log.error('Failed to refresh access token: ', error);
         return null;
@@ -75,14 +70,21 @@ export const getRefreshToken = async (key: string): Promise<null | string> => {
     }
 };
 
-export const revokeRefreshToken = async (key: string, clientSettings: OidcClientSettings) => {
-    const client = new OidcClient(clientSettings);
+export const revokeRefreshToken = async (key: string, authConfig: OAuthAuthenticationConfig) => {
+    const config = await discovery(
+        new URL(authConfig.issuerUrl),
+        authConfig.clientId,
+        undefined,
+        None,
+    );
     const refreshToken = await getRefreshToken(key);
     if (!refreshToken) {
         log.warn(`No refresh token to revoke.`);
         return;
     }
-    await client.revokeToken(refreshToken, 'refresh_token').catch((error) => {
+    await tokenRevocation(config, refreshToken, {
+        token_type_hint: 'refresh_token',
+    }).catch((error) => {
         log.error('Failed to revoke refresh token:', error);
     });
     refreshTokenStore.delete(key);

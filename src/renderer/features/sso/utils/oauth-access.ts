@@ -1,19 +1,18 @@
-import { OidcClientSettings, SigninResponse } from 'oidc-client-ts';
-
 import i18n from '/@/i18n/i18n';
 import {
     IssuerDiscoveryResponse,
-    OAuthRedirectScheme,
+    OAuthAuthenticationConfig,
+    OAuthLoginResponse,
     ServerListItem,
 } from '/@/shared/types/domain-types';
 import { formatRefreshTokenKey } from '/@/shared/utils/oauth-format-refresh-token-key';
 
 export const reauthenticateOAuth = async (
     currentServer: ServerListItem,
-): Promise<SigninResponse> => {
-    const { clientSettings } = createClientSettingsAndKey(currentServer);
+): Promise<OAuthLoginResponse> => {
+    const { authConfig } = createConfigAndRefreshTokenKey(currentServer);
 
-    const signinResponse = await signinSSO(clientSettings, currentServer.url);
+    const signinResponse = await signinSSO(authConfig, currentServer.url);
     return signinResponse;
 };
 
@@ -21,30 +20,26 @@ export const handleInitialOAuth = async (
     url: string,
     clientId: string,
     issuerUrl?: string,
-): Promise<SigninResponse> => {
+): Promise<OAuthLoginResponse> => {
     const issuerDetails: IssuerDiscoveryResponse = await getIssuerDetails(url, issuerUrl);
 
     if (!issuerDetails.issuer || !issuerDetails.metadataEndpoint) {
         throw new Error(i18n.t('error.ssoDiscoveryFailureError'));
     }
 
-    const clientSettings: OidcClientSettings = {
-        authority: issuerDetails.issuer,
-        client_id: clientId,
-        metadataUrl: issuerDetails.metadataEndpoint,
-        redirect_uri: `${OAuthRedirectScheme}://callback`,
-        response_type: 'code',
-        scope: 'openid profile email',
+    const authConfig: OAuthAuthenticationConfig = {
+        clientId: clientId,
+        issuerUrl: issuerDetails.issuer,
     };
 
-    return signinSSO(clientSettings, url);
+    return signinSSO(authConfig, url);
 };
 
 // Setups a listener for callback and errors events from main process
-function onOauthCallback(): Promise<SigninResponse> {
-    return new Promise<SigninResponse>((resolve, reject) => {
-        window.api.oauth.oauthCallback((signinResponse) => {
-            resolve(signinResponse);
+function onOauthCallback(): Promise<OAuthLoginResponse> {
+    return new Promise<OAuthLoginResponse>((resolve, reject) => {
+        window.api.oauth.oauthCallback((loginResponse: OAuthLoginResponse) => {
+            resolve(loginResponse);
         });
 
         window.api.oauth.oauthCallbackError(() => {
@@ -54,18 +49,18 @@ function onOauthCallback(): Promise<SigninResponse> {
 }
 
 export const signinSSO = async (
-    clientSettings: OidcClientSettings,
+    authConfig: OAuthAuthenticationConfig,
     audienceEndpoint: string,
-): Promise<SigninResponse> => {
-    const signinResponse = onOauthCallback();
+): Promise<OAuthLoginResponse> => {
+    const tokenResponse = onOauthCallback();
 
     // Hands off to main process to open the external browser for SSO login
-    await window.api.oauth.login(clientSettings, audienceEndpoint);
+    await window.api.oauth.login(authConfig, audienceEndpoint);
 
-    if (!signinResponse) {
+    if (!tokenResponse) {
         throw new Error(i18n.t('error.ssoError'));
     }
-    return signinResponse;
+    return tokenResponse;
 };
 
 const getIssuerDetails = async (
@@ -81,11 +76,11 @@ const getIssuerDetails = async (
 };
 
 export const refreshAccessToken = async (currentServer: ServerListItem): Promise<string> => {
-    const { clientSettings, refreshTokenKey } = createClientSettingsAndKey(currentServer);
+    const { authConfig, refreshTokenKey } = createConfigAndRefreshTokenKey(currentServer);
 
     const access_token = await window.api.oauth.refreshAccessToken(
         refreshTokenKey,
-        clientSettings,
+        authConfig,
         currentServer.url,
     );
     if (!access_token) {
@@ -95,13 +90,13 @@ export const refreshAccessToken = async (currentServer: ServerListItem): Promise
 };
 
 export const revokeRefreshToken = async (currentServer: ServerListItem): Promise<void> => {
-    const { clientSettings, refreshTokenKey } = createClientSettingsAndKey(currentServer);
-    await window.api.oauth.revokeRefreshToken(refreshTokenKey, clientSettings);
+    const { authConfig, refreshTokenKey } = createConfigAndRefreshTokenKey(currentServer);
+    await window.api.oauth.revokeRefreshToken(refreshTokenKey, authConfig);
 };
 
-const createClientSettingsAndKey = (
+const createConfigAndRefreshTokenKey = (
     currentServer: ServerListItem,
-): { clientSettings: OidcClientSettings; refreshTokenKey: string } => {
+): { authConfig: OAuthAuthenticationConfig; refreshTokenKey: string } => {
     if (!currentServer.issuerUrl || !currentServer.clientId || !currentServer.userId) {
         throw new Error(i18n.t('error.invalidServer'));
     }
@@ -110,12 +105,9 @@ const createClientSettingsAndKey = (
         currentServer.issuerUrl,
         currentServer.clientId,
     );
-    const clientSettings: OidcClientSettings = {
-        authority: currentServer.issuerUrl,
-        client_id: currentServer.clientId,
-        redirect_uri: `${OAuthRedirectScheme}://callback`,
-        response_type: 'code',
-        scope: 'openid profile email',
+    const authConfig: OAuthAuthenticationConfig = {
+        clientId: currentServer.clientId,
+        issuerUrl: currentServer.issuerUrl,
     };
-    return { clientSettings, refreshTokenKey };
+    return { authConfig, refreshTokenKey };
 };

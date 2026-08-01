@@ -22,6 +22,7 @@ import {
     DeletePlaylistImageArgs,
     DeletePlaylistImageResponse,
     InternalControllerEndpoint,
+    OAuthLoginResponse,
     playlistListSortMap,
     PlaylistSongListArgs,
     PlaylistSongListResponse,
@@ -169,14 +170,22 @@ export const NavidromeController: InternalControllerEndpoint = {
         const cleanServerUrl = url.replace(/\/$/, '');
         const cleanIssuerUrl = issuerUrl?.replace(/\/$/, '');
 
-        const signinResponse = await handleInitialOAuth(cleanServerUrl, clientId, cleanIssuerUrl);
-
+        const loginResponse: OAuthLoginResponse = await handleInitialOAuth(
+            cleanServerUrl,
+            clientId,
+            cleanIssuerUrl,
+        );
+        const accessToken = loginResponse.accessToken;
+        const claims = loginResponse.claims;
+        if (!claims || !claims.sub || !claims.iss) {
+            throw new Error('Failed to get claims from token response');
+        }
         return {
-            accessToken: signinResponse.access_token,
+            accessToken: accessToken,
             credential: '',
-            issuerUrl: signinResponse.profile.iss,
-            userId: signinResponse.profile.sub,
-            username: signinResponse.profile.sub,
+            issuerUrl: claims.iss,
+            userId: claims.sub,
+            username: claims.sub,
         };
     },
     createFavorite: SubsonicController.createFavorite,

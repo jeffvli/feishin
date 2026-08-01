@@ -24,13 +24,13 @@ export const SSOModal = ({
         const server = useAuthStore.getState().currentServer;
         if (server) {
             setIsLoading(true);
-            const signinResponse = await reauthenticateOAuth(server);
+            const loginResponse = await reauthenticateOAuth(server);
 
-            if (!signinResponse || !signinResponse.access_token) {
+            if (!loginResponse || !loginResponse.accessToken) {
                 toast.error({ message: t('error.ssoError') });
             }
 
-            server.accessToken = signinResponse.access_token;
+            server.accessToken = loginResponse.accessToken;
             closeModal(id);
         } else {
             toast.error({ message: t('error.invalidServer') });

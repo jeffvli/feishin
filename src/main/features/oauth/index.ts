@@ -1,5 +1,4 @@
 import { ipcMain } from 'electron';
-import { CreateSigninRequestArgs, OidcClient, OidcClientSettings } from 'oidc-client-ts';
 
 import { autoDiscoverIssuerFromServerUrl as autoDiscoverIssuerUrl } from './oauth-oidc-wellknown-discovery';
 import { refreshAccessToken, revokeRefreshToken } from './oauth-refresh-token-store';
@@ -7,17 +6,12 @@ import { refreshAccessToken, revokeRefreshToken } from './oauth-refresh-token-st
 import { attachAccessTokenToAssetRequests } from '/@/main/features/oauth/intercept_http_request';
 import { oauthLogin } from '/@/main/features/oauth/oauth-login';
 import { discoverIssuer } from '/@/main/features/oauth/oauth-oidc-discover-issuer';
+import { OAuthAuthenticationConfig } from '/@/shared/types/domain-types';
 
 ipcMain.handle(
     'oauth:login',
-    async (
-        _event,
-        clientSettings: OidcClientSettings,
-        audienceEndpoint: string,
-        signinArgs: CreateSigninRequestArgs,
-    ) => {
-        const oidcClient = new OidcClient(clientSettings);
-        await oauthLogin(oidcClient, audienceEndpoint, signinArgs);
+    async (_event, authConfig: OAuthAuthenticationConfig, audienceEndpoint: string) => {
+        await oauthLogin(authConfig, audienceEndpoint);
     },
 );
 
@@ -32,17 +26,17 @@ ipcMain.handle(
     async (
         _event,
         refreshTokenKey: string,
-        clientSettings: OidcClientSettings,
+        authConfig: OAuthAuthenticationConfig,
         audienceEndpoint: string,
     ) => {
-        return await refreshAccessToken(refreshTokenKey, clientSettings, audienceEndpoint);
+        return await refreshAccessToken(refreshTokenKey, authConfig, audienceEndpoint);
     },
 );
 
 ipcMain.handle(
     'oauth:revoke-refresh-token',
-    async (_event, serverId: string, clientSettings: OidcClientSettings) => {
-        await revokeRefreshToken(serverId, clientSettings);
+    async (_event, refreshTokenKey: string, authConfig: OAuthAuthenticationConfig) => {
+        await revokeRefreshToken(refreshTokenKey, authConfig);
     },
 );
 

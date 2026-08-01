@@ -7,6 +7,7 @@ import {
 } from '/@/renderer/features/sso/utils/oauth-access';
 import { openSsoModal } from '/@/renderer/features/sso/utils/open-sso-modal';
 import { ServerListItem } from '/@/shared/types/domain-types';
+
 export const refreshOAuth = async ({
     axiosClient,
     config,
@@ -30,11 +31,11 @@ export const refreshOAuth = async ({
             // Try to prompt OIDC flow
             openSsoModal(true);
             return reauthenticateOAuth(currentServer)
-                .then((signinResponse) => {
-                    if (!signinResponse) {
+                .then((loginResponse) => {
+                    if (!loginResponse) {
                         throw new Error(i18n.t('error.ssoError'));
                     }
-                    const accessToken = signinResponse.access_token;
+                    const accessToken = loginResponse.accessToken;
                     config.headers['Authorization'] = `Bearer ${accessToken}`;
                     return axiosClient.request(config);
                 })

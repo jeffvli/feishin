@@ -1,8 +1,10 @@
 import { ipcRenderer } from 'electron';
-import { CreateSigninRequestArgs, OidcClientSettings, SigninResponse } from 'oidc-client-ts';
 
-import { IssuerDiscoveryResponse } from '../shared/types/domain-types';
-
+import {
+    IssuerDiscoveryResponse,
+    OAuthAuthenticationConfig,
+    OAuthLoginResponse,
+} from '../shared/types/domain-types';
 export const oauth = {
     attachAccessTokenToRequests: (audienceEndpoint: string, accessToken: string): void => {
         ipcRenderer.invoke('oauth:attach-token', audienceEndpoint, accessToken);
@@ -19,15 +21,11 @@ export const oauth = {
             callback();
         });
     },
-    login: (
-        clientSettings: OidcClientSettings,
-        audienceEndpoint: string,
-        signinArgs: CreateSigninRequestArgs = {},
-    ): Promise<SigninResponse> =>
-        ipcRenderer.invoke('oauth:login', clientSettings, audienceEndpoint, signinArgs),
-    oauthCallback: (callback: (signinResponse: SigninResponse) => void): void => {
-        ipcRenderer.on('oauth:callback', (_event, signinResponse: SigninResponse) => {
-            callback(signinResponse);
+    login: (authConfig: OAuthAuthenticationConfig, audienceEndpoint: string) =>
+        ipcRenderer.invoke('oauth:login', authConfig, audienceEndpoint),
+    oauthCallback: (callback: (loginResponse: OAuthLoginResponse) => void): void => {
+        ipcRenderer.on('oauth:callback', (_event, loginResponse: OAuthLoginResponse) => {
+            callback(loginResponse);
         });
     },
     oauthCallbackError: (callback: () => void): void => {
@@ -36,14 +34,14 @@ export const oauth = {
         });
     },
     refreshAccessToken: (
-        serverId: string,
-        clientSettings: OidcClientSettings,
+        refreshTokenKey: string,
+        authConfig: OAuthAuthenticationConfig,
         audienceEndpoint: string,
     ): Promise<null | string> =>
         ipcRenderer.invoke(
             'oauth:refresh-access-token',
-            serverId,
-            clientSettings,
+            refreshTokenKey,
+            authConfig,
             audienceEndpoint,
         ),
     removeOAuthListeners: (): void => {
@@ -51,6 +49,9 @@ export const oauth = {
         ipcRenderer.removeAllListeners('oauth:callback');
         ipcRenderer.removeAllListeners('oauth:endLogin');
     },
-    revokeRefreshToken: (serverId: string, clientSettings: OidcClientSettings): Promise<void> =>
-        ipcRenderer.invoke('oauth:revoke-refresh-token', serverId, clientSettings),
+    revokeRefreshToken: (
+        refreshTokenKey: string,
+        authConfig: OAuthAuthenticationConfig,
+    ): Promise<void> =>
+        ipcRenderer.invoke('oauth:revoke-refresh-token', refreshTokenKey, authConfig),
 };

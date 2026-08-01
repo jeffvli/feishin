@@ -1,29 +1,42 @@
 import { app, ipcMain, shell } from 'electron';
 import path from 'node:path';
-import { CreateSigninRequestArgs, OidcClient } from 'oidc-client-ts';
+import * as openid from 'openid-client';
 
 import { attachAccessTokenToAssetRequests } from './intercept_http_request';
 
 import { storeRefreshToken } from '/@/main/features/oauth/oauth-refresh-token-store';
 import { getMainWindow } from '/@/main/index';
 import log from '/@/main/logger';
-import { OAuthRedirectScheme } from '/@/shared/types/domain-types';
+import {
+    OAuthAuthenticationConfig,
+    OAuthLoginResponse,
+    OAuthRedirectScheme,
+} from '/@/shared/types/domain-types';
 import { formatRefreshTokenKey } from '/@/shared/utils/oauth-format-refresh-token-key';
 
 const gotLock = app.requestSingleInstanceLock();
+const CALLBACK_ENDING = '://oauth2/callback';
+const AUTH_CALLBACK_URL = `${OAuthRedirectScheme}${CALLBACK_ENDING}`;
+const DEFAULT_SCOPES = 'openid profile email';
+const DEFAULT_CODE_CHALLENGE_METHOD = 'S256';
 
 export const oauthLogin = async (
-    oidcClient: OidcClient,
+    authConfig: OAuthAuthenticationConfig,
     audienceEndpoint: string,
-    signinArgs: CreateSigninRequestArgs,
 ) => {
-    const client = oidcClient;
     log.info('Creating OIDC/OAuth2 signin request');
     try {
-        const url = await setupAuthorizeUrl(client, signinArgs);
+        const code_verifier = openid.randomPKCECodeVerifier();
+        const { authUrl, config, nonce, state } = await makeAuthorizationUrl(
+            authConfig,
+            code_verifier,
+        );
         const { endOAuthLogin, openUrlListener, secondInstanceListener } = createFunctions(
-            client,
+            config,
+            code_verifier,
             audienceEndpoint,
+            state,
+            nonce,
         );
 
         // Set up listeners for the OIDC/OAuth2 callback URL
@@ -32,7 +45,7 @@ export const oauthLogin = async (
         ipcMain.once('oauth:cancel-sso-login', endOAuthLogin);
 
         // Open the authorization URL in an external browser
-        await shell.openExternal(url);
+        await shell.openExternal(authUrl.href);
         // Show button to cancel SSO login in the main window
         getMainWindow()?.webContents.send('oauth:external-page-opened');
     } catch (error) {
@@ -42,21 +55,39 @@ export const oauthLogin = async (
     }
 };
 
-const setupAuthorizeUrl = async (client: OidcClient, signinArgs: CreateSigninRequestArgs) => {
-    const signinRequest = await client.createSigninRequest(signinArgs);
-
-    if (!signinRequest) {
-        throw new Error('Failed to create OIDC/OAuth2 signin request');
+const makeAuthorizationUrl = async (
+    authConfig: OAuthAuthenticationConfig,
+    code_verifier: string,
+) => {
+    const issuerUrl = new URL(authConfig.issuerUrl);
+    const clientId = authConfig.clientId;
+    const config: openid.Configuration = await openid.discovery(
+        issuerUrl,
+        clientId,
+        undefined,
+        openid.None(),
+    );
+    if (!config) {
+        throw new Error('Failed to discover OIDC/OAuth2 issuer configuration');
     }
 
-    const url = signinRequest.url;
-    log.info(`Opening OIDC/OAuth2 login URL`);
+    const code_challenge = await openid.calculatePKCECodeChallenge(code_verifier);
+    const parameters: Record<string, string> = {
+        code_challenge: code_challenge,
+        code_challenge_method: DEFAULT_CODE_CHALLENGE_METHOD,
+        nonce: openid.randomNonce(),
+        redirect_uri: AUTH_CALLBACK_URL,
+        scope: DEFAULT_SCOPES,
+        state: openid.randomState(),
+    };
+    const authUrl = openid.buildAuthorizationUrl(config, parameters);
+    log.info(`Created authorization login URL`);
 
+    // Setup app callback protocol
     if (!gotLock) {
         throw new Error('Failed to acquire single instance lock for OIDC/OAuth2 callback handling');
     }
 
-    // Setup app callback protocol
     if (process.defaultApp) {
         // In development mode, the app is run with `electron .` and not packaged
         app.setAsDefaultProtocolClient(OAuthRedirectScheme, process.execPath, [
@@ -65,17 +96,23 @@ const setupAuthorizeUrl = async (client: OidcClient, signinArgs: CreateSigninReq
     } else {
         app.setAsDefaultProtocolClient(OAuthRedirectScheme);
     }
-    return url;
+    return { authUrl, config, nonce: parameters.nonce, state: parameters.state };
 };
 
-const createFunctions = (client: OidcClient, audienceEndpoint: string) => {
+const createFunctions = (
+    config: openid.Configuration,
+    code_verifier: string,
+    audienceEndpoint: string,
+    state: string,
+    nonce: string,
+) => {
     const openUrlListener = async (_event: Electron.Event, url: string) => {
-        if (url.startsWith(`${OAuthRedirectScheme}://`)) {
+        if (url.startsWith(AUTH_CALLBACK_URL)) {
             processSigninResponse(url);
         }
     };
     const secondInstanceListener = async (_event: Electron.Event, argv: string[]) => {
-        const url = argv.find((arg) => arg.startsWith(`${OAuthRedirectScheme}://`));
+        const url = argv.find((arg) => arg.startsWith(AUTH_CALLBACK_URL));
         if (url) {
             processSigninResponse(url);
         }
@@ -84,18 +121,26 @@ const createFunctions = (client: OidcClient, audienceEndpoint: string) => {
     const processSigninResponse = async (url: string) => {
         log.info(`Received OIDC/OAuth2 callback URL`);
         try {
-            const signinResponse = await client.processSigninResponse(url);
-            log.info('Successfully processed OIDC/OAuth2 signin response');
-            if (signinResponse.refresh_token) {
+            const tokenResponse = await getTokens(config, url, code_verifier, state, nonce);
+            const claims = tokenResponse.claims();
+            if (!claims || !claims.sub || !claims.iss)
+                throw new Error('Failed to get claims from token response');
+
+            if (tokenResponse.refresh_token) {
                 const identifier = formatRefreshTokenKey(
-                    signinResponse.profile.sub,
-                    signinResponse.profile.iss,
-                    client.settings.client_id,
+                    claims.sub,
+                    claims.iss,
+                    config.clientMetadata().client_id,
                 );
-                await storeRefreshToken(identifier, signinResponse.refresh_token);
+                await storeRefreshToken(identifier, tokenResponse.refresh_token);
             }
-            attachAccessTokenToAssetRequests(audienceEndpoint, signinResponse.access_token);
-            getMainWindow()?.webContents.send('oauth:callback', signinResponse);
+            attachAccessTokenToAssetRequests(audienceEndpoint, tokenResponse.access_token);
+
+            const response: OAuthLoginResponse = {
+                accessToken: tokenResponse.access_token,
+                claims: claims,
+            };
+            getMainWindow()?.webContents.send('oauth:callback', response);
             endOAuthLogin();
         } catch (error) {
             log.error('Failed to process OIDC/OAuth2 signin response:', error);
@@ -116,4 +161,21 @@ const createFunctions = (client: OidcClient, audienceEndpoint: string) => {
         processSigninResponse,
         secondInstanceListener,
     };
+};
+
+const getTokens = async (
+    config: openid.Configuration,
+    url: string,
+    code_verifier: string,
+    state: string,
+    nonce: string,
+) => {
+    const callbackUrl = new URL(url);
+    const tokenResponse: openid.TokenEndpointResponse & openid.TokenEndpointResponseHelpers =
+        await openid.authorizationCodeGrant(config, callbackUrl, {
+            expectedNonce: nonce,
+            expectedState: state,
+            pkceCodeVerifier: code_verifier,
+        });
+    return tokenResponse;
 };

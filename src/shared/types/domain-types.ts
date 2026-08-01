@@ -1,3 +1,5 @@
+import { IDToken } from 'openid-client';
+
 import {
     JFAlbumArtistListSort,
     JFAlbumListSort,
@@ -1927,6 +1929,16 @@ export type MoveItemQuery = {
     playlistId: string;
     startingIndex: number;
     trackId: string;
+};
+
+export type OAuthAuthenticationConfig = {
+    clientId: string;
+    issuerUrl: string;
+};
+
+export type OAuthLoginResponse = {
+    accessToken: string;
+    claims: IDToken;
 };
 
 export type ReplaceApiClientProps<T> = BaseEndpointArgsWithServer & Omit<T, 'apiClientProps'>;
