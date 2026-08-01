@@ -137,6 +137,17 @@ const UpdatePlaylistContextModal = (props: any) => (
         <LazyUpdatePlaylistContextModal {...props} />
     </Suspense>
 );
+const LazySSOModal = lazy(() =>
+    import('/@/renderer/features/sso/components/sso-modal').then((module) => ({
+        default: module.SSOModal,
+    })),
+);
+
+const SSOModal = (props: any) => (
+    <Suspense fallback={<Spinner container />}>
+        <LazySSOModal {...props} />
+    </Suspense>
+);
 
 const LazyShareItemContextModal = lazy(() =>
     import('/@/renderer/features/sharing/components/share-item-context-modal').then((module) => ({
@@ -185,6 +196,7 @@ const appRouterModals = {
     settings: SettingsContextModal,
     shareItem: ShareItemContextModal,
     shuffleAll: ShuffleAllContextModal,
+    sso: SSOModal,
     updatePlaylist: UpdatePlaylistContextModal,
     visualizerSettings: VisualizerSettingsContextModal,
 };

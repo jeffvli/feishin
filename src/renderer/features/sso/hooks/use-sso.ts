@@ -12,6 +12,7 @@ export const useSSO = (
 
     useEffect(() => {
         const pageOpened = () => {
+            setIsLoading(true);
             externalSSOPageOpenRef.current = true;
             setExternalSSOPageOpen(true);
         };

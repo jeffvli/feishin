@@ -29,7 +29,7 @@ export const oauthLogin = async (
         // Set up listeners for the OIDC/OAuth2 callback URL
         app.once('open-url', openUrlListener);
         app.once('second-instance', secondInstanceListener);
-        ipcMain.handleOnce('oauth:cancel-sso-login', endOAuthLogin);
+        ipcMain.once('oauth:cancel-sso-login', endOAuthLogin);
 
         // Open the authorization URL in an external browser
         await shell.openExternal(url);
@@ -105,7 +105,7 @@ const createFunctions = (client: OidcClient, audienceEndpoint: string) => {
     };
 
     const endOAuthLogin = () => {
-        ipcMain.removeHandler('oauth:cancel-sso-login');
+        ipcMain.removeListener('oauth:cancel-sso-login', endOAuthLogin);
         app.removeListener('open-url', openUrlListener);
         app.removeListener('second-instance', secondInstanceListener);
         getMainWindow()?.webContents.send('oauth:endLogin');

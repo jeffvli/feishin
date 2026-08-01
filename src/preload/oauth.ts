@@ -10,7 +10,7 @@ export const oauth = {
     autoDiscoverIssuerUrl: (url: string): Promise<IssuerDiscoveryResponse> =>
         ipcRenderer.invoke('oauth:auto-discover-issuer-url', url),
     cancelSSOLogin: (): void => {
-        ipcRenderer.invoke('oauth:cancel-sso-login');
+        ipcRenderer.send('oauth:cancel-sso-login');
     },
     discoverIssuer: (url: string): Promise<IssuerDiscoveryResponse> =>
         ipcRenderer.invoke('oauth:discover', url),

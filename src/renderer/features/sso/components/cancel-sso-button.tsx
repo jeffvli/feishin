@@ -22,7 +22,7 @@ export const CancelSSOLoginButton = ({
 
     return externalSSOPageOpen ? (
         <ModalButton disabled={!externalSSOPageOpen} onClick={cancelSSOLogin} variant="default">
-            {t('form.sso.cancelSignIn')}
+            {t('form.addServer.cancelSSO')}
         </ModalButton>
     ) : null;
 };

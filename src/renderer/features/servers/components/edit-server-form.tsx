@@ -214,7 +214,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     });
                     if (!testResponse) {
                         return toast.error({
-                            message: t('error.ssoAuthenticationFailed'),
+                            message: t('error.ssoError'),
                         });
                     }
                     serverItem.accessToken = data.accessToken;
