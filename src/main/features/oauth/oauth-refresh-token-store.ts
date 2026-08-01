@@ -1,10 +1,13 @@
 import { safeStorage } from 'electron';
+import ElectronStore from 'electron-store';
 import { OidcClient, OidcClientSettings } from 'oidc-client-ts';
 
 import log from '../../logger';
 import { attachAccessTokenToAssetRequests } from './intercept_http_request';
 
-import { store } from '/@/main/features/core/settings';
+const refreshTokenStore = new ElectronStore({
+    name: 'refresh-tokens',
+});
 
 export const storeRefreshToken = async (key: string, refreshToken: string) => {
     if (!safeStorage.isEncryptionAvailable()) {
@@ -13,7 +16,7 @@ export const storeRefreshToken = async (key: string, refreshToken: string) => {
     }
 
     const encryptedToken = safeStorage.encryptString(refreshToken);
-    store.set(key, encryptedToken.toString('base64'));
+    refreshTokenStore.set(key, encryptedToken.toString('base64'));
 };
 
 export const refreshAccessToken = async (
@@ -56,7 +59,7 @@ export const refreshAccessToken = async (
 
 export const getRefreshToken = async (key: string): Promise<null | string> => {
     try {
-        const encryptedToken = store.get(key);
+        const encryptedToken = refreshTokenStore.get(key);
         if (!encryptedToken) {
             log.warn(`No refresh token found for server.`);
             return null;
@@ -82,5 +85,5 @@ export const revokeRefreshToken = async (key: string, clientSettings: OidcClient
     await client.revokeToken(refreshToken, 'refresh_token').catch((error) => {
         log.error('Failed to revoke refresh token:', error);
     });
-    store.delete(key);
+    refreshTokenStore.delete(key);
 };
