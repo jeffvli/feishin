@@ -54,7 +54,7 @@ const getSubsonicImageRequest = ({
     const imageSize = size;
     const url = baseUrl || getServerUrl(server);
 
-    if (!url || !server?.credential) {
+    if (!url || (!server?.credential && !server?.accessToken)) {
         return null;
     }
 

@@ -13,7 +13,7 @@ import JellyfinIcon from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeIcon from '/@/renderer/features/servers/assets/navidrome.png';
 import SubsonicIcon from '/@/renderer/features/servers/assets/opensubsonic.png';
 import { IgnoreCorsSslSwitches } from '/@/renderer/features/servers/components/ignore-cors-ssl-switches';
-import { useSSO } from '/@/renderer/hooks/use-sso';
+import { CancelSSOLoginButton } from '/@/renderer/features/sso/components/cancel-sso-button';
 import { useAuthStoreActions, useServerList } from '/@/renderer/store';
 import { Accordion } from '/@/shared/components/accordion/accordion';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
@@ -115,16 +115,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const { addServer, setCurrentServer } = useAuthStoreActions();
     const serverList = useServerList();
     const { servers: discovered } = useAutodiscovery();
-    const { cancelSSOLogin, externalSSOPageOpen, externalSSOPageOpenRef } = useSSO(setIsLoading);
     const serverLock = isServerLock();
-    useEffect(() => {
-        const externalSSOPageOpen = externalSSOPageOpenRef.current;
-        return () => {
-            if (externalSSOPageOpen) {
-                cancelSSOLogin(); // Clean up SSO if component unmounts while SSO is in progress
-            }
-        };
-    }, [cancelSSOLogin, externalSSOPageOpenRef]);
 
     const form = useForm({
         initialValues: {
@@ -184,9 +175,9 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 authFunction = api.controller.authenticateOAuth;
                 data = await authFunction?.(
                     values.url,
-                    values.issuerUrl,
                     values.clientId,
                     values.type as ServerType,
+                    values.issuerUrl,
                 );
             } else {
                 authFunction = api.controller.authenticate;
@@ -220,6 +211,19 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 userId: data.userId,
                 username: data.username,
             };
+
+            if (isOAuth && data.accessToken) {
+                // Test API Access Token and store it in the server item if valid
+                serverItem.accessToken = data.accessToken;
+                const testResponse = await api.controller.testOAuthAccessToken({
+                    apiClientProps: { server: serverItem, serverId: serverItem.id },
+                });
+                if (!testResponse) {
+                    return toast.error({
+                        message: t('error.ssoAuthenticationFailed'),
+                    });
+                }
+            }
 
             if (values.preferInstantMix !== undefined) {
                 serverItem.preferInstantMix = values.preferInstantMix;
@@ -448,13 +452,9 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             <Divider />
                         </>
                     )}
-                    {externalSSOPageOpen && (
-                        <ModalButton onClick={cancelSSOLogin} variant="default">
-                            {t('form.addServer.cancelSSO')}
-                        </ModalButton>
-                    )}
+                    <CancelSSOLoginButton setIsLoading={setIsLoading} />
                     <Group grow justify="flex-end">
-                        {onCancel && !externalSSOPageOpen && (
+                        {onCancel && isLoading && isOAuth && (
                             <ModalButton onClick={onCancel}>{t('common.cancel')}</ModalButton>
                         )}
                         <ModalButton

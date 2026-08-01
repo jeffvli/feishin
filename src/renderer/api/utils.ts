@@ -33,6 +33,36 @@ export const authenticationFailure = (currentServer: null | ServerListItem, mess
         store.actions.logout();
     } else {
         store.actions.updateServer(serverId, {
+            accessToken: undefined,
+            credential: '',
+            ndCredential: undefined,
+            savePassword: false,
+        });
+    }
+};
+
+export const authenticateOAuthFailure = (
+    currentServer: null | ServerListItem,
+    message?: string,
+) => {
+    const store = useAuthStore.getState();
+    const serverId = currentServer?.id ?? store.currentServer?.id;
+
+    toast.error({
+        id: AUTH_FAILURE_TOAST_ID,
+        message: message ?? (i18n.t('error.ssoReauthenticationError') as string),
+    });
+
+    if (!serverId) {
+        return;
+    }
+
+    console.error('SSO reauthentication could not be completed');
+    if (store.currentServer) {
+        store.actions.logout();
+    } else {
+        store.actions.updateServer(serverId, {
+            accessToken: undefined,
             credential: '',
             ndCredential: undefined,
             savePassword: false,

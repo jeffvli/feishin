@@ -24,7 +24,8 @@ const ActionRequiredRoute = () => {
     const { t } = useTranslation();
     const currentServer = useCurrentServerWithCredential();
     const isServerRequired = !currentServer;
-    const isCredentialRequired = currentServer && !currentServer.credential;
+    const isCredentialRequired =
+        currentServer && !currentServer.credential && !currentServer.accessToken;
 
     const isLoginRequired = isServerLock() && !currentServer;
 

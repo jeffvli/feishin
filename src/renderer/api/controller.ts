@@ -235,8 +235,8 @@ export const controller: GeneralController = {
     authenticate(url, body, type) {
         return apiController('authenticate', type)(url, body);
     },
-    authenticateOAuth(url, issuerUrl, clientId, type) {
-        return apiController('authenticateOAuth', type)!(url, issuerUrl, clientId);
+    authenticateOAuth(url, clientId, type, issuerUrl) {
+        return apiController('authenticateOAuth', type)!(url, clientId, issuerUrl);
     },
     createFavorite(args) {
         const server = getServerById(args.apiClientProps.serverId);
@@ -1071,6 +1071,17 @@ export const controller: GeneralController = {
         return apiController(
             'startLibraryScan',
             server.type,
+        )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
+    },
+    testOAuthAccessToken(args) {
+        const serverType = args.apiClientProps.server?.type;
+        const server = args.apiClientProps.server;
+        if (!server) {
+            throw new Error(`${i18n.t('error.apiRouteError')}: testOAuthAccessToken`);
+        }
+        return apiController(
+            'testOAuthAccessToken',
+            serverType,
         )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
     },
     updateInternetRadioStation(args) {

@@ -4,7 +4,8 @@ import qs from 'qs';
 import { z } from 'zod';
 
 import i18n from '/@/i18n/i18n';
-import { authenticationFailure } from '/@/renderer/api/utils';
+import { authenticateOAuthFailure, authenticationFailure } from '/@/renderer/api/utils';
+import { refreshOAuth } from '/@/renderer/api/utils-refresh-oauth';
 import { useAuthStore } from '/@/renderer/store';
 import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
 import { ssType } from '/@/shared/api/subsonic/subsonic-types';
@@ -12,6 +13,7 @@ import { hasFeature } from '/@/shared/api/utils';
 import { toast } from '/@/shared/components/toast/toast';
 import { ServerListItemWithCredential } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
+import { AuthType } from '/@/shared/types/types';
 
 const SUBSONIC_AUTH_ERROR_CODE = 40;
 
@@ -396,7 +398,9 @@ axiosClient.interceptors.response.use(
             // Suppress code related to non-linked lastfm or spotify from Navidrome
             if (data['subsonic-response'].error.code !== 0) {
                 const currentServer = useAuthStore.getState().currentServer;
-                const isAuthenticated = Boolean(currentServer?.credential);
+                const isAuthenticated = Boolean(
+                    currentServer?.credential || currentServer?.accessToken,
+                );
                 const errorCode = data['subsonic-response'].error.code;
                 const errorMessage = data['subsonic-response'].error.message as string | undefined;
                 // Servers may return code as string ("40") — coerce before comparing
@@ -420,6 +424,28 @@ axiosClient.interceptors.response.use(
         return response;
     },
     (error) => {
+        if (error.response && error.response.status === 401) {
+            const currentServer = useAuthStore.getState().currentServer;
+            if (currentServer?.authType === AuthType.OAUTH) {
+                // If OAuth login, refresh access token or SSO login on expired refresh token.
+                try {
+                    return refreshOAuth({
+                        axiosClient,
+                        config: error.config,
+                        currentServer,
+                    });
+                } catch (newError: any) {
+                    console.error('Error when trying to refresh OAuth: ', newError);
+                    if (isAxiosError(error) && error.code === 'ERR_NETWORK') {
+                        console.warn(
+                            'Network error during authentication - preserving credentials',
+                        );
+                    } else {
+                        authenticateOAuthFailure(currentServer);
+                    }
+                }
+            }
+        }
         return Promise.reject(error);
     },
 );
@@ -486,7 +512,7 @@ export const ssApiClient = (args: {
 
     return initClient(contract, {
         api: async ({ body, headers, method, path, rawQuery }) => {
-            if (server && !server.credential) {
+            if (server && !server.credential && !server.accessToken) {
                 throw new Error('Not authenticated');
             }
 
@@ -499,8 +525,13 @@ export const ssApiClient = (args: {
                 const serverUrl = getServerUrl(server, forceRemoteUrl);
                 baseUrl = serverUrl ? `${serverUrl}/rest` : undefined;
                 const token = server.credential;
+
                 const params = token.split(/&?\w=/gm);
 
+                const accessToken = server?.accessToken;
+                if (accessToken) {
+                    headers['Authorization'] = `Bearer ${accessToken}`;
+                }
                 authParams.u = decodeURIComponent(server.username);
                 if (params?.length === 4) {
                     authParams.s = params[2];

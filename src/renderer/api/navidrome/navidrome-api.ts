@@ -7,6 +7,7 @@ import qs from 'qs';
 
 import i18n from '/@/i18n/i18n';
 import { authenticationFailure } from '/@/renderer/api/utils';
+import { refreshOAuth } from '/@/renderer/api/utils-refresh-oauth';
 import { useAuthStore } from '/@/renderer/store';
 import { logger } from '/@/renderer/utils/logger';
 import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
@@ -14,6 +15,7 @@ import { ndType } from '/@/shared/api/navidrome/navidrome-types';
 import { resultWithHeaders } from '/@/shared/api/utils';
 import { toast } from '/@/shared/components/toast/toast';
 import { ServerListItemWithCredential } from '/@/shared/types/domain-types';
+import { AuthType } from '/@/shared/types/types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
@@ -460,6 +462,20 @@ axiosClient.interceptors.response.use(
                     });
             }
 
+            if (currentServer?.authType === AuthType.OAUTH) {
+                console.log(error);
+                // If OAuth login, refresh access token or SSO login on expired refresh token.
+                try {
+                    return refreshOAuth({
+                        axiosClient,
+                        config: error.config,
+                        currentServer,
+                    });
+                } catch (newError: any) {
+                    console.error('Error when trying to refresh OAuth: ', newError);
+                }
+            }
+
             if (isAxiosError(error) && error.code === 'ERR_NETWORK') {
                 logger.warn('Network error during authentication - preserving credentials');
             } else {
@@ -483,6 +499,7 @@ export const ndApiClient = (args: {
         api: async ({ body, headers, method, path }) => {
             let baseUrl: string | undefined;
             let token: string | undefined;
+            let accessToken: string | undefined;
 
             const { params, path: api } = parsePath(path);
 
@@ -490,6 +507,10 @@ export const ndApiClient = (args: {
                 const serverUrl = getServerUrl(server, forceRemoteUrl);
                 baseUrl = serverUrl ? `${serverUrl}/api` : undefined;
                 token = server?.ndCredential;
+                accessToken = server?.accessToken;
+                if (accessToken) {
+                    headers['Authorization'] = `Bearer ${accessToken}`;
+                }
             } else {
                 baseUrl = url;
             }

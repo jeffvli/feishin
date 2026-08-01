@@ -86,11 +86,11 @@ export interface SavedCollection {
 
 export type ServerListItem = {
     authType: AuthType;
-    clientId: string;
+    clientId?: string;
     features?: ServerFeatures;
     id: string;
     isAdmin?: boolean;
-    issuerUrl: string;
+    issuerUrl?: string;
     musicFolderId?: string[];
     name: string;
     preferInstantMix?: boolean;
@@ -1570,9 +1570,9 @@ export type ControllerEndpoint = {
     ) => Promise<AuthenticationResponse>;
     authenticateOAuth?: (
         url: string,
-        issuerUrl: string,
         clientId: string,
         type: ServerType,
+        issuerUrl?: string,
     ) => Promise<AuthenticationResponse>;
     createFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
     createInternetRadioStation: (
@@ -1644,6 +1644,7 @@ export type ControllerEndpoint = {
     setRating?: (args: SetRatingArgs) => Promise<RatingResponse>;
     shareItem?: (args: ShareItemArgs) => Promise<ShareItemResponse>;
     startLibraryScan: (args: StartLibraryScanArgs) => Promise<StartLibraryScanResponse>;
+    testOAuthAccessToken?: (args: TestOAuthAccessTokenArgs) => Promise<boolean>;
     updateInternetRadioStation: (
         args: UpdateInternetRadioStationArgs,
     ) => Promise<UpdateInternetRadioStationResponse>;
@@ -1713,8 +1714,8 @@ export type InternalControllerEndpoint = {
     ) => Promise<AuthenticationResponse>;
     authenticateOAuth?: (
         url: string,
-        issuerUrl: string,
         clientId: string,
+        issuerUrl?: string,
     ) => Promise<AuthenticationResponse>;
     createFavorite: (args: ReplaceApiClientProps<FavoriteArgs>) => Promise<FavoriteResponse>;
     createInternetRadioStation: (
@@ -1833,6 +1834,9 @@ export type InternalControllerEndpoint = {
     startLibraryScan: (
         args: ReplaceApiClientProps<StartLibraryScanArgs>,
     ) => Promise<StartLibraryScanResponse>;
+    testOAuthAccessToken?: (
+        args: ReplaceApiClientProps<TestOAuthAccessTokenArgs>,
+    ) => Promise<boolean>;
     updateInternetRadioStation: (
         args: ReplaceApiClientProps<UpdateInternetRadioStationArgs>,
     ) => Promise<UpdateInternetRadioStationResponse>;
@@ -2019,6 +2023,8 @@ export type TagListResponse = {
     };
     tags?: Tag[];
 };
+
+export type TestOAuthAccessTokenArgs = BaseEndpointArgs;
 
 export type TranscodeDecisionArgs = BaseEndpointArgs & {
     body?: TranscodeDecisionRequestBody;

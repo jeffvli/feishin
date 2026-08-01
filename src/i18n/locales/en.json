@@ -344,7 +344,6 @@
     },
     "form": {
         "addServer": {
-            "cancelSSO": "Cancel Sign-in with SSO",
             "error_savePassword": "An error occurred when trying to save the password",
             "ignoreCors": "Ignore CORS ($t(common.restartRequired))",
             "ignoreSsl": "Ignore SSL ($t(common.restartRequired))",
@@ -1575,5 +1574,10 @@
                 "z": "Z"
             }
         }
+    },
+    "sso": {
+        "modalTitle": "Sign-in again with SSO",
+        "modalDescription": "You are being redirected to your SSO provider to log in. After logging in, you will be redirected back to the application.",
+        "cancelSignIn": "Cancel Sign-in with SSO"
     }
 }

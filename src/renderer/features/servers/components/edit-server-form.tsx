@@ -1,11 +1,11 @@
 import { closeAllModals } from '@mantine/modals';
 import isElectron from 'is-electron';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
-import { useSSO } from '/@/renderer/hooks/use-sso';
+import { CancelSSOLoginButton } from '/@/renderer/features/sso/components/cancel-sso-button';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { getServerById, useAuthStoreActions } from '/@/renderer/store';
 import { Accordion } from '/@/shared/components/accordion/accordion';
@@ -61,16 +61,6 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
     const { setCurrentServer, updateServer } = useAuthStoreActions();
     const focusTrapRef = useFocusTrap();
     const [isLoading, setIsLoading] = useState(false);
-    const { cancelSSOLogin, externalSSOPageOpen, externalSSOPageOpenRef } = useSSO(setIsLoading);
-
-    useEffect(() => {
-        const externalSSOPageOpen = externalSSOPageOpenRef.current;
-        return () => {
-            if (externalSSOPageOpen) {
-                cancelSSOLogin(); // Clean up SSO if component unmounts while SSO is in progress
-            }
-        };
-    }, [cancelSSOLogin, externalSSOPageOpenRef]);
 
     const form = useForm({
         initialValues: {
@@ -106,24 +96,32 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
             const passwordProvided = values.password && values.password.trim() !== '';
             const urlChanged = values.url !== server.url;
             const typeChanged = values.type !== server.type;
-            const authTypeChanged = values.authType !== server.authType;
-            const clientIDChanged = values.clientId !== server.clientId;
+            const clientIDChanged =
+                values.clientId !== server.clientId &&
+                values.clientId?.trim() !== '' &&
+                server.clientId;
             const issuerUrlChanged = values.issuerUrl !== server.issuerUrl;
 
             // Skip authentication if username hasn't changed, password is empty, and URL/type haven't changed
             const canSkipAuth =
+                server.authType === AuthType.BASIC &&
+                isBasicAuth &&
                 !usernameChanged &&
                 !passwordProvided &&
                 !urlChanged &&
-                !typeChanged &&
-                !authTypeChanged &&
+                !typeChanged;
+
+            const canSkipOAuth =
+                server.authType === AuthType.OAUTH &&
+                isOAuth &&
                 !clientIDChanged &&
-                !issuerUrlChanged;
+                !issuerUrlChanged &&
+                !urlChanged;
 
             let data: AuthenticationResponse | undefined;
             let serverItem: ServerListItemWithCredential;
 
-            if (canSkipAuth) {
+            if (canSkipAuth || canSkipOAuth) {
                 // Use existing server credentials
                 const existingServer = getServerById(server.id);
                 if (!existingServer) {
@@ -157,12 +155,17 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 }
 
                 if (isOAuth) {
+                    if (!values.clientId) {
+                        return toast.error({
+                            message: t('error.invalidServer'),
+                        });
+                    }
                     authFunction = api.controller.authenticateOAuth;
                     data = await authFunction?.(
                         values.url,
-                        values.issuerUrl,
                         values.clientId,
                         values.type as ServerType,
+                        values.issuerUrl,
                     );
                 } else {
                     authFunction = api.controller.authenticate;
@@ -201,7 +204,16 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     serverItem.ndCredential = data.ndCredential;
                 }
 
-                if (data.accessToken !== undefined) {
+                if (isOAuth && data.accessToken !== undefined) {
+                    // Test API Access Token and store it in the server item if valid
+                    const testResponse = await api.controller.testOAuthAccessToken({
+                        apiClientProps: { server: serverItem, serverId: serverItem.id },
+                    });
+                    if (!testResponse) {
+                        return toast.error({
+                            message: t('error.ssoAuthenticationFailed'),
+                        });
+                    }
                     serverItem.accessToken = data.accessToken;
                 }
             }
@@ -423,13 +435,10 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     />
                 )}
                 <Group justify="flex-end">
-                    {!externalSSOPageOpen ? (
+                    {isLoading && isOAuth && (
                         <ModalButton onClick={onCancel}>{t('common.cancel')}</ModalButton>
-                    ) : (
-                        <ModalButton onClick={cancelSSOLogin} variant="default">
-                            {t('form.addServer.cancelSSO')}
-                        </ModalButton>
                     )}
+                    <CancelSSOLoginButton setIsLoading={setIsLoading} />
                     <ModalButton loading={isLoading} type="submit" variant="filled">
                         {t('common.save')}
                     </ModalButton>

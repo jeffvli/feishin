@@ -163,7 +163,9 @@ export const ServerSelectorItems = () => {
             <DropdownMenu.Label>{t('page.appMenu.selectServer')}</DropdownMenu.Label>
             {Object.values(serverList).map((server) => {
                 const isNavidromeExpired =
-                    server.type === ServerType.NAVIDROME && !server.ndCredential;
+                    server.type === ServerType.NAVIDROME &&
+                    !server.ndCredential &&
+                    !server.accessToken;
                 const isJellyfinExpired = server.type === ServerType.JELLYFIN && !server.credential;
                 const isSubsonicExpired = server.type === ServerType.SUBSONIC && !server.credential;
                 const isSessionExpired =

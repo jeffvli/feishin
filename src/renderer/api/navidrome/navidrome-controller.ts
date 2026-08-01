@@ -2,10 +2,11 @@ import axios from 'axios';
 import { set } from 'idb-keyval';
 import orderBy from 'lodash/orderBy';
 
+import { handleInitialOAuth } from '../../features/sso/utils/oauth-access';
+
 import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
 import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
 import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
-import { handleOAuth } from '/@/renderer/api/utils-oidc';
 import { ndNormalize } from '/@/shared/api/navidrome/navidrome-normalize';
 import { NDRadioListSort, NDSongListSort } from '/@/shared/api/navidrome/navidrome-types';
 import { ssNormalize } from '/@/shared/api/subsonic/subsonic-normalize';
@@ -164,19 +165,17 @@ export const NavidromeController: InternalControllerEndpoint = {
             username: res.body.data.username,
         };
     },
-    authenticateOAuth: async (url, issuerUrl, clientId): Promise<AuthenticationResponse> => {
+    authenticateOAuth: async (url, clientId, issuerUrl?): Promise<AuthenticationResponse> => {
         const cleanServerUrl = url.replace(/\/$/, '');
+        const cleanIssuerUrl = issuerUrl?.replace(/\/$/, '');
 
-        const signinResponse = await handleOAuth(cleanServerUrl, issuerUrl, clientId);
+        const signinResponse = await handleInitialOAuth(cleanServerUrl, clientId, cleanIssuerUrl);
 
         return {
             accessToken: signinResponse.access_token,
             credential: '',
             userId: signinResponse.profile.sub,
-            username:
-                signinResponse.profile.preferred_username ||
-                signinResponse.profile.name ||
-                signinResponse.profile.sub,
+            username: signinResponse.profile.sub,
         };
     },
     createFavorite: SubsonicController.createFavorite,
@@ -1255,6 +1254,15 @@ export const NavidromeController: InternalControllerEndpoint = {
         };
     },
     startLibraryScan: SubsonicController.startLibraryScan,
+    testOAuthAccessToken: async (args) => {
+        const { apiClientProps } = args;
+        const ping = await ssApiClient(apiClientProps).ping();
+
+        if (ping.status !== 200) {
+            throw new Error('Failed to ping server');
+        }
+        return true;
+    },
     updateInternetRadioStation: async (args) => {
         const { apiClientProps, body, query } = args;
 

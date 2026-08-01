@@ -7,12 +7,15 @@ import { isServerLock } from '/@/renderer/features/action-required/utils/window-
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAuthStore, useAuthStoreActions } from '/@/renderer/store';
 import { ServerType } from '/@/shared/types/domain-types';
+import { AuthType } from '/@/shared/types/types';
 
 export const AppOutlet = () => {
     const currentServer = useAuthStore(
         (state) =>
             state.currentServer
                 ? {
+                      accessToken: state.currentServer.accessToken,
+                      authType: state.currentServer.authType,
                       credential: state.currentServer.credential,
                       id: state.currentServer.id,
                       ndCredential: state.currentServer.ndCredential,
@@ -35,10 +38,16 @@ export const AppOutlet = () => {
         return configuredUrl !== persistedUrl;
     }, [currentServer]);
 
+    const isBasicAuth = currentServer?.authType === AuthType.BASIC;
+
+    const missingBasicAuthCredentials =
+        isBasicAuth &&
+        (!currentServer?.credential ||
+            (currentServer?.type === ServerType.NAVIDROME && !currentServer?.ndCredential));
+    const missingOAuthCredentials = !isBasicAuth && !currentServer?.accessToken;
+
     const hasMissingCredentials = Boolean(
-        currentServer &&
-        (!currentServer.credential ||
-            (currentServer.type === ServerType.NAVIDROME && !currentServer.ndCredential)),
+        currentServer && (missingBasicAuthCredentials || missingOAuthCredentials),
     );
 
     useEffect(() => {
