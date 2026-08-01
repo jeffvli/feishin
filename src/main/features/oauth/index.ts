@@ -4,14 +4,20 @@ import { CreateSigninRequestArgs, OidcClient, OidcClientSettings } from 'oidc-cl
 import { autoDiscoverIssuerFromServerUrl as autoDiscoverIssuerUrl } from './oauth-oidc-wellknown-discovery';
 import { refreshAccessToken, revokeRefreshToken } from './oauth-refresh-token-store';
 
+import { attachAccessTokenToAssetRequests } from '/@/main/features/oauth/intercept_http_request';
 import { oauthLogin } from '/@/main/features/oauth/oauth-login';
 import { discoverIssuer } from '/@/main/features/oauth/oauth-oidc-discover-issuer';
 
 ipcMain.handle(
     'oauth:login',
-    async (_event, clientSettings: OidcClientSettings, signinArgs: CreateSigninRequestArgs) => {
+    async (
+        _event,
+        clientSettings: OidcClientSettings,
+        audienceEndpoint: string,
+        signinArgs: CreateSigninRequestArgs,
+    ) => {
         const oidcClient = new OidcClient(clientSettings);
-        await oauthLogin(oidcClient, signinArgs);
+        await oauthLogin(oidcClient, audienceEndpoint, signinArgs);
     },
 );
 
@@ -23,8 +29,13 @@ ipcMain.handle('oauth:auto-discover-issuer-url', autoDiscoverIssuerUrl);
 
 ipcMain.handle(
     'oauth:refresh-access-token',
-    async (_event, serverId: string, clientSettings: OidcClientSettings) => {
-        return await refreshAccessToken(serverId, clientSettings);
+    async (
+        _event,
+        refreshTokenKey: string,
+        audienceEndpoint: string,
+        clientSettings: OidcClientSettings,
+    ) => {
+        return await refreshAccessToken(refreshTokenKey, clientSettings, audienceEndpoint);
     },
 );
 
@@ -34,3 +45,7 @@ ipcMain.handle(
         await revokeRefreshToken(serverId, clientSettings);
     },
 );
+
+ipcMain.handle('oauth:attach-token', (_event, audienceEndpoint: string, accessToken: string) => {
+    attachAccessTokenToAssetRequests(audienceEndpoint, accessToken);
+});

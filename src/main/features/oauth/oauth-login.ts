@@ -2,6 +2,8 @@ import { app, ipcMain, shell } from 'electron';
 import path from 'node:path';
 import { CreateSigninRequestArgs, OidcClient } from 'oidc-client-ts';
 
+import { attachAccessTokenToAssetRequests } from './intercept_http_request';
+
 import { storeRefreshToken } from '/@/main/features/oauth/oauth-refresh-token-store';
 import { getMainWindow } from '/@/main/index';
 import log from '/@/main/logger';
@@ -10,12 +12,19 @@ import { formatRefreshTokenKey } from '/@/shared/utils/oauth-format-refresh-toke
 
 const gotLock = app.requestSingleInstanceLock();
 
-export const oauthLogin = async (oidcClient: OidcClient, signinArgs: CreateSigninRequestArgs) => {
+export const oauthLogin = async (
+    oidcClient: OidcClient,
+    audienceEndpoint: string,
+    signinArgs: CreateSigninRequestArgs,
+) => {
     const client = oidcClient;
     log.info('Creating OIDC/OAuth2 signin request');
     try {
         const url = await setupAuthorizeUrl(client, signinArgs);
-        const { endOAuthLogin, openUrlListener, secondInstanceListener } = createFunctions(client);
+        const { endOAuthLogin, openUrlListener, secondInstanceListener } = createFunctions(
+            client,
+            audienceEndpoint,
+        );
 
         // Set up listeners for the OIDC/OAuth2 callback URL
         app.once('open-url', openUrlListener);
@@ -59,7 +68,7 @@ const setupAuthorizeUrl = async (client: OidcClient, signinArgs: CreateSigninReq
     return url;
 };
 
-const createFunctions = (client: OidcClient) => {
+const createFunctions = (client: OidcClient, audienceEndpoint: string) => {
     const openUrlListener = async (_event: Electron.Event, url: string) => {
         if (url.startsWith(`${OAuthRedirectScheme}://`)) {
             processSigninResponse(url);
@@ -85,6 +94,7 @@ const createFunctions = (client: OidcClient) => {
                 );
                 await storeRefreshToken(identifier, signinResponse.refresh_token);
             }
+            attachAccessTokenToAssetRequests(audienceEndpoint, signinResponse.access_token);
             getMainWindow()?.webContents.send('oauth:callback', signinResponse);
             endOAuthLogin();
         } catch (error) {

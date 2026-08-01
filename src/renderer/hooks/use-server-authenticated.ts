@@ -11,7 +11,7 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { getServerById, useAuthStoreActions, useCurrentServerId } from '/@/renderer/store';
 import { logger } from '/@/renderer/utils/logger';
 import { toast } from '/@/shared/components/toast/toast';
-import { AuthState } from '/@/shared/types/types';
+import { AuthState, AuthType } from '/@/shared/types/types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
@@ -68,6 +68,7 @@ export const useServerAuthenticated = () => {
                 // First, try getUserInfo to check if current credentials are still valid
                 logger.info('Authenticating server', {
                     method: 'getUserInfo',
+                    serverAuthType: serverWithAuth.authType,
                     serverId: serverWithAuth.id,
                     serverName: serverWithAuth.name,
                     serverType: serverWithAuth.type,
@@ -140,6 +141,14 @@ export const useServerAuthenticated = () => {
 
                     if (remainingDelay > 0) {
                         await new Promise((resolve) => setTimeout(resolve, remainingDelay));
+                    }
+
+                    if (serverWithAuth.authType === AuthType.OAUTH && serverWithAuth.accessToken) {
+                        // Access token is valid, Need to attach for asset requests i.e images, audio
+                        window.api.oauth.attachAccessTokenToRequests(
+                            serverWithAuth.url,
+                            serverWithAuth.accessToken,
+                        );
                     }
 
                     setReady(AuthState.VALID);

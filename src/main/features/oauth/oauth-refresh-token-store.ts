@@ -2,6 +2,7 @@ import { safeStorage } from 'electron';
 import { OidcClient, OidcClientSettings } from 'oidc-client-ts';
 
 import log from '../../logger';
+import { attachAccessTokenToAssetRequests } from './intercept_http_request';
 
 import { store } from '/@/main/features/core/settings';
 
@@ -16,14 +17,15 @@ export const storeRefreshToken = async (key: string, refreshToken: string) => {
 };
 
 export const refreshAccessToken = async (
-    serverId: string,
+    refreshTokenKey: string,
     clientSettings: OidcClientSettings,
+    audienceEndpoint: string,
 ): Promise<null | string> => {
     const client = new OidcClient(clientSettings);
-    const refreshToken = await getRefreshToken(serverId);
+    const refreshToken = await getRefreshToken(refreshTokenKey);
 
     if (!refreshToken) {
-        log.warn(`No refresh token found for server ${serverId}.`);
+        log.warn(`No refresh token found for server ${refreshTokenKey}.`);
         return null;
     }
 
@@ -45,6 +47,7 @@ export const refreshAccessToken = async (
         if (!tokenResponse || !tokenResponse.access_token) {
             return null;
         }
+        attachAccessTokenToAssetRequests(audienceEndpoint, tokenResponse.access_token);
         return tokenResponse.access_token;
     } catch {
         log.error('Failed to refresh access token');
