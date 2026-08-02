@@ -2,20 +2,21 @@ import { closeModal, ContextModalProps } from '@mantine/modals';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { onOauthCallback, reloginOIDC } from '../utils/oidc-reauth-refresh';
+
 import { CancelSSOLoginButton } from '/@/renderer/features/sso/components/cancel-sso-button';
-import { onOauthCallback, reauthenticateOAuth } from '/@/renderer/features/sso/utils/oauth-access';
 import { useAuthStoreActions } from '/@/renderer/store';
 import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
-import { OAuthLoginResponse, ServerListItem } from '/@/shared/types/domain-types';
+import { OIDCLoginResponse, ServerListItem } from '/@/shared/types/domain-types';
 
 export const SSOModal = ({
     id,
     innerProps,
 }: ContextModalProps<{
-    onSuccess?: (response: OAuthLoginResponse) => void;
+    onSuccess?: (response: OIDCLoginResponse) => void;
     server: ServerListItem;
 }>) => {
     const { t } = useTranslation();
@@ -26,7 +27,7 @@ export const SSOModal = ({
     const retrySSOLogin = async () => {
         if (server) {
             setIsLoading(true);
-            const loginResponse = await reauthenticateOAuth(server);
+            const loginResponse = await reloginOIDC(server);
 
             if (!loginResponse || !loginResponse.accessToken) {
                 toast.error({ message: t('error.ssoError') });
@@ -53,7 +54,7 @@ export const SSOModal = ({
         handleOAuthCallback();
         const server = innerProps.server;
         if (server) {
-            reauthenticateOAuth(server);
+            reloginOIDC(server);
         }
     }, [id, innerProps]);
 

@@ -2,7 +2,7 @@ import { BrowserWindow } from 'electron';
 
 import { IssuerDiscoveryResponse } from '../../../shared/types/domain-types';
 import log from '../../logger';
-import { discoverIssuer } from './oauth-oidc-discover-issuer';
+import { discoverIssuer } from './oidc-discover-issuer';
 
 const DISCOVERY_TIMEOUT = 5 * 1000; //5 seconds
 
@@ -14,6 +14,7 @@ export const autoDiscoverIssuerFromServerUrl = async (
     log.info(`Auto-discovering OIDC configuration for URL: ${url}`);
 
     return new Promise((resolve, reject) => {
+        log.info('Checking URL');
         const checkURL = async (_event, url: string) => {
             const configResponse = await discoverIssuer(url);
             if (configResponse.issuer && configResponse.metadataEndpoint) {
@@ -23,7 +24,6 @@ export const autoDiscoverIssuerFromServerUrl = async (
                 reject(new Error('Could not auto-discover OIDC/OAuth2 configuration.'));
             }
         };
-        log.info('loading url');
         discoveryWindow.webContents.on('did-navigate', checkURL);
         discoveryWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription) => {
             log.error(`URL could not be loaded: ${errorDescription} (Error code: ${errorCode})`);

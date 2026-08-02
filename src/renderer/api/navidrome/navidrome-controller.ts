@@ -2,7 +2,7 @@ import axios from 'axios';
 import { set } from 'idb-keyval';
 import orderBy from 'lodash/orderBy';
 
-import { handleInitialOAuth } from '../../features/sso/utils/oauth-access';
+import { initalOIDCLogin } from '../../features/sso/utils/oidc-reauth-refresh';
 
 import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
 import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
@@ -22,7 +22,7 @@ import {
     DeletePlaylistImageArgs,
     DeletePlaylistImageResponse,
     InternalControllerEndpoint,
-    OAuthLoginResponse,
+    OIDCLoginResponse,
     playlistListSortMap,
     PlaylistSongListArgs,
     PlaylistSongListResponse,
@@ -166,11 +166,11 @@ export const NavidromeController: InternalControllerEndpoint = {
             username: res.body.data.username,
         };
     },
-    authenticateOAuth: async (url, clientId, issuerUrl?): Promise<AuthenticationResponse> => {
+    authenticateOIDC: async (url, clientId, issuerUrl?): Promise<AuthenticationResponse> => {
         const cleanServerUrl = url.replace(/\/$/, '');
         const cleanIssuerUrl = issuerUrl?.replace(/\/$/, '');
 
-        const loginResponse: OAuthLoginResponse = await handleInitialOAuth(
+        const loginResponse: OIDCLoginResponse = await initalOIDCLogin(
             cleanServerUrl,
             clientId,
             cleanIssuerUrl,

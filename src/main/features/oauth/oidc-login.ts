@@ -3,14 +3,14 @@ import path from 'node:path';
 import * as openid from 'openid-client';
 
 import { attachAccessTokenToAssetRequests } from './intercept_http_request';
+import { storeRefreshToken } from './refresh-token-store';
 
-import { storeRefreshToken } from '/@/main/features/oauth/oauth-refresh-token-store';
 import { getMainWindow } from '/@/main/index';
 import log from '/@/main/logger';
 import {
     OAuthAuthenticationConfig,
-    OAuthLoginResponse,
     OAuthRedirectScheme,
+    OIDCLoginResponse,
 } from '/@/shared/types/domain-types';
 import { formatRefreshTokenKey } from '/@/shared/utils/oauth-format-refresh-token-key';
 
@@ -20,7 +20,7 @@ const AUTH_CALLBACK_URL = `${OAuthRedirectScheme}${CALLBACK_ENDING}`;
 const DEFAULT_SCOPES = 'openid profile email';
 const DEFAULT_CODE_CHALLENGE_METHOD = 'S256';
 
-export const oauthLogin = async (
+export const oidcLogin = async (
     authConfig: OAuthAuthenticationConfig,
     audienceEndpoint: string,
 ) => {
@@ -31,7 +31,7 @@ export const oauthLogin = async (
             authConfig,
             code_verifier,
         );
-        const { endOAuthLogin, openUrlListener, secondInstanceListener } = createFunctions(
+        const { endSSOLogin, openUrlListener, secondInstanceListener } = createFunctions(
             config,
             code_verifier,
             audienceEndpoint,
@@ -42,7 +42,7 @@ export const oauthLogin = async (
         // Set up listeners for the OIDC/OAuth2 callback URL
         app.once('open-url', openUrlListener);
         app.once('second-instance', secondInstanceListener);
-        ipcMain.once('oauth:cancel-sso-login', endOAuthLogin);
+        ipcMain.once('oauth:cancel-sso-login', endSSOLogin);
 
         // Open the authorization URL in an external browser
         await shell.openExternal(authUrl.href);
@@ -136,27 +136,30 @@ const createFunctions = (
             }
             attachAccessTokenToAssetRequests(audienceEndpoint, tokenResponse.access_token);
 
-            const response: OAuthLoginResponse = {
+            const response: OIDCLoginResponse = {
                 accessToken: tokenResponse.access_token,
                 claims: claims,
             };
+            log.info(
+                'Successfully processed OIDC/OAuth2 signin response, sending to renderer process',
+            );
             getMainWindow()?.webContents.send('oauth:callback', response);
-            endOAuthLogin();
+            endSSOLogin();
         } catch (error) {
             log.error('Failed to process OIDC/OAuth2 signin response:', error);
             getMainWindow()?.webContents.send('oauth:endLogin');
-            endOAuthLogin();
+            endSSOLogin();
         }
     };
 
-    const endOAuthLogin = () => {
-        ipcMain.removeListener('oauth:cancel-sso-login', endOAuthLogin);
+    const endSSOLogin = () => {
+        ipcMain.removeListener('oauth:cancel-sso-login', endSSOLogin);
         app.removeListener('open-url', openUrlListener);
         app.removeListener('second-instance', secondInstanceListener);
         getMainWindow()?.webContents.send('oauth:endLogin');
     };
     return {
-        endOAuthLogin,
+        endSSOLogin,
         openUrlListener,
         processSigninResponse,
         secondInstanceListener,

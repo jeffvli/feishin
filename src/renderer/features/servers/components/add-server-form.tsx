@@ -161,7 +161,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             return;
         }
 
-        let authFunction = isOAuth ? api.controller.authenticateOAuth : api.controller.authenticate;
+        let authFunction = isOAuth ? api.controller.authenticateOIDC : api.controller.authenticate;
         if (!authFunction) {
             return toast.error({
                 message: t('error.invalidServer'),
@@ -172,7 +172,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             setIsLoading(true);
             let data: AuthenticationResponse | undefined;
             if (isOAuth) {
-                authFunction = api.controller.authenticateOAuth;
+                authFunction = api.controller.authenticateOIDC;
                 data = await authFunction?.(
                     values.url,
                     values.clientId,

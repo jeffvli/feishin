@@ -9,22 +9,21 @@ export async function discoverIssuer(url: string): Promise<IssuerDiscoveryRespon
     issuerURL.pathname = issuerURL.pathname.replace(/\/$/, '');
     const wellKnownUrls = [
         `${issuerURL.origin}/.well-known/openid-configuration`,
-        `${issuerURL.origin}/.well-known/oauth-authorization-server`,
+        `${issuerURL.origin}`,
     ];
     if (issuerURL.pathname !== '') {
         wellKnownUrls.push(
             // RFC 8414 convetions for paths
             `${issuerURL.origin}${issuerURL.pathname}/.well-known/openid-configuration`,
-            `${issuerURL.origin}/.well-known/oauth-authorization-server${issuerURL.pathname}`,
         );
     }
-    console.info(`Attempting to discover OIDC/OAuth2 metadata`);
     for (const wellKnownUrl of wellKnownUrls) {
         try {
+            // Attempt to fetch the well-known configuration
             const res = await fetch(wellKnownUrl);
             if (res.ok && res.headers.get('content-type')?.includes('application/json')) {
+                // Parse the JSON response and return the issuer and metadata endpoint
                 const jsonResponse: issuerMetadata = await res.json();
-                console.info(`Successfully discovered OIDC/OAuth2 metadata`);
                 return formatIssuerDiscoveryResponse(jsonResponse, wellKnownUrl);
             }
         } catch {

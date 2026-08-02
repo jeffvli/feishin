@@ -1,11 +1,11 @@
 import { openContextModal } from '@mantine/modals';
 import { t } from 'i18next';
 
-import { OAuthLoginResponse } from '/@/shared/types/domain-types';
+import { OIDCLoginResponse } from '/@/shared/types/domain-types';
 
 export const openSsoModal = (
     server: any,
-    onSSOSuccess: (response: OAuthLoginResponse) => void,
+    onSSOSuccess: (response: OIDCLoginResponse) => void,
     onClose?: () => void,
 ) => {
     openContextModal({

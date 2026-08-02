@@ -1571,7 +1571,7 @@ export type ControllerEndpoint = {
         url: string,
         body: { legacy?: boolean; password: string; username: string },
     ) => Promise<AuthenticationResponse>;
-    authenticateOAuth?: (
+    authenticateOIDC?: (
         url: string,
         clientId: string,
         type: ServerType,
@@ -1715,7 +1715,7 @@ export type InternalControllerEndpoint = {
         url: string,
         body: { legacy?: boolean; password: string; username: string },
     ) => Promise<AuthenticationResponse>;
-    authenticateOAuth?: (
+    authenticateOIDC?: (
         url: string,
         clientId: string,
         issuerUrl?: string,
@@ -1936,7 +1936,7 @@ export type OAuthAuthenticationConfig = {
     issuerUrl: string;
 };
 
-export type OAuthLoginResponse = {
+export type OIDCLoginResponse = {
     accessToken: string;
     claims: IDToken;
 };

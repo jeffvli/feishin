@@ -1,8 +1,9 @@
+import { refreshAccessToken } from '../features/sso/utils/oidc-reauth-refresh';
+
 import i18n from '/@/i18n/i18n';
-import { refreshAccessToken } from '/@/renderer/features/sso/utils/oauth-access';
 import { openSsoModal } from '/@/renderer/features/sso/utils/open-sso-modal';
 import { logger } from '/@/renderer/utils/logger';
-import { OAuthLoginResponse, ServerListItem } from '/@/shared/types/domain-types';
+import { OIDCLoginResponse, ServerListItem } from '/@/shared/types/domain-types';
 
 export const refreshOAuth = async (currentServer: ServerListItem): Promise<string> => {
     // Try to refresh the access token first, if that fails, try to reauthenticate via SSO flow.
@@ -17,7 +18,7 @@ export const refreshOAuth = async (currentServer: ServerListItem): Promise<strin
         .catch((accessTokenError) => {
             logger.error('Error when trying to refresh access token: ', accessTokenError);
             // Prompt OIDC flow to reauthenticate the user via SSO modal
-            return new Promise<null | OAuthLoginResponse>((resolve, reject) => {
+            return new Promise<null | OIDCLoginResponse>((resolve, reject) => {
                 openSsoModal(
                     currentServer,
                     (tokenResponse) => resolve(tokenResponse),

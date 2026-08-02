@@ -2,25 +2,23 @@ import i18n from '/@/i18n/i18n';
 import {
     IssuerDiscoveryResponse,
     OAuthAuthenticationConfig,
-    OAuthLoginResponse,
+    OIDCLoginResponse as OIDCLoginResponse,
     ServerListItem,
 } from '/@/shared/types/domain-types';
 import { formatRefreshTokenKey } from '/@/shared/utils/oauth-format-refresh-token-key';
 
-export const reauthenticateOAuth = async (
-    currentServer: ServerListItem,
-): Promise<OAuthLoginResponse> => {
+export const reloginOIDC = async (currentServer: ServerListItem): Promise<OIDCLoginResponse> => {
     const { authConfig } = createConfigAndRefreshTokenKey(currentServer);
 
-    const signinResponse = await signinSSO(authConfig, currentServer.url);
+    const signinResponse = await ssoSignIn(authConfig, currentServer.url);
     return signinResponse;
 };
 
-export const handleInitialOAuth = async (
+export const initalOIDCLogin = async (
     url: string,
     clientId: string,
     issuerUrl?: string,
-): Promise<OAuthLoginResponse> => {
+): Promise<OIDCLoginResponse> => {
     const issuerDetails: IssuerDiscoveryResponse = await getIssuerDetails(url, issuerUrl);
 
     if (!issuerDetails.issuer || !issuerDetails.metadataEndpoint) {
@@ -32,13 +30,13 @@ export const handleInitialOAuth = async (
         issuerUrl: issuerDetails.issuer,
     };
 
-    return signinSSO(authConfig, url);
+    return ssoSignIn(authConfig, url);
 };
 
 // Setups a listener for callback and errors events from main process
-export const onOauthCallback = (): Promise<OAuthLoginResponse> => {
-    return new Promise<OAuthLoginResponse>((resolve, reject) => {
-        window.api.oauth.oauthCallback((loginResponse: OAuthLoginResponse) => {
+export const onOauthCallback = (): Promise<OIDCLoginResponse> => {
+    return new Promise<OIDCLoginResponse>((resolve, reject) => {
+        window.api.oauth.oauthCallback((loginResponse: OIDCLoginResponse) => {
             resolve(loginResponse);
         });
 
@@ -48,10 +46,10 @@ export const onOauthCallback = (): Promise<OAuthLoginResponse> => {
     });
 };
 
-export const signinSSO = async (
+const ssoSignIn = async (
     authConfig: OAuthAuthenticationConfig,
     audienceEndpoint: string,
-): Promise<OAuthLoginResponse> => {
+): Promise<OIDCLoginResponse> => {
     const tokenResponse = onOauthCallback();
 
     // Hands off to main process to open the external browser for SSO login

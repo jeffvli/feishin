@@ -1,17 +1,17 @@
 import { ipcMain } from 'electron';
 
-import { autoDiscoverIssuerFromServerUrl as autoDiscoverIssuerUrl } from './oauth-oidc-wellknown-discovery';
-import { refreshAccessToken, revokeRefreshToken } from './oauth-refresh-token-store';
+import { discoverIssuer } from './oidc-discover-issuer';
+import { oidcLogin } from './oidc-login';
+import { refreshAccessToken, revokeRefreshToken } from './refresh-token-store';
+import { autoDiscoverIssuerFromServerUrl as autoDiscoverIssuerUrl } from './wellknown-discovery';
 
 import { attachAccessTokenToAssetRequests } from '/@/main/features/oauth/intercept_http_request';
-import { oauthLogin } from '/@/main/features/oauth/oauth-login';
-import { discoverIssuer } from '/@/main/features/oauth/oauth-oidc-discover-issuer';
 import { OAuthAuthenticationConfig } from '/@/shared/types/domain-types';
 
 ipcMain.handle(
     'oauth:login',
     async (_event, authConfig: OAuthAuthenticationConfig, audienceEndpoint: string) => {
-        await oauthLogin(authConfig, audienceEndpoint);
+        await oidcLogin(authConfig, audienceEndpoint);
     },
 );
 

@@ -3,7 +3,7 @@ import { ipcRenderer } from 'electron';
 import {
     IssuerDiscoveryResponse,
     OAuthAuthenticationConfig,
-    OAuthLoginResponse,
+    OIDCLoginResponse,
 } from '../shared/types/domain-types';
 export const oauth = {
     attachAccessTokenToRequests: (audienceEndpoint: string, accessToken: string): void => {
@@ -23,8 +23,8 @@ export const oauth = {
     },
     login: (authConfig: OAuthAuthenticationConfig, audienceEndpoint: string) =>
         ipcRenderer.invoke('oauth:login', authConfig, audienceEndpoint),
-    oauthCallback: (callback: (loginResponse: OAuthLoginResponse) => void): void => {
-        ipcRenderer.on('oauth:callback', (_event, loginResponse: OAuthLoginResponse) => {
+    oauthCallback: (callback: (loginResponse: OIDCLoginResponse) => void): void => {
+        ipcRenderer.on('oauth:callback', (_event, loginResponse: OIDCLoginResponse) => {
             callback(loginResponse);
         });
     },

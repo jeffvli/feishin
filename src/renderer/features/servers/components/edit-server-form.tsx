@@ -137,7 +137,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 // Need to authenticate
 
                 let authFunction = isOAuth
-                    ? api.controller.authenticateOAuth
+                    ? api.controller.authenticateOIDC
                     : api.controller.authenticate;
 
                 if (!authFunction) {
@@ -152,7 +152,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                             message: t('error.invalidServer'),
                         });
                     }
-                    authFunction = api.controller.authenticateOAuth;
+                    authFunction = api.controller.authenticateOIDC;
                     data = await authFunction?.(
                         values.url,
                         values.clientId,
