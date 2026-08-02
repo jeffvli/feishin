@@ -469,10 +469,13 @@ axiosClient.interceptors.response.use(
             if (currentServer?.authType === AuthType.OAUTH) {
                 // If OAuth login, refresh access token or SSO login on expired refresh token.
                 try {
-                    return refreshOAuth({
-                        axiosClient,
-                        config: error.config,
-                        currentServer,
+                    refreshOAuth(currentServer).then((accessToken) => {
+                        // Retry the original request with the new access token
+                        useAuthStore.getState().actions.updateServer(currentServer.id, {
+                            accessToken,
+                        });
+                        error.config.headers['Authorization'] = `Bearer ${accessToken}`;
+                        return axiosClient.request(error.config);
                     });
                 } catch (newError: any) {
                     console.error('Error when trying to refresh OAuth: ', newError);

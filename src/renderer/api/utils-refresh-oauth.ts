@@ -1,46 +1,38 @@
-import { AxiosInstance, AxiosResponse } from 'axios';
-
 import i18n from '/@/i18n/i18n';
-import {
-    reauthenticateOAuth,
-    refreshAccessToken,
-} from '/@/renderer/features/sso/utils/oauth-access';
+import { refreshAccessToken } from '/@/renderer/features/sso/utils/oauth-access';
 import { openSsoModal } from '/@/renderer/features/sso/utils/open-sso-modal';
-import { ServerListItem } from '/@/shared/types/domain-types';
+import { logger } from '/@/renderer/utils/logger';
+import { OAuthLoginResponse, ServerListItem } from '/@/shared/types/domain-types';
 
-export const refreshOAuth = async ({
-    axiosClient,
-    config,
-    currentServer,
-}: {
-    axiosClient: AxiosInstance;
-    config: any;
-    currentServer: ServerListItem;
-}): Promise<AxiosResponse<any, any, object> | void> => {
+export const refreshOAuth = async (currentServer: ServerListItem): Promise<string> => {
     // Try to refresh the access token first, if that fails, try to reauthenticate via SSO flow.
     return refreshAccessToken(currentServer)
         .then((accessToken) => {
             if (!accessToken) {
                 throw new Error(i18n.t('error.ssoError'));
             }
-            config.headers['Authorization'] = `Bearer ${accessToken}`;
-            return axiosClient.request(config);
+
+            return accessToken;
         })
         .catch((accessTokenError) => {
-            console.error('Error when trying to refresh access token: ', accessTokenError);
-            // Try to prompt OIDC flow
-            openSsoModal(true);
-            return reauthenticateOAuth(currentServer)
+            logger.error('Error when trying to refresh access token: ', accessTokenError);
+            // Prompt OIDC flow to reauthenticate the user via SSO modal
+            return new Promise<null | OAuthLoginResponse>((resolve, reject) => {
+                openSsoModal(
+                    currentServer,
+                    (tokenResponse) => resolve(tokenResponse),
+                    () => reject(),
+                );
+            })
                 .then((loginResponse) => {
                     if (!loginResponse) {
                         throw new Error(i18n.t('error.ssoError'));
                     }
                     const accessToken = loginResponse.accessToken;
-                    config.headers['Authorization'] = `Bearer ${accessToken}`;
-                    return axiosClient.request(config);
+                    return accessToken;
                 })
                 .catch((reauthError) => {
-                    console.error('Error when trying to handle OAuth: ', reauthError);
+                    logger.error('Error when trying to handle OAuth: ', reauthError);
                     throw reauthError;
                 });
         });

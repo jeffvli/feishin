@@ -1,27 +1,29 @@
 import { closeModal, ContextModalProps } from '@mantine/modals';
-import { ipcMain } from 'electron';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { CancelSSOLoginButton } from '/@/renderer/features/sso/components/cancel-sso-button';
-import { reauthenticateOAuth } from '/@/renderer/features/sso/utils/oauth-access';
-import { useAuthStore } from '/@/renderer/store';
+import { onOauthCallback, reauthenticateOAuth } from '/@/renderer/features/sso/utils/oauth-access';
+import { useAuthStoreActions } from '/@/renderer/store';
 import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
+import { OAuthLoginResponse, ServerListItem } from '/@/shared/types/domain-types';
 
 export const SSOModal = ({
     id,
     innerProps,
 }: ContextModalProps<{
-    ssoFlowInProgress: boolean;
+    onSuccess?: (response: OAuthLoginResponse) => void;
+    server: ServerListItem;
 }>) => {
     const { t } = useTranslation();
-    const [isLoading, setIsLoading] = useState(innerProps.ssoFlowInProgress);
+    const [isLoading, setIsLoading] = useState(true);
+    const { updateServer } = useAuthStoreActions();
+    const { server } = innerProps;
 
     const retrySSOLogin = async () => {
-        const server = useAuthStore.getState().currentServer;
         if (server) {
             setIsLoading(true);
             const loginResponse = await reauthenticateOAuth(server);
@@ -30,16 +32,30 @@ export const SSOModal = ({
                 toast.error({ message: t('error.ssoError') });
             }
 
-            server.accessToken = loginResponse.accessToken;
+            updateServer(server.id, { accessToken: loginResponse.accessToken });
             closeModal(id);
         } else {
             toast.error({ message: t('error.invalidServer') });
         }
     };
-
-    ipcMain.once('oauth:callback', () => {
-        closeModal(id);
-    });
+    useEffect(() => {
+        const closeSsoModal = () => {
+            closeModal(id);
+        };
+        const handleOAuthCallback = async () => {
+            // Wait for the OAuth callback to be received from the main process
+            const response = await onOauthCallback().catch(() => null);
+            if (response) {
+                innerProps.onSuccess?.(response);
+                closeSsoModal();
+            }
+        };
+        handleOAuthCallback();
+        const server = innerProps.server;
+        if (server) {
+            reauthenticateOAuth(server);
+        }
+    }, [id, innerProps]);
 
     return (
         <Stack>

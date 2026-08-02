@@ -36,7 +36,7 @@ export const handleInitialOAuth = async (
 };
 
 // Setups a listener for callback and errors events from main process
-function onOauthCallback(): Promise<OAuthLoginResponse> {
+export const onOauthCallback = (): Promise<OAuthLoginResponse> => {
     return new Promise<OAuthLoginResponse>((resolve, reject) => {
         window.api.oauth.oauthCallback((loginResponse: OAuthLoginResponse) => {
             resolve(loginResponse);
@@ -46,7 +46,7 @@ function onOauthCallback(): Promise<OAuthLoginResponse> {
             reject(new Error(i18n.t('error.ssoError')));
         });
     });
-}
+};
 
 export const signinSSO = async (
     authConfig: OAuthAuthenticationConfig,

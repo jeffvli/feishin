@@ -103,25 +103,17 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
             const issuerUrlChanged = values.issuerUrl !== server.issuerUrl;
 
             // Skip authentication if username hasn't changed, password is empty, and URL/type haven't changed
-            const canSkipAuth =
-                server.authType === AuthType.BASIC &&
-                isBasicAuth &&
-                !usernameChanged &&
-                !passwordProvided &&
-                !urlChanged &&
-                !typeChanged;
+            const canSkipBasicAuth =
+                isBasicAuth && !usernameChanged && !passwordProvided && !urlChanged && !typeChanged;
 
-            const canSkipOAuth =
-                server.authType === AuthType.OAUTH &&
-                isOAuth &&
-                !clientIDChanged &&
-                !issuerUrlChanged &&
-                !urlChanged;
+            const canSkipOAuth = isOAuth && !clientIDChanged && !issuerUrlChanged && !urlChanged;
+            const canSkipAuth =
+                server.authType === AuthType.BASIC ? canSkipBasicAuth : canSkipOAuth;
 
             let data: AuthenticationResponse | undefined;
             let serverItem: ServerListItemWithCredential;
 
-            if (canSkipAuth || canSkipOAuth) {
+            if (canSkipAuth) {
                 // Use existing server credentials
                 const existingServer = getServerById(server.id);
                 if (!existingServer) {

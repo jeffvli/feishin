@@ -136,13 +136,16 @@ export const useServerAuthenticated = () => {
                         userId: userInfo.id,
                     });
 
-                    // Auth successful, attach access token for asset requests if using OAuth
-                    if (serverWithAuth.authType === AuthType.OAUTH && serverWithAuth.accessToken) {
+                    // If access token, attach it for asset fetches (images, audio, etc.)
+                    if (serverWithAuth.authType === AuthType.OAUTH) {
                         // Access token is valid, Need to attach for asset requests i.e images, audio
-                        window.api.oauth.attachAccessTokenToRequests(
-                            serverWithAuth.url,
-                            serverWithAuth.accessToken,
-                        );
+                        const currentToken = getServerById(serverWithAuth.id)?.accessToken;
+                        if (currentToken) {
+                            window.api.oauth.attachAccessTokenToRequests(
+                                serverWithAuth.url,
+                                currentToken,
+                            );
+                        }
                     }
 
                     const elapsedTime = Date.now() - authStartTime;

@@ -4,7 +4,7 @@ import qs from 'qs';
 import { z } from 'zod';
 
 import i18n from '/@/i18n/i18n';
-import { authenticateOAuthFailure, authenticationFailure } from '/@/renderer/api/utils';
+import { authenticationFailure } from '/@/renderer/api/utils';
 import { refreshOAuth } from '/@/renderer/api/utils-refresh-oauth';
 import { useAuthStore } from '/@/renderer/store';
 import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
@@ -429,10 +429,13 @@ axiosClient.interceptors.response.use(
             if (currentServer?.authType === AuthType.OAUTH) {
                 // If OAuth login, refresh access token or SSO login on expired refresh token.
                 try {
-                    return refreshOAuth({
-                        axiosClient,
-                        config: error.config,
-                        currentServer,
+                    return refreshOAuth(currentServer).then((accessToken) => {
+                        // Retry the original request with the new access token
+                        useAuthStore.getState().actions.updateServer(currentServer.id, {
+                            accessToken,
+                        });
+                        error.config.headers['Authorization'] = `Bearer ${accessToken}`;
+                        return axiosClient.request(error.config);
                     });
                 } catch (newError: any) {
                     console.error('Error when trying to refresh OAuth: ', newError);
@@ -441,7 +444,7 @@ axiosClient.interceptors.response.use(
                             'Network error during authentication - preserving credentials',
                         );
                     } else {
-                        authenticateOAuthFailure(currentServer);
+                        authenticationFailure(currentServer);
                     }
                 }
             }

@@ -3,6 +3,7 @@ import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { refreshOAuth } from '/@/renderer/api/utils-refresh-oauth';
 import styles from '/@/renderer/features/action-required/components/server-required.module.css';
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
@@ -24,6 +25,7 @@ import {
     ServerListItemWithCredential,
     ServerType,
 } from '/@/shared/types/domain-types';
+import { AuthType } from '/@/shared/types/types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
@@ -54,7 +56,24 @@ function ServerSelector() {
     const navigate = useNavigate();
     const serverList = useServerList();
     const currentServer = useCurrentServer();
-    const { setCurrentServer } = useAuthStoreActions();
+    const { setCurrentServer, updateServer } = useAuthStoreActions();
+
+    const handleServerSelect = async (
+        server: ServerListItemWithCredential,
+        sessionExpired: boolean,
+    ) => {
+        if (!sessionExpired) {
+            return handleSetCurrentServer(server);
+        } else if (server.type === ServerType.NAVIDROME && server.authType === AuthType.OAUTH) {
+            // Might be able to simply refresh/reauth
+            const accessToken = await refreshOAuth(server).catch(() => null);
+            if (accessToken) {
+                updateServer(server.id, { accessToken });
+                return handleSetCurrentServer(server);
+            }
+        }
+        return handleCredentialsModal(server);
+    };
 
     const handleSetCurrentServer = (server: ServerListItemWithCredential) => {
         navigate(AppRoute.HOME);
@@ -113,8 +132,7 @@ function ServerSelector() {
                         }}
                         key={`server-${server.id}`}
                         onClick={() => {
-                            if (!isSessionExpired) return handleSetCurrentServer(server);
-                            return handleCredentialsModal(server);
+                            return handleServerSelect(server, isSessionExpired);
                         }}
                         size="lg"
                         variant={
