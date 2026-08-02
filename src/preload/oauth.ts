@@ -13,6 +13,7 @@ export const oauth = {
         ipcRenderer.invoke('oauth:auto-discover-issuer-url', url),
     cancelSSOLogin: (): void => {
         ipcRenderer.send('oauth:cancel-sso-login');
+        ipcRenderer.removeAllListeners('oauth:callback');
     },
     discoverIssuer: (url: string): Promise<IssuerDiscoveryResponse> =>
         ipcRenderer.invoke('oauth:discover', url),
@@ -24,12 +25,12 @@ export const oauth = {
     login: (authConfig: OAuthAuthenticationConfig, audienceEndpoint: string) =>
         ipcRenderer.invoke('oauth:login', authConfig, audienceEndpoint),
     oauthCallback: (callback: (loginResponse: OIDCLoginResponse) => void): void => {
-        ipcRenderer.on('oauth:callback', (_event, loginResponse: OIDCLoginResponse) => {
+        ipcRenderer.once('oauth:callback', (_event, loginResponse: OIDCLoginResponse) => {
             callback(loginResponse);
         });
     },
     oauthCallbackError: (callback: () => void): void => {
-        ipcRenderer.on('oauth:endLogin', () => {
+        ipcRenderer.once('oauth:endLogin', () => {
             callback();
         });
     },
