@@ -147,7 +147,8 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
     const usernameRequired = !form.values.username && isBasicAuth;
     const clientIdRequired = !form.values.clientId && isOAuth;
-    const isSubmitDisabled = !form.values.name || usernameRequired || clientIdRequired;
+    const isSubmitDisabled =
+        !form.values.name || !form.values.url || usernameRequired || clientIdRequired;
 
     const fillServerDetails = (server: DiscoveredServerItem) => {
         form.setValues({ ...server });

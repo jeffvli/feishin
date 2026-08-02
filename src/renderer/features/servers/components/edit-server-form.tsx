@@ -104,9 +104,19 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
 
             // Skip authentication if username hasn't changed, password is empty, and URL/type haven't changed
             const canSkipBasicAuth =
-                isBasicAuth && !usernameChanged && !passwordProvided && !urlChanged && !typeChanged;
+                isBasicAuth &&
+                server.authType === AuthType.BASIC &&
+                !usernameChanged &&
+                !passwordProvided &&
+                !urlChanged &&
+                !typeChanged;
 
-            const canSkipOAuth = isOAuth && !clientIDChanged && !issuerUrlChanged && !urlChanged;
+            const canSkipOAuth =
+                isOAuth &&
+                server.authType === AuthType.OAUTH &&
+                !clientIDChanged &&
+                !issuerUrlChanged &&
+                !urlChanged;
             const canSkipAuth =
                 server.authType === AuthType.BASIC ? canSkipBasicAuth : canSkipOAuth;
 
