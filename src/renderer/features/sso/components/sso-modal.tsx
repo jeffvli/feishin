@@ -1,16 +1,27 @@
 import { closeModal, ContextModalProps } from '@mantine/modals';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { onOauthCallback, reloginOIDC } from '../utils/oidc-reauth-refresh';
 
 import { CancelSSOLoginButton } from '/@/renderer/features/sso/components/cancel-sso-button';
-import { useAuthStoreActions } from '/@/renderer/store';
 import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { OIDCLoginResponse, ServerListItem } from '/@/shared/types/domain-types';
+
+const useOAuthCallback = (close: () => void, onSuccess?: (response: OIDCLoginResponse) => void) => {
+    const handleOAuthCallback = useCallback(async () => {
+        // Wait for the OAuth callback to be received from the main process
+        const response = await onOauthCallback().catch(() => null);
+        if (response) {
+            onSuccess?.(response);
+            close?.();
+        }
+    }, [close, onSuccess]);
+    return { handleOAuthCallback };
+};
 
 export const SSOModal = ({
     id,
@@ -21,42 +32,34 @@ export const SSOModal = ({
 }>) => {
     const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState(true);
-    const { updateServer } = useAuthStoreActions();
     const { server } = innerProps;
+
+    const closeSsoModal = useCallback(() => {
+        closeModal(id);
+    }, [id]);
+
+    const { handleOAuthCallback } = useOAuthCallback(closeSsoModal, innerProps.onSuccess);
 
     const retrySSOLogin = async () => {
         if (server) {
             setIsLoading(true);
-            const loginResponse = await reloginOIDC(server);
-
-            if (!loginResponse || !loginResponse.accessToken) {
+            const promise = handleOAuthCallback();
+            reloginOIDC(server);
+            if (!promise) {
                 toast.error({ message: t('error.ssoError') });
             }
-
-            updateServer(server.id, { accessToken: loginResponse.accessToken });
-            closeModal(id);
         } else {
             toast.error({ message: t('error.invalidServer') });
+            closeModal(id);
         }
     };
     useEffect(() => {
-        const closeSsoModal = () => {
-            closeModal(id);
-        };
-        const handleOAuthCallback = async () => {
-            // Wait for the OAuth callback to be received from the main process
-            const response = await onOauthCallback().catch(() => null);
-            if (response) {
-                innerProps.onSuccess?.(response);
-                closeSsoModal();
-            }
-        };
         handleOAuthCallback();
         const server = innerProps.server;
         if (server) {
             reloginOIDC(server);
         }
-    }, [id, innerProps]);
+    }, [handleOAuthCallback, innerProps.server]);
 
     return (
         <Stack>
