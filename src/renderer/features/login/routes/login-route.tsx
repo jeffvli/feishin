@@ -40,7 +40,7 @@ import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { useForm } from '/@/shared/hooks/use-form';
 import { AuthenticationResponse, ServerListItemWithCredential } from '/@/shared/types/domain-types';
-import { ServerType, toServerType } from '/@/shared/types/types';
+import { AuthType, ServerType, toServerType } from '/@/shared/types/types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
@@ -162,6 +162,7 @@ const LoginRoute = () => {
 
             const serverId = existingServer?.id ?? nanoid();
             const serverItem: ServerListItemWithCredential = {
+                authType: AuthType.BASIC,
                 credential: data.credential,
                 id: serverId,
                 isAdmin: data.isAdmin,
