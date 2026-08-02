@@ -430,14 +430,12 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     />
                 )}
                 <Group justify="flex-end">
-                    {isLoading && isOAuth && (
-                        <ModalButton onClick={onCancel}>{t('common.cancel')}</ModalButton>
-                    )}
-                    <CancelSSOLoginButton setIsLoading={setIsLoading} />
+                    <ModalButton onClick={onCancel}>{t('common.cancel')}</ModalButton>
                     <ModalButton loading={isLoading} type="submit" variant="filled">
                         {t('common.save')}
                     </ModalButton>
                 </Group>
+                <CancelSSOLoginButton setIsLoading={setIsLoading} />
             </Stack>
         </form>
     );

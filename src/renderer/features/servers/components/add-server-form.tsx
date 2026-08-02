@@ -454,9 +454,8 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             <Divider />
                         </>
                     )}
-                    <CancelSSOLoginButton setIsLoading={setIsLoading} />
                     <Group grow justify="flex-end">
-                        {onCancel && isLoading && isOAuth && (
+                        {onCancel && (
                             <ModalButton onClick={onCancel}>{t('common.cancel')}</ModalButton>
                         )}
                         <ModalButton
@@ -468,6 +467,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             {t('common.add')}
                         </ModalButton>
                     </Group>
+                    <CancelSSOLoginButton setIsLoading={setIsLoading} />
                 </Stack>
             </form>
         </>
