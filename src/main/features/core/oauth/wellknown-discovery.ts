@@ -1,7 +1,7 @@
 import { BrowserWindow } from 'electron';
 
-import { IssuerDiscoveryResponse } from '../../../shared/types/domain-types';
-import log from '../../logger';
+import { IssuerDiscoveryResponse } from '../../../../shared/types/domain-types';
+import log from '../../../logger';
 import { discoverIssuer } from './oidc-discover-issuer';
 
 const DISCOVERY_TIMEOUT = 5 * 1000; //5 seconds

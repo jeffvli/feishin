@@ -1,12 +1,31 @@
 import { ipcMain } from 'electron';
 
+import { refreshAccessToken, revokeRefreshToken } from './access-token';
+import { attachAccessTokenToAssetRequests } from './intercept_http_request';
 import { discoverIssuer } from './oidc-discover-issuer';
 import { oidcLogin } from './oidc-login';
-import { refreshAccessToken, revokeRefreshToken } from './refresh-token-store';
+import { deleteRefreshToken, getRefreshToken, storeRefreshToken } from './refresh-token-store';
 import { autoDiscoverIssuerFromServerUrl as autoDiscoverIssuerUrl } from './wellknown-discovery';
 
-import { attachAccessTokenToAssetRequests } from '/@/main/features/oauth/intercept_http_request';
 import { OAuthAuthenticationConfig } from '/@/shared/types/domain-types';
+
+ipcMain.handle('oauth-attach-token', (_event, audienceEndpoint: string, accessToken: string) => {
+    attachAccessTokenToAssetRequests(audienceEndpoint, accessToken);
+});
+
+ipcMain.handle('oauth-store-refresh-token', async (_event, key: string, refreshToken: string) => {
+    await storeRefreshToken(key, refreshToken);
+});
+
+ipcMain.handle('oauth-get-refresh-token', async (_event, key: string) => {
+    return await getRefreshToken(key);
+});
+
+ipcMain.handle('oauth-delete-refresh-token', async (_event, key: string) => {
+    return await deleteRefreshToken(key);
+});
+
+// TODO: BELOW CODE TO BE MOVED TO RENDERER
 
 ipcMain.handle(
     'oauth:login',

@@ -7,7 +7,7 @@ import {
 } from '../shared/types/domain-types';
 export const oauth = {
     attachAccessTokenToRequests: (audienceEndpoint: string, accessToken: string): void => {
-        ipcRenderer.invoke('oauth:attach-token', audienceEndpoint, accessToken);
+        ipcRenderer.invoke('oauth-attach-token', audienceEndpoint, accessToken);
     },
     autoDiscoverIssuerUrl: (url: string): Promise<IssuerDiscoveryResponse> =>
         ipcRenderer.invoke('oauth:auto-discover-issuer-url', url),
@@ -15,6 +15,8 @@ export const oauth = {
         ipcRenderer.send('oauth:cancel-sso-login');
         ipcRenderer.removeAllListeners('oauth:callback');
     },
+    deleteRefreshToken: (key: string): Promise<void> =>
+        ipcRenderer.invoke('oauth:delete-refresh-token', key),
     discoverIssuer: (url: string): Promise<IssuerDiscoveryResponse> =>
         ipcRenderer.invoke('oauth:discover', url),
     externalPageOpenedCallback: (callback: () => void): void => {
@@ -22,6 +24,8 @@ export const oauth = {
             callback();
         });
     },
+    getRefreshToken: (key: string): Promise<null | string> =>
+        ipcRenderer.invoke('oauth-get-refresh-token', key),
     login: (authConfig: OAuthAuthenticationConfig, audienceEndpoint: string) =>
         ipcRenderer.invoke('oauth:login', authConfig, audienceEndpoint),
     oauthCallback: (callback: (loginResponse: OIDCLoginResponse) => void): void => {
@@ -55,4 +59,6 @@ export const oauth = {
         authConfig: OAuthAuthenticationConfig,
     ): Promise<void> =>
         ipcRenderer.invoke('oauth:revoke-refresh-token', refreshTokenKey, authConfig),
+    storeRefreshToken: (key: string, refreshToken: string): Promise<void> =>
+        ipcRenderer.invoke('oauth:store-refresh-token', key, refreshToken),
 };

@@ -1,5 +1,5 @@
 import './core';
-import './oauth';
+import './core/oauth';
 
 if (process.platform === 'linux') {
     import('./linux');

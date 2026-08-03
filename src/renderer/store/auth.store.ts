@@ -5,7 +5,7 @@ import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
-import { revokeRefreshToken } from '../features/sso/utils/oidc-reauth-refresh';
+import { revokeServerRefreshToken } from '../features/sso/utils/oidc-reauth-refresh';
 
 import { ServerListItem, ServerListItemWithCredential } from '/@/shared/types/domain-types';
 import { AuthType } from '/@/shared/types/types';
@@ -42,7 +42,7 @@ export const useAuthStore = createWithEqualityFn<AuthSlice>()(
                         set((state) => {
                             delete state.serverList[id];
                             if (state.currentServer?.authType === AuthType.OAUTH) {
-                                revokeRefreshToken(state.currentServer).catch((error) => {
+                                revokeServerRefreshToken(state.currentServer).catch((error) => {
                                     console.warn('Could not revoke refresh token: ', error);
                                 });
                             }

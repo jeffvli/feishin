@@ -1,5 +1,14 @@
 import i18n from '/@/i18n/i18n';
 import {
+    autoDiscoverIssuerUrl,
+    discoverIssuer,
+    login,
+    oauthCallback,
+    oauthCallbackError,
+    refreshAccessToken,
+    revokeRefreshToken,
+} from '/@/renderer/features/sso/api/oidc/oidc-api';
+import {
     IssuerDiscoveryResponse,
     OAuthAuthenticationConfig,
     OIDCLoginResponse as OIDCLoginResponse,
@@ -36,11 +45,11 @@ export const initalOIDCLogin = async (
 // Setups a listener for callback and errors events from main process
 export const onOauthCallback = (): Promise<OIDCLoginResponse> => {
     return new Promise<OIDCLoginResponse>((resolve, reject) => {
-        window.api.oauth.oauthCallback((loginResponse: OIDCLoginResponse) => {
+        oauthCallback((loginResponse: OIDCLoginResponse) => {
             resolve(loginResponse);
         });
 
-        window.api.oauth.oauthCallbackError(() => {
+        oauthCallbackError(() => {
             reject(new Error(i18n.t('error.ssoError')));
         });
     });
@@ -53,7 +62,7 @@ const ssoSignIn = async (
     const tokenResponse = onOauthCallback();
 
     // Hands off to main process to open the external browser for SSO login
-    await window.api.oauth.login(authConfig, audienceEndpoint);
+    await login(authConfig, audienceEndpoint);
 
     if (!tokenResponse) {
         throw new Error(i18n.t('error.ssoError'));
@@ -66,30 +75,26 @@ const getIssuerDetails = async (
     issuerUrl?: string,
 ): Promise<IssuerDiscoveryResponse> => {
     try {
-        if (issuerUrl) return await window.api.oauth.discoverIssuer(issuerUrl);
-        return await window.api.oauth.autoDiscoverIssuerUrl(url);
+        if (issuerUrl) return await discoverIssuer(issuerUrl);
+        return await autoDiscoverIssuerUrl(url);
     } catch {
         throw new Error(i18n.t('error.ssoDiscoveryFailureError'));
     }
 };
 
-export const refreshAccessToken = async (currentServer: ServerListItem): Promise<string> => {
+export const refreshServerAccessToken = async (currentServer: ServerListItem): Promise<string> => {
     const { authConfig, refreshTokenKey } = createConfigAndRefreshTokenKey(currentServer);
 
-    const access_token = await window.api.oauth.refreshAccessToken(
-        refreshTokenKey,
-        authConfig,
-        currentServer.url,
-    );
+    const access_token = await refreshAccessToken(refreshTokenKey, authConfig, currentServer.url);
     if (!access_token) {
         throw new Error(i18n.t('error.ssoError'));
     }
     return access_token;
 };
 
-export const revokeRefreshToken = async (currentServer: ServerListItem): Promise<void> => {
+export const revokeServerRefreshToken = async (currentServer: ServerListItem): Promise<void> => {
     const { authConfig, refreshTokenKey } = createConfigAndRefreshTokenKey(currentServer);
-    await window.api.oauth.revokeRefreshToken(refreshTokenKey, authConfig);
+    await revokeRefreshToken(refreshTokenKey, authConfig);
 };
 
 const createConfigAndRefreshTokenKey = (

@@ -1,4 +1,4 @@
-import { IssuerDiscoveryResponse } from '../../../shared/types/domain-types';
+import { IssuerDiscoveryResponse } from '../../../../shared/types/domain-types';
 
 type issuerMetadata = {
     issuer: string;

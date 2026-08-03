@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router';
 
 import { api } from '/@/renderer/api';
 import { controller } from '/@/renderer/api/controller';
+import { attachAccessTokenToRequests } from '/@/renderer/features/sso/api/oidc/oidc-api';
 import { AppRoute } from '/@/renderer/router/routes';
 import { getServerById, useAuthStoreActions, useCurrentServerId } from '/@/renderer/store';
 import { logger } from '/@/renderer/utils/logger';
@@ -141,10 +142,7 @@ export const useServerAuthenticated = () => {
                         // Access token is valid, Need to attach for asset requests i.e images, audio
                         const currentToken = getServerById(serverWithAuth.id)?.accessToken;
                         if (currentToken) {
-                            window.api.oauth.attachAccessTokenToRequests(
-                                serverWithAuth.url,
-                                currentToken,
-                            );
+                            attachAccessTokenToRequests(serverWithAuth.url, currentToken);
                         }
                     }
 
