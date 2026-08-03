@@ -40,11 +40,21 @@ export const refreshAccessToken = async (
             return null;
         }
 
+        // Refresh the access token using the refresh token
         const response = await refreshTokenGrant(config, refreshToken);
         if (!response || !response.access_token) {
             return null;
         }
         attachAccessTokenToAssetRequests(audienceEndpoint, response.access_token);
+
+        // An OIDC provider may make one-time refresh tokens and send a new one when refreshing access token
+        if (!response.refresh_token) {
+            log.info(
+                'No refresh token returned in the response. The existing refresh token will be used.',
+            );
+        } else {
+            await storeRefreshToken(refreshTokenKey, response.refresh_token);
+        }
         return response.access_token;
     } catch (error) {
         log.error('Failed to refresh access token: ', error);
