@@ -68,6 +68,16 @@ const ssoCallback = (url: string) => {
 };
 
 // If desktop app, listen for the oauth callback URL from the main process
+// If web app, listen for the oauth callback URL from the popup window
 if (oauthIpc) {
     oauthIpc.registerSSOCallback(ssoCallback);
+} else {
+    window.addEventListener('message', (event: MessageEvent) => {
+        if (event.origin !== window.location.origin) {
+            return;
+        }
+        if (event.data && event.data.type === 'sso-callback') {
+            ssoCallback(event.data.url);
+        }
+    });
 }

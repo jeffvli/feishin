@@ -1,9 +1,11 @@
+import isElectron from 'is-electron';
 import * as openid from 'openid-client';
 
 import {
     attachAccessTokenToRequests,
     storeRefreshToken,
 } from '/@/renderer/features/sso/api/oidc/oidc-api';
+import { AppRoute } from '/@/renderer/router/routes';
 import { logger } from '/@/renderer/utils/logger';
 import {
     OAuthAuthenticationConfig,
@@ -11,8 +13,9 @@ import {
     OIDCLoginResponse,
 } from '/@/shared/types/domain-types';
 import { formatRefreshTokenKey } from '/@/shared/utils/oauth-format-refresh-token-key';
-const CALLBACK_ENDING = '://oauth2/callback';
-const AUTH_CALLBACK_URL = `${OAuthRedirectScheme}${CALLBACK_ENDING}`;
+
+const CALLBACK_PATH = AppRoute.OAUTH_CALLBACK;
+const ELECTRON_CALLBACK_URL = `${OAuthRedirectScheme}:/${CALLBACK_PATH}`;
 const DEFAULT_SCOPES = 'openid profile email';
 const DEFAULT_CODE_CHALLENGE_METHOD = 'S256';
 
@@ -46,8 +49,10 @@ export const oidcLogin = async (
             // Set up listeners for the OIDC/OAuth2 callback URL
             window.addEventListener('sso-callback', ssoCallback);
             window.addEventListener('sso-end-login', endSSOLogin);
-            // Open the authorization URL in an external browser
-            window.open(authUrl, '_blank', 'noopener,noreferrer');
+
+            // Open the OIDC/OAuth2 login page in a new tab/window
+            window.open(authUrl, '_blank');
+
             // Show button to cancel SSO login in the main window
             window.dispatchEvent(new CustomEvent('sso-external-page-opened'));
         });
@@ -76,11 +81,17 @@ const makeAuthorizationUrl = async (
     }
 
     const code_challenge = await openid.calculatePKCECodeChallenge(code_verifier);
+
+    // Redirect URI is different for Electron and web
+    // Web redirect URI is the current origin + callback path
+    const redirectURI = isElectron()
+        ? ELECTRON_CALLBACK_URL
+        : `${window.location.origin}${CALLBACK_PATH}`;
     const parameters: Record<string, string> = {
         code_challenge: code_challenge,
         code_challenge_method: DEFAULT_CODE_CHALLENGE_METHOD,
         nonce: openid.randomNonce(),
-        redirect_uri: AUTH_CALLBACK_URL,
+        redirect_uri: redirectURI,
         scope: DEFAULT_SCOPES,
         state: openid.randomState(),
     };
@@ -102,7 +113,14 @@ const createFunctions = (
     const ssoCallback = async (event: any) => {
         window.removeEventListener('sso-callback', ssoCallback);
         const url = event.detail.url;
-        if (!url.startsWith(AUTH_CALLBACK_URL)) {
+        const webCallbackUrl = new URL(
+            CALLBACK_PATH,
+            window.location.origin + window.location.pathname,
+        ).href;
+        const urlCheck = isElectron()
+            ? url.startsWith(ELECTRON_CALLBACK_URL)
+            : url.startsWith(webCallbackUrl);
+        if (!urlCheck) {
             logger.warn(`Received unexpected callback URL: ${url}`);
             return;
         }

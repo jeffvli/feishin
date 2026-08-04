@@ -30,6 +30,8 @@ import '/@/shared/styles/global.css';
 import { PlayerProvider } from '/@/renderer/features/player/context/player-context';
 import { AudioPlayers } from '/@/renderer/features/player/components/audio-players';
 import { ReleaseNotesModal } from '/@/renderer/release-notes-modal';
+import { AppRoute } from '/@/renderer/router/routes';
+import { WebOAuthCallbackPage } from '/@/renderer/features/sso/components/web-oauth-callback-page';
 
 const UpdateAvailableDialog = lazy(() =>
     import('./update-available-dialog').then((module) => ({
@@ -64,9 +66,17 @@ export const App = () => {
 const ThemedApp = () => {
     const { mode, theme } = useAppTheme();
 
+    let page = <AppShell />;
+
+    // For web SPA, the SSO login page is opened in a new tab/popup while the main window is still open
+    // After signing in, the redirect URI is in a separate page so we need to capture the URL
+    // and send it back to the main window to process the login response.
+    if (!isElectron() && window.location.pathname.endsWith(AppRoute.OAUTH_CALLBACK)) {
+        page = <WebOAuthCallbackPage />;
+    }
     return (
         <MantineProvider forceColorScheme={mode} theme={theme}>
-            <AppShell />
+            {page}
         </MantineProvider>
     );
 };

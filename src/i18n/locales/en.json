@@ -1578,6 +1578,8 @@
     "sso": {
         "modalTitle": "Sign-in again with SSO",
         "modalDescription": "You are being redirected to your SSO provider to log in. After logging in, you will be redirected back to the application.",
-        "cancelSignIn": "Cancel Sign-in with SSO"
+        "cancelSignIn": "Cancel Sign-in with SSO",
+        "callbackPageDescription": "You are being redirected back to finish signing in with SSO. Please wait...",
+        "callbackPageError": "There was an error signing you in with SSO. Please try again."
     }
 }

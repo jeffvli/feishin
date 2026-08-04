@@ -25,6 +25,7 @@ export enum AppRoute {
     LOGIN = '/login',
     NO_NETWORK = '/no-network',
     NOW_PLAYING = '/now-playing',
+    OAUTH_CALLBACK = '/oauth2/callback',
     PLAYING = '/playing',
     PLAYLISTS = '/playlists',
     PLAYLISTS_DETAIL_SONGS = '/playlists/:playlistId/songs',
