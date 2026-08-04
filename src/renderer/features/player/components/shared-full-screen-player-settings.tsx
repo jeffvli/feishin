@@ -233,33 +233,13 @@ export const SharedFullscreenPlayerSettings = () => {
                             {t('page.fullscreenPlayer.config.coverArtSize')}
                         </Option.Label>
                         <Option.Control>
-                            <SegmentedControl
-                                data={[
-                                    {
-                                        label: t('page.fullscreenPlayer.config.coverArtSize', {
-                                            context: 'optionSmall',
-                                        }),
-                                        value: 'small',
-                                    },
-                                    {
-                                        label: t('page.fullscreenPlayer.config.coverArtSize', {
-                                            context: 'optionMedium',
-                                        }),
-                                        value: 'medium',
-                                    },
-                                    {
-                                        label: t('page.fullscreenPlayer.config.coverArtSize', {
-                                            context: 'optionLarge',
-                                        }),
-                                        value: 'large',
-                                    },
-                                ]}
-                                onChange={(value) =>
-                                    setStore({
-                                        coverArtSize: value as 'large' | 'medium' | 'small',
-                                    })
-                                }
-                                value={coverArtSize}
+                            <Slider
+                                defaultValue={coverArtSize}
+                                label={(e) => `${e} %`}
+                                max={100}
+                                min={40}
+                                onChangeEnd={(e) => setStore({ coverArtSize: Number(e) })}
+                                w="100%"
                             />
                         </Option.Control>
                     </Option>

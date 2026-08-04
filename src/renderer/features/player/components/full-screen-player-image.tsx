@@ -52,12 +52,6 @@ const imageVariants: Variants = {
 
 const MotionImage = motion.img;
 
-const COVER_ART_SIZE_CLASS = {
-    large: styles.imageContainerLarge,
-    medium: styles.imageContainerMedium,
-    small: styles.imageContainerSmall,
-};
-
 const ImageWithPlaceholder = ({
     className,
     explicit,
@@ -264,9 +258,12 @@ export const FullScreenPlayerImage = () => {
             w="100%"
         >
             <div
-                className={clsx(styles.imageContainer, COVER_ART_SIZE_CLASS[coverArtSize])}
+                className={styles.imageContainer}
                 ref={mainImageRef}
-                style={{ marginBottom: showMetadata ? '2rem' : undefined }}
+                style={{
+                    marginBottom: showMetadata ? '2rem' : undefined,
+                    maxHeight: `${coverArtSize}%`,
+                }}
             >
                 <AnimatePresence initial={false} mode="sync">
                     {!isPlayingRadio && imageState.current === 0 && (

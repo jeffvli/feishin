@@ -20,18 +20,6 @@
     aspect-ratio: 1/1;
 }
 
-.image-container-small {
-    max-height: 60%;
-}
-
-.image-container-medium {
-    max-height: 75%;
-}
-
-.image-container-large {
-    max-height: 100%;
-}
-
 .metadata-container {
     display: flex;
     justify-content: center;

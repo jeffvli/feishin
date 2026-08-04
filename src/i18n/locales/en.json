@@ -570,9 +570,6 @@
         "fullscreenPlayer": {
             "config": {
                 "coverArtSize": "Cover art size",
-                "coverArtSize_optionLarge": "Large",
-                "coverArtSize_optionMedium": "Med",
-                "coverArtSize_optionSmall": "Small",
                 "dynamicBackground": "Dynamic background",
                 "dynamicImageBlur": "Image blur size",
                 "dynamicIsImage": "Enable background image",

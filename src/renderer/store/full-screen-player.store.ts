@@ -5,8 +5,6 @@ import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
-export type FullScreenPlayerCoverArtSize = 'large' | 'medium' | 'small';
-
 export type FullScreenPlayerItemAlignment = 'center' | 'left' | 'right';
 
 export interface FullScreenPlayerSlice extends FullScreenPlayerState {
@@ -19,7 +17,7 @@ export type FullScreenPlayerTitleDisplayType = 'multiLine' | 'scroll';
 
 interface FullScreenPlayerState {
     activeTab: 'lyrics' | 'queue' | 'related' | string;
-    coverArtSize: FullScreenPlayerCoverArtSize;
+    coverArtSize: number;
     dynamicBackground?: boolean;
     dynamicImageBlur: number;
     dynamicIsImage?: boolean;
@@ -43,7 +41,7 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
                     },
                 },
                 activeTab: 'queue',
-                coverArtSize: 'medium',
+                coverArtSize: 75,
                 dynamicBackground: true,
                 dynamicImageBlur: 1.5,
                 dynamicIsImage: false,
@@ -67,6 +65,19 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
                     return {} as FullScreenPlayerState;
                 }
 
+                if (version <= 4) {
+                    const state = persistedState as { coverArtSize?: number | string };
+                    const legacyCoverArtSizeMap: Record<string, number> = {
+                        large: 100,
+                        medium: 75,
+                        small: 50,
+                    };
+
+                    if (typeof state.coverArtSize === 'string') {
+                        state.coverArtSize = legacyCoverArtSizeMap[state.coverArtSize] ?? 75;
+                    }
+                }
+
                 return persistedState;
             },
             name: 'store_full_screen_player',
@@ -74,7 +85,7 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
             // the "shrink visualizer" action back to the full-screen player; it isn't
             // meaningful across app restarts, so it's excluded from persistence.
             partialize: (state) => omit(state, ['visualizerReturnToPlayer']),
-            version: 4,
+            version: 5,
         },
     ),
 );
