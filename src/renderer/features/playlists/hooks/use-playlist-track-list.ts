@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { useListContext } from '/@/renderer/context/list-context';
 import { usePlaylistSongListFilters } from '/@/renderer/features/playlists/hooks/use-playlist-song-list-filters';
@@ -100,6 +100,7 @@ export function usePlaylistTrackList(
     const sortBy = (query.sortBy as SongListSort) ?? SongListSort.ID;
     // only re-randomize when the sort is actually random
     const randomRefreshRevision = sortBy === SongListSort.RANDOM ? refreshRevision : null;
+    const randomCacheRef = useRef<{ revision: boolean | null; songs: Song[] }>();
 
     const sortedAndFilteredSongs = useMemo(() => {
         const raw = data?.items ?? [];
@@ -108,6 +109,17 @@ export function usePlaylistTrackList(
             return searchLibraryItems(filtered, searchTerm, LibraryItem.SONG);
         }
         const sortOrder = (query.sortOrder as SortOrder) ?? SortOrder.ASC;
+
+        if (sortBy === SongListSort.RANDOM) {
+            const cached = randomCacheRef.current;
+            if (cached && cached.revision === randomRefreshRevision) {
+                return cached.songs;
+            }
+            const shuffled = sortSongList(filtered, sortBy, sortOrder);
+            randomCacheRef.current = { revision: randomRefreshRevision, songs: shuffled };
+            return shuffled;
+        }
+
         return sortSongList(filtered, sortBy, sortOrder);
     }, [data?.items, query, searchTerm, sortBy, randomRefreshRevision]);
 

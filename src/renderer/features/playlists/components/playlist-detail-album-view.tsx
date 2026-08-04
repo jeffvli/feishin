@@ -1,5 +1,5 @@
 import shuffle from 'lodash/shuffle';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { useGridRows } from '/@/renderer/components/item-list/helpers/use-grid-rows';
 import { useItemListColumnReorder } from '/@/renderer/components/item-list/helpers/use-item-list-column-reorder';
@@ -57,6 +57,7 @@ export const PlaylistDetailAlbumView = ({
     const sortBy = (query.sortBy as SongListSort) ?? SongListSort.ID;
     // only re-randomize when the sort is actually random
     const randomRefreshRevision = sortBy === SongListSort.RANDOM ? refreshRevision : null;
+    const randomCacheRef = useRef<{ revision: boolean | null; songs: Song[] }>();
 
     const filteredAndSortedSongs = useMemo(() => {
         const raw = data?.items ?? [];
@@ -73,6 +74,11 @@ export const PlaylistDetailAlbumView = ({
         const sortOrder = (query.sortOrder as SortOrder) ?? SortOrder.ASC;
 
         if (sortBy === SongListSort.RANDOM) {
+            const cached = randomCacheRef.current;
+            if (cached && cached.revision === randomRefreshRevision) {
+                return cached.songs;
+            }
+
             const songsByAlbum = new Map<string, Song[]>();
 
             searched.forEach((song) => {
@@ -84,9 +90,11 @@ export const PlaylistDetailAlbumView = ({
                 }
             });
 
-            return shuffle(Array.from(songsByAlbum.values())).flatMap((albumSongs) =>
+            const shuffled = shuffle(Array.from(songsByAlbum.values())).flatMap((albumSongs) =>
                 sortSongList(albumSongs, SongListSort.ALBUM, SortOrder.ASC),
             );
+            randomCacheRef.current = { revision: randomRefreshRevision, songs: shuffled };
+            return shuffled;
         }
 
         return sortSongList(searched, sortBy, sortOrder);
