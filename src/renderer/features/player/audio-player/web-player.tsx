@@ -37,7 +37,7 @@ export function WebPlayer() {
     const { t } = useTranslation();
     const { num, player1, player2, status } = usePlayerData();
     const repeat = usePlayerRepeat();
-    const repeatOneProgressRef = useRef({ player1: 0, player2: 0 });
+    const playbackProgressRef = useRef({ player1: 0, player2: 0 });
     const { mediaAutoNext, mediaPause, setTimestamp } = usePlayerActions();
     const playback = useMpvSettings();
     const { webAudio } = useWebAudio();
@@ -101,24 +101,72 @@ export function WebPlayer() {
         [],
     );
 
-    const handleRepeatOne = useCallback(
-        (playerId: 1 | 2, playedSeconds: number, duration: number) => {
-            if (repeat !== PlayerRepeat.ONE || duration <= 0 || num !== playerId) {
+    const handlePlaybackEnd = useCallback(
+        (playerId: 1 | 2, song: QueueSong | undefined, resetNextPlayer = false) => {
+            const state = usePlayerStoreBase.getState();
+
+            if (
+                !song ||
+                state.player.status !== PlayerStatus.PLAYING ||
+                state.player.playerNum !== playerId ||
+                state.getCurrentSong()?._uniqueId !== song._uniqueId
+            ) {
                 return;
             }
 
+            if (resetNextPlayer) {
+                const nextPlayer =
+                    playerId === 1 ? playerRef.current?.player2() : playerRef.current?.player1();
+                nextPlayer?.ref?.seekTo(0, 'seconds');
+            }
+
+            mediaAutoNext();
+
+            const endedPlayer =
+                playerId === 1 ? playerRef.current?.player1() : playerRef.current?.player2();
+            endedPlayer?.ref?.getInternalPlayer().pause();
+
+            // If mediaAutoNext resulted in a stopped/paused state (e.g. end of queue,
+            // or pauseOnNextSongEnd flag), stop all audio instead of restoring volume.
+            const currentStatus = usePlayerStoreBase.getState().player.status;
+            if (currentStatus !== PlayerStatus.PLAYING) {
+                playerRef.current?.pause();
+            } else {
+                playerRef.current?.setVolume(volume);
+            }
+            setIsTransitioning(false);
+        },
+        [mediaAutoNext, volume],
+    );
+
+    const handlePlaybackProgress = useCallback(
+        (playerId: 1 | 2, song: QueueSong | undefined, playedSeconds: number, duration: number) => {
+            if (duration <= 0 || num !== playerId) {
+                return false;
+            }
+
             const key = playerId === 1 ? 'player1' : 'player2';
-            const last = repeatOneProgressRef.current[key];
-            repeatOneProgressRef.current[key] = playedSeconds;
+            const last = playbackProgressRef.current[key];
+            playbackProgressRef.current[key] = playedSeconds;
 
             if (last > duration * 0.85 && playedSeconds < duration * 0.15) {
+                if (repeat !== PlayerRepeat.ONE) {
+                    // Chromium can restart direct-play audio at zero without firing `ended`.
+                    // Treat that wrap as the end, while the active song guard prevents a
+                    // delayed `ended` event from advancing twice.
+                    handlePlaybackEnd(playerId, song, true);
+                    return true;
+                }
+
                 setTimestamp(0);
                 eventEmitter.emit('PLAYER_REPEATED', {
                     index: usePlayerStoreBase.getState().player.index,
                 });
             }
+
+            return repeat === PlayerRepeat.ONE;
         },
-        [num, repeat, setTimestamp],
+        [handlePlaybackEnd, num, repeat, setTimestamp],
     );
 
     const onProgressPlayer1 = useCallback(
@@ -131,8 +179,8 @@ export function WebPlayer() {
                 setTimestamp(e.playedSeconds);
             }
 
-            if (repeat === PlayerRepeat.ONE) {
-                handleRepeatOne(1, e.playedSeconds, getDuration(playerRef.current.player1().ref));
+            const duration = getDuration(playerRef.current.player1().ref);
+            if (handlePlaybackProgress(1, player1, e.playedSeconds, duration)) {
                 return;
             }
 
@@ -148,7 +196,7 @@ export function WebPlayer() {
                         currentPlayer: playerRef.current.player1(),
                         currentPlayerNum: num,
                         currentTime: e.playedSeconds,
-                        duration: getDuration(playerRef.current.player1().ref),
+                        duration,
                         hasNextSong: Boolean(player2),
                         isTransitioning,
                         nextPlayer: playerRef.current.player2(),
@@ -160,7 +208,7 @@ export function WebPlayer() {
                 case PlayerStyle.GAPLESS:
                     gaplessHandler({
                         currentTime: e.playedSeconds,
-                        duration: getDuration(playerRef.current.player1().ref),
+                        duration,
                         hasNextSong: Boolean(player2),
                         isFlac: false,
                         isTransitioning,
@@ -173,11 +221,11 @@ export function WebPlayer() {
         [
             crossfadeDuration,
             crossfadeStyle,
-            handleRepeatOne,
+            handlePlaybackProgress,
             isTransitioning,
             num,
+            player1,
             player2,
-            repeat,
             setTimestamp,
             transitionType,
             volume,
@@ -194,8 +242,8 @@ export function WebPlayer() {
                 setTimestamp(e.playedSeconds);
             }
 
-            if (repeat === PlayerRepeat.ONE) {
-                handleRepeatOne(2, e.playedSeconds, getDuration(playerRef.current.player2().ref));
+            const duration = getDuration(playerRef.current.player2().ref);
+            if (handlePlaybackProgress(2, player2, e.playedSeconds, duration)) {
                 return;
             }
 
@@ -211,7 +259,7 @@ export function WebPlayer() {
                         currentPlayer: playerRef.current.player2(),
                         currentPlayerNum: num,
                         currentTime: e.playedSeconds,
-                        duration: getDuration(playerRef.current.player2().ref),
+                        duration,
                         hasNextSong: Boolean(player1),
                         isTransitioning,
                         nextPlayer: playerRef.current.player1(),
@@ -223,7 +271,7 @@ export function WebPlayer() {
                 case PlayerStyle.GAPLESS:
                     gaplessHandler({
                         currentTime: e.playedSeconds,
-                        duration: getDuration(playerRef.current.player2().ref),
+                        duration,
                         hasNextSong: Boolean(player1),
                         isFlac: false,
                         isTransitioning,
@@ -236,11 +284,11 @@ export function WebPlayer() {
         [
             crossfadeDuration,
             crossfadeStyle,
-            handleRepeatOne,
+            handlePlaybackProgress,
             isTransitioning,
             num,
             player1,
-            repeat,
+            player2,
             setTimestamp,
             transitionType,
             volume,
@@ -248,50 +296,19 @@ export function WebPlayer() {
     );
 
     const handleOnEndedPlayer1 = useCallback(() => {
-        const promise = new Promise((resolve) => {
-            mediaAutoNext();
-            resolve(true);
-        });
-
-        promise.then(() => {
-            playerRef.current?.player1()?.ref?.getInternalPlayer().pause();
-
-            // If mediaAutoNext resulted in a stopped/paused state (e.g. end of queue,
-            // or pauseOnNextSongEnd flag), stop all audio instead of restoring volume.
-            const currentStatus = usePlayerStoreBase.getState().player.status;
-            if (currentStatus !== PlayerStatus.PLAYING) {
-                playerRef.current?.pause();
-            } else {
-                playerRef.current?.setVolume(volume);
-            }
-            setIsTransitioning(false);
-        });
-    }, [mediaAutoNext, volume]);
+        handlePlaybackEnd(1, player1);
+    }, [handlePlaybackEnd, player1]);
 
     const handleOnEndedPlayer2 = useCallback(() => {
-        const promise = new Promise((resolve) => {
-            mediaAutoNext();
-            resolve(true);
-        });
-
-        promise.then(() => {
-            playerRef.current?.player2()?.ref?.getInternalPlayer().pause();
-
-            const currentStatus = usePlayerStoreBase.getState().player.status;
-            if (currentStatus !== PlayerStatus.PLAYING) {
-                playerRef.current?.pause();
-            } else {
-                playerRef.current?.setVolume(volume);
-            }
-            setIsTransitioning(false);
-        });
-    }, [mediaAutoNext, volume]);
+        handlePlaybackEnd(2, player2);
+    }, [handlePlaybackEnd, player2]);
 
     const player = usePlayer();
 
     usePlayerEvents(
         {
             onCurrentSongChange: () => {
+                playbackProgressRef.current = { player1: 0, player2: 0 };
                 setIsTransitioning(false);
             },
             onPlayerQueueChange: () => {
@@ -303,6 +320,7 @@ export function WebPlayer() {
                 setIsTransitioning(false);
 
                 const timestamp = properties.timestamp;
+                playbackProgressRef.current[num === 1 ? 'player1' : 'player2'] = timestamp;
 
                 // Reset transition state if seeking during a crossfade transition
                 if (isTransitioning && transitionType === PlayerStyle.CROSSFADE) {
