@@ -59,6 +59,7 @@ const getRowIdFromTableColumn = (tableColumn: TableColumn): null | string => {
         [TableColumn.CODEC]: null,
         [TableColumn.COMMENT]: null,
         [TableColumn.COMPOSER]: null,
+        [TableColumn.DATE]: 'date',
         [TableColumn.DATE_ADDED]: 'createdAt',
         [TableColumn.DISC_NUMBER]: null,
         [TableColumn.DURATION]: 'duration',
@@ -73,6 +74,7 @@ const getRowIdFromTableColumn = (tableColumn: TableColumn): null | string => {
         [TableColumn.PLAY_COUNT]: 'playCount',
         [TableColumn.PLAYLIST_REORDER]: null,
         [TableColumn.RELEASE_DATE]: 'releaseDate',
+        [TableColumn.RELEASE_YEAR]: 'releaseYear',
         [TableColumn.ROW_INDEX]: null,
         [TableColumn.SAMPLE_RATE]: 'sampleRate',
         [TableColumn.SIZE]: null,
@@ -84,7 +86,7 @@ const getRowIdFromTableColumn = (tableColumn: TableColumn): null | string => {
         [TableColumn.TRACK_NUMBER]: null,
         [TableColumn.USER_FAVORITE]: 'userFavorite',
         [TableColumn.USER_RATING]: 'rating',
-        [TableColumn.YEAR]: 'releaseYear',
+        [TableColumn.YEAR]: 'year',
     };
     return columnToRowIdMap[tableColumn] || null;
 };

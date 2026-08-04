@@ -147,7 +147,15 @@
                 "lyricFollowScrollAlignment": "Les lletres segueixen l'alineament",
                 "lyricLineLeadTime": "Temps de resposta de la línia (ms)",
                 "lyricPaddingLeft": "Espai a l'esquerra de la lletra (%)",
-                "lyricPaddingRight": "Espai a la dreta de la lletra (%)"
+                "lyricPaddingRight": "Espai a la dreta de la lletra (%)",
+                "followCurrentLyric_description": "Desplaça automàticament per mantenir la lletra activa a la vista",
+                "lyricFollowScrollAlignment_description": "Posició vertical de la línia activa mentre se segueix",
+                "lyricAlignment_description": "Alineació horitzontal de la lletra",
+                "lyricGapSynchronized_description": "Espaiat vertical entre les línies de les lletres sincronitzades",
+                "lyricGapUnsynchronized_description": "Espaiat vertical entre les línies de les lletres no sincronitzades",
+                "lyricLineLeadTime_description": "Avança la línia activa aquests tants milisegons abans de la seva marca temporal",
+                "lyricPaddingLeft_description": "Espaiat a l'esquerra com a percentatge de l'àrea de la lletra",
+                "lyricPaddingRight_description": "Espaiat a la dreta com a percentatge de l'àrea de la lletra"
             },
             "lyrics": "Lletres",
             "visualizer": "Visualitzador",

@@ -43,7 +43,7 @@ export const useUpdateCurrentSong = () => {
                     if (!isEqual(currentSongData, updatedSong)) {
                         updateQueueSong(currentSong.id, updatedSong);
 
-                        logger.debug('Song updated in queue', {
+                        logger.debug('Differences found, updating song in queue', {
                             id: currentSong.id,
                             name: updatedSong.name,
                         });

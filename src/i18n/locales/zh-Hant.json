@@ -226,7 +226,8 @@
             "noMusicFolder": "未選取任何媒體庫",
             "multipleMusicFolders": "已選取 {{count}} 個媒體庫",
             "commandPalette": "開啟命令面板",
-            "logout": "登出"
+            "logout": "登出",
+            "rescanLibrary": "重新掃描媒體庫"
         },
         "fullscreenPlayer": {
             "config": {
@@ -249,7 +250,21 @@
                 "lyricFollowScrollAlignment": "歌詞跟隨滾動對齊",
                 "lyricLineLeadTime": "歌詞提前顯示時間 (ms)",
                 "lyricPaddingLeft": "歌詞左側邊距 (%)",
-                "lyricPaddingRight": "歌詞右側邊距 (%)"
+                "lyricPaddingRight": "歌詞右側邊距 (%)",
+                "followCurrentLyric_description": "自動捲動以保持目前歌詞於畫面中",
+                "lyricFollowScrollAlignment_description": "跟隨歌詞時，目前歌詞的垂直顯示位置",
+                "lyricAlignment_description": "歌詞文字的水平對齊方式",
+                "lyricGapSynchronized_description": "動態歌詞的行距",
+                "lyricGapUnsynchronized_description": "靜態歌詞的行距",
+                "lyricLineLeadTime_description": "提前指定毫秒數顯示目前歌詞",
+                "lyricPaddingLeft_description": "歌詞區域的左側留白比例",
+                "lyricPaddingRight_description": "歌詞區域的右側留白比例",
+                "lyricSizeSynchronized_description": "動態歌詞的字型大小",
+                "lyricSizeUnsynchronized_description": "靜態歌詞的字型大小",
+                "lyricOpacityNonActive_description": "非目前歌詞的透明度",
+                "lyricScaleNonActive_description": "非目前歌詞的縮放比例",
+                "showLyricMatch_description": "顯示匹配歌詞的歌曲名稱與藝人",
+                "showLyricProvider_description": "顯示哪個提供者提供了目前的歌詞"
             },
             "lyrics": "歌詞",
             "related": "相關歌曲",
@@ -287,7 +302,8 @@
             "queryBuilder": "查詢建構器",
             "playerFilters": "播放篩選器",
             "logger": "日誌記錄器",
-            "lyricsDisplay": "歌詞顯示"
+            "lyricsDisplay": "歌詞顯示",
+            "lyricsTranslation": "歌詞翻譯"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
@@ -534,7 +550,7 @@
         "hotkey_zoomOut": "縮小",
         "language_description": "設定應用程式的語言（$t(common.restartRequired)）",
         "lyricFetch": "從網路取得歌詞",
-        "lyricFetch_description": "從多個網路來源取得歌詞",
+        "lyricFetch_description": "從多個選擇的來源取得歌詞",
         "lyricFetchProvider": "歌詞來源",
         "lyricOffset": "歌詞偏移（毫秒）",
         "lyricOffset_description": "將歌詞偏移指定的毫秒數",
@@ -673,11 +689,11 @@
         "transcodeFormat": "轉碼的格式",
         "transcodeFormat_description": "選擇要轉碼的格式。留空來讓伺服器決定",
         "translationApiProvider": "翻譯API提供者",
-        "translationApiProvider_description": "翻譯API的提供者",
+        "translationApiProvider_description": "選擇用來翻譯的 API 提供者",
         "translationApiKey": "翻譯API金鑰",
         "translationApiKey_description": "翻譯的API金鑰（僅限全域伺服端點）",
         "translationTargetLanguage": "目標翻譯語言",
-        "translationTargetLanguage_description": "翻譯的目標語言",
+        "translationTargetLanguage_description": "設定用來自動翻譯的目標語言",
         "trayEnabled": "顯示系統匣",
         "trayEnabled_description": "顯示/隱藏系統匣圖示/選單。如果停用，將同時停用最小化/退出到系統匣",
         "volumeWidth": "音量條寬度",
@@ -865,7 +881,7 @@
         "autoDJ_songStrategy": "歌曲選擇模式",
         "autoDJ_strategy_option_library_random": "隨機",
         "autoDJ_strategy_option_similar": "相似",
-        "enableFurigana_description": "在日文歌詞漢字上方顯示發音標記（振假名）。",
+        "enableFurigana_description": "在日文歌詞漢字上方顯示發音標記（振假名）",
         "enableFurigana": "啟用振假名顯示",
         "equalizer_descriptionMpv": "透過 FFmpeg lavfi (MPV) 使用參數等化器",
         "equalizer_descriptionWebAudio": "透過 Web Audio API 使用參數等化器",
@@ -901,7 +917,7 @@
         "compressorSavePreset_description": "將目前壓縮器設定儲存為具名預設",
         "compressorThreshold_description": "開始進行壓縮的訊號電平。",
         "compressorThreshold": "閾值",
-        "enableRomaji_description": "在日文歌詞下方顯示羅馬拼音。",
+        "enableRomaji_description": "在日文歌詞下方顯示羅馬拼音",
         "enableRomaji": "啟用羅馬拼音顯示",
         "windowBarTrackinfo": "在視窗標題列顯示曲目資訊",
         "windowBarTrackinfo_description": "在視窗標題列中顯示目前播放曲目的標題與藝人、播放佇列中的位置，以及播放/暫停狀態。",
@@ -920,7 +936,13 @@
         "showQueueInSidebar_description": "播放器側邊欄將新增一個顯示播放佇列的面板",
         "showQueueInSidebar": "在播放器側邊欄中顯示播放佇列",
         "showFavorites_description": "控制收藏（愛心）按鈕是否顯示於介面中",
-        "showFavorites": "顯示收藏"
+        "showFavorites": "顯示收藏",
+        "customThemeErrors_description": "無法載入這些主題檔案。",
+        "customThemeErrors": "錯誤",
+        "customThemeWarnings_description": "這些主題已載入，但部分值無效，已被忽略。",
+        "customThemeWarnings": "警告",
+        "customThemes_description": "將 .json 主題檔案拖入此資料夾以新增自訂主題。每當您新增、編輯或移除檔案時，都會自動載入它們。",
+        "customThemes": "自訂主題"
     },
     "table": {
         "config": {

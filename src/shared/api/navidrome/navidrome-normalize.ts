@@ -212,9 +212,13 @@ const normalizeSong = (
 
     const fromSongRelease = parsePartialIsoDate(item.releaseDate);
     const songApiYear = coerceYear(item.year);
+    const fromSongDate = parsePartialIsoDate(item.date);
     const releaseYear: null | number =
         fromSongRelease.year > 0 ? fromSongRelease.year : songApiYear > 0 ? songApiYear : null;
-    const releaseDate = fromSongRelease.date ?? (songApiYear > 0 ? String(songApiYear) : null);
+    const releaseDate =
+        fromSongRelease.date ?? fromSongDate.date ?? (songApiYear > 0 ? String(songApiYear) : null);
+    const date = fromSongDate.date ?? (songApiYear > 0 ? String(songApiYear) : null);
+    const year = fromSongDate.year > 0 ? fromSongDate.year : releaseYear;
 
     return {
         album: item.album,
@@ -233,6 +237,7 @@ const normalizeSong = (
         compilation: item.compilation,
         container: item.suffix,
         createdAt: item.createdAt,
+        date,
         discNumber: item.discNumber,
         discSubtitle: item.discSubtitle ? item.discSubtitle : null,
         duration: item.duration * 1000,
@@ -285,6 +290,7 @@ const normalizeSong = (
         updatedAt: item.updatedAt,
         userFavorite: item.starred || false,
         userRating: item.rating || null,
+        year,
     };
 };
 
@@ -337,6 +343,7 @@ const normalizeAlbum = (
 ): Album => {
     const releaseDate = normalizeNavidromeReleaseDate(item);
     const originalDate = normalizeNavidromeOriginalDate(item);
+    const trackYearRange = { max: item.maxYear, min: item.minYear };
 
     return {
         ...parseAlbumTags(item),
@@ -384,6 +391,7 @@ const normalizeAlbum = (
         songs: item.songs ? item.songs.map((song) => normalizeSong(song, server)) : undefined,
         sortName: item.orderAlbumName,
         tags: item.tags || null,
+        trackYearRange,
         updatedAt: item.updatedAt,
         userFavorite: item.starred || false,
         userRating: item.rating || null,

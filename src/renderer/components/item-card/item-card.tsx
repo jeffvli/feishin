@@ -1251,6 +1251,24 @@ export const getDataRows = (type?: 'compact' | 'default' | 'poster'): DataRow[] 
         },
         {
             format: (data) => {
+                if ('year' in data && data.year) {
+                    return String(data.year);
+                }
+                return '';
+            },
+            id: 'year',
+        },
+        {
+            format: (data) => {
+                if ('date' in data && data.date) {
+                    return formatPartialIsoDateUTC(data.date);
+                }
+                return '';
+            },
+            id: 'date',
+        },
+        {
+            format: (data) => {
                 if ('createdAt' in data && data.createdAt) {
                     return formatDateAbsolute(data.createdAt);
                 }

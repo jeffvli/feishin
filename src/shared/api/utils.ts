@@ -311,6 +311,14 @@ export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: Sor
             );
             break;
 
+        case SongListSort.RELEASE_YEAR:
+            results = orderBy(
+                results,
+                ['releaseYear', (v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
+                [order, order, order, order],
+            );
+            break;
+
         case SongListSort.SORT_NAME:
             results = orderBy(results, [(v) => v.sortName ?? v.name], [order]);
             break;
@@ -318,7 +326,7 @@ export const sortSongList = (songs: Song[], sortBy: SongListSort, sortOrder: Sor
         case SongListSort.YEAR:
             results = orderBy(
                 results,
-                ['releaseYear', (v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
+                ['year', (v) => v.album?.toLowerCase(), 'discNumber', 'trackNumber'],
                 [order, order, order, order],
             );
             break;

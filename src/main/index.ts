@@ -765,6 +765,29 @@ async function createWindow(first = true): Promise<void> {
         log.error('Renderer process unresponsive');
     });
 
+    // Mouse navigation
+    mainWindow.on('app-command', (_event, command) => {
+        if (
+            command === 'browser-backward' &&
+            mainWindow?.webContents.navigationHistory.canGoBack()
+        ) {
+            mainWindow.webContents.navigationHistory.goBack();
+        } else if (
+            command === 'browser-forward' &&
+            mainWindow?.webContents.navigationHistory.canGoForward()
+        ) {
+            mainWindow.webContents.navigationHistory.goForward();
+        }
+    });
+
+    mainWindow.on('swipe', (_event, direction) => {
+        if (direction === 'right' && mainWindow?.webContents.navigationHistory.canGoForward()) {
+            mainWindow.webContents.navigationHistory.goForward();
+        } else if (direction === 'left' && mainWindow?.webContents.navigationHistory.canGoBack()) {
+            mainWindow.webContents.navigationHistory.goBack();
+        }
+    });
+
     mainWindow.on('closed', () => {
         log.info('Main window closed');
         ipcMain.removeHandler('window-clear-cache');

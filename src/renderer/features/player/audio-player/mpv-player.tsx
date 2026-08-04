@@ -28,7 +28,7 @@ export function MpvPlayer() {
     const { speed } = usePlayerProperties();
     const isMuted = usePlayerMuted();
     const volume = usePlayerVolume();
-    const { audioFadeOnStatusChange } = usePlaybackSettings();
+    const { audioFadeOnStatusChange, preservePitch } = usePlaybackSettings();
 
     const [localPlayerStatus, setLocalPlayerStatus] = useState<PlayerStatus>(status);
     const [isTransitioning, setIsTransitioning] = useState(false);
@@ -180,6 +180,7 @@ export function MpvPlayer() {
             onProgress={onProgress}
             playerRef={playerRef}
             playerStatus={localPlayerStatus}
+            preservePitch={preservePitch}
             speed={speed}
             volume={volume}
         />

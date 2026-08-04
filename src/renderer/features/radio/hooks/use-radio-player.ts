@@ -5,6 +5,7 @@ import { createWithEqualityFn } from 'zustand/traditional';
 
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { usePlaybackType, usePlayerStoreBase, useSettingsStore } from '/@/renderer/store';
+import { logger } from '/@/renderer/utils/logger';
 import { PlayerStatus, PlayerType } from '/@/shared/types/types';
 
 export type RadioCurrentStationArt = {
@@ -43,6 +44,7 @@ interface RadioStore {
 export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
     actions: {
         pause: () => {
+            logger.debug('Paused radio playback');
             set({ isPlaying: false });
             usePlayerStoreBase.getState().mediaPause();
         },
@@ -68,6 +70,10 @@ export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
                     nextStationArt = stationArt ?? null;
                 }
 
+                logger.debug('Started radio playback', {
+                    hasStationArt: Boolean(nextStationArt),
+                    stationName: newStationName,
+                });
                 usePlayerStoreBase.getState().mediaPlay();
 
                 return {
@@ -97,8 +103,10 @@ export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
             // When stopping radio with mpv, just pause instead of calling mediaStop
             // This prevents mpv from quitting
             if (playbackType === PlayerType.LOCAL && mpvPlayer) {
+                logger.debug('Paused radio playback via mpv');
                 mpvPlayer.pause();
             } else {
+                logger.debug('Stopped radio playback');
                 usePlayerStoreBase.getState().mediaStop();
             }
         },

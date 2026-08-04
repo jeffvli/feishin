@@ -48,12 +48,14 @@ import { NumericColumn } from '/@/renderer/components/item-list/item-table-list/
 import { PathColumn } from '/@/renderer/components/item-list/item-table-list/columns/path-column';
 import { PlaylistReorderColumn } from '/@/renderer/components/item-list/item-table-list/columns/playlist-reorder-column';
 import { RatingColumn } from '/@/renderer/components/item-list/item-table-list/columns/rating-column';
+import { ReleaseYearColumn } from '/@/renderer/components/item-list/item-table-list/columns/release-year-column';
 import { RowIndexColumn } from '/@/renderer/components/item-list/item-table-list/columns/row-index-column';
 import { SizeColumn } from '/@/renderer/components/item-list/item-table-list/columns/size-column';
 import { TextColumn } from '/@/renderer/components/item-list/item-table-list/columns/text-column';
 import { TitleArtistColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-artist-column';
 import { TitleColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-column';
 import { TitleCombinedColumn } from '/@/renderer/components/item-list/item-table-list/columns/title-combined-column';
+import { TrackDateColumn } from '/@/renderer/components/item-list/item-table-list/columns/track-date-column';
 import { TrackNumberColumn } from '/@/renderer/components/item-list/item-table-list/columns/track-number-column';
 import { YearColumn } from '/@/renderer/components/item-list/item-table-list/columns/year-column';
 import { useItemDragDropState } from '/@/renderer/components/item-list/item-table-list/hooks/use-item-drag-drop-state';
@@ -248,6 +250,11 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
             case TableColumn.COMPOSER:
                 return <ComposerColumn {...props} {...dragProps} controls={controls} type={type} />;
 
+            case TableColumn.DATE:
+                return (
+                    <TrackDateColumn {...props} {...dragProps} controls={controls} type={type} />
+                );
+
             case TableColumn.DATE_ADDED:
                 return <DateColumn {...props} {...dragProps} controls={controls} type={type} />;
 
@@ -279,6 +286,11 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
             case TableColumn.RELEASE_DATE:
                 return (
                     <AbsoluteDateColumn {...props} {...dragProps} controls={controls} type={type} />
+                );
+
+            case TableColumn.RELEASE_YEAR:
+                return (
+                    <ReleaseYearColumn {...props} {...dragProps} controls={controls} type={type} />
                 );
 
             case TableColumn.ROW_INDEX:
@@ -1268,6 +1280,9 @@ export const columnLabelMap: Record<TableColumn, ReactNode | string> = {
     [TableColumn.COMPOSER]: i18n.t('table.config.label.composer', {
         postProcess: 'upperCase',
     }) as string,
+    [TableColumn.DATE]: i18n.t('table.column.date', {
+        postProcess: 'upperCase',
+    }) as string,
     [TableColumn.DATE_ADDED]: i18n.t('table.column.dateAdded', {
         postProcess: 'upperCase',
     }) as string,
@@ -1302,6 +1317,9 @@ export const columnLabelMap: Record<TableColumn, ReactNode | string> = {
         </Flex>
     ),
     [TableColumn.RELEASE_DATE]: i18n.t('table.column.releaseDate', {
+        postProcess: 'upperCase',
+    }) as string,
+    [TableColumn.RELEASE_YEAR]: i18n.t('table.column.releaseYear', {
         postProcess: 'upperCase',
     }) as string,
     [TableColumn.ROW_INDEX]: (
@@ -1339,7 +1357,7 @@ export const columnLabelMap: Record<TableColumn, ReactNode | string> = {
             <Icon icon="star" />
         </Flex>
     ),
-    [TableColumn.YEAR]: i18n.t('table.column.releaseYear', { postProcess: 'upperCase' }) as string,
+    [TableColumn.YEAR]: i18n.t('table.column.year', { postProcess: 'upperCase' }) as string,
 };
 
 export const ColumnNullFallback = (props: ItemTableListInnerColumn) => {

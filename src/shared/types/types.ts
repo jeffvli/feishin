@@ -178,6 +178,7 @@ export enum TableColumn {
     CODEC = 'container',
     COMMENT = 'comment',
     COMPOSER = 'composer',
+    DATE = 'date',
     DATE_ADDED = 'createdAt',
     DISC_NUMBER = 'discNumber',
     DURATION = 'duration',
@@ -192,6 +193,7 @@ export enum TableColumn {
     PLAY_COUNT = 'playCount',
     PLAYLIST_REORDER = 'playlistReorder',
     RELEASE_DATE = 'releaseDate',
+    RELEASE_YEAR = 'releaseYear',
     ROW_INDEX = 'rowIndex',
     SAMPLE_RATE = 'sampleRate',
     SIZE = 'size',
@@ -203,7 +205,7 @@ export enum TableColumn {
     TRACK_NUMBER = 'trackNumber',
     USER_FAVORITE = 'userFavorite',
     USER_RATING = 'userRating',
-    YEAR = 'releaseYear',
+    YEAR = 'year',
 }
 
 export type DiscoveredServerItem = {

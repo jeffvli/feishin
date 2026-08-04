@@ -1,4 +1,3 @@
-import { openModal } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { Fragment, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,8 +5,6 @@ import { Link, useNavigate } from 'react-router';
 
 import styles from './app-menu.module.css';
 
-import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
-import { ServerList } from '/@/renderer/features/servers/components/server-list';
 import { UpdateAvailableButton } from '/@/renderer/features/settings/components/update-available-button';
 import { openSettingsModal } from '/@/renderer/features/settings/utils/open-settings-modal';
 import { ServerSelector } from '/@/renderer/features/sidebar/components/server-selector';
@@ -120,13 +117,6 @@ export const AppMenu = () => {
         });
     };
 
-    const handleManageServersModal = () => {
-        openModal({
-            children: <ServerList />,
-            title: t('page.manageServers.title'),
-        });
-    };
-
     const handleQuit = () => {
         browser?.quit();
     };
@@ -220,21 +210,6 @@ export const AppMenu = () => {
         },
         {
             id: 'divider-2',
-            type: 'divider',
-        },
-        {
-            condition: !isServerLock(),
-            id: 'manage-servers',
-            item: {
-                label: t('page.appMenu.manageServers'),
-                leftSection: <Icon icon="edit" />,
-                onClick: handleManageServersModal,
-                type: 'item',
-            },
-            type: 'conditional-item',
-        },
-        {
-            id: 'divider-3',
             type: 'divider',
         },
         {

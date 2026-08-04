@@ -40,6 +40,31 @@ export function getButterchurnPresetOptions(presets: Record<string, string>) {
     );
 }
 
+// Merges every non-image preset bundle shipped in butterchurn-presets (base, extra,
+// md1). Skips image.js/imageData.js on purpose since those presets
+// depend on separate texture data and are more likely to break/require extra wiring.
+let mergedPresetsCache: null | Record<string, any> = null;
+
+export async function loadAllButterchurnPresets(): Promise<Record<string, any>> {
+    if (mergedPresetsCache) return mergedPresetsCache;
+
+    const [base, extra, md1] = await Promise.all([
+        import('butterchurn-presets/dist/base.js'),
+        import('butterchurn-presets/dist/extra.js'),
+        import('butterchurn-presets/dist/md1.js'),
+    ]);
+
+    const presets = {
+        ...base.default,
+        ...extra.default,
+        ...md1.default,
+    };
+
+    mergedPresetsCache = presets;
+
+    return presets;
+}
+
 const VisualizerInner = () => {
     const { webAudio } = useWebAudio();
     const canvasRef = createRef<HTMLCanvasElement>();
@@ -72,15 +97,14 @@ const VisualizerInner = () => {
 
         const loadLibraries = async () => {
             try {
-                const [butterchurnModule, presetsModule] = await Promise.all([
+                const [butterchurnModule, mergedPresets] = await Promise.all([
                     import('butterchurn'),
-                    import('butterchurn-presets'),
+                    loadAllButterchurnPresets(),
                 ]);
 
                 if (isMounted) {
                     butterchurnRef.current = butterchurnModule.default;
-                    butterchurnPresetsRef.current = butterchurnPresetsRef.current =
-                        getButterchurnPresetOptions(presetsModule.default);
+                    butterchurnPresetsRef.current = getButterchurnPresetOptions(mergedPresets);
 
                     setLibrariesLoaded(true);
                 }
@@ -533,11 +557,9 @@ export const Visualizer = () => {
 
         const loadPresets = async () => {
             try {
-                const presetsModule = await import('butterchurn-presets');
+                const mergedPresets = await loadAllButterchurnPresets();
                 if (isMounted) {
-                    butterchurnPresetsRef.current = getButterchurnPresetOptions(
-                        presetsModule.default,
-                    );
+                    butterchurnPresetsRef.current = getButterchurnPresetOptions(mergedPresets);
                     setPresetsLoaded(true);
                 }
             } catch (error) {
@@ -593,6 +615,15 @@ export const Visualizer = () => {
         }
     };
 
+    const pickRandomPreset = (presetList: string[], currentPresetName: string | undefined) => {
+        const availablePresets =
+            presetList.length > 1
+                ? presetList.filter((name) => name !== currentPresetName)
+                : presetList;
+        const randomIndex = Math.floor(Math.random() * availablePresets.length);
+        return availablePresets[randomIndex];
+    };
+
     const handleNextPreset = () => {
         if (!presetsLoaded) return;
 
@@ -600,10 +631,16 @@ export const Visualizer = () => {
         if (presetList.length === 0) return;
 
         const currentPresetName = useSettingsStore.getState().visualizer.butterchurn.currentPreset;
-        const currentIndex = currentPresetName ? presetList.indexOf(currentPresetName) : -1;
-        const nextIndex =
-            currentIndex >= 0 && currentIndex < presetList.length - 1 ? currentIndex + 1 : 0;
-        const nextPresetName = presetList[nextIndex];
+
+        let nextPresetName: string;
+        if (butterchurnSettings.randomizeNextPreset) {
+            nextPresetName = pickRandomPreset(presetList, currentPresetName);
+        } else {
+            const currentIndex = currentPresetName ? presetList.indexOf(currentPresetName) : -1;
+            const nextIndex =
+                currentIndex >= 0 && currentIndex < presetList.length - 1 ? currentIndex + 1 : 0;
+            nextPresetName = presetList[nextIndex];
+        }
 
         setSettings({
             visualizer: {
@@ -621,9 +658,15 @@ export const Visualizer = () => {
         if (presetList.length === 0) return;
 
         const currentPresetName = useSettingsStore.getState().visualizer.butterchurn.currentPreset;
-        const currentIndex = currentPresetName ? presetList.indexOf(currentPresetName) : -1;
-        const prevIndex = currentIndex > 0 ? currentIndex - 1 : presetList.length - 1;
-        const prevPresetName = presetList[prevIndex];
+
+        let prevPresetName: string;
+        if (butterchurnSettings.randomizeNextPreset) {
+            prevPresetName = pickRandomPreset(presetList, currentPresetName);
+        } else {
+            const currentIndex = currentPresetName ? presetList.indexOf(currentPresetName) : -1;
+            const prevIndex = currentIndex > 0 ? currentIndex - 1 : presetList.length - 1;
+            prevPresetName = presetList[prevIndex];
+        }
 
         setSettings({
             visualizer: {

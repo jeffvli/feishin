@@ -1,6 +1,7 @@
 import type { AutocompleteProps as MantineAutocompleteProps } from '@mantine/core';
 
 import { Autocomplete as MantineAutocomplete } from '@mantine/core';
+import clsx from 'clsx';
 import { CSSProperties, forwardRef } from 'react';
 
 import styles from './autocomplete.module.css';
@@ -14,6 +15,7 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
     (
         {
             classNames,
+            clearable = false,
             maxWidth,
             size = 'sm',
             style,
@@ -28,12 +30,20 @@ export const Autocomplete = forwardRef<HTMLInputElement, AutocompleteProps>(
                 classNames={{
                     description: styles.description,
                     dropdown: styles.dropdown,
-                    input: styles.input,
+                    input: clsx(styles.input, {
+                        [styles.clearable]: clearable,
+                    }),
                     label: styles.label,
                     option: styles.option,
                     root: styles.root,
                     section: styles.section,
                     ...classNames,
+                }}
+                clearable={clearable}
+                clearButtonProps={{
+                    classNames: {
+                        root: styles.clearButton,
+                    },
                 }}
                 ref={ref}
                 size={size}

@@ -214,6 +214,11 @@ export const CLIENT_SIDE_SONG_FILTERS = [
     {
         defaultOrder: SortOrder.DESC,
         name: i18n.t('filter.releaseYear'),
+        value: SongListSort.RELEASE_YEAR,
+    },
+    {
+        defaultOrder: SortOrder.DESC,
+        name: i18n.t('filter.year'),
         value: SongListSort.YEAR,
     },
 ];
@@ -591,6 +596,11 @@ const SONG_LIST_FILTERS: Partial<
         {
             defaultOrder: SortOrder.DESC,
             name: i18n.t('filter.releaseYear'),
+            value: SongListSort.RELEASE_YEAR,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.year'),
             value: SongListSort.YEAR,
         },
     ],

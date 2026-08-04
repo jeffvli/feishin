@@ -27,6 +27,7 @@ interface MpvPlayerEngineProps {
     onProgress: (e: PlayerOnProgressProps) => void;
     playerRef: RefObject<MpvPlayerEngineHandle | null>;
     playerStatus: PlayerStatus;
+    preservePitch?: boolean;
     speed?: number;
     volume: number;
 }
@@ -45,6 +46,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
         onProgress,
         playerRef,
         playerStatus,
+        preservePitch,
         speed,
         volume,
     } = props;
@@ -107,6 +109,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
             // Initialize mpv with fresh state
             const properties: Record<string, any> = {
                 ...getMpvProperties(mpvProperties),
+                'audio-pitch-correction': preservePitch === false ? 'no' : 'yes',
                 speed: speed,
                 volume: volume,
             };
@@ -161,8 +164,8 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
             isInitializedRef.current = false;
             hasPopulatedQueueRef.current = false;
         };
-        // Note: volume, speed, and transcode are intentionally not in dependencies.
-        // Volume and speed changes are handled by separate useEffects below to avoid
+        // Note: volume, speed, preservePitch, and transcode are intentionally not in dependencies.
+        // Volume speed, and preservePitch changes are handled by separate useEffects below to avoid
         // reinitializing the entire player. Transcode changes are handled by queue
         // update callbacks in usePlayerEvents.
         // reloadTrigger is included to allow manual reload via MPV_RELOAD event.
@@ -203,6 +206,19 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
 
         mpvPlayer.setProperties({ speed });
     }, [speed]);
+
+    // Update pitch correction status
+    useEffect(() => {
+        if (!mpvPlayer) {
+            return;
+        }
+
+        if (preservePitch === false) {
+            mpvPlayer.setProperties({ 'audio-pitch-correction': 'no' });
+        } else {
+            mpvPlayer.setProperties({ 'audio-pitch-correction': 'yes' });
+        }
+    }, [preservePitch]);
 
     // Handle play/pause status
     useEffect(() => {

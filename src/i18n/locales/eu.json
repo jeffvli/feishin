@@ -37,7 +37,8 @@
         "shuffleSelected": "Nahastu aukeratutak",
         "moveItems": "Elementuak mugitu",
         "openApplicationDirectory": "Ireki aplikazioaren direktorioa",
-        "goToCurrent": "Joan uneko elementura"
+        "goToCurrent": "Joan uneko elementura",
+        "createPlaylistFromQueue": "Sortu $t(entity.playlist, {\"count\": 1}) ilaratik"
     },
     "common": {
         "add": "Gehitu",
@@ -725,7 +726,12 @@
         "sidePlayQueueLayout_optionVertical": "Bertikala",
         "skipDuration_description": "Erreproduzitzailearen barran saltatzeko botoiak erabiltzean saltatzeko iraupena ezartzen du",
         "skipPlaylistPage_description": "Erreprodukzio-zerrenda batera nabigatzean, joan erreprodukzio-zerrendako abestien zerrendara lehenetsitako orrialdera joan beharrean",
-        "translationApiKey_description": "Itzulpenerako api gakoa (zerbitzu globalaren amaiera-puntua soilik)"
+        "translationApiKey_description": "Itzulpenerako api gakoa (zerbitzu globalaren amaiera-puntua soilik)",
+        "savePlayQueue_description": "Gorde erreprodukzio-ilara aplikazioa ixtean eta berrezarri aplikazioa irekitzean",
+        "showSkipButton_description": "Erakutsi edo ezkutatu saltatzeko botoiak erreproduzitzailearen barran",
+        "showSkipButton": "Erakutsi saltatzeko botoiak",
+        "showSkipButtons_description": "Erakutsi edo ezkutatu saltatzeko botoiak erreproduzitzailearen barran",
+        "showSkipButtons": "Erakutsi saltatzeko botoiak"
     },
     "form": {
         "addServer": {

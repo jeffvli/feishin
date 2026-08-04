@@ -1,6 +1,7 @@
 import type { SelectProps as MantineSelectProps } from '@mantine/core';
 
 import { Select as MantineSelect } from '@mantine/core';
+import clsx from 'clsx';
 import { CSSProperties } from 'react';
 
 import styles from './select.module.css';
@@ -25,7 +26,9 @@ export const Select = ({
             classNames={{
                 description: styles.description,
                 dropdown: styles.dropdown,
-                input: styles.input,
+                input: clsx(styles.input, {
+                    [styles.clearable]: clearable,
+                }),
                 label: styles.label,
                 option: styles.option,
                 root: styles.root,
@@ -33,6 +36,11 @@ export const Select = ({
                 ...classNames,
             }}
             clearable={clearable}
+            clearButtonProps={{
+                classNames: {
+                    root: styles.clearButton,
+                },
+            }}
             spellCheck={false}
             style={{ maxWidth, width }}
             variant={variant}

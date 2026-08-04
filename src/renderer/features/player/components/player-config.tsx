@@ -288,7 +288,6 @@ const AudioDeviceConfig = () => {
 
     return (
         <Select
-            clearable
             comboboxProps={{ withinPortal: false }}
             data={audioDevices}
             disabled={status === PlayerStatus.PLAYING}

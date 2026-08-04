@@ -976,6 +976,56 @@ export const SubsonicController: InternalControllerEndpoint = {
             '&c=Feishin'
         );
     },
+    getFavoriteSongs: async (args) => {
+        const { apiClientProps, query } = args;
+
+        // if user selects 'rating'
+        if (query.type === 'rating') {
+            const res = await SubsonicController.getSongList({
+                apiClientProps,
+                query: {
+                    artistIds: [query.artistId],
+                    sortBy: SongListSort.RATING,
+                    sortOrder: SortOrder.DESC,
+                    startIndex: 0,
+                },
+            });
+
+            const songsWithHighRating = orderBy(
+                res.items.filter((song) => song.userRating !== null && song.userRating > 2),
+                ['userRating', 'userFavorite', 'playCount', 'albumId', 'trackNumber'],
+                ['desc', 'desc', 'desc', 'asc', 'asc'],
+            );
+
+            return {
+                items: songsWithHighRating,
+                startIndex: 0,
+                totalRecordCount: res.totalRecordCount,
+            };
+        }
+
+        // else if user selects 'favorites'
+        const res = await SubsonicController.getSongList({
+            apiClientProps,
+            query: {
+                artistIds: [query.artistId],
+                sortBy: SongListSort.FAVORITED,
+                sortOrder: SortOrder.DESC,
+                startIndex: 0,
+            },
+        });
+        const songsWithFavorite = orderBy(
+            res.items.filter((song) => song.userFavorite),
+            ['userFavorite', 'userRating', 'playCount', 'albumId', 'trackNumber'],
+            ['desc', 'desc', 'desc', 'asc', 'asc'],
+        );
+
+        return {
+            items: songsWithFavorite,
+            startIndex: 0,
+            totalRecordCount: res.totalRecordCount,
+        };
+    },
     getFolder: async ({ apiClientProps, query }) => {
         const sortOrder = (query.sortOrder?.toLowerCase() ?? 'asc') as 'asc' | 'desc';
 
@@ -2362,6 +2412,17 @@ export const SubsonicController: InternalControllerEndpoint = {
                     rating: query.rating,
                 },
             });
+        }
+
+        return null;
+    },
+    startLibraryScan: async (args) => {
+        const { apiClientProps } = args;
+
+        const res = await ssApiClient(apiClientProps).startScan({ query: {} });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to start library scan');
         }
 
         return null;

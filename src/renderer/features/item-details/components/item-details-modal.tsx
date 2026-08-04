@@ -6,7 +6,11 @@ import { generatePath, Link } from 'react-router';
 import { SongPath } from '/@/renderer/features/item-details/components/song-path';
 import { AppRoute } from '/@/renderer/router/routes';
 import { formatDurationString, formatSizeString } from '/@/renderer/utils';
-import { formatDateRelative, formatRating } from '/@/renderer/utils/format';
+import {
+    formatDateRelative,
+    formatPartialIsoDateUTC,
+    formatRating,
+} from '/@/renderer/utils/format';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
 import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types';
 import { sanitize } from '/@/renderer/utils/sanitize';
@@ -304,7 +308,24 @@ const SongPropertyMapping: ItemDetailRow<Song>[] = [
     },
     { key: 'discNumber', label: 'common.disc' },
     { key: 'trackNumber', label: 'common.trackNumber' },
-    { key: 'releaseYear', label: 'filter.releaseYear' },
+    {
+        key: 'date',
+        label: 'filter.date',
+        render: (song) => (song.date ? formatPartialIsoDateUTC(song.date) : null),
+    },
+    {
+        label: 'filter.year',
+        render: (song) => (!song.date ? song.year : null),
+    },
+    {
+        key: 'releaseDate',
+        label: 'filter.releaseDate',
+        render: (song) => (song.releaseDate ? formatPartialIsoDateUTC(song.releaseDate) : null),
+    },
+    {
+        label: 'filter.releaseYear',
+        render: (song) => (!song.releaseDate ? song.releaseYear : null),
+    },
     {
         label: 'filter.explicitStatus',
         render: (song, t) =>

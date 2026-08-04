@@ -1259,9 +1259,9 @@
         "sidebarPlaylistFolders_description": "Создайте представление папки для плейлистов, в названии которых содержится настроенный разделитель",
         "audioDeviceDefault": "Системные настройки по умолчанию",
         "discordLinkType_none": "$t(common.none)",
-        "enableFurigana_description": "Отображать подсказки для произношения (фуригана) над японскими иероглифами в тексте песни.",
+        "enableFurigana_description": "Отображать подсказки для произношения (фуригана) над японскими иероглифами в тексте песни",
         "enableFurigana": "Включить генерацию фуриганы",
-        "enableRomaji_description": "Отображать строку с ромадзи-транскрипцией под текстом японской песни.",
+        "enableRomaji_description": "Отображать строку с ромадзи-транскрипцией под текстом японской песни",
         "enableRomaji": "Включить генерацию ромадзи",
         "equalizer_descriptionMpv": "Параметрический эквалайзер через FFmpeg lavfi (MPV)",
         "equalizer_descriptionWebAudio": "Параметрический эквалайзер на основе Web Audio API",
@@ -1319,7 +1319,8 @@
         "logLevel_optionInfoDescription": "Содержит информацию, предупреждения и сообщения об ошибках",
         "exportDiagnostics": "Экспортировать данные диагностики",
         "showQueueInSidebar_description": "В боковую панель плеера будет добавлена панель, отображающая очередь воспроизведения",
-        "showQueueInSidebar": "Отображать очередь воспроизведения в боковой панели плеера"
+        "showQueueInSidebar": "Отображать очередь воспроизведения в боковой панели плеера",
+        "showFavorites": "Показать избранное"
     },
     "releaseType": {
         "secondary": {

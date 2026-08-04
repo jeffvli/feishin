@@ -550,8 +550,6 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     const getQueue = useCallback(() => {
-        logger.debug('Cleared queue');
-
         const queue = storeActions.getQueue();
         return queue.items;
     }, [storeActions]);

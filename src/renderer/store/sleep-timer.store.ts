@@ -1,6 +1,8 @@
 import { useShallow } from 'zustand/react/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
+import { logger } from '/@/renderer/utils/logger';
+
 export type SleepTimerMode = 'endOfAlbum' | 'endOfSong' | 'timed';
 
 interface SleepTimerActions {
@@ -27,6 +29,7 @@ export const useSleepTimerStore = createWithEqualityFn<SleepTimerActions & Sleep
     (set) => ({
         active: false,
         cancelTimer: () => {
+            logger.info('Cancelled sleep timer');
             set({
                 active: false,
                 mode: 'timed',
@@ -46,6 +49,7 @@ export const useSleepTimerStore = createWithEqualityFn<SleepTimerActions & Sleep
         },
 
         startEndOfAlbumTimer: () => {
+            logger.debug('Started sleep timer', { mode: 'endOfAlbum' });
             set({
                 active: true,
                 mode: 'endOfAlbum',
@@ -55,6 +59,7 @@ export const useSleepTimerStore = createWithEqualityFn<SleepTimerActions & Sleep
         },
 
         startEndOfSongTimer: () => {
+            logger.debug('Started sleep timer', { mode: 'endOfSong' });
             set({
                 active: true,
                 mode: 'endOfSong',
@@ -64,6 +69,10 @@ export const useSleepTimerStore = createWithEqualityFn<SleepTimerActions & Sleep
         },
 
         startTimedTimer: (durationSeconds: number) => {
+            logger.debug('Started sleep timer', {
+                durationSeconds,
+                mode: 'timed',
+            });
             set({
                 active: true,
                 mode: 'timed',

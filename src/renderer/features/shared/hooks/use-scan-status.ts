@@ -49,7 +49,7 @@ const stopWatchingScan = () => {
     setIsWatchingScan(false);
 };
 
-const startScanWatch = () => {
+export const startScanWatch = () => {
     clearWatchTimeout();
     hasSeenScanStart = false;
     setIsWatchingScan(true);

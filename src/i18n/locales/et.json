@@ -510,7 +510,8 @@
             "multipleMusicFolders": "{{count}} muusikakausta valitud",
             "settings": "$t(common.setting, {\"count\": 2})",
             "version": "Versioon {{version}}",
-            "logout": "Logi välja"
+            "logout": "Logi välja",
+            "rescanLibrary": "Skanni meediakogu uuesti"
         },
         "manageServers": {
             "title": "Halda servereid",

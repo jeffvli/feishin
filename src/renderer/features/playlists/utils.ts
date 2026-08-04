@@ -48,6 +48,7 @@ export function playlistSongsToAlbums(songs: Song[]): PlaylistAlbumRow[] {
             songCount: null,
             sortName: song.album ?? '',
             tags: song.tags,
+            trackYearRange: null,
             updatedAt: song.updatedAt,
             userFavorite: false,
             userRating: null,

@@ -158,6 +158,16 @@ const subsonicReleaseFields = (item: {
 
     return { releaseDate: null, releaseYear: null };
 };
+const subsonicTrackYearField = (item: {
+    year?: number;
+}): { date: null | string; year: null | number } => {
+    const y = coerceYear(item.year);
+    if (y > 0) {
+        return { date: String(y), year: y };
+    }
+
+    return { date: null, year: null };
+};
 
 const normalizeSong = (
     item: z.infer<typeof ssType._response.song>,
@@ -173,6 +183,7 @@ const normalizeSong = (
             : item.artist || '';
 
     const { releaseDate, releaseYear } = subsonicReleaseFields(item);
+    const { date, year } = subsonicTrackYearField(item);
 
     return {
         _itemType: LibraryItem.SONG,
@@ -192,6 +203,7 @@ const normalizeSong = (
         compilation: null,
         container: item.contentType.startsWith('audio/') ? item.contentType.split('/')[1] : null,
         createdAt: item.created,
+        date,
         discNumber: item.discNumber || 1,
         discSubtitle: discTitleMap?.get(item.discNumber ?? 1) ?? null,
         duration: item.duration ? item.duration * 1000 : 0,
@@ -239,6 +251,7 @@ const normalizeSong = (
         updatedAt: '',
         userFavorite: Boolean(item.starred) || false,
         userRating: item.userRating || null,
+        year,
     };
 };
 
@@ -353,6 +366,7 @@ const normalizeAlbum = (
             ) || [],
         sortName: item.title,
         tags: null,
+        trackYearRange: null,
         updatedAt: item.created,
         userFavorite: Boolean(item.starred) || false,
         userRating: item.userRating || null,

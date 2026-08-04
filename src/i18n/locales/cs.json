@@ -176,7 +176,7 @@
         "hotkey_playbackNext": "Další skladba",
         "useSystemTheme_description": "Následovat systémovou předvolbu světlého nebo tmavého motivu",
         "playButtonBehavior_optionAddNext": "$t(player.addNext)",
-        "lyricFetch_description": "Načtení textů z různých internetových zdrojů",
+        "lyricFetch_description": "Načtení textů od zvolených poskytovatelů",
         "lyricFetchProvider_description": "Vyberte poskytovatele textů",
         "globalMediaHotkeys_description": "Zapnout nebo vypnout použití vašich systémových zkratek médií pro ovládání přehrávače",
         "customFontPath": "Vlastní cesta k písmům",
@@ -258,11 +258,11 @@
         "trayEnabled": "Zobrazit v oznamovací oblasti",
         "trayEnabled_description": "Zobrazit/skrýt ikonu/nabídku v oznamovací oblasti. pokud je zakázáno, vypne také minimalizaci/ukončení do oznamovací oblasti",
         "translationApiProvider": "Poskytovatel api překladů",
-        "translationApiProvider_description": "Poskytovatel API pro překlady",
+        "translationApiProvider_description": "Zvolí poskytovatele API použitého pro překlady",
         "translationApiKey": "Klíč API překladů",
         "translationApiKey_description": "Klíč API pro překlady (pouze koncový bod globální služby)",
         "translationTargetLanguage": "Cílový jazyk překladu",
-        "translationTargetLanguage_description": "Cílový jazyk pro překlad",
+        "translationTargetLanguage_description": "Nastaví cílový jazyk použitý pro automatický překlad",
         "lastfmApiKey": "Klíč API {{lastfm}}",
         "lastfmApiKey_description": "Klíč API pro {{lastfm}}. Vyžadováno pro obaly alb",
         "discordServeImage": "Načítat obrázky {{discord}} ze serveru",
@@ -458,7 +458,7 @@
         "autoDJ_songStrategy": "Režim výběru skladeb",
         "autoDJ_strategy_option_library_random": "Náhodně",
         "autoDJ_strategy_option_similar": "Podobné",
-        "enableFurigana_description": "Zobrazit návody na výslovnost (furigana) u japonských kandži textů.",
+        "enableFurigana_description": "Zobrazit návody na výslovnost (furigana) u japonských kandži textů",
         "enableFurigana": "Povolit generování furigana",
         "equalizer_descriptionMpv": "Parametrický ekvalizér skrze FFmpeg lavfi (MPV)",
         "equalizer_descriptionWebAudio": "Parametrický ekvalizér skrze Web Audio API",
@@ -494,7 +494,7 @@
         "compressorSavePreset_description": "Uložit aktuální nastavení kompresoru jako pojmenovanou předvolbu",
         "compressorThreshold_description": "Úroveň signálu, nad kterou začne komprese.",
         "compressorThreshold": "Hranice",
-        "enableRomaji_description": "Zobrazit rómadži výslovnost pod japonskými texty.",
+        "enableRomaji_description": "Zobrazit rómadži výslovnost pod japonskými texty",
         "enableRomaji": "Povolit generování rómadži",
         "windowBarTrackinfo_description": "Zobrazit v titulku okna umělce a název aktuální skladby, její pozici ve frontě a stav Přehrává se/Pozastaveno.",
         "windowBarTrackinfo": "Informace o skladbě v titulku okna",
@@ -513,7 +513,13 @@
         "autoDJ_allowDuplicates_description": "Povolit automatickému DJ přidávat znovu skladby nebo alba, která již jsou ve frontě přehrávání",
         "autoDJ_onlySimilar_description": "Přidávat pouze položky, které jsou podobné ke spuštěné skladbě. Počet položek je maximální počet položek k přidání, namísto vyplnění limitu jinými zdroji",
         "showFavorites": "Zobrazit oblíbené",
-        "showFavorites_description": "Ovládá, zda se tlačítko oblíbení (srdíčko) zobrazí v rozhraní"
+        "showFavorites_description": "Ovládá, zda se tlačítko oblíbení (srdíčko) zobrazí v rozhraní",
+        "customThemeErrors_description": "Nepodařilo se načíst tyto soubory motivu.",
+        "customThemeErrors": "Chyby",
+        "customThemeWarnings_description": "Následující motivy byly načteny, ale některé hodnoty byly neplatné a byly ignorovány.",
+        "customThemeWarnings": "Varování",
+        "customThemes_description": "Přesuňte soubory motivu .json pro přidání vlastních motivů. Budou načteny automaticky kdykoli přidáte, upravíte nebo odstraníte soubor.",
+        "customThemes": "Vlastní motivy"
     },
     "action": {
         "editPlaylist": "Upravit $t(entity.playlist, {\"count\": 1})",
@@ -935,7 +941,21 @@
                 "lyricFollowScrollAlignment": "Zarovnání sledování textů",
                 "lyricLineLeadTime": "Doba vedení řádku (ms)",
                 "lyricPaddingLeft": "Odsazení textů zleva (%)",
-                "lyricPaddingRight": "Odsazení textů zprava (%)"
+                "lyricPaddingRight": "Odsazení textů zprava (%)",
+                "followCurrentLyric_description": "Automaticky posouvat pro udržení aktivního řádku textu v zobrazení",
+                "lyricFollowScrollAlignment_description": "Vertikální umístění aktivního řádku při následování",
+                "lyricAlignment_description": "Horizontální zarovnání textu",
+                "lyricGapSynchronized_description": "Vertikální rozestup mezi synchronizovanými řádky textu písně",
+                "lyricGapUnsynchronized_description": "Vertikální rozestup mezi nesynchronizovanými řádky textu písně",
+                "lyricLineLeadTime_description": "Posunout aktivní řádek o tento počet milisekund před jeho časové razítko",
+                "lyricPaddingLeft_description": "Vzdálenost od levého okraje jako procento plochy pro text písně",
+                "lyricPaddingRight_description": "Vzdálenost od pravého okraje jako procento plochy pro text písně",
+                "lyricSizeSynchronized_description": "Velikost písma pro synchronizované (časované) texty písní",
+                "lyricSizeUnsynchronized_description": "Velikost písma pro nesynchronizované (obyčejné) texty písní",
+                "lyricOpacityNonActive_description": "Neprůhlednost řákdů textu, které nejsou právě aktivní",
+                "lyricScaleNonActive_description": "Rozsah řádků textu, které nejsou v současné době aktivní",
+                "showLyricMatch_description": "Zobrazit název skladby a interpreta u odpovídajících textů",
+                "showLyricProvider_description": "Zobrazit poskytovatele aktuálních textů"
             },
             "upNext": "Další",
             "lyrics": "Texty",
@@ -964,7 +984,8 @@
             "noMusicFolder": "Není vybrána žádná složka s hudbou",
             "multipleMusicFolders": "Vybráno {{count}} složek s hudbou",
             "commandPalette": "Otevřít paletu příkazů",
-            "logout": "Odhlásit se"
+            "logout": "Odhlásit se",
+            "rescanLibrary": "Skenovat knihovnu"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -1032,7 +1053,8 @@
             "discord": "Discord",
             "playerFilters": "Filtry přehrávače",
             "logger": "Protokol",
-            "lyricsDisplay": "Zobrazení textů"
+            "lyricsDisplay": "Zobrazení textů",
+            "lyricsTranslation": "Překlad textů"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"

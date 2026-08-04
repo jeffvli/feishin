@@ -50,7 +50,9 @@
         "artistRadio": "アーティストラジオ",
         "trackRadio": "ラジオを追跡する",
         "scrobbleForceSubmit": "強制 Scrobble",
-        "sleepTimer_endOfAlbum": "現在のアルバムの終了"
+        "sleepTimer_endOfAlbum": "現在のアルバムの終了",
+        "nextAlbum": "Alt を押しながらクリックで次のアルバムへ",
+        "previousAlbum": "Alt を押しながらクリックで前のアルバムへ"
     },
     "setting": {
         "crossfadeStyle_description": "オーディオプレーヤーが使用するクロスフェードのスタイルを選択します",
@@ -231,7 +233,7 @@
         "passwordStore": "パスワード / シークレットストア",
         "playerbarOpenDrawer_description": "プレーヤーバーをクリックすると全画面プレーヤーが開きます",
         "preferLocalLyrics_description": "利用可能な場合は、リモート歌詞よりもローカル歌詞を優先します",
-        "preferLocalLyrics": "ローカル歌詞を優先する",
+        "preferLocalLyrics": "ローカル歌詞を優先",
         "preservePitch_description": "再生速度を変更してもピッチを保持します",
         "preservePitch": "ピッチを保持する",
         "preventSleepOnPlayback_description": "音楽の再生中にディスプレイがスリープ状態にならないようにします",
@@ -330,7 +332,7 @@
         "followCurrentSong": "現在の曲をフォロー",
         "followCurrentSong_description": "再生キューを現在再生中の曲まで自動的にスクロールします",
         "logLevel": "ログレベル",
-        "logLevel_description": "表示するログの最小レベルを設定します。Debug はすべてのログを表示し、Error はエラーのみを表示します",
+        "logLevel_description": "表示するログの最小レベルを設定します",
         "logLevel_optionDebug": "Debug",
         "logLevel_optionInfo": "Info",
         "playerFilters": "キューから曲をフィルタリング",
@@ -341,7 +343,7 @@
         "imageResolution_description": "アプリ内で使用される画像の解像度。値を 0 に設定すると、デフォルトでネイティブ画像解像度が適用されます",
         "showLyricsInSidebar_description": "添付の再生キューに歌詞を表示するパネルが追加されます",
         "showLyricsInSidebar": "サイドバーのプレーヤーに歌詞を表示",
-        "showRatings": "星評価を表示する",
+        "showRatings": "星評価を表示",
         "imageResolution_optionSidebar": "サイドバー",
         "imageResolution_optionHeader": "ヘッダー",
         "imageResolution_optionFullScreenPlayer": "全画面プレーヤー",
@@ -439,12 +441,12 @@
         "autoDJ_songStrategy": "選曲モード",
         "autoDJ_strategy_option_library_random": "ランダム",
         "autoDJ_strategy_option_similar": "類似",
-        "enableFurigana_description": "日本語の漢字歌詞の上にふりがなを表示します。",
+        "enableFurigana_description": "日本語の漢字歌詞の上にふりがなを表示します",
         "enableFurigana": "ふりがなの表示を有効にする",
-        "enableRomaji_description": "日本語の歌詞の下にローマ字の発音表記を表示します。",
+        "enableRomaji_description": "日本語の歌詞の下にローマ字の発音表記を表示します",
         "enableRomaji": "ローマ字の表示を有効にする",
         "equalizer": "イコライザー",
-        "equalizerBands_description": "バンドごとのゲイン。上下にドラッグするか、値を入力してください。範囲: -12 ~ +12 dB。",
+        "equalizerBands_description": "バンドごとのゲインを設定します。上下にドラッグするか、値を入力してください。範囲: -12 ~ +12 dB。",
         "equalizerBands": "バンド",
         "equalizerPreset": "プリセット",
         "equalizerPresetGroupBuiltIn": "内蔵",
@@ -461,7 +463,25 @@
         "sidebarPlaylistFolders_description": "設定済みの区切り文字が名前に含まれるプレイリストのフォルダービューを作成します",
         "sidebarPlaylistFolderTreeIndent": "ツリーのインデント",
         "sidebarPlaylistMode_optionCompact": "コンパクト",
-        "sidebarPlaylistMode_optionExpanded": "拡張"
+        "sidebarPlaylistMode_optionExpanded": "拡張",
+        "autoDJ_allowDuplicates": "重複を許可",
+        "autoDJ_allowDuplicates_description": "Auto DJ が既にキューに入っている曲やアルバムを再度追加できるようにします",
+        "autoDJ_onlySimilar": "類似のもののみ",
+        "autoDJ_onlySimilar_description": "トリガーとなった曲に類似した曲のみを追加します。曲数は、他のソースで上限まで埋められるのではなく、追加可能な曲の最大数として扱われます",
+        "audioDeviceDefault": "システムのデフォルト",
+        "equalizer_descriptionMpv": "FFmpeg lavfi (MPV) によるパラメトリックイコライザー",
+        "equalizer_descriptionWebAudio": "Web Audio API によるパラメトリックイコライザー",
+        "equalizerPreamp_description": "EQ バンド前の入力ゲインを設定します。バンドをブーストする場合は、クリッピングを防ぐためにマイナスに設定してください（MPV）。",
+        "equalizerPreamp": "プリアンプ",
+        "hotkey_playbackNextAlbum": "次のアルバム",
+        "hotkey_playbackPreviousAlbum": "前のアルバム",
+        "logLevel_optionDebugDescription": "Debug には、Info で提供されるエラーログに加えてさらに詳細なデバッグ情報と編集済みの API レスポンスが含まれています",
+        "logLevel_optionInfoDescription": "Info には、Warning と Error で提供されるエラーログが含まれています",
+        "exportDiagnostics": "診断結果をエクスポート",
+        "showFavorites": "お気に入りを表示",
+        "showFavorites_description": "インターフェースにお気に入り（ハート）ボタンを表示するかどうかを設定します",
+        "showQueueInSidebar_description": "サイドバーのプレーヤーに、再生キューを表示するパネルが追加されます",
+        "showQueueInSidebar": "サイドバーのプレーヤーに再生キューを表示"
     },
     "action": {
         "editPlaylist": "$t(entity.playlist, {\"count\": 1}) を編集",
@@ -633,7 +653,11 @@
         "back": "戻る",
         "openFolder": "フォルダーを開く",
         "saveAndClose": "保存して閉じる",
-        "undo": "元に戻す"
+        "undo": "元に戻す",
+        "lastScan": "前回のスキャン {{date}}",
+        "scanFolderCount": "{{count}} 個のフォルダー",
+        "scanItemCount": "{{count}} 個の項目",
+        "scanningLibrary": "ライブラリをスキャン中…"
     },
     "table": {
         "config": {
@@ -847,7 +871,7 @@
         },
         "fullscreenPlayer": {
             "config": {
-                "showLyricMatch": "歌詞のマッチを表示",
+                "showLyricMatch": "歌詞の一致を表示",
                 "dynamicBackground": "ダイナミック背景",
                 "synchronized": "同期",
                 "followCurrentLyric": "歌詞を再生位置に追従",
@@ -864,8 +888,21 @@
                 "lyricOpacityNonActive": "非アクティブな歌詞の不透明度",
                 "lyricScaleNonActive": "非アクティブな歌詞のスケール",
                 "lyricLineLeadTime": "行を読み込む時間 (ms)",
-                "lyricPaddingLeft": "歌詞の左側のパディング (%)",
-                "lyricPaddingRight": "歌詞の右側のパディング (%)"
+                "lyricPaddingLeft": "歌詞の左側の余白 (%)",
+                "lyricPaddingRight": "歌詞の右側の余白 (%)",
+                "followCurrentLyric_description": "現在表示されている歌詞の行が画面内に見えるように自動的にスクロールします",
+                "lyricGapSynchronized_description": "同期歌詞の行間の垂直方向の間隔",
+                "lyricGapUnsynchronized_description": "非同期歌詞の行間の垂直方向の間隔",
+                "lyricFollowScrollAlignment_description": "追従中の現在表示されている歌詞の行の垂直位置",
+                "lyricAlignment_description": "歌詞の水平方向の配置",
+                "lyricFollowScrollAlignment": "追従中の歌詞の位置",
+                "lyricLineLeadTime_description": "現在表示されている歌詞の行を、タイムスタンプより設定したミリ秒分だけ先に進めます",
+                "lyricPaddingLeft_description": "歌詞領域に対する左側の余白の割合",
+                "lyricPaddingRight_description": "歌詞領域に対する右側の余白の割合",
+                "lyricSizeSynchronized_description": "同期歌詞のフォントサイズ",
+                "lyricSizeUnsynchronized_description": "非同期歌詞のフォントサイズ",
+                "showLyricMatch_description": "一致した歌詞の曲名とアーティスト名を表示します",
+                "showLyricProvider_description": "現在の歌詞を提供したプロバイダーを表示します"
             },
             "upNext": "次へ",
             "lyrics": "歌詞",
@@ -894,7 +931,8 @@
             "noMusicFolder": "音楽フォルダーが選択されていません",
             "commandPalette": "コマンドパレットを開く",
             "multipleMusicFolders": "{{count}} 個の音楽フォルダーが選択されました",
-            "logout": "ログアウト"
+            "logout": "ログアウト",
+            "rescanLibrary": "ライブラリを再スキャン"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -962,7 +1000,8 @@
             "transcoding": "トランスコーディング",
             "discord": "Discord",
             "logger": "ロガー",
-            "playerFilters": "プレーヤーフィルター"
+            "playerFilters": "プレーヤーフィルター",
+            "lyricsTranslation": "翻訳歌詞"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
@@ -1019,14 +1058,32 @@
             "removeServer": "リモートサーバー"
         },
         "itemDetail": {
-            "openFile": "ファイルマネージャーでトラックを表示する",
+            "openFile": "ファイルマネージャーでトラックを表示",
             "copyPath": "パスをクリップボードにコピーする",
             "copiedPath": "パスが正常にコピーされました",
             "tagConfiguration": "タグ設定",
-            "addTagConfig": "タグを追加…"
+            "addTagConfig": "タグを追加…",
+            "multiValueToggle": "複数値",
+            "autocompleteSource": "自動入力ソース",
+            "customValues": "カスタム値",
+            "addCustomValue": "カスタム値を追加…",
+            "serverSuggestions": "サーバー",
+            "fileNotWritable": "ファイルにアクセスできないか、書き込み権限がありません",
+            "triggerRescan": "保存後にライブラリの再スキャンを実行",
+            "addField": "フィールドを追加…",
+            "emptyFields": "フィールドは空欄にできません",
+            "tagsTab": "タグ",
+            "artworkTab": "アートワーク",
+            "removeArtwork": "アートワークを削除",
+            "noArtwork": "アートワークがありません",
+            "multipleValues": "（複数値）",
+            "multipleArtworks": "複数のアートワーク",
+            "noLocalSongs": "ローカルファイルパスを持つ曲は見つかりませんでした",
+            "readPartialFailure": "{{total}} 個のファイルのうち、{{count}} 個のファイルからメタデータを読み取ることができませんでした",
+            "writePartialFailure": "{{count}} 個のファイルの保存に失敗しました"
         },
         "playlist": {
-            "reorder": "ID によるソート時のみ並べ替えが可能です"
+            "reorder": "ID 順に並べ替えた場合のみ、並べ替えの順序変更が可能になります"
         },
         "radioList": {
             "title": "ラジオ局"

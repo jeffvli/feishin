@@ -17,6 +17,7 @@ import { SegmentedControl } from '/@/shared/components/segmented-control/segment
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
 import { Table } from '/@/shared/components/table/table';
+import { Text } from '/@/shared/components/text/text';
 import { useDisclosure } from '/@/shared/hooks/use-disclosure';
 import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
 
@@ -232,6 +233,7 @@ export const ListConfigTable = ({
 }: {
     options: {
         component: ReactNode;
+        description?: ReactNode | string;
         id: string;
         isDivider?: boolean;
         isHidden?: boolean;
@@ -269,7 +271,20 @@ export const ListConfigTable = ({
 
                     return (
                         <Table.Tr key={option.id}>
-                            <Table.Th>{option.label}</Table.Th>
+                            <Table.Th>
+                                {option.description !== undefined ? (
+                                    <Stack gap="xs">
+                                        <Text isNoSelect size="sm">
+                                            {option.label}
+                                        </Text>
+                                        <Text isMuted isNoSelect size="xs">
+                                            {option.description}
+                                        </Text>
+                                    </Stack>
+                                ) : (
+                                    option.label
+                                )}
+                            </Table.Th>
                             <Table.Td>
                                 <div className={styles.control}>{option.component}</div>
                             </Table.Td>

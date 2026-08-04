@@ -54,7 +54,6 @@ import { SegmentedControl } from '/@/shared/components/segmented-control/segment
 import { Select } from '/@/shared/components/select/select';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
-import { Text } from '/@/shared/components/text/text';
 import { useMediaQuery } from '/@/shared/hooks/use-media-query';
 import { useThrottledCallback } from '/@/shared/hooks/use-throttled-callback';
 import { useThrottledValue } from '/@/shared/hooks/use-throttled-value';
@@ -201,17 +200,9 @@ const AutoDJButton = () => {
                         w="96px"
                     />
                 ),
+                description: t('setting.autoDJ_itemCount_description'),
                 id: 'itemCount',
-                label: (
-                    <Stack gap="xs">
-                        <Text isNoSelect size="sm">
-                            {t('setting.autoDJ_itemCount')}
-                        </Text>
-                        <Text isMuted isNoSelect size="xs">
-                            {t('setting.autoDJ_itemCount_description')}
-                        </Text>
-                    </Stack>
-                ),
+                label: t('setting.autoDJ_itemCount'),
             },
             {
                 component: (
@@ -239,17 +230,9 @@ const AutoDJButton = () => {
                         w="144px"
                     />
                 ),
+                description: t('setting.autoDJ_timing_description'),
                 id: 'timing',
-                label: (
-                    <Stack gap="xs">
-                        <Text isNoSelect size="sm">
-                            {t('setting.autoDJ_timing')}
-                        </Text>
-                        <Text isMuted isNoSelect size="xs">
-                            {t('setting.autoDJ_timing_description')}
-                        </Text>
-                    </Stack>
-                ),
+                label: t('setting.autoDJ_timing'),
             },
         ],
         [
@@ -279,17 +262,9 @@ const AutoDJButton = () => {
                         value={settings.allowDuplicates}
                     />
                 ),
+                description: t('setting.autoDJ_allowDuplicates_description'),
                 id: 'allowDuplicates',
-                label: (
-                    <Stack gap="xs">
-                        <Text isNoSelect size="sm">
-                            {t('setting.autoDJ_allowDuplicates')}
-                        </Text>
-                        <Text isMuted isNoSelect size="xs">
-                            {t('setting.autoDJ_allowDuplicates_description')}
-                        </Text>
-                    </Stack>
-                ),
+                label: t('setting.autoDJ_allowDuplicates'),
             },
             {
                 component: (
@@ -304,17 +279,9 @@ const AutoDJButton = () => {
                         value={settings.onlySimilar}
                     />
                 ),
+                description: t('setting.autoDJ_onlySimilar_description'),
                 id: 'onlySimilar',
-                label: (
-                    <Stack gap="xs">
-                        <Text isNoSelect size="sm">
-                            {t('setting.autoDJ_onlySimilar')}
-                        </Text>
-                        <Text isMuted isNoSelect size="xs">
-                            {t('setting.autoDJ_onlySimilar_description')}
-                        </Text>
-                    </Stack>
-                ),
+                label: t('setting.autoDJ_onlySimilar'),
             },
         ],
         [setSettings, settings.allowDuplicates, settings.onlySimilar, t],
