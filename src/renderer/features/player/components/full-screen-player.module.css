@@ -23,18 +23,36 @@
 }
 
 .responsive-container {
+    position: relative;
     z-index: 1;
-    display: grid;
-    grid-template-rows: minmax(0, 1fr);
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     width: 100%;
     max-width: 2560px;
     margin: 2rem 0;
 
     @media screen and (orientation: portrait) {
-        grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
-        grid-template-columns: minmax(0, 1fr);
         margin-top: 0;
+    }
+}
+
+.image-column {
+    position: relative;
+    width: 50%;
+    height: 100%;
+    transition: width 0.5s ease-in-out;
+
+    @media screen and (orientation: portrait) {
+        width: 100%;
+        height: 50%;
+        transition: height 0.5s ease-in-out;
+    }
+}
+
+.image-column-full {
+    width: 100%;
+
+    @media screen and (orientation: portrait) {
+        width: 100%;
+        height: 100%;
     }
 }
 

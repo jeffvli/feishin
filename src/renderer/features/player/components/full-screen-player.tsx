@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { AnimatePresence, motion, Variants } from 'motion/react';
 import {
     CSSProperties,
@@ -14,7 +15,10 @@ import styles from './full-screen-player.module.css';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { FullScreenPlayerImage } from '/@/renderer/features/player/components/full-screen-player-image';
-import { FullScreenPlayerQueue } from '/@/renderer/features/player/components/full-screen-player-queue';
+import {
+    FullScreenPlayerControls,
+    FullScreenPlayerQueue,
+} from '/@/renderer/features/player/components/full-screen-player-queue';
 import { SharedFullscreenPlayerSettings } from '/@/renderer/features/player/components/shared-full-screen-player-settings';
 import {
     useIsRadioActive,
@@ -325,9 +329,10 @@ const PlayerContainer = memo(
 PlayerContainer.displayName = 'PlayerContainer';
 
 export const FullScreenPlayer = () => {
-    const { dynamicBackground, dynamicImageBlur, dynamicIsImage, opacity } =
+    const { activeTab, dynamicBackground, dynamicImageBlur, dynamicIsImage, opacity } =
         useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
+    const hasActiveModule = Boolean(activeTab);
     const { windowBarStyle } = useWindowSettings();
     const isRadioActive = useIsRadioActive();
     const { isPlaying: isRadioPlaying } = useRadioPlayer();
@@ -371,9 +376,16 @@ export const FullScreenPlayer = () => {
                 dynamicImageBlur={dynamicImageBlur}
             />
             <div className={styles.responsiveContainer}>
-                <FullScreenPlayerImage />
+                <div
+                    className={clsx(styles.imageColumn, {
+                        [styles.imageColumnFull]: !hasActiveModule,
+                    })}
+                >
+                    <FullScreenPlayerImage />
+                </div>
                 <FullScreenPlayerQueue />
             </div>
+            <FullScreenPlayerControls />
         </PlayerContainer>
     );
 };

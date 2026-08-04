@@ -140,7 +140,7 @@ export const LeftControls = () => {
                                 onClick={handleToggleFullScreenPlayer}
                                 onContextMenu={handleToggleContextMenu}
                                 role="button"
-                                transition={{ duration: 0.2, ease: 'easeIn' }}
+                                transition={{ duration: 0.2, ease: 'easeOut' }}
                                 whileHover={{ scale: 1.1 }}
                             >
                                 <Tooltip label={t('player.toggleFullscreenPlayer')}>

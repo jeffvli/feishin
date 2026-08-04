@@ -253,8 +253,10 @@ export const FullScreenPlayerImage = () => {
             align="center"
             className={clsx(styles.playerContainer, 'full-screen-player-image-container')}
             direction="column"
+            h="100%"
             justify="center"
             p="1rem"
+            w="100%"
         >
             <div
                 className={clsx(styles.imageContainer, COVER_ART_SIZE_CLASS[coverArtSize])}
