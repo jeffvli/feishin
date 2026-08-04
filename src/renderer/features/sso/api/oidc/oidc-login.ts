@@ -1,20 +1,16 @@
-import { app, ipcMain, shell } from 'electron';
-import path from 'node:path';
 import * as openid from 'openid-client';
 
-import { attachAccessTokenToAssetRequests } from './intercept_http_request';
-import { storeRefreshToken } from './refresh-token-store';
-
-import { getMainWindow } from '/@/main/index';
-import log from '/@/main/logger';
+import {
+    attachAccessTokenToRequests,
+    storeRefreshToken,
+} from '/@/renderer/features/sso/api/oidc/oidc-api';
+import { logger } from '/@/renderer/utils/logger';
 import {
     OAuthAuthenticationConfig,
     OAuthRedirectScheme,
     OIDCLoginResponse,
 } from '/@/shared/types/domain-types';
 import { formatRefreshTokenKey } from '/@/shared/utils/oauth-format-refresh-token-key';
-
-const gotLock = app.requestSingleInstanceLock();
 const CALLBACK_ENDING = '://oauth2/callback';
 const AUTH_CALLBACK_URL = `${OAuthRedirectScheme}${CALLBACK_ENDING}`;
 const DEFAULT_SCOPES = 'openid profile email';
@@ -24,34 +20,42 @@ export const oidcLogin = async (
     authConfig: OAuthAuthenticationConfig,
     audienceEndpoint: string,
 ) => {
-    log.info('Creating OIDC/OAuth2 signin request');
+    logger.info('Creating OIDC/OAuth2 signin request', {
+        audienceEndpoint,
+        clientId: authConfig.clientId,
+        issuerUrl: authConfig.issuerUrl,
+    });
     try {
         const code_verifier = openid.randomPKCECodeVerifier();
         const { authUrl, config, nonce, state } = await makeAuthorizationUrl(
             authConfig,
             code_verifier,
         );
-        const { endSSOLogin, openUrlListener, secondInstanceListener } = createFunctions(
-            config,
-            code_verifier,
-            audienceEndpoint,
-            state,
-            nonce,
-        );
 
-        // Set up listeners for the OIDC/OAuth2 callback URL
-        app.once('open-url', openUrlListener);
-        app.once('second-instance', secondInstanceListener);
-        ipcMain.once('oauth:cancel-sso-login', endSSOLogin);
+        return new Promise<OIDCLoginResponse>((resolve, reject) => {
+            const { endSSOLogin, ssoCallback } = createFunctions(
+                config,
+                code_verifier,
+                audienceEndpoint,
+                state,
+                nonce,
+                resolve,
+                reject,
+            );
 
-        // Open the authorization URL in an external browser
-        await shell.openExternal(authUrl.href);
-        // Show button to cancel SSO login in the main window
-        getMainWindow()?.webContents.send('oauth:external-page-opened');
+            // Set up listeners for the OIDC/OAuth2 callback URL
+            window.addEventListener('sso-callback', ssoCallback);
+            window.addEventListener('sso-end-login', endSSOLogin);
+            // Open the authorization URL in an external browser
+            window.open(authUrl, '_blank', 'noopener,noreferrer');
+            // Show button to cancel SSO login in the main window
+            window.dispatchEvent(new CustomEvent('sso-external-page-opened'));
+        });
     } catch (error) {
-        log.error('Failed to create OIDC/OAuth2 signin request:', error);
+        logger.error('Failed to create OIDC/OAuth2 signin request:', error);
         // End authenticateOAuth flow in renderer process
-        getMainWindow()?.webContents.send('oauth:endLogin');
+        window.dispatchEvent(new CustomEvent('sso-end-login'));
+        return Promise.reject(error);
     }
 };
 
@@ -81,21 +85,8 @@ const makeAuthorizationUrl = async (
         state: openid.randomState(),
     };
     const authUrl = openid.buildAuthorizationUrl(config, parameters);
-    log.info(`Created authorization login URL`);
+    logger.info(`Created authorization login URL`);
 
-    // Setup app callback protocol
-    if (!gotLock) {
-        throw new Error('Failed to acquire single instance lock for OIDC/OAuth2 callback handling');
-    }
-
-    if (process.defaultApp) {
-        // In development mode, the app is run with `electron .` and not packaged
-        app.setAsDefaultProtocolClient(OAuthRedirectScheme, process.execPath, [
-            path.resolve(process.argv[1]),
-        ]);
-    } else {
-        app.setAsDefaultProtocolClient(OAuthRedirectScheme);
-    }
     return { authUrl, config, nonce: parameters.nonce, state: parameters.state };
 };
 
@@ -105,21 +96,20 @@ const createFunctions = (
     audienceEndpoint: string,
     state: string,
     nonce: string,
+    resolve: (value: OIDCLoginResponse | PromiseLike<OIDCLoginResponse>) => void,
+    reject: (reason?: any) => void,
 ) => {
-    const openUrlListener = async (_event: Electron.Event, url: string) => {
-        if (url.startsWith(AUTH_CALLBACK_URL)) {
-            processSigninResponse(url);
+    const ssoCallback = async (event: any) => {
+        window.removeEventListener('sso-callback', ssoCallback);
+        const url = event.detail.url;
+        if (!url.startsWith(AUTH_CALLBACK_URL)) {
+            logger.warn(`Received unexpected callback URL: ${url}`);
+            return;
         }
+        processSigninResponse(url);
     };
-    const secondInstanceListener = async (_event: Electron.Event, argv: string[]) => {
-        const url = argv.find((arg) => arg.startsWith(AUTH_CALLBACK_URL));
-        if (url) {
-            processSigninResponse(url);
-        }
-    };
-
     const processSigninResponse = async (url: string) => {
-        log.info(`Received OIDC/OAuth2 callback URL`);
+        logger.info(`Received OIDC/OAuth2 callback URL`);
         try {
             const tokenResponse = await getTokens(config, url, code_verifier, state, nonce);
             const claims = tokenResponse.claims();
@@ -134,35 +124,35 @@ const createFunctions = (
                 );
                 await storeRefreshToken(identifier, tokenResponse.refresh_token);
             }
-            attachAccessTokenToAssetRequests(audienceEndpoint, tokenResponse.access_token);
+            attachAccessTokenToRequests(audienceEndpoint, tokenResponse.access_token);
 
             const response: OIDCLoginResponse = {
                 accessToken: tokenResponse.access_token,
                 claims: claims,
             };
-            log.info(
+            logger.info(
                 'Successfully processed OIDC/OAuth2 signin response, sending to renderer process',
             );
-            getMainWindow()?.webContents.send('oauth:callback', response);
+            window.dispatchEvent(new CustomEvent('sso-success'));
+            resolve(response);
             endSSOLogin();
         } catch (error) {
-            log.error('Failed to process OIDC/OAuth2 signin response:', error);
-            getMainWindow()?.webContents.send('oauth:endLogin');
+            logger.error('Failed to process OIDC/OAuth2 signin response:', error);
+            reject(error);
+            window.dispatchEvent(new CustomEvent('sso-error', { detail: error }));
             endSSOLogin();
         }
     };
 
     const endSSOLogin = () => {
-        ipcMain.removeListener('oauth:cancel-sso-login', endSSOLogin);
-        app.removeListener('open-url', openUrlListener);
-        app.removeListener('second-instance', secondInstanceListener);
-        getMainWindow()?.webContents.send('oauth:endLogin');
+        window.removeEventListener('sso-end-login', endSSOLogin);
+        window.removeEventListener('sso-callback', ssoCallback);
+        window.dispatchEvent(new CustomEvent('sso-end-login'));
     };
     return {
         endSSOLogin,
-        openUrlListener,
         processSigninResponse,
-        secondInstanceListener,
+        ssoCallback,
     };
 };
 

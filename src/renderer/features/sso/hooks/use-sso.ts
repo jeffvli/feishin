@@ -1,11 +1,13 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 
 import {
-    cancelOIDCLogin,
+    endOIDCLogin,
     externalPageOpenedCallback,
-    oauthCallback,
-    oauthCallbackError,
-    removeOAuthListeners,
+    removeExternalPageOpenedCallback,
+    removeSsoErrorCallback,
+    removeSsoSuccessCallback,
+    ssoErrorCallback,
+    ssoSuccessCallback,
 } from '/@/renderer/features/sso/api/oidc/oidc-api';
 
 export const useSSO = (
@@ -37,10 +39,12 @@ export const useSSO = (
         };
 
         externalPageOpenedCallback(pageOpened);
-        oauthCallback(gotSSOResponse);
-        oauthCallbackError(gotSSOError);
+        ssoSuccessCallback(gotSSOResponse);
+        ssoErrorCallback(gotSSOError);
         return () => {
-            removeOAuthListeners();
+            removeExternalPageOpenedCallback(pageOpened);
+            removeSsoSuccessCallback(gotSSOResponse);
+            removeSsoErrorCallback(gotSSOError);
         };
     }, [setIsLoading]);
 
@@ -48,7 +52,7 @@ export const useSSO = (
         externalSSOPageOpenRef.current = false;
         setExternalSSOPageOpen(false);
         setIsLoading(false);
-        cancelOIDCLogin();
+        endOIDCLogin();
     };
 
     return { cancelSSOLogin, externalSSOPageOpen, externalSSOPageOpenRef };

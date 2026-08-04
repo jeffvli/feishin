@@ -1,69 +1,73 @@
 import isElectron from 'is-electron';
 
-import {
-    IssuerDiscoveryResponse,
-    OAuthAuthenticationConfig,
-    OIDCLoginResponse,
-} from '/@/shared/types/domain-types';
+const oauthIpc = isElectron() ? window.api.oauth : null;
 
 export const attachAccessTokenToRequests: (
     audienceEndpoint: string,
     accessToken: string,
 ) => void = (audienceEndpoint, accessToken) => {
-    if (isElectron()) {
-        window.api?.oauth.attachAccessTokenToRequests(audienceEndpoint, accessToken);
+    if (oauthIpc) {
+        oauthIpc.attachAccessTokenToRequests(audienceEndpoint, accessToken);
     }
 };
 
-export const autoDiscoverIssuerUrl: (url: string) => Promise<IssuerDiscoveryResponse> = (url) =>
-    window.api?.oauth.autoDiscoverIssuerUrl(url);
+export const endOIDCLogin: () => void = () => {
+    window.dispatchEvent(new CustomEvent('sso-end-login'));
+};
 
-export const cancelOIDCLogin: () => void = () => window.api?.oauth.cancelSSOLogin();
+export const deleteRefreshToken: (key: string) => Promise<void> = async (key) => {
+    if (oauthIpc) {
+        await oauthIpc.deleteRefreshToken(key);
+    }
+};
 
-export const discoverIssuer: (url: string) => Promise<IssuerDiscoveryResponse> = (url) =>
-    window.api?.oauth.discoverIssuer(url);
+export const ssoSuccessCallback: (callback: (loginResponse: any) => void) => void = (callback) => {
+    window.addEventListener('sso-success', callback);
+};
 
-export const externalPageOpenedCallback: (callback: () => void) => void = (callback) =>
-    window.api?.oauth.externalPageOpenedCallback(callback);
+export const ssoErrorCallback: (callback: () => void) => void = (callback) => {
+    window.addEventListener('sso-error', callback);
+};
+
+export const externalPageOpenedCallback: (callback: () => void) => void = (callback) => {
+    window.addEventListener('sso-external-page-opened', callback);
+};
+
+export const removeExternalPageOpenedCallback: (callback: () => void) => void = (callback) => {
+    window.removeEventListener('sso-external-page-opened', callback);
+};
+
+export const removeSsoSuccessCallback: (callback: () => void) => void = (callback) => {
+    window.removeEventListener('sso-success', callback);
+};
+export const removeSsoErrorCallback: (callback: () => void) => void = (callback) => {
+    window.removeEventListener('sso-error', callback);
+};
 
 export const getRefreshToken: (key: string) => Promise<null | string> = async (key) => {
-    if (isElectron()) {
-        return await window.api?.oauth.getRefreshToken(key);
+    if (oauthIpc) {
+        return await oauthIpc.getRefreshToken(key);
     } else {
         return null;
     }
 };
 
-export const login: (authConfig: OAuthAuthenticationConfig, audienceEndpoint: string) => void = (
-    authConfig,
-    audienceEndpoint,
-) => window.api?.oauth.login(authConfig, audienceEndpoint);
-
-export const oauthCallback: (callback: (loginResponse: OIDCLoginResponse) => void) => void = (
-    callback,
-) => {
-    window.api?.oauth.oauthCallback(callback);
-};
-
-export const oauthCallbackError: (callback: () => void) => void = (callback) =>
-    window.api?.oauth.oauthCallbackError(callback);
-
-export const refreshAccessToken: (
-    refreshTokenKey: string,
-    authConfig: OAuthAuthenticationConfig,
-    audienceEndpoint: string,
-) => Promise<null | string> = (refreshTokenKey, authConfig, audienceEndpoint) =>
-    window.api?.oauth.refreshAccessToken(refreshTokenKey, authConfig, audienceEndpoint);
-
-export const removeOAuthListeners: () => void = () => window.api?.oauth.removeOAuthListeners();
-
-export const revokeRefreshToken: (
-    refreshTokenKey: string,
-    authConfig: OAuthAuthenticationConfig,
-) => Promise<void> = (refreshTokenKey, authConfig) =>
-    window.api?.oauth.revokeRefreshToken(refreshTokenKey, authConfig);
-
 export const storeRefreshToken: (key: string, refreshToken: string) => Promise<void> = (
     key,
     refreshToken,
-) => window.api?.oauth.storeRefreshToken(key, refreshToken);
+) => {
+    if (oauthIpc) {
+        return oauthIpc.storeRefreshToken(key, refreshToken);
+    }
+    return Promise.resolve();
+};
+
+const ssoCallback = (url: string) => {
+    const customEvent = new CustomEvent('sso-callback', { detail: { url } });
+    window.dispatchEvent(customEvent);
+};
+
+// If desktop app, listen for the oauth callback URL from the main process
+if (oauthIpc) {
+    oauthIpc.registerSSOCallback(ssoCallback);
+}

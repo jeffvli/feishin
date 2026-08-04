@@ -1,13 +1,11 @@
 import i18n from '/@/i18n/i18n';
 import {
-    autoDiscoverIssuerUrl,
-    discoverIssuer,
-    login,
-    oauthCallback,
-    oauthCallbackError,
     refreshAccessToken,
     revokeRefreshToken,
-} from '/@/renderer/features/sso/api/oidc/oidc-api';
+} from '/@/renderer/features/sso/api/oidc/access-token';
+import { autoDiscoverIssuerUrl } from '/@/renderer/features/sso/api/oidc/auto-wellknown-discovery';
+import { discoverIssuer } from '/@/renderer/features/sso/api/oidc/oidc-discover-issuer';
+import { oidcLogin } from '/@/renderer/features/sso/api/oidc/oidc-login';
 import {
     IssuerDiscoveryResponse,
     OAuthAuthenticationConfig,
@@ -42,27 +40,12 @@ export const initalOIDCLogin = async (
     return ssoSignIn(authConfig, url);
 };
 
-// Setups a listener for callback and errors events from main process
-export const onOauthCallback = (): Promise<OIDCLoginResponse> => {
-    return new Promise<OIDCLoginResponse>((resolve, reject) => {
-        oauthCallback((loginResponse: OIDCLoginResponse) => {
-            resolve(loginResponse);
-        });
-
-        oauthCallbackError(() => {
-            reject(new Error(i18n.t('error.ssoError')));
-        });
-    });
-};
-
 const ssoSignIn = async (
     authConfig: OAuthAuthenticationConfig,
     audienceEndpoint: string,
 ): Promise<OIDCLoginResponse> => {
-    const tokenResponse = onOauthCallback();
-
-    // Hands off to main process to open the external browser for SSO login
-    await login(authConfig, audienceEndpoint);
+    // Perform the OIDC login flow
+    const tokenResponse = await oidcLogin(authConfig, audienceEndpoint);
 
     if (!tokenResponse) {
         throw new Error(i18n.t('error.ssoError'));

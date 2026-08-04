@@ -1,4 +1,5 @@
-import { IssuerDiscoveryResponse } from '../../../../shared/types/domain-types';
+import { logger } from '/@/renderer/utils/logger';
+import { IssuerDiscoveryResponse } from '/@/shared/types/domain-types';
 
 type issuerMetadata = {
     issuer: string;
@@ -31,7 +32,7 @@ export async function discoverIssuer(url: string): Promise<IssuerDiscoveryRespon
         }
     }
 
-    console.warn(
+    logger.warn(
         `Could not discover OIDC/OAuth2 metadata from ${issuerURL}. Provide Issuer URL manually.`,
     );
     return {
