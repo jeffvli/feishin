@@ -5,7 +5,7 @@
     min-width: 0;
     height: 100%;
     overflow: hidden;
-    mask-image: linear-gradient(180deg, rgb(0 0 0 / 100%) 85%, transparent 100%);
+    mask-image: linear-gradient(180deg, rgb(0 0 0 / 100%) 90%, transparent 100%);
 
     :global(.ag-header) {
         display: none;
@@ -33,8 +33,8 @@
     mask-image: linear-gradient(
         180deg,
         transparent 0%,
-        rgb(0 0 0 / 100%) 15%,
-        rgb(0 0 0 / 100%) 85%,
+        rgb(0 0 0 / 100%) 5%,
+        rgb(0 0 0 / 100%) 90%,
         transparent 100%
     );
 }
