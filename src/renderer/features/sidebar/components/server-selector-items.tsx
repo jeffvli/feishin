@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { controller } from '/@/renderer/api/controller';
+import { refreshOAuth } from '/@/renderer/api/utils-refresh-oauth';
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
@@ -25,6 +26,7 @@ import {
     ServerType,
 } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
+import { AuthType } from '/@/shared/types/types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
@@ -33,7 +35,7 @@ export const ServerSelectorItems = () => {
     const navigate = useNavigate();
     const currentServer = useCurrentServer();
     const serverList = useServerList();
-    const { logout, setCurrentServer, setMusicFolderId } = useAuthStoreActions();
+    const { logout, setCurrentServer, setMusicFolderId, updateServer } = useAuthStoreActions();
     const { isScanning, isWatching } = useScanStatus();
 
     const { data: musicFolders } = useQuery(
@@ -41,6 +43,23 @@ export const ServerSelectorItems = () => {
             ? sharedQueries.musicFolders({ query: null, serverId: currentServer.id })
             : { enabled: false, queryKey: ['disabled'] },
     );
+
+    const handleServerSelect = async (
+        server: ServerListItemWithCredential,
+        sessionExpired: boolean,
+    ) => {
+        if (!sessionExpired) {
+            return handleSetCurrentServer(server);
+        } else if (server.type === ServerType.NAVIDROME && server.authType === AuthType.OAUTH) {
+            // Might be able to simply refresh/reauth
+            const accessToken = await refreshOAuth(server).catch(() => null);
+            if (accessToken) {
+                updateServer(server.id, { accessToken });
+                return handleSetCurrentServer(server);
+            }
+        }
+        return handleCredentialsModal(server);
+    };
 
     const handleSetCurrentServer = (server: ServerListItemWithCredential) => {
         navigate(AppRoute.HOME);
@@ -184,11 +203,7 @@ export const ServerSelectorItems = () => {
                         key={`server-${server.id}`}
                         leftSection={<img src={logo} style={{ height: '1rem', width: '1rem' }} />}
                         onClick={() => {
-                            if (isSessionExpired) {
-                                handleCredentialsModal(server);
-                            } else {
-                                handleSetCurrentServer(server);
-                            }
+                            handleServerSelect(server, isSessionExpired);
                         }}
                         rightSection={
                             isSessionExpired ? <Icon icon="lock" /> : <Icon icon="arrowRight" />
