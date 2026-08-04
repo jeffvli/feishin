@@ -97,17 +97,19 @@ export function usePlaylistTrackList(
     const { searchTerm } = useSearchTermFilter();
     const { query } = usePlaylistSongListFilters();
 
+    const sortBy = (query.sortBy as SongListSort) ?? SongListSort.ID;
+    // only re-randomize when the sort is actually random
+    const randomRefreshRevision = sortBy === SongListSort.RANDOM ? refreshRevision : null;
+
     const sortedAndFilteredSongs = useMemo(() => {
         const raw = data?.items ?? [];
         const filtered = applyClientSideSongFilters(raw, query as Record<string, unknown>);
         if (searchTerm?.trim()) {
             return searchLibraryItems(filtered, searchTerm, LibraryItem.SONG);
         }
-        const sortBy = (query.sortBy as SongListSort) ?? SongListSort.ID;
         const sortOrder = (query.sortOrder as SortOrder) ?? SortOrder.ASC;
         return sortSongList(filtered, sortBy, sortOrder);
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- refreshRevision intentionally triggers a new random order
-    }, [data?.items, query, searchTerm, refreshRevision]);
+    }, [data?.items, query, searchTerm, sortBy, randomRefreshRevision]);
 
     const totalCount = sortedAndFilteredSongs.length;
 

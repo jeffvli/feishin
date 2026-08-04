@@ -54,6 +54,10 @@ export const PlaylistDetailAlbumView = ({
     const { searchTerm } = useSearchTermFilter();
     const { query } = usePlaylistSongListFilters();
 
+    const sortBy = (query.sortBy as SongListSort) ?? SongListSort.ID;
+    // only re-randomize when the sort is actually random
+    const randomRefreshRevision = sortBy === SongListSort.RANDOM ? refreshRevision : null;
+
     const filteredAndSortedSongs = useMemo(() => {
         const raw = data?.items ?? [];
         const filtered = applyClientSideSongFilters(raw, query as Record<string, unknown>);
@@ -66,7 +70,6 @@ export const PlaylistDetailAlbumView = ({
             return searched;
         }
 
-        const sortBy = (query.sortBy as SongListSort) ?? SongListSort.ID;
         const sortOrder = (query.sortOrder as SortOrder) ?? SortOrder.ASC;
 
         if (sortBy === SongListSort.RANDOM) {
@@ -87,8 +90,7 @@ export const PlaylistDetailAlbumView = ({
         }
 
         return sortSongList(searched, sortBy, sortOrder);
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- refreshRevision intentionally triggers a new random order
-    }, [data?.items, query, searchTerm, refreshRevision]);
+    }, [data?.items, query, searchTerm, sortBy, randomRefreshRevision]);
 
     const sortedAlbums = useMemo(
         () => playlistSongsToAlbums(filteredAndSortedSongs),
