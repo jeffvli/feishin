@@ -100,7 +100,7 @@ export function usePlaylistTrackList(
     const sortBy = (query.sortBy as SongListSort) ?? SongListSort.ID;
     // only re-randomize when the sort is actually random
     const randomRefreshRevision = sortBy === SongListSort.RANDOM ? refreshRevision : null;
-    const randomCacheRef = useRef<{ revision: boolean | null; songs: Song[] }>();
+    const randomCacheRef = useRef<{ revision: boolean | null; songs: Song[] }>(undefined);
 
     const sortedAndFilteredSongs = useMemo(() => {
         const raw = data?.items ?? [];
