@@ -194,6 +194,21 @@ export const SharedFullscreenPlayerSettings = () => {
                     <Divider my="sm" />
                     <Option>
                         <Option.Label>
+                            {t('page.fullscreenPlayer.config.coverArtSize')}
+                        </Option.Label>
+                        <Option.Control>
+                            <Slider
+                                defaultValue={coverArtSize}
+                                label={null}
+                                max={100}
+                                min={55}
+                                onChangeEnd={(e) => setStore({ coverArtSize: Number(e) })}
+                                w="100%"
+                            />
+                        </Option.Control>
+                    </Option>
+                    <Option>
+                        <Option.Label>
                             {t('page.fullscreenPlayer.config.playerItemAlignment')}
                         </Option.Label>
                         <Option.Control>
@@ -226,21 +241,6 @@ export const SharedFullscreenPlayerSettings = () => {
                             <div style={{ width: '100%' }}>
                                 <FullscreenPlayerSettings showDescription={false} />
                             </div>
-                        </Option.Control>
-                    </Option>
-                    <Option>
-                        <Option.Label>
-                            {t('page.fullscreenPlayer.config.coverArtSize')}
-                        </Option.Label>
-                        <Option.Control>
-                            <Slider
-                                defaultValue={coverArtSize}
-                                label={null}
-                                max={100}
-                                min={55}
-                                onChangeEnd={(e) => setStore({ coverArtSize: Number(e) })}
-                                w="100%"
-                            />
                         </Option.Control>
                     </Option>
                     {isTitleEnabled && (
