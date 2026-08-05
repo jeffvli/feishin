@@ -85,3 +85,8 @@
         transform: translateY(100%);
     }
 }
+
+.controls-container {
+    right: 0;
+    bottom: 0;
+}
