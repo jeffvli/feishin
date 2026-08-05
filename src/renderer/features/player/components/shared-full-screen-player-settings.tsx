@@ -235,9 +235,9 @@ export const SharedFullscreenPlayerSettings = () => {
                         <Option.Control>
                             <Slider
                                 defaultValue={coverArtSize}
-                                label={(e) => `${e} %`}
+                                label={null}
                                 max={100}
-                                min={40}
+                                min={55}
                                 onChangeEnd={(e) => setStore({ coverArtSize: Number(e) })}
                                 w="100%"
                             />

@@ -248,7 +248,7 @@ const containerVariants: Variants = {
             top: '100vh',
             transition: {
                 duration: 0.5,
-                ease: 'easeInOut',
+                ease: 'easeOut',
             },
             width: '100vw',
             y: 0,
@@ -268,7 +268,7 @@ const containerVariants: Variants = {
             transition: {
                 delay: 0.1,
                 duration: 0.5,
-                ease: 'easeInOut',
+                ease: 'easeOut',
             },
             width: '100vw',
             y: 0,
