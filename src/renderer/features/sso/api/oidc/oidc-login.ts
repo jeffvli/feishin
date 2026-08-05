@@ -19,10 +19,24 @@ const ELECTRON_CALLBACK_URL = `${OAuthRedirectScheme}:/${CALLBACK_PATH}`;
 const DEFAULT_SCOPES = 'openid profile email';
 const DEFAULT_CODE_CHALLENGE_METHOD = 'S256';
 
+let currentLoginPromise: null | Promise<OIDCLoginResponse> = null;
+
 export const oidcLogin = async (
     authConfig: OAuthAuthenticationConfig,
     audienceEndpoint: string,
 ) => {
+    if (currentLoginPromise) {
+        logger.info('Returning existing OIDC/OAuth2 login promise');
+        return currentLoginPromise;
+    }
+    currentLoginPromise = createOIDCLoginPromise(authConfig, audienceEndpoint);
+    return currentLoginPromise;
+};
+
+export const createOIDCLoginPromise = async (
+    authConfig: OAuthAuthenticationConfig,
+    audienceEndpoint: string,
+): Promise<OIDCLoginResponse> => {
     logger.info('Creating OIDC/OAuth2 signin request', {
         audienceEndpoint,
         clientId: authConfig.clientId,
@@ -163,6 +177,7 @@ const createFunctions = (
     };
 
     const endSSOLogin = () => {
+        currentLoginPromise = null;
         window.removeEventListener('sso-end-login', endSSOLogin);
         window.removeEventListener('sso-callback', ssoCallback);
         window.dispatchEvent(new CustomEvent('sso-end-login'));
