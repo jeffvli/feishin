@@ -20,7 +20,7 @@ export const SSOModal = ({
 }>) => {
     const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState(true);
-    const { server } = innerProps;
+    const { onSuccess, server } = innerProps;
 
     const retrySSOLogin = async () => {
         if (server) {
@@ -29,7 +29,7 @@ export const SSOModal = ({
                 .then((tokenResponse) => {
                     setIsLoading(false);
                     if (tokenResponse) {
-                        innerProps.onSuccess?.(tokenResponse);
+                        onSuccess?.(tokenResponse);
                         closeModal(id);
                     } else {
                         toast.error({ message: t('error.ssoError') });
@@ -45,17 +45,16 @@ export const SSOModal = ({
         }
     };
     useEffect(() => {
-        const server = innerProps.server;
         if (server) {
             reloginOIDC(server).then((tokenResponse) => {
                 setIsLoading(false);
                 if (tokenResponse) {
-                    innerProps.onSuccess?.(tokenResponse);
+                    onSuccess?.(tokenResponse);
                     closeModal(id);
                 }
             });
         }
-    }, [innerProps, id]);
+    }, [server, onSuccess, id]);
 
     return (
         <Stack>

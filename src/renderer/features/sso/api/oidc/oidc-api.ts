@@ -25,8 +25,8 @@ export const ssoSuccessCallback: (callback: (loginResponse: any) => void) => voi
     window.addEventListener('sso-success', callback);
 };
 
-export const ssoErrorCallback: (callback: () => void) => void = (callback) => {
-    window.addEventListener('sso-error', callback);
+export const ssoEndCallback: (callback: () => void) => void = (callback) => {
+    window.addEventListener('sso-end-login', callback);
 };
 
 export const externalPageOpenedCallback: (callback: () => void) => void = (callback) => {
@@ -40,8 +40,8 @@ export const removeExternalPageOpenedCallback: (callback: () => void) => void = 
 export const removeSsoSuccessCallback: (callback: () => void) => void = (callback) => {
     window.removeEventListener('sso-success', callback);
 };
-export const removeSsoErrorCallback: (callback: () => void) => void = (callback) => {
-    window.removeEventListener('sso-error', callback);
+export const removeSsoEndCallback: (callback: () => void) => void = (callback) => {
+    window.removeEventListener('sso-end-login', callback);
 };
 
 export const getRefreshToken: (key: string) => Promise<null | string> = async (key) => {

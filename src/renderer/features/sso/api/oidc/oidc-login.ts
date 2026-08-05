@@ -171,7 +171,6 @@ const createFunctions = (
         } catch (error) {
             logger.error('Failed to process OIDC/OAuth2 signin response:', error);
             reject(error);
-            window.dispatchEvent(new CustomEvent('sso-error', { detail: error }));
             endSSOLogin();
         }
     };

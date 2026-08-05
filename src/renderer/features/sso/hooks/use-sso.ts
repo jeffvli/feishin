@@ -4,13 +4,13 @@ import {
     endOIDCLogin,
     externalPageOpenedCallback,
     removeExternalPageOpenedCallback,
-    removeSsoErrorCallback,
+    removeSsoEndCallback,
     removeSsoSuccessCallback,
-    ssoErrorCallback,
+    ssoEndCallback,
     ssoSuccessCallback,
 } from '/@/renderer/features/sso/api/oidc/oidc-api';
 
-export const useSSO = (
+export const useSSOPageOpen = (
     setIsLoading: Dispatch<SetStateAction<boolean>>,
 ): {
     cancelSSOLogin: () => void;
@@ -30,7 +30,7 @@ export const useSSO = (
             externalSSOPageOpenRef.current = false;
             setExternalSSOPageOpen(false);
         };
-        const gotSSOError = () => {
+        const gotSSOEnd = () => {
             if (!externalSSOPageOpenRef.current) return;
 
             externalSSOPageOpenRef.current = false;
@@ -40,11 +40,11 @@ export const useSSO = (
 
         externalPageOpenedCallback(pageOpened);
         ssoSuccessCallback(gotSSOResponse);
-        ssoErrorCallback(gotSSOError);
+        ssoEndCallback(gotSSOEnd);
         return () => {
             removeExternalPageOpenedCallback(pageOpened);
             removeSsoSuccessCallback(gotSSOResponse);
-            removeSsoErrorCallback(gotSSOError);
+            removeSsoEndCallback(gotSSOEnd);
         };
     }, [setIsLoading]);
 
