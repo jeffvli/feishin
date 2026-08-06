@@ -967,6 +967,8 @@
         "followLyric": "Follow current lyric",
         "font_description": "Sets the font to use for the application",
         "font": "Font",
+        "fullscreenAutoOpenTimeout_description": "Automatically opens the fullscreen player after this many minutes of inactivity while a song is playing. Leave empty to disable",
+        "fullscreenAutoOpenTimeout": "Fullscreen player auto-open timeout (minutes)",
         "fontType_description": "Built-in font selects one of the fonts provided by Feishin. System font allows you to select any font provided by your operating system. Custom allows you to provide your own font",
         "fontType_optionBuiltIn": "Built-in font",
         "fontType_optionCustom": "Custom font",

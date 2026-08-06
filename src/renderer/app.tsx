@@ -12,6 +12,7 @@ import { lazy, memo, Suspense, useEffect, useMemo, useRef, useState } from 'reac
 import i18n from '/@/i18n/i18n';
 import { WebAudioContext } from '/@/renderer/features/player/context/webaudio-context';
 import { useCheckForUpdates } from '/@/renderer/hooks/use-check-for-updates';
+import { useFullscreenAutoOpen } from '/@/renderer/hooks/use-fullscreen-auto-open';
 import { useFullscreenToggle } from '/@/renderer/hooks/use-fullscreen-toggle';
 import { useNativeMenuSync } from '/@/renderer/hooks/use-native-menu-sync';
 import { useSyncSettingsToMain } from '/@/renderer/hooks/use-sync-settings-to-main';
@@ -120,6 +121,7 @@ const AppEffects = () => (
         <LanguageEffect />
         <NativeMenuSyncEffect />
         <FullscreenToggleEffect />
+        <FullscreenAutoOpenEffect />
         <InputFocusEffect />
     </>
 );
@@ -266,6 +268,12 @@ const NativeMenuSyncEffect = () => {
 
 const FullscreenToggleEffect = () => {
     useFullscreenToggle();
+
+    return null;
+};
+
+const FullscreenAutoOpenEffect = () => {
+    useFullscreenAutoOpen();
 
     return null;
 };

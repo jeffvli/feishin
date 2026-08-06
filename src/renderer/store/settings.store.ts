@@ -527,6 +527,7 @@ export const GeneralSettingsSchema = z.object({
     externalLinks: z.boolean(),
     followCurrentSong: z.boolean(),
     followSystemTheme: z.boolean(),
+    fullscreenAutoOpenTimeout: z.number().min(1).max(120).optional(),
     genreTarget: GenreTargetSchema,
     homeFeature: z.boolean(),
     homeFeatureStyle: z.nativeEnum(HomeFeatureStyle),
@@ -1326,6 +1327,7 @@ const initialState: SettingsState = {
         externalLinks: true,
         followCurrentSong: true,
         followSystemTheme: false,
+        fullscreenAutoOpenTimeout: undefined,
         genreTarget: GenreTarget.TRACK,
         homeFeature: true,
         homeFeatureStyle: HomeFeatureStyle.SINGLE,
@@ -3013,6 +3015,9 @@ export const useVolumeWidth = () => useSettingsStore((state) => state.general.vo
 
 export const useFollowCurrentSong = () =>
     useSettingsStore((state) => state.general.followCurrentSong, shallow);
+
+export const useFullscreenAutoOpenTimeout = () =>
+    useSettingsStore((state) => state.general.fullscreenAutoOpenTimeout, shallow);
 
 export const useSidebarImageExpand = () =>
     useSettingsStore((state) => state.general.sidebarImageExpand, shallow);
