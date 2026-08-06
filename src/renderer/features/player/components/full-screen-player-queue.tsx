@@ -106,7 +106,14 @@ const Controls = () => {
     }, [activeTab, setStore, t, webAudio]);
 
     return (
-        <Group className={styles.controlsContainer} gap="xs" p="0.5rem" pos="absolute">
+        <Group
+            className={[styles.controlsContainer, 'full-screen-player-controls-container'].join(
+                ' ',
+            )}
+            gap="xs"
+            p="0.5rem"
+            pos="absolute"
+        >
             {headerItems.map((item) => (
                 <div key={`tab-${item.label}`}>
                     <ActionIcon
