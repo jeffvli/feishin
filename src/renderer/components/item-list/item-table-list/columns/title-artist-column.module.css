@@ -37,6 +37,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    --text-text-wrap: nowrap;
 }
 
 a.title {
