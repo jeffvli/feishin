@@ -121,6 +121,8 @@ export const QueueSongTitleArtistColumn = (props: ItemTableListInnerColumn) => {
                     <Text
                         className={clsx({
                             [styles.active]: isActive,
+                            [styles.compact]: props.size === 'compact',
+                            [styles.large]: props.size === 'large',
                             [styles.title]: true,
                         })}
                         isNoSelect
