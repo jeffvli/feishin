@@ -40,9 +40,9 @@
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: normal;
-    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
 }
 
 .title.compact {
