@@ -275,6 +275,11 @@ const ENV_SETTING_SPECS: EnvSettingSpec[] = [
         type: 'bool',
     },
     {
+        key: 'FS_GENERAL_SIDEBAR_IMAGE_EXPAND',
+        path: ['general', 'sidebarImageExpand'],
+        type: 'bool',
+    },
+    {
         key: 'FS_GENERAL_SIDEBAR_PLAYLIST_FOLDERS',
         path: ['general', 'sidebarPlaylistFolders'],
         type: 'bool',

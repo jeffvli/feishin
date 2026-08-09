@@ -43,6 +43,7 @@ These variables override app settings **on first run** when no persisted setting
 | `general.showVisualizerInSidebar` | `true` | `FS_GENERAL_SHOW_VISUALIZER_IN_SIDEBAR` | `true` / `false` — Show visualizer in sidebar. |
 | `general.sidebarCollapsedNavigation` | `true` | `FS_GENERAL_SIDEBAR_COLLAPSED_NAVIGATION` | `true` / `false` — Start with collapsed sidebar nav. |
 | `general.sidebarCollapseShared` | `false` | `FS_GENERAL_SIDEBAR_COLLAPSE_SHARED` | `true` / `false` — Share sidebar collapse state. |
+| `general.sidebarImageExpand` | `false` | `FS_GENERAL_SIDEBAR_IMAGE_EXPAND` | `true` / `false` — Show the player-bar album-art button that expands art into the sidebar. |
 | `general.sidebarPlaylistFolders` | `true` | `FS_GENERAL_SIDEBAR_PLAYLIST_FOLDERS` | `true` / `false` — Group playlists into folders by name separator. |
 | `general.sidebarPlaylistFolderSeparator` | `/` | `FS_GENERAL_SIDEBAR_PLAYLIST_FOLDER_SEPARATOR` | Character or string that separates folder levels in a playlist name. Empty = use default. |
 | `general.sidebarPlaylistFolderTreeIndent` | `16` | `FS_GENERAL_SIDEBAR_PLAYLIST_FOLDER_TREE_INDENT` | Pixels each tree level is indented (0–64). |
