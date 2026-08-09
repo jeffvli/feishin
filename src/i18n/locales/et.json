@@ -590,7 +590,6 @@
                 "lyricScaleNonActive_description": "Mitteaktiivsete ridade suurus suhtarvuna",
                 "showLyricMatch_description": "Kuva leitud laulusõnade pealkiri ja esitaja",
                 "showLyricProvider_description": "Kuva praeguste laulusõnade allikas"
-                "lyricLineLeadTime": "Rea kuvamise eelajastus (ms)"
             },
             "lyrics": "Laulusõnad",
             "related": "Seotud",
