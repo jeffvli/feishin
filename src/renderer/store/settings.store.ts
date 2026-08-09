@@ -1224,9 +1224,18 @@ export const sidebarItems: SidebarItemType[] = [
     },
 ];
 
-const homeItems = Object.values(HomeItem).map((item) => ({
+const defaultHomeItemOrder: HomeItem[] = [
+    HomeItem.GENRES,
+    HomeItem.RANDOM,
+    HomeItem.RECENTLY_ADDED,
+    HomeItem.RECENTLY_RELEASED,
+    HomeItem.RECENTLY_PLAYED,
+    HomeItem.MOST_PLAYED,
+];
+
+const homeItems = defaultHomeItemOrder.map((id) => ({
     disabled: false,
-    id: item,
+    id,
 }));
 
 const artistItems = Object.values(ArtistItem).map((item) => ({
