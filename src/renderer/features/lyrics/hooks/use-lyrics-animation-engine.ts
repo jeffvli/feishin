@@ -26,8 +26,6 @@ export interface UseLyricsAnimationEngineOptions {
     lineLeadTimeMsRef?: React.RefObject<number>;
     lyrics: SynchronizedLyrics;
     onLineActive?: (lineIndex: number) => void;
-    paddingLeft?: number;
-    paddingRight?: number;
     scrollContainerId: string;
 }
 
@@ -43,8 +41,6 @@ export const useLyricsAnimationEngine = ({
     lineLeadTimeMsRef,
     lyrics,
     onLineActive,
-    paddingLeft,
-    paddingRight,
     scrollContainerId,
 }: UseLyricsAnimationEngineOptions) => {
     const internalAnimStateRef = useRef<AnimEngineState>(createAnimEngineState());
@@ -165,7 +161,7 @@ export const useLyricsAnimationEngine = ({
         return () => {
             cancelAnimationFrame(frame);
         };
-    }, [fontSize, gap, paddingLeft, paddingRight, recalculatePositions]);
+    }, [fontSize, gap, recalculatePositions]);
 
     useEffect(() => {
         const container = containerRef.current;

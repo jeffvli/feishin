@@ -570,8 +570,7 @@
                 "useImageAspectRatio": "Kasuta pildi kuvasuhet",
                 "lyricFollowScrollAlignment": "Laulusõnad järgivad joondumist",
                 "lyricLineLeadTime": "Rea kuvamise eelajastus (ms)",
-                "lyricPaddingLeft": "Laulusõnade vasakpoolne veeris (%)",
-                "lyricPaddingRight": "Laulusõnade parempoolne veeris (%)"
+                "lyricLineLeadTime": "Rea kuvamise eelajastus (ms)"
             },
             "lyrics": "Laulusõnad",
             "related": "Seotud",

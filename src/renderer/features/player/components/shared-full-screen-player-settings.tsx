@@ -61,14 +61,7 @@ export const SharedFullscreenPlayerSettings = () => {
     };
 
     const handleLyricsSettings = (property: string, value: any) => {
-        const displayProperties = [
-            'fontSize',
-            'fontSizeUnsync',
-            'gap',
-            'gapUnsync',
-            'paddingLeft',
-            'paddingRight',
-        ];
+        const displayProperties = ['fontSize', 'fontSizeUnsync', 'gap', 'gapUnsync'];
         if (displayProperties.includes(property)) {
             const currentDisplay = useSettingsStore.getState().lyricsDisplay;
             setSettings({
@@ -394,38 +387,6 @@ export const SharedFullscreenPlayerSettings = () => {
                                     w="100%"
                                 />
                             </Group>
-                        </Option.Control>
-                    </Option>
-                    <Option>
-                        <Option.Label>
-                            {t('page.fullscreenPlayer.config.lyricPaddingLeft')}
-                        </Option.Label>
-                        <Option.Control>
-                            <Slider
-                                defaultValue={lyricConfig.paddingLeft ?? 0}
-                                label={(value) => `${value}%`}
-                                max={20}
-                                min={0}
-                                onChangeEnd={(value) => handleLyricsSettings('paddingLeft', value)}
-                                step={1}
-                                w="100%"
-                            />
-                        </Option.Control>
-                    </Option>
-                    <Option>
-                        <Option.Label>
-                            {t('page.fullscreenPlayer.config.lyricPaddingRight')}
-                        </Option.Label>
-                        <Option.Control>
-                            <Slider
-                                defaultValue={lyricConfig.paddingRight ?? 0}
-                                label={(value) => `${value}%`}
-                                max={20}
-                                min={0}
-                                onChangeEnd={(value) => handleLyricsSettings('paddingRight', value)}
-                                step={1}
-                                w="100%"
-                            />
                         </Option.Control>
                     </Option>
                     <Option>

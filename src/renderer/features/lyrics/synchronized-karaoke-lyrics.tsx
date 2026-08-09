@@ -83,8 +83,6 @@ export const SynchronizedKaraokeLyrics = ({
 
     const effectiveFontSize = preview ? PREVIEW_FONT_SIZE : settings.fontSize;
     const effectiveGap = preview ? PREVIEW_GAP : settings.gap;
-    const effectivePaddingLeft = preview ? 0 : settings.paddingLeft;
-    const effectivePaddingRight = preview ? 0 : settings.paddingRight;
 
     const normalizedLyrics = useMemo(() => normalizeLyrics(lyrics), [lyrics]);
     const rafRef = useRef<null | number>(null);
@@ -111,8 +109,6 @@ export const SynchronizedKaraokeLyrics = ({
         lineIdPrefix: 'karaoke-line',
         lineLeadTimeMsRef,
         lyrics: normalizedLyrics,
-        paddingLeft: effectivePaddingLeft,
-        paddingRight: effectivePaddingRight,
         scrollContainerId: LYRICS_SCROLL_CONTAINER_ID,
     });
 
@@ -349,12 +345,7 @@ export const SynchronizedKaraokeLyrics = ({
             ref={containerRef}
             style={{ ...containerStyle, ...style }}
         >
-            <LyricsScrollContent
-                gap={effectiveGap}
-                paddingLeft={effectivePaddingLeft}
-                paddingRight={effectivePaddingRight}
-                preview={preview}
-            >
+            <LyricsScrollContent gap={effectiveGap} preview={preview}>
                 {settings.showProvider && source && (
                     <LyricLine
                         alignment={settings.alignment}

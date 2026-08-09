@@ -112,17 +112,6 @@ These variables override app settings **on first run** when no persisted setting
 
 ---
 
-## Lyrics display
-
-Applies to the default lyrics display profile (`lyricsDisplay.default`).
-
-| Setting path | Default | Env variable | Available values / Description |
-|-------------|---------|--------------|--------------------------------|
-| `lyricsDisplay.default.paddingLeft` | `0` | `FS_LYRICS_PADDING_LEFT` | Left content padding as a percentage (`0`–`20`). |
-| `lyricsDisplay.default.paddingRight` | `0` | `FS_LYRICS_PADDING_RIGHT` | Right content padding as a percentage (`0`–`20`). |
-
----
-
 ## Auto DJ
 
 | Setting path | Default | Env variable | Available values / Description |

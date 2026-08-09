@@ -818,8 +818,6 @@
                 "lyricOffset": "Offset testi (ms)",
                 "lyricFollowScrollAlignment": "Allineamento scorrimento testi",
                 "lyricLineLeadTime": "Anticipo riga (ms)",
-                "lyricPaddingLeft": "Margine sinistro testi (%)",
-                "lyricPaddingRight": "Margine destro testi (%)",
                 "lyricOpacityNonActive": "Opacità testo non attivo",
                 "lyricScaleNonActive": "Scala testo non attivo"
             },

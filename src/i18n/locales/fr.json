@@ -360,8 +360,7 @@
                 "lyricOpacityNonActive": "Opacité des paroles inactive",
                 "lyricFollowScrollAlignment": "Les paroles suivent l'alignement",
                 "lyricLineLeadTime": "Temps d'avance de la ligne de paroles (ms)",
-                "lyricPaddingLeft": "Marge de gauche des paroles (%)",
-                "lyricPaddingRight": "Marge de droite des paroles (%)"
+                "lyricLineLeadTime": "Temps d'avance de la ligne de paroles (ms)"
             },
             "upNext": "À suivre",
             "lyrics": "Paroles",
