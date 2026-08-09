@@ -428,6 +428,7 @@ export const SynchronizedKaraokeLyrics = ({
                                     ? (syncedRomajiLyrics[idx] ?? null)
                                     : undefined
                             }
+                            text={getLyricLineText(rawLine)}
                             translatedText={translationText}
                             translationCueLines={translationCueLines}
                         />

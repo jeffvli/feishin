@@ -4,12 +4,3 @@
     padding: 1rem;
     overflow: hidden;
 }
-
-.spinner-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    padding-top: 5rem;
-    padding-bottom: 5rem;
-}

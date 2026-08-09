@@ -519,7 +519,12 @@
         "customThemeWarnings_description": "Následující motivy byly načteny, ale některé hodnoty byly neplatné a byly ignorovány.",
         "customThemeWarnings": "Varování",
         "customThemes_description": "Přesuňte soubory motivu .json pro přidání vlastních motivů. Budou načteny automaticky kdykoli přidáte, upravíte nebo odstraníte soubor.",
-        "customThemes": "Vlastní motivy"
+        "customThemes": "Vlastní motivy",
+        "confirmQueueChanges": "Potvrdit změny ve frontě",
+        "confirmQueueChanges_description": "Zeptat se na potvrzení před vymazáním aktuální fronty",
+        "shareExpiration_description": "Jak daleko do budoucnosti ve výchozím nastavení vyprší nové odkazy ke sdílení. Vymažte datum v dialogu sdílení pro použití výchozí hodnoty serveru",
+        "shareExpiration": "Výchozí vypršení sdílení",
+        "shareExpirationUseServerDefault": "Použít výchozí dobu vypršení serveru"
     },
     "action": {
         "editPlaylist": "Upravit $t(entity.playlist, {\"count\": 1})",
@@ -786,7 +791,9 @@
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "Skladatel",
                 "titleArtist": "$t(common.title) (umělec)",
-                "albumGroup": "Skupina alb"
+                "albumGroup": "Skupina alb",
+                "date": "Datum",
+                "releaseYear": "Rok vydání"
             }
         },
         "column": {
@@ -796,7 +803,7 @@
             "favorite": "Oblíbené",
             "playCount": "Přehrání",
             "albumCount": "Alba",
-            "releaseYear": "Rok",
+            "releaseYear": "Rok vydání",
             "lastPlayed": "Naposledy přehráno",
             "biography": "Biografie",
             "releaseDate": "Datum vydání",
@@ -816,7 +823,9 @@
             "codec": "Kodek",
             "owner": "Majitel",
             "bitDepth": "Bitová hloubka",
-            "sampleRate": "Vzorkovací frekvence"
+            "sampleRate": "Vzorkovací frekvence",
+            "date": "Datum",
+            "year": "Rok"
         }
     },
     "error": {
@@ -899,7 +908,9 @@
         "explicitStatus": "$t(common.explicitStatus)",
         "sortName": "Název v řazení",
         "matchAnd": "A",
-        "matchOr": "Nebo"
+        "matchOr": "Nebo",
+        "date": "Datum",
+        "year": "Rok"
     },
     "page": {
         "sidebar": {
@@ -1050,7 +1061,8 @@
             "playerFilters": "Filtry přehrávače",
             "logger": "Protokol",
             "lyricsDisplay": "Zobrazení textů",
-            "lyricsTranslation": "Překlad textů"
+            "lyricsTranslation": "Překlad textů",
+            "sharing": "Sdílení"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
@@ -1230,7 +1242,9 @@
             "setExpiration": "Nastavit vypršení",
             "createFailed": "Nepodařilo se vytvořit sdílení (je sdílení povoleno?)",
             "copyToClipboard": "Zkopírovat do schránky: Ctrl+C, enter",
-            "successMustClick": "Sdílení úspěšně vytvořeno. klikněte sem pro otevření"
+            "successMustClick": "Sdílení úspěšně vytvořeno. klikněte sem pro otevření",
+            "setExpiration_description": "Ponechte prázdné pro použití výchozího vypršení serveru",
+            "setExpiration_serverDefault": "Podle serveru"
         },
         "privateMode": {
             "enabled": "Soukromý režim povolen, stav přehrávání je nyní skryt před externími integracemi",
@@ -1277,6 +1291,10 @@
         },
         "createPrefilledPlaylist": {
             "title": "Vytvořit $t(entity.playlist, {\"count\": 1}) z vybraných skladeb"
+        },
+        "queueChangeConfirmation": {
+            "title": "Vymazat aktuální frontu?",
+            "description": "Toto odstraní všechny položky z aktuální fronty."
         }
     },
     "entity": {
@@ -1398,7 +1416,14 @@
         "minuteShort": "min.",
         "secondShort": "s",
         "hourShort": "h.",
-        "dayShort": "d."
+        "dayShort": "d.",
+        "secondLong": "Sekunda",
+        "minuteLong": "Minuta",
+        "hourLong": "Hodina",
+        "dayLong": "Den",
+        "weekLong": "Týden",
+        "monthLong": "Měsíc",
+        "yearLong": "Rok"
     },
     "visualizer": {
         "visualizerType": "Typ vizualizéru",

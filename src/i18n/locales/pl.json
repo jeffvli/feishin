@@ -323,7 +323,9 @@
         "explicitStatus": "$t(common.explicitStatus)",
         "sortName": "Sortowanie po nazwie",
         "matchAnd": "I",
-        "matchOr": "Lub"
+        "matchOr": "Lub",
+        "date": "Data",
+        "year": "Rok"
     },
     "form": {
         "deletePlaylist": {
@@ -398,7 +400,9 @@
             "createFailed": "Nie udało się utworzyć linku do udostępniania (czy udostępnianie jest włączone?)",
             "expireInvalid": "Ustawiony czas wygaśnięcia musi być w przyszłości",
             "copyToClipboard": "Skopiuj do schowka: Ctrl+C, enter",
-            "successMustClick": "Udostępnianie utworzone pomyślnie, kliknij tutaj żeby otworzyć"
+            "successMustClick": "Udostępnianie utworzone pomyślnie, kliknij tutaj żeby otworzyć",
+            "setExpiration_description": "Pozostaw puste, aby użyć domyślnego wygaśnięcia serwera",
+            "setExpiration_serverDefault": "Domyślne serwera"
         },
         "privateMode": {
             "enabled": "Tryb prywatny włączony, status odtwarzania jest ukryty przed usługami zewnętrznymi",
@@ -445,6 +449,10 @@
         },
         "createPrefilledPlaylist": {
             "title": "Utwórz $t(entity.playlist, {\"count\": 1}) z wybranych piosenek"
+        },
+        "queueChangeConfirmation": {
+            "title": "Wyczyścić aktualną kolejkę?",
+            "description": "To usunie wszystkie elementy z aktualnej kolejki."
         }
     },
     "page": {
@@ -609,7 +617,8 @@
             "playerFilters": "Filtry odtwarzacza",
             "logger": "Logger",
             "lyricsDisplay": "Wyświetlanie tekstu",
-            "lyricsTranslation": "Tłumaczenie tekstu"
+            "lyricsTranslation": "Tłumaczenie tekstu",
+            "sharing": "Udostępnianie"
         },
         "trackList": {
             "title": "$t(entity.track, {\"count\": 2})",
@@ -1223,7 +1232,13 @@
         "customThemeWarnings_description": "Te motywy zostały załadowane, ale niektóre wartości były nieprawidłowe i zostały zignorowane.",
         "customThemeWarnings": "Ostrzeżenia",
         "customThemes_description": "Upuść pliki motywów .json do tego folderu, aby dodać niestandardowe motywy. Są one wczytywane automatycznie kiedy zmienisz, dodasz lub usuniesz plik.",
-        "customThemes": "Niestandardowe motywy"
+        "customThemes": "Niestandardowe motywy",
+        "confirmQueueChanges": "Potwierdź zmiany w kolejce",
+        "confirmQueueChanges_description": "Pytaj o potwierdzenie przed wyczyszczeniem aktualnej kolejki",
+        "shareExpiration_description": "Jak daleko w przyszłości będą domyślnie wygasać nowe linki udostępniania. Wyczyść datę w oknie udostępniania, aby użyć domyślnego czasu z serwera",
+        "shareExpiration": "Domyślne wygasanie udostępniania",
+        "shareExpirationUseServerDefault_description": "Pomiń dodawanie wygaśnięcia podczas tworzenia udostępnień, aby serwer mógł zastosować swoje skonfigurowane domyślne wygasanie (np. Navidrome DefaultShareExpiration)",
+        "shareExpirationUseServerDefault": "Używaj domyślnego wygasania serwera"
     },
     "table": {
         "config": {
@@ -1306,7 +1321,9 @@
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "Kompozytor",
                 "titleArtist": "$t(common.title) (wykonawca)",
-                "albumGroup": "Grupa albumu"
+                "albumGroup": "Grupa albumu",
+                "date": "Data",
+                "releaseYear": "Rok wydania"
             }
         },
         "column": {
@@ -1316,7 +1333,7 @@
             "favorite": "Ulubione",
             "playCount": "Odtwarzane",
             "albumCount": "Albumy",
-            "releaseYear": "Rok",
+            "releaseYear": "Rok wydania",
             "lastPlayed": "Ostatnio odtwarzane",
             "biography": "Biografia",
             "releaseDate": "Data premiery",
@@ -1336,7 +1353,9 @@
             "codec": "Kodek",
             "owner": "Właściciel",
             "bitDepth": "Głębia bitowa",
-            "sampleRate": "Częstotliwość próbkowania"
+            "sampleRate": "Częstotliwość próbkowania",
+            "date": "Data",
+            "year": "Rok"
         }
     },
     "queryBuilder": {
@@ -1398,7 +1417,14 @@
         "minuteShort": "Min",
         "secondShort": "Sek",
         "hourShort": "Godz",
-        "dayShort": "Dzień"
+        "dayShort": "d",
+        "secondLong": "Sekunda",
+        "minuteLong": "Minuta",
+        "hourLong": "Godzina",
+        "dayLong": "Dzień",
+        "weekLong": "Tydzień",
+        "monthLong": "Miesiąc",
+        "yearLong": "Rok"
     },
     "visualizer": {
         "visualizerType": "Typ Wizualizacji",

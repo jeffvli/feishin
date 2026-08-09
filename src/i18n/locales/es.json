@@ -519,7 +519,13 @@
         "customThemeWarnings": "Advertencias",
         "customThemes": "Temas personalizados",
         "customThemeWarnings_description": "Estos temas se cargaron, pero algunos valores eran inválidos y fueron ignorados.",
-        "customThemes_description": "Arrastra los archivos de tema .json en esta carpeta para añadir temas personalizados. Se registran automáticamente cada vez que añades, editas o eliminas un archivo."
+        "customThemes_description": "Arrastra los archivos de tema .json en esta carpeta para añadir temas personalizados. Se registran automáticamente cada vez que añades, editas o eliminas un archivo.",
+        "shareExpirationUseServerDefault": "Usar la expiración predeterminada del servidor",
+        "shareExpiration": "Expiración de compartir predeterminada",
+        "shareExpiration_description": "Cuándo expiran en el futuro de forma predeterminada los nuevos enlaces de compartir. Limpiar la fecha en el diálogo de compartir para usar en su lugar la predeterminada del servidor",
+        "shareExpirationUseServerDefault_description": "Omite una expiración cuando se crean enlaces de compartir para que el servidor pueda aplicar la predeterminada configurada (p. ej. Navidrome DefaultShareExpiration)",
+        "confirmQueueChanges": "Confirmar cambios en cola",
+        "confirmQueueChanges_description": "Pide confirmación antes de descartar la cola actual"
     },
     "action": {
         "editPlaylist": "Editar $t(entity.playlist, {\"count\": 1})",
@@ -785,7 +791,9 @@
         "explicitStatus": "$t(common.explicitStatus)",
         "sortName": "Ordenar por nombre",
         "matchAnd": "Y",
-        "matchOr": "O"
+        "matchOr": "O",
+        "date": "Fecha",
+        "year": "Año"
     },
     "page": {
         "sidebar": {
@@ -936,7 +944,8 @@
             "playerFilters": "Filtros del Reproductor",
             "logger": "Registrador",
             "lyricsDisplay": "Mostrar Letras",
-            "lyricsTranslation": "Traducción de letras"
+            "lyricsTranslation": "Traducción de letras",
+            "sharing": "Compartir"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
@@ -1116,7 +1125,9 @@
             "success": "Enlace de compartición copiado al portapapeles (o pulsa aquí para abrir)",
             "expireInvalid": "La expiración debe ser en el futuro",
             "copyToClipboard": "Copiar al portapapeles: Ctrl+C, enter",
-            "successMustClick": "Compartir creado correctamente. Haz clic aquí para abrir"
+            "successMustClick": "Compartir creado correctamente. Haz clic aquí para abrir",
+            "setExpiration_description": "Dejar vacío para usar la expiración predeterminada del servidor",
+            "setExpiration_serverDefault": "Predeterminado del servidor"
         },
         "privateMode": {
             "enabled": "Modo privado activado, el estado de reproducción ahora está oculto de integraciones externas",
@@ -1163,6 +1174,10 @@
         },
         "createPrefilledPlaylist": {
             "title": "Crear $t(entity.playlist, {\"count\": 1}) desde las canciones seleccionadas"
+        },
+        "queueChangeConfirmation": {
+            "title": "¿Descartar la cola actual?",
+            "description": "Esto eliminará todos los elementos de la cola actual."
         }
     },
     "table": {
@@ -1173,7 +1188,7 @@
             "favorite": "Favorito",
             "playCount": "Reproducciones",
             "albumCount": "Álbumes",
-            "releaseYear": "Año",
+            "releaseYear": "Año de lanzamiento",
             "lastPlayed": "Última reproducción",
             "biography": "Biografía",
             "releaseDate": "Fecha de lanzamiento",
@@ -1193,7 +1208,9 @@
             "codec": "Códecs",
             "owner": "Propietario",
             "bitDepth": "Profundidad de Bit",
-            "sampleRate": "Frecuencia de Muestreo"
+            "sampleRate": "Frecuencia de Muestreo",
+            "date": "Fecha",
+            "year": "Año"
         },
         "config": {
             "label": {
@@ -1232,7 +1249,9 @@
                 "sampleRate": "$t(common.sampleRate)",
                 "titleArtist": "$t(common.title) (artista)",
                 "composer": "Compositor",
-                "albumGroup": "Grupo del Álbum"
+                "albumGroup": "Grupo del Álbum",
+                "date": "Fecha",
+                "releaseYear": "Año de lanzamiento"
             },
             "general": {
                 "gap": "$t(common.gap)",
@@ -1398,7 +1417,14 @@
         "minuteShort": "M",
         "secondShort": "S",
         "hourShort": "H",
-        "dayShort": "D"
+        "dayShort": "D",
+        "secondLong": "Segundo",
+        "minuteLong": "Minuto",
+        "hourLong": "Hora",
+        "dayLong": "Día",
+        "weekLong": "Semana",
+        "monthLong": "Mes",
+        "yearLong": "Año"
     },
     "visualizer": {
         "visualizerType": "Tipo de visualizador",

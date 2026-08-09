@@ -1,52 +1,16 @@
 import isElectron from 'is-electron';
-import { lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './settings-content.module.css';
 
+import { AdvancedTab } from '/@/renderer/features/settings/components/advanced/advanced-tab';
+import { GeneralTab } from '/@/renderer/features/settings/components/general/general-tab';
+import { HotkeysTab } from '/@/renderer/features/settings/components/hotkeys/hotkeys-tab';
+import { PlaybackTab } from '/@/renderer/features/settings/components/playback/playback-tab';
+import { WindowTab } from '/@/renderer/features/settings/components/window/window-tab';
 import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store/settings.store';
-import { Box } from '/@/shared/components/box/box';
-import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Tabs } from '/@/shared/components/tabs/tabs';
-
-const GeneralTab = lazy(() =>
-    import('/@/renderer/features/settings/components/general/general-tab').then((module) => ({
-        default: module.GeneralTab,
-    })),
-);
-
-const PlaybackTab = lazy(() =>
-    import('/@/renderer/features/settings/components/playback/playback-tab').then((module) => ({
-        default: module.PlaybackTab,
-    })),
-);
-
-const HotkeysTab = lazy(() =>
-    import('/@/renderer/features/settings/components/hotkeys/hotkeys-tab').then((module) => ({
-        default: module.HotkeysTab,
-    })),
-);
-
-const WindowTab = lazy(() =>
-    import('/@/renderer/features/settings/components/window/window-tab').then((module) => ({
-        default: module.WindowTab,
-    })),
-);
-
-const AdvancedTab = lazy(() =>
-    import('/@/renderer/features/settings/components/advanced/advanced-tab').then((module) => ({
-        default: module.AdvancedTab,
-    })),
-);
-
-const SuspenseSpinner = () => {
-    return (
-        <Box className={styles.spinnerContainer}>
-            <Spinner container />
-        </Box>
-    );
-};
 
 export const SettingsContent = () => {
     const { t } = useTranslation();
@@ -73,31 +37,21 @@ export const SettingsContent = () => {
                         <Tabs.Tab value="advanced">{t('page.setting.advanced')}</Tabs.Tab>
                     </Tabs.List>
                     <Tabs.Panel value="general">
-                        <Suspense fallback={<SuspenseSpinner />}>
-                            <GeneralTab />
-                        </Suspense>
+                        <GeneralTab />
                     </Tabs.Panel>
                     <Tabs.Panel value="playback">
-                        <Suspense fallback={<SuspenseSpinner />}>
-                            <PlaybackTab />
-                        </Suspense>
+                        <PlaybackTab />
                     </Tabs.Panel>
                     <Tabs.Panel value="hotkeys">
-                        <Suspense fallback={<SuspenseSpinner />}>
-                            <HotkeysTab />
-                        </Suspense>
+                        <HotkeysTab />
                     </Tabs.Panel>
                     {isElectron() && (
                         <Tabs.Panel value="window">
-                            <Suspense fallback={<SuspenseSpinner />}>
-                                <WindowTab />
-                            </Suspense>
+                            <WindowTab />
                         </Tabs.Panel>
                     )}
                     <Tabs.Panel value="advanced">
-                        <Suspense fallback={<SuspenseSpinner />}>
-                            <AdvancedTab />
-                        </Suspense>
+                        <AdvancedTab />
                     </Tabs.Panel>
                 </Tabs>
             </div>

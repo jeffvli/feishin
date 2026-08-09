@@ -299,7 +299,8 @@
             "playerFilters": "播放篩選器",
             "logger": "日誌記錄器",
             "lyricsDisplay": "歌詞顯示",
-            "lyricsTranslation": "歌詞翻譯"
+            "lyricsTranslation": "歌詞翻譯",
+            "sharing": "分享"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
@@ -938,7 +939,13 @@
         "customThemeWarnings_description": "這些主題已載入，但部分值無效，已被忽略。",
         "customThemeWarnings": "警告",
         "customThemes_description": "將 .json 主題檔案拖入此資料夾以新增自訂主題。每當您新增、編輯或移除檔案時，都會自動載入它們。",
-        "customThemes": "自訂主題"
+        "customThemes": "自訂主題",
+        "confirmQueueChanges": "確認佇列變更",
+        "confirmQueueChanges_description": "在捨棄目前佇列前先詢問確認",
+        "shareExpiration_description": "新分享連結預設的過期時間。在分享對話框中清除日期即可改用伺服器預設值",
+        "shareExpiration": "預設分享過期時間",
+        "shareExpirationUseServerDefault_description": "建立分享時不指定過期時間，以便伺服器套用其設定的預設值 (例如 Navidrome 的 DefaultShareExpiration)",
+        "shareExpirationUseServerDefault": "使用伺服器預設過期時間"
     },
     "table": {
         "config": {
@@ -1015,7 +1022,9 @@
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "作曲者",
                 "titleArtist": "$t(common.title) (藝人)",
-                "albumGroup": "專輯分組"
+                "albumGroup": "專輯分組",
+                "date": "日期",
+                "releaseYear": "發行年份"
             },
             "view": {
                 "table": "表格",
@@ -1041,7 +1050,7 @@
             "playCount": "播放次數",
             "rating": "評分",
             "releaseDate": "發行日期",
-            "releaseYear": "年份",
+            "releaseYear": "發行年份",
             "genre": "曲風",
             "bpm": "BPM",
             "songCount": "曲目",
@@ -1051,7 +1060,9 @@
             "codec": "編解碼器",
             "owner": "擁有者",
             "bitDepth": "位元深度",
-            "sampleRate": "取樣率"
+            "sampleRate": "取樣率",
+            "date": "日期",
+            "year": "年"
         }
     },
     "action": {
@@ -1169,7 +1180,9 @@
         "explicitStatus": "$t(common.explicitStatus)",
         "sortName": "排序名稱",
         "matchAnd": "和",
-        "matchOr": "或"
+        "matchOr": "或",
+        "date": "日期",
+        "year": "年"
     },
     "form": {
         "addServer": {
@@ -1244,7 +1257,9 @@
             "expireInvalid": "到期日必須是未來",
             "createFailed": "無法建立分享（分享是否啟用？）",
             "copyToClipboard": "複製到剪貼簿：Ctrl+C, Enter",
-            "successMustClick": "分享建立成功，點擊此處開啟"
+            "successMustClick": "分享建立成功，點擊此處開啟",
+            "setExpiration_description": "留空以使用伺服器預設過期時間",
+            "setExpiration_serverDefault": "伺服器預設"
         },
         "privateMode": {
             "enabled": "已啟用私人模式，播放狀態現在將對外部整合功能隱藏",
@@ -1291,6 +1306,10 @@
         },
         "createPrefilledPlaylist": {
             "title": "從選取的歌曲建立$t(entity.playlist, {\"count\": 1})"
+        },
+        "queueChangeConfirmation": {
+            "title": "捨棄目前佇列？",
+            "description": "這將從目前佇列中刪除所有項目。"
         }
     },
     "releaseType": {
@@ -1352,7 +1371,14 @@
         "minuteShort": "分",
         "secondShort": "秒",
         "hourShort": "小時",
-        "dayShort": "天"
+        "dayShort": "天",
+        "secondLong": "秒",
+        "minuteLong": "分",
+        "hourLong": "小時",
+        "dayLong": "天",
+        "weekLong": "週",
+        "monthLong": "月",
+        "yearLong": "年"
     },
     "visualizer": {
         "visualizerType": "視覺化效果類型",

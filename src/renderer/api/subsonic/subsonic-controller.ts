@@ -2035,11 +2035,21 @@ export const SubsonicController: InternalControllerEndpoint = {
     getStructuredLyrics: async (args) => {
         const { apiClientProps, query } = args;
         const server = apiClientProps.server;
+        const supportsStructuredLyrics = hasFeatureWithVersion(
+            server,
+            ServerFeature.LYRICS_MULTIPLE_STRUCTURED,
+            1,
+        );
+
         const supportsEnhancedLyrics = hasFeatureWithVersion(
             server,
             ServerFeature.LYRICS_MULTIPLE_STRUCTURED,
             2,
         );
+
+        if (!supportsStructuredLyrics && !supportsEnhancedLyrics) {
+            return [];
+        }
 
         const res = await ssApiClient(apiClientProps).getStructuredLyrics({
             query: {

@@ -9,7 +9,7 @@
         },
         "moveToBottom": "Flytt til bunnen",
         "deletePlaylist": "Slett $t(entity.playlist, {\"count\": 1})",
-        "deselectAll": "Avmarker alle",
+        "deselectAll": "Fjern alle markerte",
         "editPlaylist": "Rediger $t(entity.playlist, {\"count\": 1})",
         "addToFavorites": "Legg til $t(entity.favorite, {\"count\": 2})",
         "addToPlaylist": "Legg til $t(entity.playlist, {\"count\": 1})",
@@ -28,13 +28,13 @@
         "selectAll": "Marker alle",
         "downloadStarted": "Startet nedlasting av {{count}} elementer",
         "selectRangeOfItems": "Velg en rekke elementer",
-        "addOrRemoveFromSelection": "Legge til eller fjerne fra utvalg",
+        "addOrRemoveFromSelection": "Legg til eller fjern fra utvalg",
         "moveUp": "Flytt opp",
         "moveDown": "Flytt ned",
         "createRadioStation": "Opprett $t(entity.radioStation, {\"count\": 1})",
         "deleteRadioStation": "Slett $t(entity.radioStation, {\"count\": 1})",
-        "holdToMoveToTop": "Hold nede for å gå til toppen",
-        "holdToMoveToBottom": "Hold nede for å gå til bunnen",
+        "holdToMoveToTop": "Hold nede for å flytte til toppen",
+        "holdToMoveToBottom": "Hold nede for å flytte til bunnen",
         "moveItems": "Flytt elementer",
         "shuffle": "Tilfeldig avspilling",
         "shuffleAll": "Tilfelding avspilling av alt",
@@ -43,7 +43,8 @@
         "openApplicationDirectory": "Åpne applikasjonskatalogen",
         "goToCurrent": "Gå til gjeldende element",
         "collapseAllFolders": "Skjul alle mapper",
-        "expandAllFolders": "Utvid alle mapper"
+        "expandAllFolders": "Utvid alle mapper",
+        "createPlaylistFromQueue": "Opprett $t(entity.playlist, {\"count\": 1}) from queue"
     },
     "common": {
         "bpm": "Bpm",
@@ -135,11 +136,11 @@
         "right": "Høyre",
         "sortOrder": "Rekkefølge",
         "tags": "Tagger",
-        "newVersion": "En ny versjon har blitt installert ({{version}})",
+        "newVersion": "Ny versjon er installert ({{version}})",
         "viewReleaseNotes": "Se utgivelsesnotater",
         "additionalParticipants": "Ytterligere deltakere",
-        "albumGain": "Gjennomsnittlig lydnivå for album",
-        "albumPeak": "Høyeste lydnivå for album",
+        "albumGain": "Albumnormalisering",
+        "albumPeak": "Albumtoppnivå",
         "bitDepth": "Bitdybde",
         "sampleRate": "Samplingsfrekvens",
         "countSelected": "{{count}} valgt",
@@ -165,12 +166,18 @@
         "gridRows": "Rutenettrader",
         "tableColumns": "Tabellkolonner",
         "itemsMore": "{{count}} fler",
-        "explicitStatus": "Grovhetsstatus",
+        "explicitStatus": "Innholdsmerking",
         "newVersionAvailable": "En ny version er tilgjengelig",
         "back": "Tilbake",
         "openFolder": "Åpne mappe",
         "grouping": "Grupper",
-        "numberOfResults": "{{numberOfResults}} resultater"
+        "numberOfResults": "{{numberOfResults}} resultater",
+        "saveAndClose": "Lagre og avslutt",
+        "undo": "Angre",
+        "lastScan": "Siste skan {{date}}",
+        "scanningLibrary": "Skanner bibliotek",
+        "scanFolderCount": "{{count}} mapper",
+        "scanItemCount": "{{count}} elementer"
     },
     "entity": {
         "smartPlaylist": "Smart $t(entity.playlist, {\"count\": 1})",
@@ -396,6 +403,9 @@
             "input_played_optionAll": "Alle sanger",
             "input_played_optionUnplayed": "Bare uavspilte sanger",
             "input_played_optionPlayed": "Bare avspilte sanger"
+        },
+        "privateMode": {
+            "title": "Privat modus"
         }
     },
     "page": {
@@ -409,7 +419,15 @@
             "openBrowserDevtools": "Åpne utviklingsverktøy i nettleser",
             "settings": "$t(common.setting, {\"count\": 2})",
             "expandSidebar": "Utvid sidefelt",
-            "goForward": "Gå fremover"
+            "goForward": "Gå fremover",
+            "privateModeOn": "Aktiver privat modus",
+            "logout": "Logg ut",
+            "commandPalette": "Åpne kommandopalett",
+            "selectMusicFolder": "Velg musikkmappe",
+            "noMusicFolder": "Ingen musikkmappe valgt",
+            "multipleMusicFolders": "{{count}} musikkmapper valgt",
+            "privateModeOff": "Avslutt privat modus",
+            "rescanLibrary": "Skann biblioteket på nytt"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -433,7 +451,11 @@
             "shareItem": "Del element",
             "addFavorite": "$t(action.addToFavorites)",
             "deletePlaylist": "$t(action.deletePlaylist)",
-            "deselectAll": "$t(action.deselectAll)"
+            "deselectAll": "$t(action.deselectAll)",
+            "goTo": "Gå til",
+            "goToAlbum": "Gå til $t(entity.album, {\"count\": 1})",
+            "goToAlbumArtist": "Gå til $t(entity.albumArtist, {\"count\": 1})",
+            "editMetadata": "Rediger metadata"
         },
         "albumArtistDetail": {
             "topSongs": "Beste sanger",
@@ -444,7 +466,8 @@
             "viewAll": "Se alle",
             "about": "Om {{artist}}",
             "appearsOn": "Opptrer på",
-            "relatedArtists": "Relatert $t(entity.artist, {\"count\": 2})"
+            "relatedArtists": "Relatert $t(entity.artist, {\"count\": 2})",
+            "topSongsCommunity": "Fellesskap"
         },
         "albumList": {
             "artistAlbums": "Album av {{artist}}",
@@ -474,7 +497,9 @@
                 "unsynchronized": "Usynkronisert",
                 "dynamicBackground": "Dynamisk bakgrunn",
                 "useImageAspectRatio": "Bruk sideforhold til bildet",
-                "followCurrentLyric": "Følg sangtekst"
+                "followCurrentLyric": "Følg sangtekst",
+                "lyricAlignment_description": "Horisontal justering av sangtekst",
+                "lyricFollowScrollAlignment_description": "Vertikal plassering av den aktive linjen ved følging"
             },
             "noLyrics": "Fant ikke sangtekst",
             "lyrics": "Sangtekst",
@@ -531,9 +556,10 @@
             "playlists": "Spillelister",
             "search": "Søk",
             "settings": "Innstillinger",
-            "shared": "Delte Spillelister",
+            "shared": "Delte spillelister",
             "artists": "Artister",
-            "myLibrary": "Mitt bibliotek"
+            "myLibrary": "Mitt bibliotek",
+            "radio": "Radiostasjoner"
         },
         "setting": {
             "generalTab": "Generelt",
@@ -548,6 +574,12 @@
         },
         "playlist": {
             "reorder": "Omorganisering kun mulig ved sortering på ID"
+        },
+        "windowBar": {
+            "privateMode": "(Privat modus)"
+        },
+        "radioList": {
+            "title": "Radiostasjoner"
         }
     },
     "player": {
@@ -581,7 +613,18 @@
         "toggleFullscreenPlayer": "Bytt til fullskjermspiller",
         "pause": "Sett på pause",
         "viewQueue": "Se kø",
-        "unfavorite": "Fjern fra favoritter"
+        "unfavorite": "Fjern fra favoritter",
+        "addLastShuffled": "Sist (tilfeldig rekkefølge)",
+        "addNextShuffled": "Neste (tilfeldig rekkefølge)",
+        "albumRadio": "Albumradio",
+        "artistRadio": "Artistradio",
+        "holdToShuffle": "Hold inne for tilfeldig avspilling",
+        "lyrics": "Sangtekst",
+        "nextAlbum": "Alt+klikk for neste album",
+        "previousAlbum": "Alt+klikk for forrige album",
+        "saveQueueToServer": "Lagre avspillingskøen på serveren",
+        "restoreQueueFromServer": "Hent avspillingskøen fra serveren",
+        "trackRadio": "Låtradio"
     },
     "setting": {
         "accentColor": "Aksentfarge",
@@ -681,15 +724,79 @@
             },
             "frequencyScale": {
                 "linear": "Lineær skala",
-                "log": "Logaritmisk skala"
+                "log": "Logaritmisk skala",
+                "mel": "Mel-skala",
+                "bark": "Bark-skala",
+                "none": "Ingen"
             },
             "channelLayout": {
-                "single": "Enkel"
+                "single": "Enkel",
+                "dualVertical": "Dobbelt vertikalvisning",
+                "dualHorizontal": "Dobbelt horisontalvisning",
+                "dualCombined": "Kombinert dobbel"
             },
             "gradient": {
                 "rainbow": "Regnbue",
-                "prism": "Prisme"
+                "prism": "Prisme",
+                "orangered": "Oransjerød",
+                "steelblue": "Stålblå",
+                "classic": "Klassisk"
+            },
+            "colorMode": {
+                "barLevel": "Stolpehøyde",
+                "barIndex": "Stolpeindeks",
+                "gradient": "Fargeovergang"
+            },
+            "mode": {
+                "8": "[8] Full oktav / 10 bånd",
+                "10": "[10] Linje-/arealgraf",
+                "7": "[7] Halv oktav / 20 bånd",
+                "6": "[6] 1/3 oktav / 30 bånd",
+                "5": "[5] 1/4 oktav / 40 bånd",
+                "4": "[4] 1/6 oktav / 60 bånd",
+                "3": "[3] 1/8 oktav / 80 bånd",
+                "2": "[2] 1/12 oktav / 120 bånd",
+                "1": "[1] 1/24 oktav / 240 bånd",
+                "0": "[0] Diskrete frekvenser"
             }
-        }
+        },
+        "showScaleY": "Vis Y-skala",
+        "noteLabels": "Notenavn",
+        "showScaleX": "Vis X-skala",
+        "showFPS": "Vis FPS",
+        "splitGradient": "Delt gradient",
+        "lowResolution": "Lav oppløsning",
+        "roundBars": "Avrundede stolper",
+        "outlineBars": "Stolper med omriss",
+        "lumiBars": "Lysende stolper",
+        "trueLeds": "Realistiske LED-er",
+        "ledBars": "LED-stolper",
+        "ansiBands": "Frekvensbånd (ANSI)",
+        "alphaBars": "Alfa-stolper",
+        "miscellaneousSettings": "Andre innstillinger",
+        "mirror": "Speil",
+        "reflexBrightness": "Lysstyrke for refleksjon",
+        "reflexAlpha": "Refleksgjennomsiktighet",
+        "reflexRatio": "Refleksjonsforhold",
+        "reflexFit": "Reflekstilpasning",
+        "reflexMirror": "Refleksjonsspeil",
+        "radius": "Radius",
+        "spinSpeed": "Rotasjonshastighet",
+        "radialInvert": "Radial invertering",
+        "radial": "Radial",
+        "radialSpectrum": "Radialspektrum",
+        "peakHoldTime": "Toppverdiens holdetid (ms)",
+        "peakFadeTime": "Fadingstid for toppverdi (ms",
+        "gravity": "Gravitasjon",
+        "peakLine": "Toppverdi-linje",
+        "fadePeaks": "Toppverdifading",
+        "showPeaks": "Vis toppverdier",
+        "peakBehavior": "Toppverdirespons",
+        "linearBoost": "Lineær forsterkning",
+        "linearAmplitude": "Lineær amplitude",
+        "maximumDecibels": "Maksimalt desibelnivå",
+        "minimumDecibels": "Minimum desibelnivå",
+        "weightingFilter": "Vektingsfilter",
+        "sensitivity": "Følsomhet"
     }
 }

@@ -47,7 +47,7 @@ export const LyricLine = memo(
                             dangerouslySetInnerHTML={{ __html: sanitize(romajiText) }}
                         />
                     )}
-                    {translatedText && (
+                    {translatedText && translatedText !== text && (
                         <span dangerouslySetInnerHTML={{ __html: sanitize(translatedText) }} />
                     )}
                 </Stack>

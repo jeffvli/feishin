@@ -24,11 +24,11 @@
         "createPlaylist": "Sortu $t(entity.playlist, {\"count\": 1})",
         "deletePlaylist": "Ezabatu $t(entity.playlist, {\"count\": 1})",
         "addToFavorites": "Gehitu gogokoetara",
-        "addToPlaylist": "Gehitu $t(entity.playlist, {\"count\": 1})ra",
+        "addToPlaylist": "Gehitu erreprodukzio zerrendara",
         "createRadioStation": "Sortu $t(entity.radioStation, {\"count\": 1})",
         "deleteRadioStation": "Ezabatu $t(entity.radioStation, {\"count\": 1})",
         "viewMore": "Ikusi gehiago",
-        "shuffle": "Nahastu",
+        "shuffle": "Auzazkoa",
         "selectAll": "Aukeratu guztiak",
         "downloadStarted": "{{count}} elementuren deskarga hasi da",
         "addOrRemoveFromSelection": "Gehitu edo kendu hautapenetik",
@@ -38,7 +38,13 @@
         "moveItems": "Elementuak mugitu",
         "openApplicationDirectory": "Ireki aplikazioaren direktorioa",
         "goToCurrent": "Joan uneko elementura",
-        "createPlaylistFromQueue": "Sortu $t(entity.playlist, {\"count\": 1}) ilaratik"
+        "createPlaylistFromQueue": "Sortu $t(entity.playlist, {\"count\": 1}) ilaratik",
+        "collapseAllFolders": "Bildu karpeta guztiak",
+        "expandAllFolders": "Erakutsi karpeta guztiak",
+        "moveUp": "Mugitu gorantz",
+        "moveDown": "Mugitu beherantz",
+        "holdToMoveToTop": "Sakatu eta eutsi gora mugitzeko",
+        "holdToMoveToBottom": "Sakatu eta eutsi behera mugitzeko"
     },
     "common": {
         "add": "Gehitu",
@@ -159,7 +165,19 @@
         "numberOfResults": "{{numberOfResults}} emaitza",
         "rename": "Berrizendatu",
         "newVersionAvailable": "Bertsio berri bat eskuragarri dago",
-        "gridRows": "Sareta-errenkadak"
+        "gridRows": "Sareta-errenkadak",
+        "back": "Atzera",
+        "openFolder": "Ireki karpeta",
+        "filter_single": "Bakarra",
+        "filter_multiple": "Anitzeko",
+        "grouping": "Taldekatzea",
+        "mood": "Aldartea",
+        "saveAndClose": "Gorde eta itxi",
+        "undo": "Desegin",
+        "lastScan": "Azken eskaneatzea {{date}}",
+        "scanFolderCount": "{{count}} karpeta",
+        "scanItemCount": "{{count}} elementu",
+        "scanningLibrary": "Liburutegia eskaneatzen…"
     },
     "player": {
         "repeat": "Errepikatu",
@@ -173,8 +191,8 @@
         "skip": "Saltatu",
         "stop": "Gelditu",
         "unfavorite": "Kendu gogokoetatik",
-        "addLast": "Gehitu azkena",
-        "addNext": "Gehitu hurrengoa",
+        "addLast": "Azken aldiz",
+        "addNext": "Hurrengoa",
         "playbackFetchInProgress": "Abestiak kargatzen…",
         "playbackSpeed": "Erreprodukzio-abiadura",
         "playRandom": "Erreproduzitu auzaz",
@@ -199,7 +217,8 @@
         "addLastShuffled": "Azkena (ausaz)",
         "addNextShuffled": "Hurrengoa (ausaz)",
         "artistRadio": "Artista irratia",
-        "trackRadio": "Pista irratia"
+        "trackRadio": "Pista irratia",
+        "sleepTimer_custom": "Pertsonalizatua"
     },
     "table": {
         "config": {
@@ -229,14 +248,14 @@
                 "pagination_infinite": "Infinitua"
             },
             "label": {
-                "actions": "$t(common.action_other)",
+                "actions": "$t(common.action, {\"count\": 2})",
                 "album": "$t(entity.album, {\"count\": 1})",
                 "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
                 "artist": "$t(entity.artist, {\"count\": 1})",
                 "biography": "$t(common.biography)",
                 "bitrate": "$t(common.bitrate)",
                 "bpm": "$t(common.bpm)",
-                "channels": "$t(common.channel_other)",
+                "channels": "$t(common.channel, {\"count\": 2})",
                 "codec": "$t(common.codec)",
                 "duration": "$t(common.duration)",
                 "favorite": "$t(common.favorite)",
@@ -258,25 +277,27 @@
                 "albumCount": "$t(entity.album, {\"count\": 2})",
                 "image": "Irudia",
                 "bitDepth": "$t(common.bitDepth)",
-                "sampleRate": "$t(common.sampleRate)"
+                "sampleRate": "$t(common.sampleRate)",
+                "date": "Data",
+                "releaseYear": "Argitaratze urtea"
             }
         },
         "column": {
             "album": "Albuma",
-            "albumCount": "$t(entity.album, {\"count\": 2})",
-            "artist": "$t(entity.artist, {\"count\": 1})",
+            "albumCount": "albumak",
+            "artist": "Artista",
             "biography": "Biografia",
             "bitrate": "Bit-emaria",
-            "channels": "$t(common.channel_other)",
-            "codec": "$t(common.codec)",
+            "channels": "Kanalak",
+            "codec": "Kodekak",
             "discNumber": "Diskoa",
             "favorite": "Gogokoa",
-            "genre": "$t(entity.genre, {\"count\": 1})",
+            "genre": "Generoa",
             "path": "Bidea",
             "rating": "Balorazioa",
-            "releaseYear": "Urtea",
-            "size": "$t(common.size)",
-            "songCount": "$t(entity.track, {\"count\": 2})",
+            "releaseYear": "Argitaratze urtea",
+            "size": "Tamaina",
+            "songCount": "Pistak",
             "title": "Tituloa",
             "trackNumber": "Pista",
             "bpm": "BPM",
@@ -287,15 +308,17 @@
             "dateAdded": "Gehitutako data",
             "albumArtist": "Albumeko artista",
             "owner": "Jabea",
-            "bitDepth": "$t(common.bitDepth)",
-            "sampleRate": "$t(common.sampleRate)"
+            "bitDepth": "Bit-sakonera",
+            "sampleRate": "$t(common.sampleRate)",
+            "date": "Data",
+            "year": "Urtea"
         }
     },
     "entity": {
         "album_one": "Albuma",
         "album_other": "Albumak",
-        "albumArtist_one": "Albumaren artista",
-        "albumArtist_other": "Albumaren artistak",
+        "albumArtist_one": "Albumaren Artista",
+        "albumArtist_other": "Albumaren Artistak",
         "albumArtistCount_one": "Album artista {{count}}",
         "albumArtistCount_other": "{{count}} album artista",
         "albumWithCount_one": "Album {{count}}",
@@ -412,7 +435,9 @@
         "explicitStatus": "$t(common.explicitStatus)",
         "matchAnd": "Eta",
         "matchOr": "Edo",
-        "sortName": "Izenaren arabera ordenatu"
+        "sortName": "Izenaren arabera ordenatu",
+        "date": "Data",
+        "year": "Urtea"
     },
     "setting": {
         "hotkey_playbackPause": "Pausatu",
@@ -470,7 +495,7 @@
         "lastfmApiKey": "{{lastfm}} API gakoa",
         "lastfmApiKey_description": "{{lastfm}}-ren API gakoa. Azaleko arterako beharrezkoa.",
         "lyricFetch": "Eskuratu letrak internetetik",
-        "lyricFetch_description": "Eskuratu letrak hainbat internet iturrietatik",
+        "lyricFetch_description": "Eskuratu letrak hautatutako hornitzaileetatik",
         "audioExclusiveMode_description": "Gaitu irteera esklusiboko modua. Modu honetan, sistema normalean blokeatuta egoten da, eta mpv-k bakarrik atera ahal izango du audioa",
         "audioDevice_description": "Aukeratu erreproduzitzeko erabiliko den audio gailua (web erreproduzitzailea bakarrik)",
         "audioPlayer": "Audio erreproduzitzailea",
@@ -601,7 +626,7 @@
         "playerbarOpenDrawer": "Txandakatu erreproduzitzailearen barra pantaila osora",
         "playerbarOpenDrawer_description": "Aukera ematen du erreproduzitzailearen barran klik egiteak pantaila osoko erreproduzitzailea irekitzeko",
         "customCssNotice": "Abisua: garbiketa batzuk dauden arren (URL() eta content: debekatuz), CSS pertsonalizatua erabiltzeak arriskuak sor ditzake interfazea aldatuz gero",
-        "customCss_description": "CSS eduki pertsonalizatua. Oharra: edukia eta urruneko urlak debekatutako propietateak dira. Zure edukiaren aurrebista erakusten da behean. Ezarri ez dituzun eremu gehigarriak daude garbiketa dela eta",
+        "customCss_description": "CSS eduki pertsonalizatua. Oharra: edukia eta urruneko urlak debekatutako propietateak dira. Zure edukiaren aurrebista erakusten da behean. Ezarri ez dituzun eremu gehigarriak daude garbiketa dela eta. Mahaigaina: Feishinek custom.css fitxategia aplikazioaren konfigurazio direktorioan irakurri eta idazten du eta fitxategia aldatzen denean berriro kargatzen du",
         "enableRemote": "Gaitu urruneko kontrol zerbitzaria",
         "enableRemote_description": "Urruneko kontrol zerbitzariari beste gailu batzuei aplikazioa kontrolatzeko aukera ematen dio",
         "imageAspectRatio_description": "Gaituta badago, azaleko artea jatorrizko aspektu-erlazioa erabiliz erakutsiko da. 1:1 ez den arterako, gainerako espazioa hutsik egongo da",
@@ -658,7 +683,7 @@
         "transcodeFormat": "Transkodetzeko formatua",
         "queryBuilderCustomFields_inputLabel": "Etiketa",
         "autoDJ": "DJ automatikoa",
-        "autoDJ_itemCount_description": "DJ automatikoa gaituta dagoenean ilaran gehitzen saiatu diren elementuen kopurua",
+        "autoDJ_itemCount_description": "Ilaran gehitzen saiatu diren elementuen kopurua",
         "autoDJ_timing_description": "DJ automatikoa aktibatu aurretik ilaran geratzen diren abestien kopurua",
         "analyticsDisable": "Erabileran oinarritutako analisiei uko egin",
         "analyticsDisable_description": "Erabilera-datu anonimoak garatzaileari bidaltzen zaizkio aplikazioa hobetzen laguntzeko",
@@ -672,7 +697,7 @@
         "hotkey_listPlayLast": "Zerrenda erreproduzitu amaieran",
         "hotkey_listPlayNow": "Zerrenda erreproduzitu orain",
         "logLevel": "Erregistro maila",
-        "logLevel_description": "Bistaratzeko erregistroen gutxieneko maila ezartzen du. Debug-ek erregistro guztiak erakusten ditu, «erroreak» erroreak bakarrik erakusten ditu",
+        "logLevel_description": "Bistaratzeko erregistroen gutxieneko maila ezartzen du",
         "logLevel_optionDebug": "Arazketa",
         "playerFilters_description": "Saltatu abestiak ilaran gehitzea irizpide hauen arabera",
         "artistRadioCount_description": "Artista eta abestien irratian bilatu beharreko abesti kopurua ezartzen du",
@@ -731,7 +756,28 @@
         "showSkipButton_description": "Erakutsi edo ezkutatu saltatzeko botoiak erreproduzitzailearen barran",
         "showSkipButton": "Erakutsi saltatzeko botoiak",
         "showSkipButtons_description": "Erakutsi edo ezkutatu saltatzeko botoiak erreproduzitzailearen barran",
-        "showSkipButtons": "Erakutsi saltatzeko botoiak"
+        "showSkipButtons": "Erakutsi saltatzeko botoiak",
+        "replayGainPreamp": "{{ReplayGain}} aurreamplifikadorea (db)",
+        "replayGainPreamp_description": "Doitu {{ReplayGain}} balioei aplikatutako aurreamplifikadorearen irabazpena",
+        "sidebarPlaylistFolderSeparator": "Karpeta-bereizlea",
+        "sidebarPlaylistFolderView_description": "Karpetak alboko barran nola bistaratzen diren",
+        "sidebarPlaylistFolderView": "Karpeta-ikuspegia",
+        "sidebarPlaylistFolderView_optionSingle": "Karpeta bakarra",
+        "sidebarPlaylistFolderView_optionTree": "Zuhaitz-ikuspegia",
+        "sidebarPlaylistFolderView_optionNavigation": "Nabigazio ikuspegia",
+        "exportDiagnostics": "Esportatu diagnostikoak",
+        "confirmQueueChanges": "Berretsi ilararen aldaketak",
+        "confirmQueueChanges_description": "Eskatu baieztapena uneko ilara baztertu aurretik",
+        "preventSuspendOnPlayback_description": "Saihestu aplikazioa musika erreproduzitzen ari den bitartean etetea",
+        "preventSuspendOnPlayback": "Saihestu erreprodukzioan etetea",
+        "shareExpiration": "Partekatze-iraungitze lehenetsia",
+        "shareExpirationUseServerDefault": "Erabili zerbitzariaren iraungitze-data lehenetsia",
+        "playerItemConfiguration": "Erreproduzitzeilearen elementuen ezarpenak",
+        "sidebarPlaylistFolders": "Gaitu karpetak",
+        "sidebarPlaylistList": "Alboko barrako erreprodukzio-zerrendak",
+        "sidebarPlaylistMode_description": "Nola bistaratzen den erreprodukzio-zerrenda bakoitza alboko barrako zerrendan",
+        "equalizerPreset": "Aurrezarpena",
+        "equalizerPresetGroupBuiltIn": "Barneratua"
     },
     "form": {
         "addServer": {
@@ -750,7 +796,8 @@
             "input_preferInstantMixDescription": "Erabili berehalako nahasketa soilik antzeko abestiak lortzeko. Erabilgarria portaera hau aldatzen duten pluginak badituzu",
             "input_remoteUrl": "URL publikoa",
             "input_preferRemoteUrl": "URL publikoa nahiago izan",
-            "input_remoteUrlPlaceholder": "Aukerakoa: kanpoko funtzioetarako URL publikoa"
+            "input_remoteUrlPlaceholder": "Aukerakoa: kanpoko funtzioetarako URL publikoa",
+            "input_passwordNoSSO": "Alderantzizko proxy (SSO) autentifikazioa ez da onartzen. Erabiltzaile-izen/pasahitz autentifikazioa eta Subsonic autentifikazioa bakarrik onartzen dira"
         },
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
@@ -782,7 +829,9 @@
             "allowDownloading": "Baimendu deskargatzea",
             "createFailed": "Partekatzea sortzeak huts egin du (Partekatzea gaituta al dago?)",
             "copyToClipboard": "Kopiatu arbelean: Ctrl+C, Enter",
-            "successMustClick": "Partekatzea behar bezala sortu da. Egin klik hemen irekitzeko"
+            "successMustClick": "Partekatzea behar bezala sortu da. Egin klik hemen irekitzeko",
+            "setExpiration_description": "Utzi hutsik zerbitzariaren iraungitze-data lehenetsia erabiltzeko",
+            "setExpiration_serverDefault": "Zerbitzariaren lehenetsia"
         },
         "deletePlaylist": {
             "success": "$t(entity.playlist, {\"count\": 1}) behar bezala ezabatu da",
@@ -833,10 +882,28 @@
             "input_limit": "Zenbat abesti?",
             "input_played_optionAll": "Pista guztiak",
             "input_played_optionUnplayed": "Erreproduzitu gabeko pistak bakarrik",
-            "input_played_optionPlayed": "Erreproduzitutako pistak bakarrik"
+            "input_played_optionPlayed": "Erreproduzitutako pistak bakarrik",
+            "input_kind_albums": "Albumak",
+            "input_kind_songs": "Abestiak",
+            "input_kind": "Ausazko aukeraketak",
+            "input_limit_albums": "Zenbat album?",
+            "input_limit_songs": "Zenbat abesti?",
+            "input_minYear": "Urtetik aurrera",
+            "input_maxYear": "Urtera arte",
+            "input_played": "Erreproduzitu iragazkia"
         },
         "saveQueue": {
             "success": "Erreprodukzio-ilara zerbitzarian gordeta"
+        },
+        "queueChangeConfirmation": {
+            "title": "Uneko ilara baztertu?",
+            "description": "Honek uneko ilaratik elementu guztiak kenduko ditu."
+        },
+        "createPrefilledPlaylist": {
+            "title": "Hautatutako abestietatik $t(entity.playlist, {\"count\": 1}) sortu"
+        },
+        "editRadioStation": {
+            "success": "Irrati-katea behar bezala eguneratu da"
         }
     },
     "page": {
@@ -869,7 +936,9 @@
             "commandPalette": "Ireki komando-paleta",
             "noMusicFolder": "Ez da musika karpetarik hautatu",
             "selectMusicFolder": "Aukeratu musika karpeta",
-            "multipleMusicFolders": "{{count}} musika karpeta aukeratuta"
+            "multipleMusicFolders": "{{count}} musika karpeta aukeratuta",
+            "rescanLibrary": "Berriro eskaneatu liburutegia",
+            "logout": "Saioa itxi"
         },
         "manageServers": {
             "url": "URLa",
@@ -904,7 +973,9 @@
             "goToAlbum": "Joan $t(entity.album, {\"count\": 1})-(e)ra",
             "goToAlbumArtist": "Joan albumera",
             "showDetails": "Informazioa lortu",
-            "moveItems": "$t(action.moveItems)"
+            "moveItems": "$t(action.moveItems)",
+            "goTo": "Joan honera",
+            "editMetadata": "Editatu metadatuak"
         },
         "fullscreenPlayer": {
             "config": {
@@ -921,7 +992,12 @@
                 "showLyricProvider": "Erakutsi letra hornitzailea",
                 "lyricOffset": "Letra-desplazamendua (ms)",
                 "lyricGap": "Letra hutsunea",
-                "useImageAspectRatio": "Erabili irudiaren aspektu-erlazioa"
+                "useImageAspectRatio": "Erabili irudiaren aspektu-erlazioa",
+                "followCurrentLyric_description": "Korritu automatikoki letra-lerro aktiboa ikusgai mantentzeko",
+                "lyricFollowScrollAlignment": "Letrak lerrokatzeari jarraitzen diote",
+                "lyricAlignment_description": "Letra-testuaren lerrokatze horizontala",
+                "lyricGapSynchronized_description": "Letra-lerro sinkronizatuen arteko tarte bertikala",
+                "lyricGapUnsynchronized_description": "Letra-lerro ez-sinkronizatuen arteko tarte bertikala"
             },
             "lyrics": "Letrak",
             "related": "Erlazionatuta",
@@ -966,15 +1042,16 @@
             "sidebar": "Alboko barra",
             "exportImport": "Inportatu/esportatu",
             "scrobble": "Scrobble",
-            "audio": "Audioa",
+            "audio": "Audio",
             "lyrics": "Letrak",
             "discord": "Discord",
             "playerFilters": "Erreproduzitzailearen iragazkiak",
-            "updates": "Eguneraketa",
+            "updates": "Eguneratu",
             "queryBuilder": "Kontsulta-sortzailea",
             "controls": "Kontrolak",
             "remote": "Urrunekoa",
-            "lyricsDisplay": "Erakutsi letrak"
+            "lyricsDisplay": "Erakutsi letrak",
+            "transcoding": "Transkodetzea"
         },
         "sidebar": {
             "albumArtists": "Albumaren artistak",
@@ -1013,12 +1090,19 @@
             "groupingTypePrimary": "Argitalpen mota nagusiak",
             "favoriteSongs": "Abesti gogokoenak",
             "topSongsCommunity": "Komunitatea",
-            "topSongsPersonal": "Pertsonala"
+            "topSongsPersonal": "Pertsonala",
+            "favoriteSongsFrom": "{{title}}-ko abesti gogokoenak"
         },
         "itemDetail": {
             "copyPath": "Kopiatu bidea arbelean",
             "openFile": "Erakutsi pista fitxategi-kudeatzailean",
-            "copiedPath": "Bidea behar bezala kopiatu da"
+            "copiedPath": "Bidea behar bezala kopiatu da",
+            "fileNotWritable": "Fitxategia ez da eskuragarria edo ezin da idatzi",
+            "triggerRescan": "Aktibatu beste liburutegi-eskaneatzea gorde ondoren",
+            "addField": "Gehitu eremua…",
+            "emptyFields": "Eremuak ezin dira hutsik egon",
+            "tagsTab": "Etiketak",
+            "multipleValues": "(Balio Anitzak)"
         },
         "playlist": {
             "reorder": "Berrantolaketa idaren arabera ordenatzean bakarrik gaituta dago"
@@ -1058,7 +1142,14 @@
         "minuteShort": "M",
         "secondShort": "S",
         "hourShort": "H",
-        "dayShort": "D"
+        "dayShort": "D",
+        "secondLong": "Segundoa",
+        "minuteLong": "Minutua",
+        "hourLong": "Ordua",
+        "dayLong": "Eguna",
+        "weekLong": "Astea",
+        "monthLong": "Hilabetea",
+        "yearLong": "Urtea"
     },
     "queryBuilder": {
         "customTags": "Etiketa pertsonalizatutak",
@@ -1070,7 +1161,7 @@
         "notContains": "Ez dauka",
         "startsWith": "Honekin hasten da",
         "endsWith": "Honekin amaitzen da",
-        "isNot": "Ez da",
+        "isNot": "Ez dago",
         "afterDate": "(Data) ondoren da",
         "after": "Ondoren da",
         "before": "Lehenago da",
@@ -1082,7 +1173,10 @@
         "isGreaterThan": "Hau baino handiagoa da",
         "isLessThan": "Hau baino gutxiago da",
         "notInPlaylist": "Ez dago barruan",
-        "notInTheLast": "Ez dago azkenengoan"
+        "notInTheLast": "Ez dago azkenengoan",
+        "isMissing": "falta da",
+        "isPresent": "Badago",
+        "matchesRegex": "Adierazpen erregularrarekin bat dator"
     },
     "visualizer": {
         "general": "Orokorra",
