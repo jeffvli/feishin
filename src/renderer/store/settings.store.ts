@@ -1078,15 +1078,15 @@ export type VersionedSettings = SettingsState & { version: number };
 
 export const playerItems: SortableItem<PlayerItem>[] = [
     {
-        disabled: false,
+        disabled: true,
         id: PlayerItem.ALBUM,
     },
     {
-        disabled: false,
+        disabled: true,
         id: PlayerItem.ARTIST,
     },
     {
-        disabled: false,
+        disabled: true,
         id: PlayerItem.TITLE,
     },
     {
@@ -1102,7 +1102,7 @@ export const playerItems: SortableItem<PlayerItem>[] = [
         id: PlayerItem.BPM,
     },
     {
-        disabled: false,
+        disabled: true,
         id: PlayerItem.CODEC,
     },
     {
@@ -1126,7 +1126,7 @@ export const playerItems: SortableItem<PlayerItem>[] = [
         id: PlayerItem.RELEASE_TYPE,
     },
     {
-        disabled: false,
+        disabled: true,
         id: PlayerItem.RELEASE_YEAR,
     },
     {
@@ -1138,7 +1138,7 @@ export const playerItems: SortableItem<PlayerItem>[] = [
         id: PlayerItem.TRACK_NUMBER,
     },
     {
-        disabled: false,
+        disabled: true,
         id: PlayerItem.YEAR,
     },
 ];
@@ -1327,7 +1327,7 @@ const initialState: SettingsState = {
         externalLinks: true,
         followCurrentSong: true,
         followSystemTheme: false,
-        fullscreenAutoOpenTimeout: undefined,
+        fullscreenAutoOpenTimeout: 1,
         genreTarget: GenreTarget.TRACK,
         homeFeature: true,
         homeFeatureStyle: HomeFeatureStyle.SINGLE,
@@ -1378,7 +1378,7 @@ const initialState: SettingsState = {
         showVisualizerInSidebar: true,
         sidebarCollapsedNavigation: true,
         sidebarCollapseShared: false,
-        sidebarImageExpand: true,
+        sidebarImageExpand: false,
         sidebarItems,
         sidebarPanelOrder: ['queue', 'lyrics', 'visualizer'],
         sidebarPlaylistFolders: false,
@@ -1509,12 +1509,12 @@ const initialState: SettingsState = {
                     align: column.align,
                     autoSize: column.autoSize,
                     id: column.value,
-                    isEnabled: column.isEnabled,
+                    isEnabled: column.value === TableColumn.ROW_INDEX ? false : column.isEnabled,
                     pinned: column.pinned,
                     width: column.width,
                 })),
                 enableAlternateRowColors: false,
-                enableHeader: true,
+                enableHeader: false,
                 enableHorizontalBorders: false,
                 enableRowHoverHighlight: true,
                 enableVerticalBorders: false,
@@ -2012,7 +2012,7 @@ const initialState: SettingsState = {
         },
     },
     lyrics: {
-        alignment: 'center',
+        alignment: 'left',
         delayMs: 0,
         enableAutoTranslation: false,
         enableFurigana: false,
@@ -2179,7 +2179,7 @@ const initialState: SettingsState = {
             lineWidth: 1.9,
             loRes: false,
             lumiBars: false,
-            maxDecibels: -25,
+            maxDecibels: -15,
             maxFPS: 0,
             maxFreq: 22050,
             minDecibels: -85,
