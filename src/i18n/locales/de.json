@@ -27,7 +27,7 @@
         "moveToNext": "Als nächstes",
         "downloadStarted": "Download von {{count}} elementen gestartet",
         "moveItems": "Elemente verschieben",
-        "shuffle": "Zufällig wiedergeben",
+        "shuffle": "Zufällige Wiedergabe",
         "shuffleAll": "Alle zufällig wiedergeben",
         "shuffleSelected": "Ausgewählte zufällig wiedergeben",
         "viewMore": "Mehr zeigen",
@@ -59,11 +59,11 @@
         "save": "Speichern",
         "right": "Rechtsbündig",
         "currentSong": "Aktueller $t(entity.track, {\"count\": 1})",
-        "collapse": "Verkleinern",
-        "trackNumber": "Track",
+        "collapse": "Einklappen",
+        "trackNumber": "Titelnummer",
         "descending": "Absteigend",
         "add": "Hinzufügen",
-        "gap": "Lücke",
+        "gap": "Abstand",
         "ascending": "Aufsteigend",
         "dismiss": "Verwerfen",
         "year": "Jahr",
@@ -71,7 +71,7 @@
         "limit": "Limit",
         "minimize": "Minimieren",
         "modified": "Geändert",
-        "duration": "Laufzeit",
+        "duration": "Dauer",
         "name": "Name",
         "maximize": "Maximieren",
         "decrease": "Verringern",
@@ -104,8 +104,8 @@
         "playerMustBePaused": "Player muss pausiert sein",
         "confirm": "Bestätigen",
         "resetToDefault": "Auf standard zurücksetzen",
-        "home": "Home",
-        "comingSoon": "Kommt bald…",
+        "home": "Startseite",
+        "comingSoon": "Bald verfügbar…",
         "reset": "Zurücksetzen",
         "channel_one": "Kanal",
         "channel_other": "Kanäle",
@@ -113,13 +113,13 @@
         "sortOrder": "Reihenfolge",
         "none": "Keine",
         "menu": "Menü",
-        "restartRequired": "(Neustart benötigt)",
+        "restartRequired": "Neustart benötigt",
         "previousSong": "Vorheriger $t(entity.track, {\"count\": 1})",
         "noResultsFromQuery": "Die abfrage brachte keine ergebnisse",
         "quit": "Verlassen",
-        "expand": "Vergrößern",
+        "expand": "Erweitern",
         "search": "Suchen",
-        "saveAs": "Speichern unter",
+        "saveAs": "Speichern als",
         "disc": "CD",
         "yes": "Ja",
         "random": "Zufällig",
@@ -145,7 +145,7 @@
         "sampleRate": "Abtastrate",
         "additionalParticipants": "Weitere beteiligte",
         "explicitStatus": "Anstößig-status",
-        "doNotShowAgain": "Nicht wieder zeigen",
+        "doNotShowAgain": "Nicht mehr anzeigen",
         "explicit": "Anstößig",
         "gridRows": "Rasterzeilen",
         "tableColumns": "Tabellenspalten",
@@ -160,7 +160,7 @@
         "recordLabel": "Plattenlabel",
         "slower": "Langsamer",
         "releaseType": "Veröffentlichungsformat",
-        "view": "Betrachten",
+        "view": "Ansicht",
         "countSelected": "{{count}} ausgewählt",
         "mood": "Stimmung",
         "example": "Beispiel",
@@ -170,19 +170,25 @@
         "retry": "Erneut versuchen",
         "newVersionAvailable": "Eine neue version ist verfügbar",
         "numberOfResults": "{{numberOfResults}} ergebnisse",
-        "openFolder": "Verzeichnis öffnen"
+        "openFolder": "Verzeichnis öffnen",
+        "back": "Zurück",
+        "saveAndClose": "Speichern und schließen",
+        "undo": "Rückgängig",
+        "scanFolderCount": "{{count}} Ordner",
+        "scanItemCount": "{{count}} Elemente",
+        "scanningLibrary": "Bibliothek wird gescannt…"
     },
     "error": {
-        "remotePortWarning": "Starten Sie den Server neu, um den neuen Port anzuwenden",
+        "remotePortWarning": "Starte den Server neu, um den neuen Port zu übernehmen",
         "systemFontError": "Beim Versuch, Systemschriftarten abzurufen, ist ein Fehler aufgetreten",
-        "playbackError": "Beim Versuch, das Medium abzuspielen, ist ein Fehler aufgetreten",
+        "playbackError": "Beim Abspielen der Medien ist ein Fehler aufgetreten",
         "endpointNotImplementedError": "Endgerät {{endpoint}} ist nicht für {{serverType}} implementiert",
         "remotePortError": "Beim Versuch, den Remote-Server-Port festzulegen, ist ein Fehler aufgetreten",
-        "serverRequired": "Server benötigt",
+        "serverRequired": "Server erforderlich",
         "authenticationFailed": "Authentifizierung fehlgeschlagen",
         "apiRouteError": "Anfrage kann nicht weitergeleitet werden",
         "genericError": "Ein Fehler ist aufgetreten",
-        "credentialsRequired": "Anmeldeinformationen erforderlich",
+        "credentialsRequired": "Anmeldedaten erforderlich",
         "sessionExpiredError": "Deine Sitzung ist abgelaufen",
         "remoteEnableError": "Beim Versuch, den Remote-Server mit $t(common.enable), ist ein Fehler aufgetreten",
         "localFontAccessDenied": "Zugriff auf lokale Schriftarten verweigert",
@@ -196,12 +202,12 @@
         "networkError": "Ein Netzwerkfehler ist aufgetreten",
         "openError": "Datei kann nicht geöffnet werden",
         "badValue": "Ungültige option \"{{value}}\". Dieser Wert existiert nicht mehr",
-        "notificationDenied": "Berechtigungen über Benachrichtigungen wurden verweigert. Diese Einstellung hat keinen Effekt",
-        "saveQueueFailed": "Wiedergabeliste konnte nicht gespeichert werden",
+        "notificationDenied": "Berechtigungen über Benachrichtigungen wurden verweigert. Diese Einstellung hat keine Wirkung",
+        "saveQueueFailed": "Warteschlange konnte nicht gespeichert werden",
         "multipleServerSaveQueueError": "Die Wiedergabeliste enthält einen oder mehrere Titel, die nicht vom aktuellen Server stammen. Dies wird nicht unterstützt",
         "noNetwork": "Server nicht verfügbar",
         "noNetworkDescription": "Verbindung zum Server konnte nicht hergestellt werden",
-        "invalidJson": "JSON ungültig",
+        "invalidJson": "Ungültiges JSON",
         "serverLockSingleServer": "Nur ein Server ist erlaubt, wenn der Server gesperrt ist",
         "settingsSyncError": "Es wurden Unstimmigkeiten zwischen den Einstellungen im Renderer und dem Hauptprozess gefunden. Starte die Anwendung neu, um die Änderungen zu übernehmen",
         "playbackPausedDueToError": "Die Wiedergabe wurde aufgrund eines Fehlers pausiert"
@@ -252,7 +258,9 @@
         "explicitStatus": "$t(common.explicitStatus)",
         "matchAnd": "Und",
         "matchOr": "Oder",
-        "sortName": "Sortierungsname"
+        "sortName": "Sortierungsname",
+        "date": "Datum",
+        "year": "Jahr"
     },
     "form": {
         "deletePlaylist": {
@@ -280,7 +288,7 @@
             "ignoreSsl": "SSL ignorieren ($t(common.restartRequired))",
             "ignoreCors": "CORS ignorieren ($t(common.restartRequired))",
             "error_savePassword": "Beim Speichern des Passworts ist ein Fehler aufgetreten",
-            "input_preferInstantMix": "Instant-Mix bevorzugen",
+            "input_preferInstantMix": "Instant Mix bevorzugen",
             "input_preferInstantMixDescription": "Nur Instant-Mix verwenden, um ähnliche Songs zu erhalten. Nützlich bei Verwendung von Plugins, die in dieses Verhalten eingreifen",
             "input_preferRemoteUrl": "Öffentliche URL bevorzugen",
             "input_remoteUrl": "Öffentliche URL",
@@ -292,7 +300,8 @@
             "input_skipDuplicates": "Duplikate überspringen",
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "create": "$t(entity.playlist, {\"count\": 1}) {{playlist}} erstellen",
-            "searchOrCreate": "Nach $t(entity.playlist, {\"count\": 2}) suchen oder namen eingeben, um eine neue zu erstellen"
+            "searchOrCreate": "Nach $t(entity.playlist, {\"count\": 2}) suchen oder namen eingeben, um eine neue zu erstellen",
+            "noneAdded": "Es wurden keine Titel zu $t(entity.playlist, {\"count\": 1}) '{{playlist}}' hinzugefügt"
         },
         "updateServer": {
             "title": "Server aktualisieren",
@@ -308,7 +317,7 @@
             "resetToDefault": "Auf standard zurücksetzen"
         },
         "editPlaylist": {
-            "title": "Bearbeite $t(entity.playlist, {\"count\": 1})",
+            "title": "$t(entity.playlist, {\"count\": 1}) bearbeiten",
             "success": "$t(entity.playlist, {\"count\": 1}) erfolgreich aktualisiert",
             "publicJellyfinNote": "Jellyfin legt aus irgendwelchen Gründen nicht offen, ob eine Wiedergabeliste öffentlich ist oder nicht. Wenn du möchtest, dass sie öffentlich bleibt, wähle bitte diese Option aus"
         },
@@ -325,7 +334,8 @@
             "success": "Link in die zwischenablage kopiert (oder hier klicken, um zu öffnen)",
             "createFailed": "Fehler beim Teilen (Ist Teilen aktiviert?)",
             "copyToClipboard": "In zwischenablage kopieren: strg+c, enter",
-            "successMustClick": "Freigabe erfolgreich erstellt. Hier klicken um diese zu öffnen"
+            "successMustClick": "Freigabe erfolgreich erstellt. Hier klicken zum Öffnen",
+            "setExpiration_description": "Leer lassen, um die Standard Ablaufzeit des Servers zu verwenden"
         },
         "privateMode": {
             "enabled": "Privater Modus aktiviert, Wiedergabe-Status wird externen Quellen nicht preisgegeben",
@@ -345,7 +355,12 @@
             "input_played_optionAll": "Alle tracks",
             "input_played_optionUnplayed": "Nur nicht gespielte tracks",
             "input_played_optionPlayed": "Nur gespielte tracks",
-            "input_played": "Wiedergabefilter"
+            "input_played": "Wiedergabefilter",
+            "input_kind_albums": "Alben",
+            "input_kind_songs": "Songs",
+            "input_kind": "Zufallsauswahl",
+            "input_limit_albums": "Wie viele Alben?",
+            "input_limit_songs": "Wie viele Songs?"
         },
         "saveQueue": {
             "success": "Wiedergabeliste auf Server gespeichert"
@@ -364,6 +379,12 @@
         },
         "editRadioStation": {
             "success": "Radiosender erfolgreich aktualisiert"
+        },
+        "queueChangeConfirmation": {
+            "title": "Aktuelle Warteschlange verwerfen?"
+        },
+        "createPrefilledPlaylist": {
+            "title": "$t(entity.playlist, {\"count\": 1}) aus ausgewählten Songs erstellen"
         }
     },
     "entity": {
@@ -677,7 +698,7 @@
             "recentReleases": "Kürzliche veröffentlichungen",
             "viewDiscography": "Diskographie ansehen",
             "viewAllTracks": "Alle $t(entity.track, {\"count\": 2}) ansehen",
-            "topSongsFrom": "Toplieder von {{title}}",
+            "topSongsFrom": "Top Songs von {{title}}",
             "viewAll": "Alles ansehen",
             "topSongs": "Toplieder",
             "relatedArtists": "Ähnliche $t(entity.artist, {\"count\": 2})",
@@ -1166,7 +1187,9 @@
         "beforeDate": "Ist vor (datum)",
         "inTheRange": "Ist im bereich",
         "inTheRangeDate": "Ist im bereich (datum)",
-        "matchesRegex": "Entspricht regex"
+        "matchesRegex": "Entspricht regex",
+        "isMissing": "Fehlt",
+        "isPresent": "Vorhanden"
     },
     "queryBuilder": {
         "standardTags": "Standardtags",
@@ -1199,7 +1222,14 @@
         "minuteShort": "Min",
         "secondShort": "Sek",
         "hourShort": "Std",
-        "dayShort": "Tag"
+        "dayShort": "Tag",
+        "secondLong": "Sekunde",
+        "minuteLong": "Minute",
+        "hourLong": "Stunde",
+        "dayLong": "Tag",
+        "weekLong": "Woche",
+        "monthLong": "Monat",
+        "yearLong": "Jahr"
     },
     "visualizer": {
         "options": {

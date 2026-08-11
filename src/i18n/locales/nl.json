@@ -42,7 +42,9 @@
         "holdToMoveToBottom": "Ingedrukt houden om naar einde te verplaatsen",
         "openApplicationDirectory": "Applicatiemap openen",
         "goToCurrent": "Ga naar huidige item",
-        "createPlaylistFromQueue": "Maak $t(entity.playlist, {\"count\": 1}) uit queue"
+        "createPlaylistFromQueue": "Maak $t(entity.playlist, {\"count\": 1}) uit queue",
+        "collapseAllFolders": "Alle mappen inklappen",
+        "expandAllFolders": "Alle mappen uitklappen"
     },
     "common": {
         "backward": "Achteruit",
@@ -171,7 +173,11 @@
         "back": "Terug",
         "saveAndClose": "Opslaan en afsluiten",
         "undo": "Ongedaan maken",
-        "lastScan": "Laatste scan {{date}}"
+        "lastScan": "Laatste scan {{date}}",
+        "openFolder": "Open map",
+        "scanFolderCount": "{{count}} mappen",
+        "scanItemCount": "{{count}} items",
+        "scanningLibrary": "Bibliotheek scannen…"
     },
     "filter": {
         "rating": "Rating",
@@ -219,7 +225,9 @@
         "explicitStatus": "$t(common.explicitStatus)",
         "sortName": "Sorteernaam",
         "matchAnd": "En",
-        "matchOr": "Of"
+        "matchOr": "Of",
+        "date": "Datum",
+        "year": "Jaar"
     },
     "page": {
         "contextMenu": {
@@ -268,7 +276,8 @@
             "noMusicFolder": "Geen muziekfolder geselecteerd",
             "multipleMusicFolders": "{{count}} muziekfolders geselecteerd",
             "commandPalette": "Open opdrachtvenster",
-            "logout": "Log uit"
+            "logout": "Log uit",
+            "rescanLibrary": "Herscan bibliotheek"
         },
         "albumDetail": {
             "moreFromArtist": "Meer van deze $t(entity.artist, {\"count\": 1})",
@@ -290,7 +299,27 @@
                 "unsynchronized": "Niet gesynchronizeerd",
                 "useImageAspectRatio": "Gebruik aspect ratio van de afbeelding",
                 "lyricOffset": "Songtekst-vertraging (ms)",
-                "showLyricProvider": "Toon songtekstaanbieder"
+                "showLyricProvider": "Toon songtekstaanbieder",
+                "followCurrentLyric_description": "Scrol automatisch mee om de actieve songtekstregel in beeld te houden",
+                "lyricFollowScrollAlignment": "Uitlijning bij volgen songteksten",
+                "lyricFollowScrollAlignment_description": "Verticale positie van de actieve regel bij het volgen",
+                "lyricAlignment_description": "Horizontale uitlijning van songtekst",
+                "lyricGapSynchronized_description": "Verticale ruimte tussen gesynchroniseerde songtekstregels",
+                "lyricGapUnsynchronized_description": "Verticale ruimte tussen ongesynchroniseerde songtekstregels",
+                "lyricLineLeadTime": "Regelvoorlooptijd (ms)",
+                "lyricLineLeadTime_description": "Verzet de actieve regel met dit aantal milliseconden voor zijn tijdstempel",
+                "lyricPaddingLeft": "Linker vulling songteksten (%)",
+                "lyricPaddingLeft_description": "Vulling van de linkerkant van het songtekstgebied als percentage",
+                "lyricPaddingRight": "Rechter vulling songteksten (%)",
+                "lyricPaddingRight_description": "Vulling van de rechterkant van het songtekstgebied als percentage",
+                "lyricSizeSynchronized_description": "Lettergrootte voor gesynchroniseerde songteksten",
+                "lyricSizeUnsynchronized_description": "Lettergrootte voor ongesynchroniseerde songteksten",
+                "lyricOpacityNonActive": "Opaciteit niet-actieve songtekst",
+                "lyricOpacityNonActive_description": "Opaciteit van songtekstregels die momenteel niet actief zijn",
+                "lyricScaleNonActive": "Schaal niet-actieve songtekst",
+                "lyricScaleNonActive_description": "Schaal van songtekstregels die momenteel niet actief zijn",
+                "showLyricMatch_description": "Toon het naam en de artiest van het nummer van de overeenkomende songteksten",
+                "showLyricProvider_description": "Toon welke provider de songteksten levert"
             },
             "lyrics": "Liedtekst",
             "related": "Gerelateerd",
@@ -367,7 +396,23 @@
             "fileNotWritable": "Bestand is niet beschikbaar of beschrijfbaar",
             "addField": "Voeg veld toe…",
             "emptyFields": "Velden kunnen niet leeg zijn",
-            "readPartialFailure": "Kon metadata niet lezen van {{count}} van de {{total}} bestand(en)"
+            "readPartialFailure": "Kon metadata niet lezen van {{count}} van de {{total}} bestand(en)",
+            "tagConfiguration": "Tagconfiguratie",
+            "addTagConfig": "Voeg tag toe…",
+            "multiValueToggle": "Meerdere waarden",
+            "autocompleteSource": "Bron automatisch aanvullen",
+            "customValues": "Afwijkende waarden",
+            "addCustomValue": "Voeg afwijkende waarde toe…",
+            "serverSuggestions": "Server",
+            "triggerRescan": "Herscan bibliotheek na opslaan",
+            "tagsTab": "Tags",
+            "artworkTab": "Albumhoes",
+            "removeArtwork": "Verwijder albumhoes",
+            "noArtwork": "Geen albumhoes",
+            "multipleValues": "(Meerdere Waarden)",
+            "multipleArtworks": "Meerdere Afbeeldingen",
+            "noLocalSongs": "Geen nummers met lokale bestandspaden gevonden",
+            "writePartialFailure": "Kon {{count}} bestand(en) niet opslaan"
         },
         "playlist": {
             "reorder": "Herschikken is alleen ingeschakeld wanneer er op ID wordt gestorteerd"
@@ -398,7 +443,9 @@
             "discord": "Discord",
             "lyricsDisplay": "Songtekstweergave",
             "logger": "Logger",
-            "playerFilters": "Spelerfilters"
+            "playerFilters": "Spelerfilters",
+            "sharing": "Delen",
+            "lyricsTranslation": "Songtekstvertaling"
         },
         "sidebar": {
             "albumArtists": "Albumartiesten",
@@ -1007,7 +1054,9 @@
         "equalizerPresetGroupBuiltIn": "Ingebouwd",
         "hotkey_playbackNextAlbum": "Volgend album",
         "hotkey_playbackPreviousAlbum": "Vorig album",
-        "windowBarTrackinfo": "Nummer informatie in Venstertitel"
+        "windowBarTrackinfo": "Nummer informatie in Venstertitel",
+        "autoDJ_mode_albums": "Albums",
+        "autoDJ_albumStrategy": "Albumselectiemodus"
     },
     "form": {
         "addServer": {
@@ -1082,7 +1131,9 @@
             "expireInvalid": "Vervaldatum moet in de toekomst zijn",
             "createFailed": "Kon share niet aanmaken (is delen aangezet?)",
             "copyToClipboard": "Kopieer naar klembord: Ctrl+C, enter",
-            "successMustClick": "Gedeelde bron succesvol aangemaakt. klik hier om te openen"
+            "successMustClick": "Gedeelde bron succesvol aangemaakt. klik hier om te openen",
+            "setExpiration_description": "Laat leeg om het verloopmoment van de server te gebruiken",
+            "setExpiration_serverDefault": "Standaardwaarde server"
         },
         "privateMode": {
             "enabled": "Private modus ingeschakeld, afspeelstatus is nu verborgen voor externe integraties",
@@ -1129,6 +1180,10 @@
         },
         "createPrefilledPlaylist": {
             "title": "Maak $t(entity.playlist, {\"count\": 1}) uit geselecteerde nummers."
+        },
+        "queueChangeConfirmation": {
+            "title": "Huidige wachtrij legen?",
+            "description": "Dit zal alle items uit de huidige wachtrij verwijderen."
         }
     },
     "player": {
@@ -1183,13 +1238,21 @@
         "albumRadio": "Albumradio",
         "nextAlbum": "Alt+klik voor volgende album",
         "previousAlbum": "Alt+klik voor vorige album",
-        "sleepTimer_endOfAlbum": "Einde van huidige album"
+        "sleepTimer_endOfAlbum": "Einde van huidige album",
+        "scrobbleForceSubmit": "Scrobblen forceren"
     },
     "datetime": {
         "minuteShort": "M",
         "secondShort": "S",
         "hourShort": "H",
-        "dayShort": "D"
+        "dayShort": "D",
+        "secondLong": "Seconde",
+        "minuteLong": "Minuut",
+        "hourLong": "Uur",
+        "dayLong": "Dag",
+        "weekLong": "Week",
+        "monthLong": "Maand",
+        "yearLong": "Jaar"
     },
     "filterOperator": {
         "afterDate": "Is na (datum)",
@@ -1211,7 +1274,8 @@
         "notInTheLast": "Is niet in de laatste",
         "startsWith": "Begint met",
         "after": "Is na",
-        "isPresent": "Is aanwezig"
+        "isPresent": "Is aanwezig",
+        "isMissing": "Ontbreekt"
     },
     "queryBuilder": {
         "standardTags": "Standaard tags",
