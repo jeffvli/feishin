@@ -226,6 +226,7 @@ const normalizeSong = (
         imageUrl: null,
         lastPlayedAt: null,
         lyrics: null,
+        mbzAlbumId: null,
         mbzRecordingId: item.musicBrainzId || null,
         mbzTrackId: null,
         name: item.title,
