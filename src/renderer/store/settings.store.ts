@@ -1336,7 +1336,7 @@ const initialState: SettingsState = {
         externalLinks: true,
         followCurrentSong: true,
         followSystemTheme: false,
-        fullscreenAutoOpenTimeout: null,
+        fullscreenAutoOpenTimeout: undefined,
         genreTarget: GenreTarget.TRACK,
         homeFeature: true,
         homeFeatureStyle: HomeFeatureStyle.SINGLE,
