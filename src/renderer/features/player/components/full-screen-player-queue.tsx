@@ -107,9 +107,7 @@ const Controls = () => {
 
     return (
         <Group
-            className={[styles.controlsContainer, 'full-screen-player-controls-container'].join(
-                ' ',
-            )}
+            className={clsx(styles.controlsContainer, 'full-screen-player-controls-container')}
             gap="xs"
             p="0.5rem"
             pos="absolute"
