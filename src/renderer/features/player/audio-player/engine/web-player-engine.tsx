@@ -320,7 +320,10 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
         <div id="web-player-engine" style={{ display: 'none' }}>
             <ReactPlayerComponent
                 config={{
-                    file: { attributes: { crossOrigin: 'anonymous' }, forceAudio: true },
+                    file: {
+                        attributes: { crossOrigin: 'anonymous', preload: 'auto' },
+                        forceAudio: true,
+                    },
                 }}
                 controls={false}
                 height={0}
@@ -346,7 +349,10 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
             />
             <ReactPlayerComponent
                 config={{
-                    file: { attributes: { crossOrigin: 'anonymous' }, forceAudio: true },
+                    file: {
+                        attributes: { crossOrigin: 'anonymous', preload: 'auto' },
+                        forceAudio: true,
+                    },
                 }}
                 controls={false}
                 height={0}
