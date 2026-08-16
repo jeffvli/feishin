@@ -5,6 +5,8 @@ import {
     LbRecordingMetadata,
     LbRecordingStat,
     LbReleaseStat,
+    LbSimilarArtist,
+    LbSimilarRecording,
     LbUrlRel,
 } from '/@/renderer/features/discover/api/listenbrainz-types';
 
@@ -16,18 +18,31 @@ import {
  * Discover item has no server, no library id, and may not be ownable at all.
  */
 export interface DiscoverItem {
+    /**
+     * The release this belongs to, for a track and a release alike.
+     *
+     * Distinct from `title`, which is the track name for a track and the release name for a
+     * release. Library matching needs the release either way, so it cannot read `title`.
+     */
+    albumName: null | string;
     artistName: string;
     /** Stable React key. Not a library id and never navigable. */
     id: string;
     imageUrl: null | string;
+    kind: DiscoverItemKind;
     /** Present when the item is a track. Enables exact preview resolution. */
     recordingMbid: null | string;
+    /** Release and release-group ids, for matching against a library that records them. */
+    releaseMbids: string[];
     /** Album name for tracks, or the release date for releases. Rendered as the second row. */
     subtitle: null | string;
     title: string;
     /** Direct Apple Music / Deezer track links, when ListenBrainz knows them. */
     urlRels: LbUrlRel[];
 }
+
+/** What a card stands for, which decides how it is matched against the library. */
+export type DiscoverItemKind = 'artist' | 'release' | 'track';
 
 /**
  * Cover art for a release, taken from the Cover Art Archive's copy on archive.org.
@@ -102,11 +117,14 @@ export function filterFreshReleasesByArtists(
 
 export function fromArtistStat(stat: LbArtistStat): DiscoverItem {
     return {
+        albumName: null,
         artistName: stat.artist_name,
         id: stat.artist_mbid ?? `artist-${stat.artist_name}`,
         // MusicBrainz has no canonical artist image, so artist cards fall back to a placeholder.
         imageUrl: null,
+        kind: 'artist',
         recordingMbid: null,
+        releaseMbids: [],
         subtitle: null,
         title: stat.artist_name,
         urlRels: [],
@@ -115,12 +133,15 @@ export function fromArtistStat(stat: LbArtistStat): DiscoverItem {
 
 export function fromFreshRelease(release: LbFreshRelease): DiscoverItem {
     return {
+        albumName: release.release_name,
         artistName: release.artist_credit_name,
         id: release.release_mbid,
         imageUrl:
             coverArtUrl(release.caa_release_mbid, release.caa_id) ??
             releaseGroupArtUrl(release.release_group_mbid),
+        kind: 'release',
         recordingMbid: null,
+        releaseMbids: compact([release.release_mbid, release.release_group_mbid]),
         subtitle: release.release_date,
         title: release.release_name,
         urlRels: [],
@@ -133,10 +154,13 @@ export function fromPlaylistTrack(track: LbPlaylistTrack): DiscoverItem {
     const recordingMbid = recordingMbidFromIdentifier(track.identifier);
 
     return {
+        albumName: track.album ?? null,
         artistName: track.creator,
         id: recordingMbid ?? `${track.creator}-${track.title}`,
         imageUrl: coverArtUrl(metadata?.caa_release_mbid, metadata?.caa_id),
+        kind: 'track',
         recordingMbid,
+        releaseMbids: compact([metadata?.caa_release_mbid]),
         subtitle: track.album ?? null,
         title: track.title,
         urlRels: [],
@@ -155,12 +179,15 @@ export function fromRecommendation(
     }
 
     return {
+        albumName: entry.release?.name ?? null,
         artistName: entry.artist?.name ?? '',
         id: recordingMbid,
         imageUrl:
             coverArtUrl(entry.release?.caa_release_mbid, entry.release?.caa_id) ??
             releaseGroupArtUrl(entry.release?.release_group_mbid),
+        kind: 'track',
         recordingMbid,
+        releaseMbids: compact([entry.release?.caa_release_mbid, entry.release?.release_group_mbid]),
         subtitle: entry.release?.name ?? null,
         title: entry.recording.name,
         urlRels: entry.recording.url_rels ?? [],
@@ -169,10 +196,13 @@ export function fromRecommendation(
 
 export function fromRecordingStat(stat: LbRecordingStat): DiscoverItem {
     return {
+        albumName: stat.release_name,
         artistName: stat.artist_name,
         id: stat.recording_mbid ?? `${stat.artist_name}-${stat.track_name}`,
         imageUrl: coverArtUrl(stat.caa_release_mbid, stat.caa_id),
+        kind: 'track',
         recordingMbid: stat.recording_mbid,
+        releaseMbids: compact([stat.caa_release_mbid]),
         subtitle: stat.release_name,
         title: stat.track_name,
         urlRels: [],
@@ -181,12 +211,77 @@ export function fromRecordingStat(stat: LbRecordingStat): DiscoverItem {
 
 export function fromReleaseStat(stat: LbReleaseStat): DiscoverItem {
     return {
+        albumName: stat.release_name,
         artistName: stat.artist_name,
         id: stat.release_mbid ?? `${stat.artist_name}-${stat.release_name}`,
         imageUrl: coverArtUrl(stat.caa_release_mbid, stat.caa_id),
+        kind: 'release',
         recordingMbid: null,
+        releaseMbids: compact([stat.release_mbid, stat.caa_release_mbid]),
         subtitle: stat.release_name,
         title: stat.release_name,
         urlRels: [],
     };
+}
+
+export function fromSimilarArtist(artist: LbSimilarArtist): DiscoverItem {
+    return {
+        albumName: null,
+        artistName: artist.name,
+        id: artist.artist_mbid,
+        imageUrl: null,
+        kind: 'artist',
+        recordingMbid: null,
+        releaseMbids: [],
+        // The disambiguation comment, e.g. "American rock band", is the only extra thing the
+        // endpoint knows about an artist and reads better than a raw similarity score.
+        subtitle: artist.comment,
+        title: artist.name,
+        urlRels: [],
+    };
+}
+
+export function fromSimilarRecording(recording: LbSimilarRecording): DiscoverItem {
+    return {
+        albumName: recording.release_name,
+        artistName: recording.artist_credit_name,
+        id: recording.recording_mbid,
+        imageUrl: coverArtUrl(recording.caa_release_mbid, recording.caa_id),
+        kind: 'track',
+        recordingMbid: recording.recording_mbid,
+        releaseMbids: compact([recording.release_mbid, recording.caa_release_mbid]),
+        subtitle: recording.release_name,
+        title: recording.recording_name,
+        urlRels: [],
+    };
+}
+
+/**
+ * Highest scoring first, one entry per id, capped.
+ *
+ * A batched similarity call returns around 100 entries per seed in no particular order, and
+ * seeds overlap: two seeds produced 200 entries of which 10 were the same artist twice. The raw
+ * response is therefore neither ranked nor unique.
+ */
+export function rankSimilar<T extends { score: number }>(
+    entries: T[],
+    idOf: (entry: T) => string,
+    limit = 20,
+): T[] {
+    const best = new Map<string, T>();
+
+    for (const entry of entries) {
+        const existing = best.get(idOf(entry));
+
+        if (!existing || entry.score > existing.score) {
+            best.set(idOf(entry), entry);
+        }
+    }
+
+    return [...best.values()].sort((a, b) => b.score - a.score).slice(0, limit);
+}
+
+/** Most ListenBrainz id fields are nullable, and an id list should carry only real ids. */
+function compact(values: (null | string | undefined)[]): string[] {
+    return values.filter((value): value is string => Boolean(value));
 }
