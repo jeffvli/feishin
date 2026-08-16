@@ -61,9 +61,21 @@ export function useDiscoverData(username: string) {
         staleTime: 1000 * 60 * 60,
     });
 
+    /**
+     * A deliberately wide artist seed, used only to narrow the global fresh-release feed.
+     *
+     * This is not the same slice as the visible "top artists" row. Matching the feed against a
+     * month's top 20 artists found exactly 1 of 3,093 releases; all-time top 1,000 finds 140 of
+     * 8,300. The row is worth having only at the wider setting.
+     */
+    const artistSeed = useQuery({
+        ...listenbrainzQueries.topArtists(username, 'all_time', 1000),
+        enabled,
+    });
+
     const freshReleases = useQuery({
         ...listenbrainzQueries.freshReleases(username),
-        enabled: enabled && (topArtists.data?.length ?? 0) > 0,
+        enabled: enabled && (artistSeed.data?.length ?? 0) > 0,
     });
 
     const rows = useMemo<DiscoverRow[]>(() => {
@@ -97,7 +109,7 @@ export function useDiscoverData(username: string) {
         push(
             'fresh-releases',
             t('page.discover.freshReleases'),
-            filterFreshReleasesByArtists(freshReleases.data ?? [], topArtists.data ?? []).map(
+            filterFreshReleasesByArtists(freshReleases.data ?? [], artistSeed.data ?? []).map(
                 fromFreshRelease,
             ),
         );
@@ -126,6 +138,7 @@ export function useDiscoverData(username: string) {
         recommendationMbids,
         recommendationMetadata.data,
         freshReleases.data,
+        artistSeed.data,
         topArtists.data,
         topRecordings.data,
         topReleases.data,

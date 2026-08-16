@@ -75,9 +75,14 @@ export const discoverKeys = {
     playlist: (mbid: string) => ['listenbrainz', 'playlist', mbid] as const,
     playlistsCreatedFor: (username: string) => ['listenbrainz', username, 'created-for'] as const,
     recommendations: (username: string) => ['listenbrainz', username, 'recommendations'] as const,
-    topArtists: (username: string) => ['listenbrainz', username, 'top-artists'] as const,
-    topRecordings: (username: string) => ['listenbrainz', username, 'top-recordings'] as const,
-    topReleases: (username: string) => ['listenbrainz', username, 'top-releases'] as const,
+    // Range and count belong in the key: the fresh-release seed and the visible "top artists"
+    // row ask for wildly different slices, and a shared key would let them clobber each other.
+    topArtists: (username: string, range: string, count: number) =>
+        ['listenbrainz', username, 'top-artists', range, count] as const,
+    topRecordings: (username: string, range: string, count: number) =>
+        ['listenbrainz', username, 'top-recordings', range, count] as const,
+    topReleases: (username: string, range: string, count: number) =>
+        ['listenbrainz', username, 'top-releases', range, count] as const,
 };
 
 export const listenbrainzQueries = {
@@ -85,7 +90,7 @@ export const listenbrainzQueries = {
      * The global fresh-release feed. Note this is ~8,000 releases and several megabytes;
      * `username` does not filter it server side, so callers must narrow it themselves.
      */
-    freshReleases: (username: string, days = 14) =>
+    freshReleases: (username: string, days = 30) =>
         queryOptions({
             ...CACHE,
             queryFn: ({ signal }) =>
@@ -140,7 +145,7 @@ export const listenbrainzQueries = {
                     `/stats/user/${encodeURIComponent(username)}/artists?range=${range}&count=${count}`,
                     signal,
                 ).then((response) => response.payload.artists),
-            queryKey: discoverKeys.topArtists(username),
+            queryKey: discoverKeys.topArtists(username, range, count),
         }),
 
     topRecordings: (username: string, range = 'month', count = 20) =>
@@ -151,7 +156,7 @@ export const listenbrainzQueries = {
                     `/stats/user/${encodeURIComponent(username)}/recordings?range=${range}&count=${count}`,
                     signal,
                 ).then((response) => response.payload.recordings),
-            queryKey: discoverKeys.topRecordings(username),
+            queryKey: discoverKeys.topRecordings(username, range, count),
         }),
 
     topReleases: (username: string, range = 'month', count = 20) =>
@@ -162,6 +167,6 @@ export const listenbrainzQueries = {
                     `/stats/user/${encodeURIComponent(username)}/releases?range=${range}&count=${count}`,
                     signal,
                 ).then((response) => response.payload.releases),
-            queryKey: discoverKeys.topReleases(username),
+            queryKey: discoverKeys.topReleases(username, range, count),
         }),
 };
