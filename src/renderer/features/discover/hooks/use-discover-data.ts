@@ -7,6 +7,11 @@ import {
     listenbrainzQueries,
 } from '/@/renderer/features/discover/api/listenbrainz-api';
 import { LbPlaylistSummary } from '/@/renderer/features/discover/api/listenbrainz-types';
+import { useArtistImages } from '/@/renderer/features/discover/hooks/use-artist-images';
+import {
+    filterOwnedItems,
+    useLibraryIndex,
+} from '/@/renderer/features/discover/hooks/use-library-index';
 import {
     DiscoverItem,
     filterFreshReleasesByArtists,
@@ -16,6 +21,9 @@ import {
     fromRecommendation,
     fromRecordingStat,
     fromReleaseStat,
+    fromSimilarArtist,
+    fromSimilarRecording,
+    rankSimilar,
 } from '/@/renderer/features/discover/utils/lb-adapters';
 
 export interface DiscoverRow {
@@ -25,6 +33,15 @@ export interface DiscoverRow {
     key: string;
     title: string;
 }
+
+/**
+ * How many top entries seed a similarity call.
+ *
+ * Seeds are sent in one batched request, and each returns around 100 results that overlap
+ * heavily, so more seeds buy breadth rather than volume. Five is enough to stop the row being
+ * a portrait of a single artist.
+ */
+const SIMILARITY_SEED_COUNT = 5;
 
 export function useDiscoverData(username: string) {
     const { t } = useTranslation();
@@ -78,12 +95,39 @@ export function useDiscoverData(username: string) {
         enabled: enabled && (artistSeed.data?.length ?? 0) > 0,
     });
 
+    const similarArtistSeeds = useMemo(
+        () =>
+            (topArtists.data ?? [])
+                .map((artist) => artist.artist_mbid)
+                .filter((mbid): mbid is string => Boolean(mbid))
+                .slice(0, SIMILARITY_SEED_COUNT),
+        [topArtists.data],
+    );
+
+    const similarRecordingSeeds = useMemo(
+        () =>
+            (topRecordings.data ?? [])
+                .map((recording) => recording.recording_mbid)
+                .filter((mbid): mbid is string => Boolean(mbid))
+                .slice(0, SIMILARITY_SEED_COUNT),
+        [topRecordings.data],
+    );
+
+    const similarArtists = useQuery(listenbrainzQueries.similarArtists(similarArtistSeeds));
+    const similarRecordings = useQuery(
+        listenbrainzQueries.similarRecordings(similarRecordingSeeds),
+    );
+
+    const libraryIndex = useLibraryIndex(enabled);
+
     const rows = useMemo<DiscoverRow[]>(() => {
         const result: DiscoverRow[] = [];
 
         const push = (key: string, title: string, items: DiscoverItem[], isArtist?: boolean) => {
-            if (items.length > 0) {
-                result.push({ isArtist, items, key, title });
+            const owned = filterOwnedItems(items, libraryIndex);
+
+            if (owned.length > 0) {
+                result.push({ isArtist, items: owned, key, title });
             }
         };
 
@@ -105,6 +149,29 @@ export function useDiscoverData(username: string) {
                       .map((mbid) => fromRecommendation(mbid, recommendationMetadata.data))
                       .filter((item): item is DiscoverItem => item !== null)
                 : [],
+        );
+        // The seeds come back among their own results, and an artist is not a suggestion of
+        // itself. Library dedupe would usually catch these, but only for what the user owns.
+        push(
+            'similar-tracks',
+            t('page.discover.similarTracks'),
+            rankSimilar(
+                (similarRecordings.data ?? []).filter(
+                    (entry) => !similarRecordingSeeds.includes(entry.recording_mbid),
+                ),
+                (entry) => entry.recording_mbid,
+            ).map(fromSimilarRecording),
+        );
+        push(
+            'similar-artists',
+            t('page.discover.similarArtists'),
+            rankSimilar(
+                (similarArtists.data ?? []).filter(
+                    (entry) => !similarArtistSeeds.includes(entry.artist_mbid),
+                ),
+                (entry) => entry.artist_mbid,
+            ).map(fromSimilarArtist),
+            true,
         );
         push(
             'fresh-releases',
@@ -133,10 +200,15 @@ export function useDiscoverData(username: string) {
         return result;
     }, [
         t,
+        libraryIndex,
         jams.data,
         exploration.data,
         recommendationMbids,
         recommendationMetadata.data,
+        similarArtists.data,
+        similarArtistSeeds,
+        similarRecordings.data,
+        similarRecordingSeeds,
         freshReleases.data,
         artistSeed.data,
         topArtists.data,
@@ -144,13 +216,42 @@ export function useDiscoverData(username: string) {
         topReleases.data,
     ]);
 
+    // Looked up after filtering, so no request is spent on an artist that is about to be hidden.
+    const artistItems = useMemo(
+        () => rows.filter((row) => row.isArtist).flatMap((row) => row.items),
+        [rows],
+    );
+
+    const artistImages = useArtistImages(artistItems);
+
+    const rowsWithImages = useMemo<DiscoverRow[]>(() => {
+        if (artistImages.size === 0) {
+            return rows;
+        }
+
+        return rows.map((row) => {
+            if (!row.isArtist) {
+                return row;
+            }
+
+            return {
+                ...row,
+                items: row.items.map((item) => {
+                    const imageUrl = artistImages.get(item.id);
+
+                    return imageUrl ? { ...item, imageUrl } : item;
+                }),
+            };
+        });
+    }, [rows, artistImages]);
+
     const queries = [createdFor, jams, exploration, topArtists, topReleases, topRecordings];
 
     return {
         // Every row fetches independently, so a slow or failing source never blanks the page.
         isError: queries.every((query) => query.isError),
-        isPending: rows.length === 0 && queries.some((query) => query.isPending),
-        rows,
+        isPending: rowsWithImages.length === 0 && queries.some((query) => query.isPending),
+        rows: rowsWithImages,
     };
 }
 

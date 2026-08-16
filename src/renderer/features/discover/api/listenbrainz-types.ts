@@ -124,6 +124,38 @@ export interface LbReleaseStat {
     release_name: string;
 }
 
+/**
+ * An entry from the labs `/similar-artists/json` endpoint.
+ *
+ * The response is a bare array rather than the `{ payload }` envelope the main API uses, and it
+ * already carries `name`, so unlike the recommendation feed it needs no hydration call.
+ */
+export interface LbSimilarArtist {
+    artist_mbid: string;
+    comment: null | string;
+    gender: null | string;
+    name: string;
+    /** Which seed MBID produced this, when several were sent. Observed null on some entries. */
+    reference_mbid: null | string;
+    score: number;
+    type: null | string;
+}
+
+/** An entry from the labs `/similar-recordings/json` endpoint. Also a bare array. */
+export interface LbSimilarRecording {
+    /** Observed null on every entry, so artist matching has to use the credit name. */
+    artist_credit_mbids: null | string[];
+    artist_credit_name: string;
+    caa_id: null | number;
+    caa_release_mbid: null | string;
+    recording_mbid: string;
+    recording_name: string;
+    reference_mbid: null | string;
+    release_mbid: null | string;
+    release_name: null | string;
+    score: number;
+}
+
 /** A relationship URL attached to a recording, e.g. an Apple Music or Deezer track page. */
 export interface LbUrlRel {
     type: string;

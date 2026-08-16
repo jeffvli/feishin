@@ -9,9 +9,29 @@ import {
     LbRecordingMetadata,
     LbRecordingStat,
     LbReleaseStat,
+    LbSimilarArtist,
+    LbSimilarRecording,
 } from '/@/renderer/features/discover/api/listenbrainz-types';
 
 const LB_API = 'https://api.listenbrainz.org/1';
+
+/**
+ * The similarity endpoints live on a separate host from the rest of the API.
+ *
+ * Its CORS preflight allows only `CONTENT-TYPE` as a request header, where the main API also
+ * allows `Authorization`. Nothing here may send one, which is fine because none is needed.
+ */
+const LB_LABS_API = 'https://labs.api.listenbrainz.org';
+
+/**
+ * `algorithm` is required on both similarity endpoints and each validates against its own enum,
+ * so these two strings are not interchangeable: the recordings value is a 400 on artists.
+ */
+const SIMILAR_ARTISTS_ALGORITHM =
+    'session_based_days_9000_session_300_contribution_5_threshold_15_limit_50_skip_30';
+
+const SIMILAR_RECORDINGS_ALGORITHM =
+    'session_based_days_7500_session_300_contribution_5_threshold_15_limit_50_skip_30';
 
 /**
  * Recording metadata in batches, keyed by MBID.
@@ -46,6 +66,34 @@ export async function fetchRecordingMetadata(
 }
 
 /**
+ * Seeds are sent as a repeated query parameter rather than a comma-separated list, which the
+ * endpoint rejects as an invalid UUID. One batched call covers every seed.
+ */
+async function labsFetch<T>(
+    path: string,
+    parameter: string,
+    mbids: string[],
+    algorithm: string,
+    signal?: AbortSignal,
+): Promise<T[]> {
+    const params = new URLSearchParams();
+
+    for (const mbid of mbids) {
+        params.append(parameter, mbid);
+    }
+
+    params.set('algorithm', algorithm);
+
+    const response = await fetch(`${LB_LABS_API}${path}?${params.toString()}`, { signal });
+
+    if (!response.ok) {
+        throw new Error(`ListenBrainz labs ${response.status} for ${path}`);
+    }
+
+    return response.json() as Promise<T[]>;
+}
+
+/**
  * ListenBrainz sends `access-control-allow-origin: *`, so this runs in the renderer on both
  * the Electron and the web build. Nothing here may move to the main process: the Docker
  * image is static nginx and has no main process to move it to.
@@ -75,6 +123,10 @@ export const discoverKeys = {
     playlist: (mbid: string) => ['listenbrainz', 'playlist', mbid] as const,
     playlistsCreatedFor: (username: string) => ['listenbrainz', username, 'created-for'] as const,
     recommendations: (username: string) => ['listenbrainz', username, 'recommendations'] as const,
+    similarArtists: (seedMbids: string[]) =>
+        ['listenbrainz', 'similar-artists', seedMbids] as const,
+    similarRecordings: (seedMbids: string[]) =>
+        ['listenbrainz', 'similar-recordings', seedMbids] as const,
     // Range and count belong in the key: the fresh-release seed and the visible "top artists"
     // row ask for wildly different slices, and a shared key would let them clobber each other.
     topArtists: (username: string, range: string, count: number) =>
@@ -135,6 +187,41 @@ export const listenbrainzQueries = {
                     signal,
                 ).then((response) => response.payload.mbids),
             queryKey: discoverKeys.recommendations(username),
+        }),
+
+    /**
+     * Artists similar to the given seeds. Despite `limit_50` in the algorithm name, one seed
+     * returns around 100 artists, and seeds overlap, so callers should dedupe and slice.
+     */
+    similarArtists: (seedMbids: string[]) =>
+        queryOptions({
+            ...CACHE,
+            enabled: seedMbids.length > 0,
+            queryFn: ({ signal }) =>
+                labsFetch<LbSimilarArtist>(
+                    '/similar-artists/json',
+                    'artist_mbids',
+                    seedMbids,
+                    SIMILAR_ARTISTS_ALGORITHM,
+                    signal,
+                ),
+            queryKey: discoverKeys.similarArtists(seedMbids),
+        }),
+
+    /** Recordings similar to the given seeds. Carries artist name and cover art already. */
+    similarRecordings: (seedMbids: string[]) =>
+        queryOptions({
+            ...CACHE,
+            enabled: seedMbids.length > 0,
+            queryFn: ({ signal }) =>
+                labsFetch<LbSimilarRecording>(
+                    '/similar-recordings/json',
+                    'recording_mbids',
+                    seedMbids,
+                    SIMILAR_RECORDINGS_ALGORITHM,
+                    signal,
+                ),
+            queryKey: discoverKeys.similarRecordings(seedMbids),
         }),
 
     topArtists: (username: string, range = 'month', count = 20) =>
