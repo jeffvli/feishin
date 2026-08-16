@@ -52,6 +52,8 @@ export function DiscoverCarousel(props: DiscoverCarouselProps) {
     // neither be heard alongside it nor duck it. Offer nothing rather than something broken.
     const canPreview = !isArtist && playbackType !== PlayerType.JUKEBOX;
 
+    const itemsById = useMemo(() => new Map(items.map((item) => [item.id, item])), [items]);
+
     const controls = useMemo<ItemControls | undefined>(() => {
         if (!canPreview) {
             return undefined;
@@ -59,7 +61,14 @@ export function DiscoverCarousel(props: DiscoverCarouselProps) {
 
         return {
             onPlay: ({ item }) => {
-                const discoverItem = item as unknown as DiscoverItem;
+                // `item` is the projection below, not the ListenBrainz item, because that is
+                // what was handed to the card. It carries only the fields the card renders, so
+                // the title and the Apple Music links have to be looked back up by id.
+                const discoverItem = itemsById.get((item as { id: string }).id);
+
+                if (!discoverItem) {
+                    return;
+                }
 
                 void toggle(discoverItem.id, {
                     artistName: discoverItem.artistName,
@@ -68,7 +77,7 @@ export function DiscoverCarousel(props: DiscoverCarouselProps) {
                 });
             },
         };
-    }, [canPreview, toggle]);
+    }, [canPreview, itemsById, toggle]);
 
     const cards = useMemo(() => {
         return items.map((item) => {
