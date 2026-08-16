@@ -15,10 +15,20 @@
  */
 export function artistVariants(artistName: string): string[] {
     const full = normalizeName(artistName);
-    const lead = normalizeName(artistName.split(/,| & | feat\.? | with /i)[0] ?? '');
+    const lead = normalizeName(artistName.split(CREDIT_SEPARATOR)[0] ?? '');
 
     return lead && lead !== full ? [full, lead] : [full];
 }
+
+/**
+ * Where a credit stops naming the primary artist and starts naming collaborators.
+ *
+ * ListenBrainz spells the word out where a tag usually abbreviates it, so "Santana featuring
+ * Rob Thomas" has to reduce to "Santana" against a library that simply says "Santana". Each
+ * separator is space-delimited so it cannot fire inside a name: an unanchored "x" or "vs"
+ * would split "Malcolm X" and any band with those letters mid-word.
+ */
+const CREDIT_SEPARATOR = /,|\s&\s|\s\/\s|\sfeaturing\s|\sfeat\.?\s|\sft\.?\s|\swith\s|\svs\.?\s/i;
 
 /**
  * Case, punctuation, bracketed suffixes and a leading article all vary between what a server
