@@ -21,6 +21,8 @@ interface DiscoverCarouselProps {
     /** Artists render as circles and have nothing to preview. */
     isArtist?: boolean;
     items: DiscoverItem[];
+    /** Stacked card rows. One for a normal strip, two for a feature block. */
+    rowCount?: number;
     title: React.ReactNode | string;
 }
 
@@ -42,7 +44,7 @@ const ROWS: DataRow[] = [
  * library id that does not exist. So nothing here needs new card chrome.
  */
 export function DiscoverCarousel(props: DiscoverCarouselProps) {
-    const { containerQuery, isArtist, items, title } = props;
+    const { containerQuery, isArtist, items, rowCount = 1, title } = props;
     const playbackType = usePlaybackType();
     const playingId = usePreviewPlayingId();
     const resolvingId = usePreviewResolvingId();
@@ -130,7 +132,7 @@ export function DiscoverCarousel(props: DiscoverCarouselProps) {
             containerQuery={containerQuery}
             onNextPage={noop}
             onPrevPage={noop}
-            rowCount={1}
+            rowCount={rowCount}
             title={title}
         />
     );

@@ -47,8 +47,22 @@ export interface DiscoverRow {
     isArtist?: boolean;
     items: DiscoverItem[];
     key: string;
+    /** How many card rows the carousel stacks. See `FEATURE_ROWS`. */
+    rowCount: number;
     title: string;
 }
+
+/**
+ * Rows given a double-height block instead of a single strip.
+ *
+ * The weekly playlists are the ones worth the extra room: they are curated, they are the only
+ * rows that change on a schedule, and they arrive with fifty tracks where the rest cap at
+ * twenty. Giving every row two rows would just be a wall, so this is a short list on purpose.
+ */
+const FEATURE_ROWS = new Set(['weekly-exploration', 'weekly-jams']);
+
+/** Below this a second row would sit half empty, which looks like a rendering fault. */
+const MIN_ITEMS_FOR_TWO_ROWS = 10;
 
 /**
  * How many top entries seed a similarity call.
@@ -142,9 +156,14 @@ export function useDiscoverData(username: string) {
         const push = (key: string, title: string, items: DiscoverItem[], isArtist?: boolean) => {
             const owned = filterOwnedItems(items, libraryIndex);
 
-            if (owned.length > 0) {
-                result.push({ isArtist, items: owned, key, title });
+            if (owned.length === 0) {
+                return;
             }
+
+            const rowCount =
+                FEATURE_ROWS.has(key) && owned.length >= MIN_ITEMS_FOR_TWO_ROWS ? 2 : 1;
+
+            result.push({ isArtist, items: owned, key, rowCount, title });
         };
 
         push(
@@ -276,9 +295,15 @@ export function useDiscoverData(username: string) {
         topRecordings,
     ];
 
-    // Counted on every render rather than memoized: it is four integers over nine queries, and
+    // Counted on every render rather than memoized: it is four integers over ten sources, and
     // the dependency would be the query statuses themselves, which is the whole computation.
-    const progress: DiscoverProgress = { failed: 0, loading: 0, ready: 0, total: queries.length };
+    // The library index counts as a source because the page genuinely waits on it.
+    const progress: DiscoverProgress = {
+        failed: 0,
+        loading: 0,
+        ready: libraryIndex.isReady ? 1 : 0,
+        total: queries.length + 1,
+    };
 
     for (const query of queries) {
         if (query.isError) {
@@ -293,6 +318,8 @@ export function useDiscoverData(username: string) {
     return {
         // Every row fetches independently, so a slow or failing source never blanks the page.
         isError: queries.every((query) => query.isError),
+        // Nothing renders before the library index arrives, because a row built without it
+        // would be a list of music the user already owns, which is the opposite of the point.
         isPending: rowsWithImages.length === 0 && progress.loading > 0,
         progress,
         rows: rowsWithImages,

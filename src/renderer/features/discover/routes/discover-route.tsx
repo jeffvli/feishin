@@ -101,6 +101,7 @@ const DiscoverRoute = () => {
                                 isArtist={row.isArtist}
                                 items={row.items}
                                 key={row.key}
+                                rowCount={row.rowCount}
                                 title={row.title}
                             />
                         ))}

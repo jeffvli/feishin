@@ -4,21 +4,29 @@ import { useMemo } from 'react';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { DiscoverItem } from '/@/renderer/features/discover/utils/lb-adapters';
+import {
+    artistVariants,
+    normalizeName,
+    pairKey,
+} from '/@/renderer/features/discover/utils/library-match';
+import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { useCurrentServerId } from '/@/renderer/store';
 import {
     Album,
     AlbumArtist,
     AlbumArtistListSort,
     AlbumListSort,
+    Song,
+    SongListSort,
     SortOrder,
 } from '/@/shared/types/domain-types';
 
 /**
- * What the user already owns, in the two forms a ListenBrainz item can be matched against.
+ * What the user already owns, in every form a ListenBrainz item can be matched against.
  *
  * `isReady` is the important field. An index that has not loaded is indistinguishable from a
- * library containing nothing, and filtering against an empty index would silently hide the
- * difference. Callers must not filter until this is true.
+ * library containing nothing, and the page must show nothing rather than show music the user
+ * already owns, so callers wait on this rather than filtering against a partial index.
  */
 export interface LibraryIndex {
     /** `artist|album`, both normalized. */
@@ -27,6 +35,10 @@ export interface LibraryIndex {
     albumMbids: Set<string>;
     artistNames: Set<string>;
     isReady: boolean;
+    /** MusicBrainz recording ids, the exact key for a track when the server has tagged one. */
+    recordingMbids: Set<string>;
+    /** `artist|track`, both normalized. The fallback when no recording id is available. */
+    trackKeys: Set<string>;
 }
 
 const EMPTY_INDEX: LibraryIndex = {
@@ -34,78 +46,89 @@ const EMPTY_INDEX: LibraryIndex = {
     albumMbids: new Set(),
     artistNames: new Set(),
     isReady: false,
+    recordingMbids: new Set(),
+    trackKeys: new Set(),
 };
-
-/** The key an album is matched on when no MusicBrainz id is available on either side. */
-export function albumKey(artistName: string, albumName: string): string {
-    return `${normalizeName(artistName)}|${normalizeName(albumName)}`;
-}
 
 /**
  * Drop everything the user already owns, which is the whole point of a Discover page.
  *
- * Returns the list untouched until the index has loaded. Filtering against a half-built index
- * would hide nothing on the first render and then quietly drop rows on the second, which reads
- * as flicker rather than as loading.
- *
- * A track is matched on its release rather than on itself: owning the album implies owning the
- * track, and confirming a track directly would mean pulling the full song list, which is an
- * order of magnitude larger than the album list for no additional precision.
+ * Tracks are matched as tracks, not through their release. ListenBrainz reports the canonical
+ * MusicBrainz release, which is routinely not the one in the library: it files "Wasteland" by
+ * 10 Years under "Killing All That Holds You" where the library has an album called
+ * "Wasteland". Album matching therefore missed nearly everything it should have caught.
  */
 export function filterOwnedItems(items: DiscoverItem[], index: LibraryIndex): DiscoverItem[] {
     if (!index.isReady) {
-        return items;
+        return [];
     }
 
     return items.filter((item) => {
+        const artists = artistVariants(item.artistName);
+
         if (item.kind === 'artist') {
-            return !index.artistNames.has(normalizeName(item.artistName));
+            return !artists.some((artist) => index.artistNames.has(artist));
+        }
+
+        if (item.kind === 'track') {
+            if (item.recordingMbid && index.recordingMbids.has(item.recordingMbid)) {
+                return false;
+            }
+
+            const title = normalizeName(item.title);
+
+            return !artists.some((artist) => index.trackKeys.has(`${artist}|${title}`));
         }
 
         if (item.releaseMbids.some((mbid) => index.albumMbids.has(mbid))) {
             return false;
         }
 
-        // Nothing to match on. Showing it is the safer error: a duplicate is a mild annoyance,
-        // whereas hiding a genuine suggestion defeats the feature.
         if (!item.albumName) {
             return true;
         }
 
-        return !index.albumKeys.has(albumKey(item.artistName, item.albumName));
+        const album = normalizeName(item.albumName);
+
+        return !artists.some((artist) => index.albumKeys.has(`${artist}|${album}`));
     });
 }
 
 /**
- * Case, punctuation and bracketed suffixes all vary between what a server stores and what
- * MusicBrainz calls the same record, so "Antidotes (Deluxe Edition)" has to match "Antidotes".
- */
-export function normalizeName(value: string): string {
-    return value
-        .toLowerCase()
-        .replace(/\(.*?\)|\[.*?\]/g, '')
-        .replace(/[^a-z0-9]+/g, ' ')
-        .trim();
-}
-
-/**
- * The user's whole album and album-artist list, reduced to lookup sets.
+ * The user's library reduced to lookup sets.
  *
- * Fetched once per session rather than per item: a search-by-name per recommendation would be
- * one HTTP round trip each, and the Subsonic backend answers a search by paging `search3` until
- * exhausted, so the per-item cost is far worse than one full list.
+ * The song list is the expensive part and the one that matters: album matching cannot identify
+ * a track, because the release ListenBrainz names is usually not the release the user owns.
  *
  * `limit: -1` is the codebase's existing "everything" sentinel. Jellyfin maps it to no limit and
- * Navidrome to `_end: -1`, both of which return the full list. Subsonic has no handling for it
- * and its `sortAndPaginate` ends up slicing to `-1`, dropping the final entry; one missing album
- * only means one extra suggestion is shown, so this does not special-case it.
+ * Navidrome to `_end: -1`, which is the same value the radio and playlist-song fetches already
+ * use for this purpose. Subsonic has no handling for it and its `sortAndPaginate` ends up
+ * slicing to `-1`, dropping the final entry; one missing track only means one extra suggestion.
  */
 export function useLibraryIndex(enabled: boolean): LibraryIndex {
     const serverId = useCurrentServerId();
     const canFetch = enabled && Boolean(serverId);
 
-    const [albums, artists] = useQueries({
+    const [songs, albums, artists] = useQueries({
         queries: [
+            {
+                ...songsQueries.list({
+                    query: {
+                        limit: -1,
+                        sortBy: SongListSort.NAME,
+                        sortOrder: SortOrder.ASC,
+                        startIndex: 0,
+                    },
+                    serverId,
+                }),
+                enabled: canFetch,
+                gcTime: CACHE_MS,
+                // Project inside `select` so the response's full Song objects, which carry
+                // genres, participants, tags and lyrics, are collected rather than held for the
+                // session. A library of several thousand tracks is large in that form.
+                select: selectSongs,
+                staleTime: CACHE_MS,
+            },
             {
                 ...albumQueries.list({
                     query: {
@@ -118,9 +141,6 @@ export function useLibraryIndex(enabled: boolean): LibraryIndex {
                 }),
                 enabled: canFetch,
                 gcTime: CACHE_MS,
-                // Project inside `select` so the response's full Album objects, which carry
-                // genres, participants, tags and release types, are collected rather than held
-                // for the session. A large library is tens of megabytes in that form.
                 select: selectAlbums,
                 staleTime: CACHE_MS,
             },
@@ -143,7 +163,7 @@ export function useLibraryIndex(enabled: boolean): LibraryIndex {
     });
 
     return useMemo(() => {
-        if (!albums.data || !artists.data) {
+        if (!songs.data || !albums.data || !artists.data) {
             return EMPTY_INDEX;
         }
 
@@ -152,8 +172,10 @@ export function useLibraryIndex(enabled: boolean): LibraryIndex {
             albumMbids: albums.data.mbids,
             artistNames: artists.data,
             isReady: true,
+            recordingMbids: songs.data.mbids,
+            trackKeys: songs.data.keys,
         };
-    }, [albums.data, artists.data]);
+    }, [songs.data, albums.data, artists.data]);
 }
 
 /** The library changes rarely and a full list is expensive, so hold it for the session. */
@@ -166,10 +188,12 @@ function selectAlbums(response: { items: Album[] }) {
     for (const album of response.items) {
         // `albumArtistName` is the only artist field every backend populates; `albumArtists` is
         // filled from participants on Navidrome and is absent when the server omits them.
-        keys.add(albumKey(album.albumArtistName ?? '', album.name));
+        for (const artist of artistVariants(album.albumArtistName ?? '')) {
+            keys.add(`${artist}|${normalizeName(album.name)}`);
+        }
 
         for (const artist of album.albumArtists ?? []) {
-            keys.add(albumKey(artist.name, album.name));
+            keys.add(pairKey(artist.name, album.name));
         }
 
         if (album.mbzId) {
@@ -185,5 +209,38 @@ function selectAlbums(response: { items: Album[] }) {
 }
 
 function selectArtists(response: { items: AlbumArtist[] }) {
-    return new Set(response.items.map((artist) => normalizeName(artist.name)));
+    const names = new Set<string>();
+
+    for (const artist of response.items) {
+        for (const variant of artistVariants(artist.name)) {
+            names.add(variant);
+        }
+    }
+
+    return names;
+}
+
+function selectSongs(response: { items: Song[] }) {
+    const keys = new Set<string>();
+    const mbids = new Set<string>();
+
+    for (const song of response.items) {
+        const title = normalizeName(song.name);
+
+        // Both credits are indexed because a track's own artist and its album artist differ on
+        // compilations, and ListenBrainz may report either one.
+        for (const credit of [song.artistName, song.albumArtistName]) {
+            for (const artist of artistVariants(credit ?? '')) {
+                if (artist) {
+                    keys.add(`${artist}|${title}`);
+                }
+            }
+        }
+
+        if (song.mbzRecordingId) {
+            mbids.add(song.mbzRecordingId);
+        }
+    }
+
+    return { keys, mbids };
 }
