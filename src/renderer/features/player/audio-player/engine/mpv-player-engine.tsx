@@ -377,6 +377,18 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
                 mpvPlayer.seekTo(seekTo);
             }
         },
+        setDuckLevel(multiplier: number) {
+            if (!mpvPlayer) {
+                return;
+            }
+
+            const target = Math.round(usePlayerStore.getState().player.volume * multiplier);
+
+            // Not mpvPlayer.volume(): the `player-volume` handler guards with `if (!value)`,
+            // which discards a literal 0 and would leave the duck inaudible. `setProperties`
+            // has no such guard.
+            mpvPlayer.setProperties({ volume: target });
+        },
         setVolume(vol: number) {
             const volDecimal = vol / 100 || 0;
             setInternalVolume(volDecimal);

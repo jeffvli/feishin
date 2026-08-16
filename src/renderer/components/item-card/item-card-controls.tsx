@@ -27,12 +27,24 @@ import {
 } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
+/**
+ * Marks a card as auditioning a short external clip rather than queueing library playback.
+ *
+ * When supplied, the three-button queue group collapses to a single play/pause button:
+ * "play next" and "play last" have no meaning for something that never enters the queue.
+ */
+export interface ItemCardPreviewState {
+    isLoading: boolean;
+    isPlaying: boolean;
+}
+
 interface ItemCardControlsProps {
     controls?: ItemControls;
     enableExpansion?: boolean;
     internalState?: ItemListStateActions;
     item: Album | AlbumArtist | Artist | Genre | Playlist | Song | undefined;
     itemType: LibraryItem;
+    previewState?: ItemCardPreviewState;
     showFavorite: boolean;
     showRating: boolean;
     type?: 'compact' | 'default' | 'poster';
@@ -206,6 +218,7 @@ export const ItemCardControls = ({
     internalState,
     item,
     itemType,
+    previewState,
     showFavorite,
     showRating,
     type = 'default',
@@ -264,7 +277,15 @@ export const ItemCardControls = ({
 
     return (
         <motion.div className={clsx(styles.container)} {...containerProps[type]}>
-            {controls?.onPlay && (
+            {controls?.onPlay && previewState && (
+                <PlayButton
+                    classNames={clsx(styles.playButton, styles.primary)}
+                    icon={previewState.isPlaying ? 'mediaPause' : 'mediaPlay'}
+                    loading={previewState.isLoading}
+                    onClick={playNowHandler}
+                />
+            )}
+            {controls?.onPlay && !previewState && (
                 <Tooltip.Group>
                     <PlayTooltip type={Play.NOW}>
                         <PlayButton

@@ -521,6 +521,10 @@ export const GeneralSettingsSchema = z.object({
     combinedLyricsAndVisualizer: z.boolean(),
     confirmQueueChanges: z.boolean(),
     disabledContextMenu: z.record(z.string(), z.boolean()),
+    discoverBadge: z.boolean(),
+    discoverEnabled: z.boolean(),
+    /** Discover item ids already shown to the user, so the sidebar can count what is new. */
+    discoverSeenIds: z.array(z.string()),
     enableGridMultiSelect: z.boolean(),
     externalLinks: z.boolean(),
     followCurrentSong: z.boolean(),
@@ -540,6 +544,7 @@ export const GeneralSettingsSchema = z.object({
     lastFM: z.boolean(),
     lastfmApiKey: z.string(),
     listenBrainz: z.boolean(),
+    listenBrainzUsername: z.string(),
     microtonalPitchControls: z.boolean(),
     musicBrainz: z.boolean(),
     nativeAspectRatio: z.boolean(),
@@ -992,6 +997,7 @@ export enum SidebarItem {
     ARTISTS = 'Artists',
     ARTISTS_ALL = 'Artists-all',
     COLLECTIONS = 'Collections',
+    DISCOVER = 'Discover',
     FAVORITES = 'Favorites',
     FOLDERS = 'Folders',
     GENRES = 'Genres',
@@ -1138,6 +1144,14 @@ export const sidebarItems: SidebarItemType[] = [
         route: generatePath(AppRoute.SEARCH, { itemType: LibraryItem.SONG }),
     },
     { disabled: false, id: 'Home', label: i18n.t('page.sidebar.home'), route: AppRoute.HOME },
+    {
+        // Hidden until enabled, like Now Playing and Search, because Discover does nothing
+        // until a ListenBrainz username has been supplied.
+        disabled: true,
+        id: 'Discover',
+        label: i18n.t('page.sidebar.discover'),
+        route: AppRoute.DISCOVER,
+    },
     {
         disabled: false,
         id: 'Favorites',
@@ -1305,6 +1319,9 @@ const initialState: SettingsState = {
         combinedLyricsAndVisualizer: false,
         confirmQueueChanges: true,
         disabledContextMenu: {},
+        discoverBadge: true,
+        discoverEnabled: false,
+        discoverSeenIds: [],
         enableGridMultiSelect: false,
         externalLinks: true,
         followCurrentSong: true,
@@ -1324,6 +1341,7 @@ const initialState: SettingsState = {
         lastFM: true,
         lastfmApiKey: '',
         listenBrainz: true,
+        listenBrainzUsername: '',
         microtonalPitchControls: false,
         musicBrainz: true,
         nativeAspectRatio: false,
@@ -2870,10 +2888,28 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     }
                 }
 
+                if (version < 34) {
+                    state.general.discoverBadge ??= true;
+                    state.general.discoverEnabled ??= false;
+                    state.general.discoverSeenIds ??= [];
+                    state.general.listenBrainzUsername ??= '';
+
+                    // Persisted arrays replace the defaults wholesale, so an existing install
+                    // never gains a new sidebar entry unless it is pushed here.
+                    if (!state.general.sidebarItems.some((item) => item.id === 'Discover')) {
+                        state.general.sidebarItems.push({
+                            disabled: true,
+                            id: 'Discover',
+                            label: i18n.t('page.sidebar.discover'),
+                            route: AppRoute.DISCOVER,
+                        });
+                    }
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 33,
+            version: 34,
         },
     ),
 );
@@ -3073,6 +3109,19 @@ export const useShowFavorites = () =>
 
 export const useArtistRadioCount = () =>
     useSettingsStore((state) => state.general.artistRadioCount, shallow);
+
+export const useDiscoverSettings = () =>
+    useSettingsStore(
+        (state) => ({
+            badge: state.general.discoverBadge,
+            enabled: state.general.discoverEnabled,
+            username: state.general.listenBrainzUsername,
+        }),
+        shallow,
+    );
+
+export const useDiscoverSeenIds = () =>
+    useSettingsStore((state) => state.general.discoverSeenIds, shallow);
 
 export const useArtistBackground = () =>
     useSettingsStore(

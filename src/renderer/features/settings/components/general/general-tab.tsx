@@ -3,6 +3,7 @@ import { Fragment } from 'react/jsx-runtime';
 
 import { ApplicationSettings } from '/@/renderer/features/settings/components/general/application-settings';
 import { ControlSettings } from '/@/renderer/features/settings/components/general/control-settings';
+import { DiscoverSettings } from '/@/renderer/features/settings/components/general/discover-settings';
 import { ExternalLinksSettings } from '/@/renderer/features/settings/components/general/external-links-settings';
 import { LyricSettings } from '/@/renderer/features/settings/components/general/lyric-settings';
 import { QueryBuilderSettings } from '/@/renderer/features/settings/components/general/query-builder-settings';
@@ -24,6 +25,7 @@ export const GeneralTab = memo(() => {
             { component: ThemeSettings, key: 'theme' },
             { component: ApplicationSettings, key: 'application' },
             { component: ExternalLinksSettings, key: 'externalLinks' },
+            { component: DiscoverSettings, key: 'discover' },
             { component: ControlSettings, key: 'control' },
             { component: SidebarSettings, key: 'sidebar' },
             { component: ScrobbleSettings, key: 'scrobble' },

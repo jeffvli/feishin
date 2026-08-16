@@ -6,7 +6,10 @@ import { generatePath, Link } from 'react-router';
 import styles from './item-card.module.css';
 
 import i18n from '/@/i18n/i18n';
-import { ItemCardControls } from '/@/renderer/components/item-card/item-card-controls';
+import {
+    ItemCardControls,
+    ItemCardPreviewState,
+} from '/@/renderer/components/item-card/item-card-controls';
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { getDraggedItems } from '/@/renderer/components/item-list/helpers/get-dragged-items';
 import { getTitlePath } from '/@/renderer/components/item-list/helpers/get-title-path';
@@ -68,6 +71,7 @@ export interface ItemCardProps {
     internalState?: ItemListStateActions;
     isRound?: boolean;
     itemType: LibraryItem;
+    previewState?: ItemCardPreviewState;
     rows?: DataRow[];
     type?: 'compact' | 'default' | 'poster';
     withControls?: boolean;
@@ -85,6 +89,7 @@ export const ItemCard = ({
     internalState,
     isRound,
     itemType,
+    previewState,
     rows: providedRows,
     type = 'poster',
     withControls,
@@ -110,6 +115,7 @@ export const ItemCard = ({
                     internalState={internalState}
                     isRound={isRound}
                     itemType={itemType}
+                    previewState={previewState}
                     rows={rows}
                     showFavorite={showFavorites}
                     showRating={showRatings}
@@ -131,6 +137,7 @@ export const ItemCard = ({
                     internalState={internalState}
                     isRound={isRound}
                     itemType={itemType}
+                    previewState={previewState}
                     rows={rows}
                     showFavorite={showFavorites}
                     showRating={showRatings}
@@ -152,6 +159,7 @@ export const ItemCard = ({
                     internalState={internalState}
                     isRound={isRound}
                     itemType={itemType}
+                    previewState={previewState}
                     rows={rows}
                     showFavorite={showFavorites}
                     showRating={showRatings}
@@ -191,6 +199,7 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
     isRound,
     itemType,
     navigationPath,
+    previewState,
     showFavorite,
     showRating,
     variant,
@@ -210,6 +219,7 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
     isRound?: boolean;
     itemType: LibraryItem;
     navigationPath: null | string;
+    previewState?: ItemCardPreviewState;
     showFavorite: boolean;
     showRating: boolean;
     variant: 'default' | 'poster';
@@ -276,6 +286,7 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
                         {...(variant === 'poster' ? { internalState } : {})}
                         item={data}
                         itemType={itemType}
+                        previewState={previewState}
                         showFavorite={showFavorite}
                         showRating={showRating}
                         type={variant}
@@ -328,6 +339,7 @@ const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
     isRound,
     itemType,
     navigationPath,
+    previewState,
     rows,
     showFavorite,
     showRating,
@@ -346,6 +358,7 @@ const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
     isRound?: boolean;
     itemType: LibraryItem;
     navigationPath: null | string;
+    previewState?: ItemCardPreviewState;
     rows: DataRow[];
     showFavorite: boolean;
     showRating: boolean;
@@ -413,6 +426,7 @@ const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
                         internalState={internalState}
                         item={data}
                         itemType={itemType}
+                        previewState={previewState}
                         showFavorite={showFavorite}
                         showRating={showRating}
                         type="compact"
@@ -478,6 +492,7 @@ const CompactItemCard = ({
     internalState,
     isRound,
     itemType,
+    previewState,
     rows,
     showFavorite,
     showRating,
@@ -645,6 +660,7 @@ const CompactItemCard = ({
                     isRound={isRound}
                     itemType={itemType}
                     navigationPath={navigationPath}
+                    previewState={previewState}
                     rows={rows}
                     showFavorite={showFavorite}
                     showRating={showRating}
@@ -691,6 +707,7 @@ const DefaultItemCard = ({
     internalState,
     isRound,
     itemType,
+    previewState,
     rows,
     showFavorite,
     showRating,
@@ -791,6 +808,7 @@ const DefaultItemCard = ({
                     isRound={isRound}
                     itemType={itemType}
                     navigationPath={navigationPath}
+                    previewState={previewState}
                     showFavorite={showFavorite}
                     showRating={showRating}
                     variant="default"
@@ -854,6 +872,7 @@ const PosterItemCard = ({
     internalState,
     isRound,
     itemType,
+    previewState,
     rows,
     showFavorite,
     showRating,
@@ -1021,6 +1040,7 @@ const PosterItemCard = ({
                     isRound={isRound}
                     itemType={itemType}
                     navigationPath={navigationPath}
+                    previewState={previewState}
                     showFavorite={showFavorite}
                     showRating={showRating}
                     variant="poster"

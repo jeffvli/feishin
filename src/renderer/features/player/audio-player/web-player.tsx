@@ -11,6 +11,7 @@ import {
 } from '/@/renderer/features/player/audio-player/engine/web-player-engine';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { useSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
+import { registerActivePlayer } from '/@/renderer/features/player/audio-player/ref/active-player';
 import { PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
@@ -34,6 +35,13 @@ const PLAY_PAUSE_FADE_INTERVAL = 10;
 
 export function WebPlayer() {
     const playerRef = useRef<null | WebPlayerEngineHandle>(null);
+
+    // Expose this engine to callers outside the player feature, e.g. preview ducking
+    useEffect(() => {
+        registerActivePlayer(() => playerRef.current);
+
+        return () => registerActivePlayer(null);
+    }, []);
     const { t } = useTranslation();
     const { num, player1, player2, status } = usePlayerData();
     const repeat = usePlayerRepeat();

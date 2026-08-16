@@ -409,6 +409,12 @@ export const JukeboxPlayerEngine = (props: JukeboxPlayerEngineProps) => {
             if (isChangingTrackRef.current) return;
             callApi('skip', { index: 0, offset: Math.floor(seconds) });
         },
+        setDuckLevel() {
+            // Intentionally a no-op. Jukebox audio comes out of the server's own sound card,
+            // possibly in a different room, so attenuating it for a preview playing on this
+            // machine would silence the wrong speakers. Callers hide the preview affordance
+            // under this backend instead.
+        },
         setVolume(vol: number) {
             const gain = vol / 100;
             setGainValue(gain);

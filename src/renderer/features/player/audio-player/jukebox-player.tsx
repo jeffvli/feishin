@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import {
     JukeboxPlayerEngine,
@@ -6,6 +6,7 @@ import {
     JukeboxServerState,
 } from '/@/renderer/features/player/audio-player/engine/jukebox-player-engine';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
+import { registerActivePlayer } from '/@/renderer/features/player/audio-player/ref/active-player';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     useCurrentServerId,
@@ -20,6 +21,13 @@ import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
 
 export function JukeboxPlayer() {
     const playerRef = useRef<JukeboxPlayerEngineHandle>(null);
+
+    // Expose this engine to callers outside the player feature, e.g. preview ducking
+    useEffect(() => {
+        registerActivePlayer(() => playerRef.current);
+
+        return () => registerActivePlayer(null);
+    }, []);
     const { currentSong, nextSong, status } = usePlayerData();
     const { mediaAutoNext, mediaPause, mediaPlay, mediaPlayByIndex, setTimestamp, setVolume } =
         usePlayerActions();

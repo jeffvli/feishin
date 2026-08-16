@@ -247,6 +247,11 @@ export const WaveSurferPlayerEngine = (props: WaveSurferPlayerEngineProps) => {
                     wavesurfer2?.seekTo(seekTo);
                 }
             },
+            setDuckLevel(multiplier: number) {
+                const base = volume / 100 || 0;
+                setInternalVolume1(base * multiplier);
+                setInternalVolume2(base * multiplier);
+            },
             setVolume(volume: number) {
                 setInternalVolume1(volume / 100 || 0);
                 setInternalVolume2(volume / 100 || 0);
@@ -258,7 +263,7 @@ export const WaveSurferPlayerEngine = (props: WaveSurferPlayerEngineProps) => {
                 setInternalVolume2(volume / 100 || 0);
             },
         }),
-        [wavesurfer1, wavesurfer2, playerNum, internalVolume1, internalVolume2],
+        [wavesurfer1, wavesurfer2, playerNum, internalVolume1, internalVolume2, volume],
     );
 
     return (

@@ -1,0 +1,107 @@
+import { Suspense, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { useGridCarouselContainerQuery } from '/@/renderer/components/grid-carousel/grid-carousel-v2';
+import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/native-scroll-area';
+import { DiscoverCarousel } from '/@/renderer/features/discover/components/discover-carousel';
+import { useDiscoverData } from '/@/renderer/features/discover/hooks/use-discover-data';
+import { useMarkDiscoverSeen } from '/@/renderer/features/discover/hooks/use-discover-unread';
+import { usePreviewActions } from '/@/renderer/features/preview/preview-store';
+import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
+import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
+import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
+import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
+import { useDiscoverSettings, useWindowSettings } from '/@/renderer/store';
+import { Center } from '/@/shared/components/center/center';
+import { Spinner } from '/@/shared/components/spinner/spinner';
+import { Stack } from '/@/shared/components/stack/stack';
+import { Text } from '/@/shared/components/text/text';
+import { Platform } from '/@/shared/types/types';
+
+const DiscoverRoute = () => {
+    const { t } = useTranslation();
+    const scrollAreaRef = useRef<HTMLDivElement>(null);
+    const { windowBarStyle } = useWindowSettings();
+    const { username } = useDiscoverSettings();
+    const containerQuery = useGridCarouselContainerQuery();
+    const { isError, isPending, rows } = useDiscoverData(username);
+    const markSeen = useMarkDiscoverSeen();
+    const { stop } = usePreviewActions();
+
+    // Visiting the page is what counts as reading the feed, so the badge clears here.
+    useEffect(() => {
+        markSeen(rows.flatMap((row) => row.items.map((item) => item.id)));
+    }, [rows, markSeen]);
+
+    // A preview is tied to the cards that started it; leaving should not keep it sounding.
+    useEffect(() => stop, [stop]);
+
+    return (
+        <AnimatedPage>
+            <NativeScrollArea
+                pageHeaderProps={{
+                    backgroundColor: 'var(--theme-colors-background)',
+                    children: (
+                        <LibraryHeaderBar>
+                            <LibraryHeaderBar.Title>
+                                {t('page.discover.title')}
+                            </LibraryHeaderBar.Title>
+                        </LibraryHeaderBar>
+                    ),
+                    offset: 200,
+                }}
+                ref={scrollAreaRef}
+            >
+                <LibraryContainer>
+                    <Stack
+                        gap="2xl"
+                        mb="5rem"
+                        pt={windowBarStyle === Platform.WEB ? '5rem' : '3rem'}
+                        px="2rem"
+                        ref={containerQuery.ref}
+                    >
+                        {!username && (
+                            <Center>
+                                <Stack align="center" gap="sm">
+                                    <Text size="lg">{t('page.discover.setupTitle')}</Text>
+                                    <Text isMuted size="md">
+                                        {t('page.discover.setupDescription')}
+                                    </Text>
+                                </Stack>
+                            </Center>
+                        )}
+                        {username && isPending && <Spinner container />}
+                        {username && !isPending && isError && rows.length === 0 && (
+                            <Center>
+                                <Text isMuted size="md">
+                                    {t('page.discover.unavailable')}
+                                </Text>
+                            </Center>
+                        )}
+                        {rows.map((row) => (
+                            <DiscoverCarousel
+                                containerQuery={containerQuery}
+                                isArtist={row.isArtist}
+                                items={row.items}
+                                key={row.key}
+                                title={row.title}
+                            />
+                        ))}
+                    </Stack>
+                </LibraryContainer>
+            </NativeScrollArea>
+        </AnimatedPage>
+    );
+};
+
+const DiscoverRouteWithBoundary = () => {
+    return (
+        <PageErrorBoundary>
+            <Suspense fallback={<Spinner container />}>
+                <DiscoverRoute />
+            </Suspense>
+        </PageErrorBoundary>
+    );
+};
+
+export default DiscoverRouteWithBoundary;

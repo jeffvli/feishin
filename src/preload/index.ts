@@ -9,6 +9,7 @@ import { localSettings } from './local-settings';
 import { lyrics } from './lyrics';
 import { mpris } from './mpris';
 import { mpvPlayer, mpvPlayerListener } from './mpv-player';
+import { preview } from './preview';
 import { remote } from './remote';
 import { utils } from './utils';
 import { visualizer } from './visualizer';
@@ -26,6 +27,7 @@ const api = {
     mpris,
     mpvPlayer,
     mpvPlayerListener,
+    preview,
     remote,
     utils,
     visualizer,

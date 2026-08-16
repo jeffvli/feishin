@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { MpvPlayerEngine, MpvPlayerEngineHandle } from './engine/mpv-player-engine';
 
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
+import { registerActivePlayer } from '/@/renderer/features/player/audio-player/ref/active-player';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     usePlaybackSettings,
@@ -136,6 +137,13 @@ export function MpvPlayer() {
         },
         [volume, fadeAndSetStatus, audioFadeOnStatusChange],
     );
+
+    // Expose this engine to callers outside the player feature, e.g. preview ducking
+    useEffect(() => {
+        registerActivePlayer(() => playerRef.current);
+
+        return () => registerActivePlayer(null);
+    }, []);
 
     // Cleanup fade interval on unmount
     useEffect(() => {

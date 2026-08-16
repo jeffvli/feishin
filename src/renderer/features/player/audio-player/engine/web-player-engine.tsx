@@ -153,6 +153,15 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                 ? player1Ref.current?.seekTo(seekTo, type)
                 : player2Ref.current?.seekTo(seekTo, type);
         },
+        setDuckLevel(multiplier: number) {
+            // Attenuating the media elements rather than pausing them keeps react-player's
+            // `playing` prop and the player store untouched, so nothing re-asserts playback
+            // and no status change is broadcast. Element volume still applies when the
+            // Web Audio graph is active, since it sits upstream of the source node.
+            const base = volume / 100 || 0;
+            setInternalVolume1(base * multiplier);
+            setInternalVolume2(base * multiplier);
+        },
         setVolume(volume: number) {
             setInternalVolume1(volume / 100 || 0);
             setInternalVolume2(volume / 100 || 0);
