@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './mobile-sidebar.module.css';
 
-import { DiscoverUnreadBadge } from '/@/renderer/features/discover/components/discover-unread-badge';
+import { DiscoverSidebarLink } from '/@/renderer/features/discover/components/discover-sidebar-link';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
@@ -13,7 +13,6 @@ import {
     SidebarSharedPlaylistList,
     useSidebarPlaylistAddDragMonitor,
 } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
-import { AppRoute } from '/@/renderer/router/routes';
 import {
     SidebarItemType,
     useSidebarItems,
@@ -44,7 +43,6 @@ export const MobileSidebar = () => {
             Albums: t('page.sidebar.albums'),
             Artists: t('page.sidebar.albumArtists'),
             'Artists-all': t('page.sidebar.artists'),
-            Discover: t('page.sidebar.discover'),
             Favorites: t('page.sidebar.favorites'),
             Genres: t('page.sidebar.genres'),
             Home: t('page.sidebar.home'),
@@ -80,6 +78,7 @@ export const MobileSidebar = () => {
                 <ActionBar />
             </Group>
             <ScrollArea allowDragScroll className={styles.scrollArea}>
+                <DiscoverSidebarLink gap="sm" />
                 <Accordion
                     classNames={{
                         content: styles.accordionContent,
@@ -103,9 +102,6 @@ export const MobileSidebar = () => {
                                         <Group gap="sm">
                                             <SidebarIcon route={item.route} />
                                             {item.label}
-                                            {item.route === AppRoute.DISCOVER && (
-                                                <DiscoverUnreadBadge />
-                                            )}
                                         </Group>
                                     </SidebarItem>
                                 );

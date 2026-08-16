@@ -16,6 +16,7 @@ import { AppRoute } from '/@/renderer/router/routes';
 import {
     SidebarItemType,
     useCollections,
+    useDiscoverSettings,
     useSidebarCollapsedNavigation,
     useSidebarItems,
     useWindowSettings,
@@ -44,7 +45,6 @@ export const CollapsedSidebar = () => {
             Artists: t('page.sidebar.albumArtists').replace(' ', '\n'),
             'Artists-all': t('page.sidebar.artists'),
             Collections: t('page.sidebar.collections'),
-            Discover: t('page.sidebar.discover'),
             Favorites: t('page.sidebar.favorites'),
             Folders: t('page.sidebar.folders'),
             Genres: t('page.sidebar.genres'),
@@ -117,6 +117,7 @@ export const CollapsedSidebar = () => {
                         <AppMenu />
                     </DropdownMenu.Dropdown>
                 </DropdownMenu>
+                <CollapsedDiscoverSidebarItem />
                 {sidebarItemsWithRoute.map((item) =>
                     item.id === 'Collections' ? (
                         collections && collections.length > 0 ? (
@@ -177,5 +178,30 @@ export const CollapsedSidebar = () => {
                 )}
             </ScrollArea>
         </motion.div>
+    );
+};
+
+/**
+ * Discover in the collapsed rail. Kept separate from `sidebarItemsWithRoute` because Discover
+ * is not a library section and so has no entry in the sidebar reorder settings; its visibility
+ * follows the Discover settings directly.
+ */
+const CollapsedDiscoverSidebarItem = () => {
+    const { t } = useTranslation();
+    const { enabled, username } = useDiscoverSettings();
+
+    if (!enabled || !username) {
+        return null;
+    }
+
+    return (
+        <CollapsedSidebarItem
+            activeIcon={<SidebarIcon active route={AppRoute.DISCOVER} size="25" />}
+            component={NavLink}
+            icon={<SidebarIcon route={AppRoute.DISCOVER} size="25" />}
+            label={t('page.sidebar.discover')}
+            route={AppRoute.DISCOVER}
+            to={AppRoute.DISCOVER}
+        />
     );
 };

@@ -7,7 +7,7 @@ import styles from './sidebar.module.css';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
-import { DiscoverUnreadBadge } from '/@/renderer/features/discover/components/discover-unread-badge';
+import { DiscoverSidebarLink } from '/@/renderer/features/discover/components/discover-sidebar-link';
 import {
     useIsRadioActive,
     useRadioPlayer,
@@ -22,7 +22,6 @@ import {
     SidebarSharedPlaylistList,
     useSidebarPlaylistAddDragMonitor,
 } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
-import { AppRoute } from '/@/renderer/router/routes';
 import {
     useAppStore,
     useAppStoreActions,
@@ -71,7 +70,6 @@ export const Sidebar = () => {
             Artists: t('page.sidebar.albumArtists'),
             'Artists-all': t('page.sidebar.artists'),
             Collections: t('page.sidebar.collections'),
-            Discover: t('page.sidebar.discover'),
             Favorites: t('page.sidebar.favorites'),
             Folders: t('page.sidebar.folders'),
             Genres: t('page.sidebar.genres'),
@@ -126,6 +124,7 @@ export const Sidebar = () => {
                 <ActionBar />
             </Group>
             <ScrollArea allowDragScroll className={styles.scrollArea}>
+                <DiscoverSidebarLink />
                 <Accordion
                     classNames={{
                         content: styles.accordionContent,
@@ -149,9 +148,6 @@ export const Sidebar = () => {
                                         <Group gap="md">
                                             <SidebarIcon route={item.route} />
                                             {item.label}
-                                            {item.route === AppRoute.DISCOVER && (
-                                                <DiscoverUnreadBadge />
-                                            )}
                                         </Group>
                                     </SidebarItem>
                                 );

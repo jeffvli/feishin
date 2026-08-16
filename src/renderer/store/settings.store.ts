@@ -997,7 +997,6 @@ export enum SidebarItem {
     ARTISTS = 'Artists',
     ARTISTS_ALL = 'Artists-all',
     COLLECTIONS = 'Collections',
-    DISCOVER = 'Discover',
     FAVORITES = 'Favorites',
     FOLDERS = 'Folders',
     GENRES = 'Genres',
@@ -1144,14 +1143,6 @@ export const sidebarItems: SidebarItemType[] = [
         route: generatePath(AppRoute.SEARCH, { itemType: LibraryItem.SONG }),
     },
     { disabled: false, id: 'Home', label: i18n.t('page.sidebar.home'), route: AppRoute.HOME },
-    {
-        // Hidden until enabled, like Now Playing and Search, because Discover does nothing
-        // until a ListenBrainz username has been supplied.
-        disabled: true,
-        id: 'Discover',
-        label: i18n.t('page.sidebar.discover'),
-        route: AppRoute.DISCOVER,
-    },
     {
         disabled: false,
         id: 'Favorites',
@@ -2893,23 +2884,21 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     state.general.discoverEnabled ??= false;
                     state.general.discoverSeenIds ??= [];
                     state.general.listenBrainzUsername ??= '';
+                }
 
-                    // Persisted arrays replace the defaults wholesale, so an existing install
-                    // never gains a new sidebar entry unless it is pushed here.
-                    if (!state.general.sidebarItems.some((item) => item.id === 'Discover')) {
-                        state.general.sidebarItems.push({
-                            disabled: true,
-                            id: 'Discover',
-                            label: i18n.t('page.sidebar.discover'),
-                            route: AppRoute.DISCOVER,
-                        });
-                    }
+                if (version < 35) {
+                    // Discover briefly lived in the My Library list. It is a standalone nav row
+                    // now, rendered straight from the Discover settings, so an entry left here
+                    // would draw a second copy that the reorder UI no longer knows about.
+                    state.general.sidebarItems = state.general.sidebarItems.filter(
+                        (item) => item.id !== 'Discover',
+                    );
                 }
 
                 return persistedState;
             },
             name: 'store_settings',
-            version: 34,
+            version: 35,
         },
     ),
 );
