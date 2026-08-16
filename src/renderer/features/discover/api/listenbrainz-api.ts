@@ -110,10 +110,17 @@ async function lbFetch<T>(path: string, signal?: AbortSignal): Promise<T> {
 
 const METADATA_BATCH_SIZE = 25;
 
-/** Shared cache policy. ListenBrainz recomputes these daily at best, so cache hard. */
+/**
+ * Shared cache and retry policy. ListenBrainz recomputes these daily at best, so cache hard.
+ *
+ * The retries are for the server rather than for the network. ListenBrainz sheds load by
+ * answering 502 or closing the connection outright, and it recovers within seconds, so giving
+ * up after one attempt turns a brief wobble into an empty page for the whole cache window.
+ */
 const CACHE = {
     gcTime: 1000 * 60 * 60 * 24,
-    retry: 1,
+    retry: 3,
+    retryDelay: (attempt: number) => Math.min(1000 * 2 ** attempt, 8000),
     staleTime: 1000 * 60 * 60,
 };
 

@@ -26,6 +26,22 @@ import {
     rankSimilar,
 } from '/@/renderer/features/discover/utils/lb-adapters';
 
+/**
+ * How far along the page is, so the spinner can say something rather than just spin.
+ *
+ * Worth reporting because ListenBrainz is not a fast or a reliable dependency: a cold request
+ * can take twenty seconds, and the service sheds load with 502s. Without this the page is
+ * indistinguishable from a hang.
+ */
+export interface DiscoverProgress {
+    /** Sources that gave up after their retries. */
+    failed: number;
+    /** Sources still waiting, including those retrying after a failure. */
+    loading: number;
+    ready: number;
+    total: number;
+}
+
 export interface DiscoverRow {
     /** Artists render as circles and cannot be previewed. */
     isArtist?: boolean;
@@ -245,12 +261,40 @@ export function useDiscoverData(username: string) {
         });
     }, [rows, artistImages]);
 
-    const queries = [createdFor, jams, exploration, topArtists, topReleases, topRecordings];
+    // The sources the page is actually built from. `createdFor` is excluded: it is a lookup
+    // that feeds the two playlist queries rather than a row of its own, so counting it would
+    // report a source the reader never sees.
+    const queries = [
+        jams,
+        exploration,
+        recommendationMetadata,
+        similarArtists,
+        similarRecordings,
+        freshReleases,
+        topArtists,
+        topReleases,
+        topRecordings,
+    ];
+
+    // Counted on every render rather than memoized: it is four integers over nine queries, and
+    // the dependency would be the query statuses themselves, which is the whole computation.
+    const progress: DiscoverProgress = { failed: 0, loading: 0, ready: 0, total: queries.length };
+
+    for (const query of queries) {
+        if (query.isError) {
+            progress.failed += 1;
+        } else if (query.isSuccess) {
+            progress.ready += 1;
+        }
+    }
+
+    progress.loading = progress.total - progress.ready - progress.failed;
 
     return {
         // Every row fetches independently, so a slow or failing source never blanks the page.
         isError: queries.every((query) => query.isError),
-        isPending: rowsWithImages.length === 0 && queries.some((query) => query.isPending),
+        isPending: rowsWithImages.length === 0 && progress.loading > 0,
+        progress,
         rows: rowsWithImages,
     };
 }

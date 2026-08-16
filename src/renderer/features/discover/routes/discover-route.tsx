@@ -24,7 +24,7 @@ const DiscoverRoute = () => {
     const { windowBarStyle } = useWindowSettings();
     const { username } = useDiscoverSettings();
     const containerQuery = useGridCarouselContainerQuery();
-    const { isError, isPending, rows } = useDiscoverData(username);
+    const { isError, isPending, progress, rows } = useDiscoverData(username);
     const markSeen = useMarkDiscoverSeen();
     const { stop } = usePreviewActions();
 
@@ -70,7 +70,24 @@ const DiscoverRoute = () => {
                                 </Stack>
                             </Center>
                         )}
-                        {username && isPending && <Spinner container />}
+                        {username && isPending && (
+                            <Center>
+                                <Stack align="center" gap="sm">
+                                    <Spinner size={30} />
+                                    <Text size="md">
+                                        {t('page.discover.loadingProgress', {
+                                            ready: progress.ready,
+                                            total: progress.total,
+                                        })}
+                                    </Text>
+                                    {progress.failed > 0 && (
+                                        <Text isMuted size="sm">
+                                            {t('page.discover.loadingSlow')}
+                                        </Text>
+                                    )}
+                                </Stack>
+                            </Center>
+                        )}
                         {username && !isPending && isError && rows.length === 0 && (
                             <Center>
                                 <Text isMuted size="md">
@@ -87,6 +104,21 @@ const DiscoverRoute = () => {
                                 title={row.title}
                             />
                         ))}
+                        {/* Rows appear as they arrive, so say that more are still coming rather
+                            than letting the page look finished when it is not. */}
+                        {rows.length > 0 && progress.loading > 0 && (
+                            <Center>
+                                <Stack align="center" gap="sm">
+                                    <Spinner size={20} />
+                                    <Text isMuted size="sm">
+                                        {t('page.discover.loadingProgress', {
+                                            ready: progress.ready,
+                                            total: progress.total,
+                                        })}
+                                    </Text>
+                                </Stack>
+                            </Center>
+                        )}
                     </Stack>
                 </LibraryContainer>
             </NativeScrollArea>

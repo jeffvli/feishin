@@ -636,6 +636,8 @@
         },
         "discover": {
             "freshReleases": "New from artists you play",
+            "loadingProgress": "Loading from ListenBrainz, {{ready}} of {{total}} ready",
+            "loadingSlow": "ListenBrainz is slow to respond right now. Retrying.",
             "recommended": "Recommended for you",
             "setupDescription": "Add your ListenBrainz username in Settings to see recommendations, weekly playlists and new releases.",
             "setupTitle": "Connect ListenBrainz",
