@@ -1,4 +1,4 @@
-import type { MouseEvent } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 
 import { AnimatePresence, motion } from 'motion/react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -53,7 +53,11 @@ const itemVariants = {
 
 interface FeatureCarouselProps {
     data: Album[] | undefined;
+    /** Turn off for items that have no library id to link to. */
+    enableNavigation?: boolean;
     onNearEnd?: () => void;
+    /** Replaces the queue controls, for items the server cannot play. */
+    renderControls?: (album: Album) => ReactNode;
 }
 
 const getItemsPerRow = (breakpoints: {
@@ -75,11 +79,15 @@ const getItemsPerRow = (breakpoints: {
 
 interface CarouselItemProps {
     album: Album;
+    enableNavigation: boolean;
+    renderControls?: (album: Album) => ReactNode;
 }
 
-const CarouselItem = ({ album }: CarouselItemProps) => {
+const CarouselItem = ({ album, enableNavigation, renderControls }: CarouselItemProps) => {
     const imageUrl = useItemImageUrl({
         id: album.imageId || undefined,
+        // An album carrying its own art skips the server lookup, which it has no id for.
+        imageUrl: album.imageUrl,
         itemType: LibraryItem.ALBUM,
         type: 'itemCard',
     });
@@ -98,84 +106,101 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
         addToQueueByFetch(server.id, [album.id], LibraryItem.ALBUM, type);
     };
 
+    const content = (
+        <div className={styles.content}>
+            <div className={styles.titleSection}>
+                <Text className={styles.title} fw={700} lineClamp={2} size="lg" ta="center">
+                    {album.name}
+                </Text>
+            </div>
+
+            <div className={styles.imageSection}>
+                <ItemImage
+                    className={styles.albumImage}
+                    containerClassName={styles.albumImageContainer}
+                    enableDebounce={false}
+                    enableViewport={false}
+                    explicitStatus={album.explicitStatus}
+                    fetchPriority="high"
+                    id={album.imageId}
+                    itemType={LibraryItem.ALBUM}
+                    src={imageUrl}
+                    type="itemCard"
+                />
+                <div className={styles.playButtonOverlay}>
+                    {renderControls ? (
+                        renderControls(album)
+                    ) : (
+                        <PlayButtonGroup onPlay={handlePlay} />
+                    )}
+                </div>
+            </div>
+
+            <div className={styles.metadataSection}>
+                <Stack gap="sm">
+                    {album.albumArtists?.[0] && (
+                        <Text
+                            className={styles.artist}
+                            fw={500}
+                            lineClamp={1}
+                            size="md"
+                            ta="center"
+                        >
+                            {album.albumArtists[0].name}
+                        </Text>
+                    )}
+                    <Group gap="xs" justify="center" wrap="wrap">
+                        {album.genres?.slice(0, 2).map((genre) => (
+                            <Badge
+                                classNames={{ label: styles.badge }}
+                                key={`genre-${genre.id}`}
+                                size="sm"
+                                variant="transparent"
+                            >
+                                {genre.name}
+                            </Badge>
+                        ))}
+                        {album.releaseYear && (
+                            <Badge
+                                classNames={{ label: styles.badge }}
+                                size="sm"
+                                variant="transparent"
+                            >
+                                {album.releaseYear}
+                            </Badge>
+                        )}
+                    </Group>
+                </Stack>
+            </div>
+        </div>
+    );
+
     return (
         <div className={styles.carouselItem}>
             <BackgroundOverlay backgroundColor={backgroundColor} opacity={0.7} />
-            <Link
-                className={styles.carouselLink}
-                state={{ item: album }}
-                to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
-                    albumId: album.id,
-                })}
-            >
-                <div className={styles.content}>
-                    <div className={styles.titleSection}>
-                        <Text className={styles.title} fw={700} lineClamp={2} size="lg" ta="center">
-                            {album.name}
-                        </Text>
-                    </div>
-
-                    <div className={styles.imageSection}>
-                        <ItemImage
-                            className={styles.albumImage}
-                            containerClassName={styles.albumImageContainer}
-                            enableDebounce={false}
-                            enableViewport={false}
-                            explicitStatus={album.explicitStatus}
-                            fetchPriority="high"
-                            id={album.imageId}
-                            itemType={LibraryItem.ALBUM}
-                            src={imageUrl}
-                            type="itemCard"
-                        />
-                        <div className={styles.playButtonOverlay}>
-                            <PlayButtonGroup onPlay={handlePlay} />
-                        </div>
-                    </div>
-
-                    <div className={styles.metadataSection}>
-                        <Stack gap="sm">
-                            {album.albumArtists?.[0] && (
-                                <Text
-                                    className={styles.artist}
-                                    fw={500}
-                                    lineClamp={1}
-                                    size="md"
-                                    ta="center"
-                                >
-                                    {album.albumArtists[0].name}
-                                </Text>
-                            )}
-                            <Group gap="xs" justify="center" wrap="wrap">
-                                {album.genres?.slice(0, 2).map((genre) => (
-                                    <Badge
-                                        classNames={{ label: styles.badge }}
-                                        key={`genre-${genre.id}`}
-                                        size="sm"
-                                        variant="transparent"
-                                    >
-                                        {genre.name}
-                                    </Badge>
-                                ))}
-                                {album.releaseYear && (
-                                    <Badge
-                                        classNames={{ label: styles.badge }}
-                                        size="sm"
-                                        variant="transparent"
-                                    >
-                                        {album.releaseYear}
-                                    </Badge>
-                                )}
-                            </Group>
-                        </Stack>
-                    </div>
-                </div>
-            </Link>
+            {enableNavigation ? (
+                <Link
+                    className={styles.carouselLink}
+                    state={{ item: album }}
+                    to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
+                        albumId: album.id,
+                    })}
+                >
+                    {content}
+                </Link>
+            ) : (
+                <div className={styles.carouselLink}>{content}</div>
+            )}
         </div>
     );
 };
 
-export const FeatureCarousel = ({ data, onNearEnd }: FeatureCarouselProps) => {
+export const FeatureCarousel = ({
+    data,
+    enableNavigation = true,
+    onNearEnd,
+    renderControls,
+}: FeatureCarouselProps) => {
     const [startIndex, setStartIndex] = useState(0);
     const directionRef = useRef<{ isNext: boolean }>({ isNext: true });
     const {
@@ -299,7 +324,11 @@ export const FeatureCarousel = ({ data, onNearEnd }: FeatureCarouselProps) => {
                             key={`item-${album.id}-${startIndex}-${index}`}
                             variants={itemVariants}
                         >
-                            <CarouselItem album={album} />
+                            <CarouselItem
+                                album={album}
+                                enableNavigation={enableNavigation}
+                                renderControls={renderControls}
+                            />
                         </motion.div>
                     ))}
                 </motion.div>

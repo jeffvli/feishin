@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { useGridCarouselContainerQuery } from '/@/renderer/components/grid-carousel/grid-carousel-v2';
 import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/native-scroll-area';
 import { DiscoverCarousel } from '/@/renderer/features/discover/components/discover-carousel';
+import { DiscoverFeatureCarousel } from '/@/renderer/features/discover/components/discover-feature-carousel';
+import { DiscoverSkeleton } from '/@/renderer/features/discover/components/discover-skeleton';
+import { DiscoverTrackTable } from '/@/renderer/features/discover/components/discover-track-table';
 import { useDiscoverData } from '/@/renderer/features/discover/hooks/use-discover-data';
 import { useMarkDiscoverSeen } from '/@/renderer/features/discover/hooks/use-discover-unread';
 import { usePreviewActions } from '/@/renderer/features/preview/preview-store';
@@ -71,27 +74,32 @@ const DiscoverRoute = () => {
                             </Center>
                         )}
                         {username && isPending && (
-                            <Center>
-                                <Stack align="center" gap="sm">
-                                    <Spinner size={30} />
-                                    <Text size="md">
-                                        {t('page.discover.loadingProgress', {
-                                            ready: progress.ready,
-                                            total: progress.total,
-                                        })}
-                                    </Text>
-                                    {isIndexing && (
-                                        <Text isMuted size="sm" style={{ maxWidth: '32rem' }}>
-                                            {t('page.discover.loadingLibrary')}
+                            <>
+                                <Center>
+                                    <Stack align="center" gap="sm">
+                                        <Text size="md">
+                                            {t('page.discover.loadingProgress', {
+                                                ready: progress.ready,
+                                                total: progress.total,
+                                            })}
                                         </Text>
-                                    )}
-                                    {progress.failed > 0 && (
-                                        <Text isMuted size="sm">
-                                            {t('page.discover.loadingSlow')}
-                                        </Text>
-                                    )}
-                                </Stack>
-                            </Center>
+                                        {isIndexing && (
+                                            <Text isMuted size="sm" style={{ maxWidth: '32rem' }}>
+                                                {t('page.discover.loadingLibrary')}
+                                            </Text>
+                                        )}
+                                        {progress.failed > 0 && (
+                                            <Text isMuted size="sm">
+                                                {t('page.discover.loadingSlow')}
+                                            </Text>
+                                        )}
+                                    </Stack>
+                                </Center>
+                                {/* Placeholders rather than a spinner: this wait runs to tens of
+                                    seconds, and showing the page's shape reads as loading where a
+                                    spinner reads as a hang. */}
+                                <DiscoverSkeleton />
+                            </>
                         )}
                         {username && !isPending && isError && rows.length === 0 && (
                             <Center>
@@ -100,16 +108,38 @@ const DiscoverRoute = () => {
                                 </Text>
                             </Center>
                         )}
-                        {rows.map((row) => (
-                            <DiscoverCarousel
-                                containerQuery={containerQuery}
-                                isArtist={row.isArtist}
-                                items={row.items}
-                                key={row.key}
-                                rowCount={row.rowCount}
-                                title={row.title}
-                            />
-                        ))}
+                        {rows.map((row) => {
+                            if (row.layout === 'feature') {
+                                return (
+                                    <DiscoverFeatureCarousel
+                                        items={row.items}
+                                        key={row.key}
+                                        title={row.title}
+                                    />
+                                );
+                            }
+
+                            if (row.layout === 'table') {
+                                return (
+                                    <DiscoverTrackTable
+                                        items={row.items}
+                                        key={row.key}
+                                        title={row.title}
+                                    />
+                                );
+                            }
+
+                            return (
+                                <DiscoverCarousel
+                                    containerQuery={containerQuery}
+                                    isArtist={row.isArtist}
+                                    items={row.items}
+                                    key={row.key}
+                                    rowCount={row.rowCount}
+                                    title={row.title}
+                                />
+                            );
+                        })}
                         {/* Rows appear as they arrive, so say that more are still coming rather
                             than letting the page look finished when it is not. */}
                         {rows.length > 0 && progress.loading > 0 && (

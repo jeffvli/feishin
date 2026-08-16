@@ -47,10 +47,34 @@ export interface DiscoverRow {
     isArtist?: boolean;
     items: DiscoverItem[];
     key: string;
-    /** How many card rows the carousel stacks. See `FEATURE_ROWS`. */
+    layout: DiscoverRowLayout;
+    /** How many card rows a strip stacks. Ignored by the other layouts. */
     rowCount: number;
     title: string;
 }
+
+/**
+ * How a row presents itself.
+ *
+ * A page of nine identical card strips reads as one undifferentiated wall, so the layout is a
+ * property of the row rather than a global choice. `feature` is large hero cards, `table` is a
+ * dense ranked list, `strip` is the standard carousel.
+ */
+export type DiscoverRowLayout = 'feature' | 'strip' | 'table';
+
+/**
+ * The layout each row asks for, where it wants something other than a plain strip.
+ *
+ * Tracks suit a ranked list: they carry a position worth showing and no artwork worth
+ * enlarging. The collaborative-filter picks earn the hero treatment because they are the most
+ * personal thing on the page. Everything unlisted stays a strip, which keeps this short enough
+ * to read as deliberate rather than as decoration applied everywhere.
+ */
+const ROW_LAYOUTS: Record<string, DiscoverRowLayout> = {
+    recommended: 'feature',
+    'similar-tracks': 'table',
+    'top-tracks': 'table',
+};
 
 /**
  * Rows given a double-height block instead of a single strip.
@@ -163,7 +187,11 @@ export function useDiscoverData(username: string) {
             const rowCount =
                 FEATURE_ROWS.has(key) && owned.length >= MIN_ITEMS_FOR_TWO_ROWS ? 2 : 1;
 
-            result.push({ isArtist, items: owned, key, rowCount, title });
+            // Artists are circles with no track to preview, so neither the ranked list nor the
+            // hero card suits them however the row is otherwise configured.
+            const layout = isArtist ? 'strip' : (ROW_LAYOUTS[key] ?? 'strip');
+
+            result.push({ isArtist, items: owned, key, layout, rowCount, title });
         };
 
         push(

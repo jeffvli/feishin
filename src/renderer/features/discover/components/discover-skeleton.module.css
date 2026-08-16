@@ -1,0 +1,47 @@
+.heading {
+    width: 12rem;
+    height: 1.5rem;
+}
+
+.nav-button {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.card-strip {
+    display: grid;
+    grid-auto-columns: 10.5rem;
+    grid-auto-flow: column;
+    gap: var(--theme-spacing-md);
+    width: 100%;
+    overflow: hidden;
+}
+
+.card {
+    min-width: 0;
+}
+
+.card-image {
+    width: 100%;
+    aspect-ratio: 1;
+}
+
+.card-detail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-spacing-xs);
+    width: 100%;
+    padding-top: var(--theme-spacing-sm);
+}
+
+.card-line {
+    height: 0.875rem;
+}
+
+.card-line.title {
+    width: 75%;
+}
+
+.card-line.artist {
+    width: 45%;
+}
