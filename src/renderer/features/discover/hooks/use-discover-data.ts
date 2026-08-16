@@ -318,6 +318,9 @@ export function useDiscoverData(username: string) {
     return {
         // Every row fetches independently, so a slow or failing source never blanks the page.
         isError: queries.every((query) => query.isError),
+        // The first library scan is the slow one and is worth naming, because it is the only
+        // wait the user cannot attribute to ListenBrainz being slow.
+        isIndexing: !libraryIndex.isReady,
         // Nothing renders before the library index arrives, because a row built without it
         // would be a list of music the user already owns, which is the opposite of the point.
         isPending: rowsWithImages.length === 0 && progress.loading > 0,

@@ -24,7 +24,7 @@ const DiscoverRoute = () => {
     const { windowBarStyle } = useWindowSettings();
     const { username } = useDiscoverSettings();
     const containerQuery = useGridCarouselContainerQuery();
-    const { isError, isPending, progress, rows } = useDiscoverData(username);
+    const { isError, isIndexing, isPending, progress, rows } = useDiscoverData(username);
     const markSeen = useMarkDiscoverSeen();
     const { stop } = usePreviewActions();
 
@@ -80,6 +80,11 @@ const DiscoverRoute = () => {
                                             total: progress.total,
                                         })}
                                     </Text>
+                                    {isIndexing && (
+                                        <Text isMuted size="sm" style={{ maxWidth: '32rem' }}>
+                                            {t('page.discover.loadingLibrary')}
+                                        </Text>
+                                    )}
                                     {progress.failed > 0 && (
                                         <Text isMuted size="sm">
                                             {t('page.discover.loadingSlow')}

@@ -1,25 +1,10 @@
-import { useQueries } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
-import { albumQueries } from '/@/renderer/features/albums/api/album-api';
-import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
+import { libraryIndexQueries } from '/@/renderer/features/discover/api/library-index-api';
 import { DiscoverItem } from '/@/renderer/features/discover/utils/lb-adapters';
-import {
-    artistVariants,
-    normalizeName,
-    pairKey,
-} from '/@/renderer/features/discover/utils/library-match';
-import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
+import { artistVariants, normalizeName } from '/@/renderer/features/discover/utils/library-match';
 import { useCurrentServerId } from '/@/renderer/store';
-import {
-    Album,
-    AlbumArtist,
-    AlbumArtistListSort,
-    AlbumListSort,
-    Song,
-    SongListSort,
-    SortOrder,
-} from '/@/shared/types/domain-types';
 
 /**
  * What the user already owns, in every form a ListenBrainz item can be matched against.
@@ -35,8 +20,12 @@ export interface LibraryIndex {
     albumMbids: Set<string>;
     artistNames: Set<string>;
     isReady: boolean;
+    /** True while a newer index is fetched behind an already-usable stored one. */
+    isRefreshing: boolean;
     /** MusicBrainz recording ids, the exact key for a track when the server has tagged one. */
     recordingMbids: Set<string>;
+    /** When the index in use was built, or null if it never has been. */
+    syncedAt: null | number;
     /** `artist|track`, both normalized. The fallback when no recording id is available. */
     trackKeys: Set<string>;
 }
@@ -46,7 +35,9 @@ const EMPTY_INDEX: LibraryIndex = {
     albumMbids: new Set(),
     artistNames: new Set(),
     isReady: false,
+    isRefreshing: false,
     recordingMbids: new Set(),
+    syncedAt: null,
     trackKeys: new Set(),
 };
 
@@ -95,152 +86,34 @@ export function filterOwnedItems(items: DiscoverItem[], index: LibraryIndex): Di
 }
 
 /**
- * The user's library reduced to lookup sets.
+ * The library index, restored from IndexedDB whenever one has been built before.
  *
- * The song list is the expensive part and the one that matters: album matching cannot identify
- * a track, because the release ListenBrainz names is usually not the release the user owns.
- *
- * `limit: -1` is the codebase's existing "everything" sentinel. Jellyfin maps it to no limit and
- * Navidrome to `_end: -1`, which is the same value the radio and playlist-song fetches already
- * use for this purpose. Subsonic has no handling for it and its `sortAndPaginate` ends up
- * slicing to `-1`, dropping the final entry; one missing track only means one extra suggestion.
+ * The underlying query is persisted and revalidated daily rather than refetched on a short
+ * timer, so the full library scan happens once and every later visit renders immediately from
+ * the stored copy while a fresh one is fetched behind it.
  */
 export function useLibraryIndex(enabled: boolean): LibraryIndex {
     const serverId = useCurrentServerId();
-    const canFetch = enabled && Boolean(serverId);
 
-    const [songs, albums, artists] = useQueries({
-        queries: [
-            {
-                ...songsQueries.list({
-                    query: {
-                        limit: -1,
-                        sortBy: SongListSort.NAME,
-                        sortOrder: SortOrder.ASC,
-                        startIndex: 0,
-                    },
-                    serverId,
-                }),
-                enabled: canFetch,
-                gcTime: CACHE_MS,
-                // Project inside `select` so the response's full Song objects, which carry
-                // genres, participants, tags and lyrics, are collected rather than held for the
-                // session. A library of several thousand tracks is large in that form.
-                select: selectSongs,
-                staleTime: CACHE_MS,
-            },
-            {
-                ...albumQueries.list({
-                    query: {
-                        limit: -1,
-                        sortBy: AlbumListSort.NAME,
-                        sortOrder: SortOrder.ASC,
-                        startIndex: 0,
-                    },
-                    serverId,
-                }),
-                enabled: canFetch,
-                gcTime: CACHE_MS,
-                select: selectAlbums,
-                staleTime: CACHE_MS,
-            },
-            {
-                ...artistsQueries.albumArtistList({
-                    query: {
-                        limit: -1,
-                        sortBy: AlbumArtistListSort.NAME,
-                        sortOrder: SortOrder.ASC,
-                        startIndex: 0,
-                    },
-                    serverId,
-                }),
-                enabled: canFetch,
-                gcTime: CACHE_MS,
-                select: selectArtists,
-                staleTime: CACHE_MS,
-            },
-        ],
+    const query = useQuery({
+        ...libraryIndexQueries.index(serverId),
+        enabled: enabled && Boolean(serverId),
     });
 
     return useMemo(() => {
-        if (!songs.data || !albums.data || !artists.data) {
+        if (!query.data) {
             return EMPTY_INDEX;
         }
 
         return {
-            albumKeys: albums.data.keys,
-            albumMbids: albums.data.mbids,
-            artistNames: artists.data,
+            albumKeys: new Set(query.data.albumKeys),
+            albumMbids: new Set(query.data.albumMbids),
+            artistNames: new Set(query.data.artistNames),
             isReady: true,
-            recordingMbids: songs.data.mbids,
-            trackKeys: songs.data.keys,
+            isRefreshing: query.isFetching,
+            recordingMbids: new Set(query.data.recordingMbids),
+            syncedAt: query.data.syncedAt,
+            trackKeys: new Set(query.data.trackKeys),
         };
-    }, [songs.data, albums.data, artists.data]);
-}
-
-/** The library changes rarely and a full list is expensive, so hold it for the session. */
-const CACHE_MS = 1000 * 60 * 60;
-
-function selectAlbums(response: { items: Album[] }) {
-    const keys = new Set<string>();
-    const mbids = new Set<string>();
-
-    for (const album of response.items) {
-        // `albumArtistName` is the only artist field every backend populates; `albumArtists` is
-        // filled from participants on Navidrome and is absent when the server omits them.
-        for (const artist of artistVariants(album.albumArtistName ?? '')) {
-            keys.add(`${artist}|${normalizeName(album.name)}`);
-        }
-
-        for (const artist of album.albumArtists ?? []) {
-            keys.add(pairKey(artist.name, album.name));
-        }
-
-        if (album.mbzId) {
-            mbids.add(album.mbzId);
-        }
-
-        if (album.mbzReleaseGroupId) {
-            mbids.add(album.mbzReleaseGroupId);
-        }
-    }
-
-    return { keys, mbids };
-}
-
-function selectArtists(response: { items: AlbumArtist[] }) {
-    const names = new Set<string>();
-
-    for (const artist of response.items) {
-        for (const variant of artistVariants(artist.name)) {
-            names.add(variant);
-        }
-    }
-
-    return names;
-}
-
-function selectSongs(response: { items: Song[] }) {
-    const keys = new Set<string>();
-    const mbids = new Set<string>();
-
-    for (const song of response.items) {
-        const title = normalizeName(song.name);
-
-        // Both credits are indexed because a track's own artist and its album artist differ on
-        // compilations, and ListenBrainz may report either one.
-        for (const credit of [song.artistName, song.albumArtistName]) {
-            for (const artist of artistVariants(credit ?? '')) {
-                if (artist) {
-                    keys.add(`${artist}|${title}`);
-                }
-            }
-        }
-
-        if (song.mbzRecordingId) {
-            mbids.add(song.mbzRecordingId);
-        }
-    }
-
-    return { keys, mbids };
+    }, [query.data, query.isFetching]);
 }

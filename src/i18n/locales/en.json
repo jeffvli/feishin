@@ -636,6 +636,7 @@
         },
         "discover": {
             "freshReleases": "New from artists you play",
+            "loadingLibrary": "Indexing your library so you are only shown music you don't own. This happens once, then it is kept up to date in the background.",
             "loadingProgress": "Loading from ListenBrainz, {{ready}} of {{total}} ready",
             "loadingSlow": "ListenBrainz is slow to respond right now. Retrying.",
             "recommended": "Recommended for you",

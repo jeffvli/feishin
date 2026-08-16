@@ -33,8 +33,3 @@ export function normalizeName(value: string): string {
         .trim()
         .replace(/^the\s+/, '');
 }
-
-/** The key an item is matched on when neither side has a usable MusicBrainz id. */
-export function pairKey(artistName: string, title: string): string {
-    return `${normalizeName(artistName)}|${normalizeName(title)}`;
-}

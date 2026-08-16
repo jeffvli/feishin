@@ -7,6 +7,7 @@ import { del, get, set } from 'idb-keyval';
 import { createRoot } from 'react-dom/client';
 
 import { App } from '/@/renderer/app';
+import { LIBRARY_INDEX_KEY } from '/@/renderer/features/discover/api/library-index-api';
 import { queryClient } from '/@/renderer/lib/react-query';
 
 function createIDBPersister(idbValidKey: IDBValidKey = 'reactQuery') {
@@ -38,7 +39,13 @@ createRoot(document.getElementById('root')!).render(
                         query.queryKey.includes('lyrics') &&
                         query.queryKey.includes('select');
 
-                    return isSuccess && isLyricsQueryKey;
+                    // Discover's index of what the user already owns. Scanning the whole
+                    // library takes long enough that rebuilding it on every launch would be
+                    // the slowest thing the app does; stored, it is read back in milliseconds
+                    // and refreshed in the background. It holds only normalized strings.
+                    const isLibraryIndexQueryKey = query.queryKey.includes(LIBRARY_INDEX_KEY);
+
+                    return isSuccess && (isLyricsQueryKey || isLibraryIndexQueryKey);
                 },
             },
             hydrateOptions: {
