@@ -12,6 +12,7 @@ import {
     LbSimilarRecording,
     LbSimilarUser,
 } from '/@/renderer/features/discover/api/listenbrainz-types';
+import { hasExcludedGenre } from '/@/renderer/features/discover/utils/genre-filter';
 
 const LB_API = 'https://api.listenbrainz.org/1';
 
@@ -36,8 +37,9 @@ const SIMILAR_RECORDINGS_ALGORITHM =
 /**
  * Recording metadata in batches, keyed by MBID.
  *
- * `inc=artist+release` is what makes `url_rels` available, and those carry the Apple Music
- * and Deezer track links that let a preview be resolved exactly instead of by text search.
+ * `inc=artist` is what makes `url_rels` available, and those carry the Apple Music and Deezer
+ * track links that let a preview be resolved exactly instead of by text search. `inc=tag` adds
+ * the genres, which cost nothing here and are what `hasExcludedGenre` reads.
  */
 export async function fetchRecordingMetadata(
     recordingMbids: string[],
@@ -56,7 +58,7 @@ export async function fetchRecordingMetadata(
     const results = await Promise.all(
         batches.map((batch) =>
             lbFetch<LbRecordingMetadata>(
-                `/metadata/recording/?recording_mbids=${batch.join(',')}&inc=artist+release`,
+                `/metadata/recording/?recording_mbids=${batch.join(',')}&inc=artist+release+tag`,
                 signal,
             )
                 .then((result) => result ?? ({} as LbRecordingMetadata))
@@ -211,6 +213,8 @@ function msUntilNextMonday(): number {
 
 export const discoverKeys = {
     all: (username: string) => ['listenbrainz', username] as const,
+    excludedRecordings: (recordingMbids: string[]) =>
+        ['listenbrainz', 'excluded-recordings', recordingMbids] as const,
     freshReleases: (username: string) => ['listenbrainz', username, 'fresh-releases'] as const,
     playlist: (mbid: string) => ['listenbrainz', 'playlist', mbid] as const,
     playlistsCreatedFor: (username: string) => ['listenbrainz', username, 'created-for'] as const,
@@ -233,6 +237,31 @@ export const discoverKeys = {
 };
 
 export const listenbrainzQueries = {
+    /**
+     * Artists similar to the given seeds. Despite `limit_50` in the algorithm name, one seed
+     * returns around 100 artists, and seeds overlap, so callers should dedupe and slice.
+     */
+    /**
+     * Which of these recordings fall in a category that is never a recommendation.
+     *
+     * Separate from `recommendationMetadata` because that one is keyed on the collaborative
+     * filtering mbids and these come from peer statistics, but it is the same endpoint and the
+     * same batching, so the answer is cached on the same terms. Genres are a property of the
+     * record rather than of the listener, so this is cached as long as the similarity model.
+     */
+    excludedRecordings: (recordingMbids: string[]) =>
+        queryOptions({
+            ...CACHE.similarity,
+            enabled: recordingMbids.length > 0,
+            queryFn: ({ signal }) =>
+                fetchRecordingMetadata(recordingMbids, signal).then((metadata) =>
+                    Object.entries(metadata)
+                        .filter(([, entry]) => hasExcludedGenre(entry))
+                        .map(([mbid]) => mbid),
+                ),
+            queryKey: discoverKeys.excludedRecordings(recordingMbids),
+        }),
+
     /**
      * New records from artists the user listens to, scored and narrowed server side.
      *
@@ -292,10 +321,6 @@ export const listenbrainzQueries = {
             queryKey: discoverKeys.recommendations(username, count),
         }),
 
-    /**
-     * Artists similar to the given seeds. Despite `limit_50` in the algorithm name, one seed
-     * returns around 100 artists, and seeds overlap, so callers should dedupe and slice.
-     */
     similarArtists: (seedMbids: string[]) =>
         queryOptions({
             ...CACHE.similarity,

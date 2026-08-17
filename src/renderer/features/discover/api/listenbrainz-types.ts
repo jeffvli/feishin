@@ -99,6 +99,16 @@ export interface LbRecordingMetadataEntry {
         name?: string;
         release_group_mbid?: string;
     };
+    /**
+     * Present only when `inc=tag` was requested, and reported at three levels because a record
+     * can be described at any of them. Children's music in particular is routinely tagged on
+     * the release group and nowhere else.
+     */
+    tag?: {
+        artist?: LbTag[];
+        recording?: LbTag[];
+        release_group?: LbTag[];
+    };
 }
 
 /** An entry in `payload.recordings` of `/1/stats/user/{user}/recordings`. */
@@ -155,6 +165,19 @@ export interface LbSimilarRecording {
 export interface LbSimilarUser {
     similarity: number;
     user_name: string;
+}
+
+/**
+ * A tag on a record, which may or may not be a genre.
+ *
+ * `genre_mbid` is the distinction that matters: MusicBrainz genres are a curated vocabulary and
+ * carry one, while free-text tags are whatever an editor typed and do not. Anything deciding
+ * behaviour should look only at the entries that have it.
+ */
+export interface LbTag {
+    count: number;
+    genre_mbid?: null | string;
+    tag: string;
 }
 
 /** A relationship URL attached to a recording, e.g. an Apple Music or Deezer track page. */
