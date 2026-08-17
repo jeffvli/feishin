@@ -89,6 +89,17 @@ const NEGLECTED_LIMIT = 100;
 /** Marks the query as one the IndexedDB persister should keep. See `main.tsx`. */
 export const LIBRARY_INDEX_KEY = 'discover-library-index';
 
+/**
+ * Bumped whenever `LibraryIndexData` gains a field the page reads.
+ *
+ * The index is persisted and revalidated once a day, so without this a stored copy built by an
+ * older build satisfies the cache for another twenty-four hours and every new field reads as
+ * empty. That is silent: a row seeded from a missing field renders as a row with nothing in it,
+ * which is indistinguishable from one the filters emptied. Part of the query key, so a bump
+ * simply misses the stored copy and rebuilds.
+ */
+const INDEX_VERSION = 2;
+
 async function buildLibraryIndex(
     serverId: string,
     signal?: AbortSignal,
@@ -238,7 +249,7 @@ export const libraryIndexQueries = {
         queryOptions({
             gcTime: Infinity,
             queryFn: ({ signal }) => buildLibraryIndex(serverId, signal),
-            queryKey: [LIBRARY_INDEX_KEY, serverId] as const,
+            queryKey: [LIBRARY_INDEX_KEY, serverId, INDEX_VERSION] as const,
             // A stale index still filters correctly for everything it already knows about, so
             // serving it while the refresh runs is strictly better than making the user wait.
             refetchOnWindowFocus: false,
