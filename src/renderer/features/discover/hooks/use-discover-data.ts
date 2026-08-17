@@ -30,6 +30,7 @@ import {
     sortByReleaseDate,
 } from '/@/renderer/features/discover/utils/lb-adapters';
 import { useSettingsStore } from '/@/renderer/store';
+import { logger } from '/@/renderer/utils/logger';
 
 /**
  * How far along the page is, so the spinner can say something rather than just spin.
@@ -207,10 +208,17 @@ export function useDiscoverData(username: string) {
             // whether a suggestion was any good, so a cap applied first would spend the whole
             // budget on entries that are about to be hidden. Measured on a real account: the
             // merged list is 138 entries and the head of it is almost entirely already known.
-            const fresh = newFindsFirst(
-                filterHeardItems(filterOwnedItems(items, libraryIndex), listenIndex),
-                seenBefore,
-            ).slice(0, options?.limit);
+            const owned = filterOwnedItems(items, libraryIndex);
+            const unheard = filterHeardItems(owned, listenIndex);
+            const fresh = newFindsFirst(unheard, seenBefore).slice(0, options?.limit);
+
+            // A short row has several possible causes that look identical on screen, and the
+            // counts are the only way to tell which one it was. Logged for every row on every
+            // build: they are four integers, and without them diagnosing this costs a rebuild.
+            logger.info(
+                `Discover row "${key}": ${items.length} suggested, ` +
+                    `${owned.length} unowned, ${unheard.length} unheard, ${fresh.length} shown`,
+            );
 
             if (fresh.length < MIN_ROW_ITEMS) {
                 return;
