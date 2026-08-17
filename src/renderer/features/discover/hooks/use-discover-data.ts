@@ -386,9 +386,8 @@ export function useDiscoverData(username: string) {
             return rows;
         }
 
-        return rows.map((row) => ({
-            ...row,
-            items: row.items.map((item) => {
+        return rows.map((row) => {
+            const items = row.items.map((item) => {
                 // A resolved name lookup wins over the Cover Art Archive URL the item was built
                 // with, because that URL is served by archive.org, which has been timing out
                 // rather than answering. A slow failure leaves the card blank for as long as the
@@ -398,8 +397,16 @@ export function useDiscoverData(username: string) {
                     : albumImages.get(item.id);
 
                 return imageUrl ? { ...item, imageUrl } : item;
-            }),
-        }));
+            });
+
+            // The spotlight keeps its own cover, so it has to be repaired alongside the tracks
+            // or it stays pointed at the archive.org URL the others were just moved off.
+            const album = row.album
+                ? { ...row.album, imageUrl: items.find((item) => item.imageUrl)?.imageUrl ?? null }
+                : undefined;
+
+            return { ...row, album, items };
+        });
     }, [rows, artistImages, albumImages]);
 
     // The sources the page is actually built from. `createdFor` is excluded: it is a lookup

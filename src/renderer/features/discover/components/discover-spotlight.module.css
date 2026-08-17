@@ -11,7 +11,8 @@
     gap: 1.5rem;
     align-items: start;
     padding: 1.25rem;
-    background: var(--theme-colors-surface-foreground);
+    color: var(--theme-colors-foreground);
+    background: var(--theme-colors-surface);
     border-radius: var(--theme-radius-md);
 }
 
@@ -27,7 +28,7 @@
     width: 100%;
     aspect-ratio: 1;
     object-fit: cover;
-    background: var(--theme-colors-surface-background);
+    background: var(--theme-colors-background);
     border-radius: var(--theme-radius-sm);
 }
 
@@ -56,7 +57,7 @@
 
 .track:hover,
 .track:focus-within {
-    background: var(--theme-colors-surface-background);
+    background: alpha(var(--theme-colors-foreground), 0.07);
 }
 
 /* Lining figures so the track numbers form a straight column. */

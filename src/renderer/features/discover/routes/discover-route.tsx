@@ -199,15 +199,13 @@ const DiscoverRoute = () => {
                             <Center pb="3rem" pt="1rem">
                                 <Text isMuted size="sm" style={{ textAlign: 'center' }}>
                                     {t('page.discover.libraryFiltered', {
-                                        albums: library.albumCount.toLocaleString(),
                                         tracks: library.trackCount.toLocaleString(),
-                                    })}{' '}
+                                    })}
                                     {history.isUnavailable
                                         ? t('page.discover.historyUnavailable')
-                                        : t('page.discover.historyReady', {
-                                              listens: history.listenCount.toLocaleString(),
+                                        : ` ${t('page.discover.historyReady', {
                                               tracks: history.trackKeyCount.toLocaleString(),
-                                          })}
+                                          })}`}
                                 </Text>
                             </Center>
                         )}
