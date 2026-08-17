@@ -6,6 +6,7 @@ import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/nati
 import { DiscoverCarousel } from '/@/renderer/features/discover/components/discover-carousel';
 import { DiscoverFeatureCarousel } from '/@/renderer/features/discover/components/discover-feature-carousel';
 import { DiscoverSkeleton } from '/@/renderer/features/discover/components/discover-skeleton';
+import { DiscoverSpotlight } from '/@/renderer/features/discover/components/discover-spotlight';
 import { useDiscoverSync } from '/@/renderer/features/discover/discover-sync-store';
 import { useDiscoverData } from '/@/renderer/features/discover/hooks/use-discover-data';
 import { useMarkDiscoverSeen } from '/@/renderer/features/discover/hooks/use-discover-unread';
@@ -28,7 +29,8 @@ const DiscoverRoute = () => {
     const { windowBarStyle } = useWindowSettings();
     const { username } = useDiscoverSettings();
     const containerQuery = useGridCarouselContainerQuery();
-    const { history, isError, isIndexing, isPending, progress, rows } = useDiscoverData(username);
+    const { history, isError, isIndexing, isPending, library, progress, rows } =
+        useDiscoverData(username);
     const markSeen = useMarkDiscoverSeen();
     const { stop } = usePreviewActions();
     const sync = useDiscoverSync();
@@ -157,6 +159,16 @@ const DiscoverRoute = () => {
                             </Center>
                         )}
                         {rows.map((row) => {
+                            if (row.layout === 'spotlight' && row.album) {
+                                return (
+                                    <DiscoverSpotlight
+                                        album={row.album}
+                                        key={row.key}
+                                        title={row.title}
+                                    />
+                                );
+                            }
+
                             if (row.layout === 'feature') {
                                 return (
                                     <DiscoverFeatureCarousel
@@ -184,12 +196,16 @@ const DiscoverRoute = () => {
                             nearly all of this" in the first case and nothing at all in the
                             second. Without a line saying which, the page cannot be read. */}
                         {username && rows.length > 0 && (
-                            <Center>
-                                <Text isMuted size="sm">
+                            <Center pb="3rem" pt="1rem">
+                                <Text isMuted size="sm" style={{ textAlign: 'center' }}>
+                                    {t('page.discover.libraryFiltered', {
+                                        albums: library.albumCount.toLocaleString(),
+                                        tracks: library.trackCount.toLocaleString(),
+                                    })}{' '}
                                     {history.isUnavailable
                                         ? t('page.discover.historyUnavailable')
                                         : t('page.discover.historyReady', {
-                                              total: history.listenCount.toLocaleString(),
+                                              listens: history.listenCount.toLocaleString(),
                                               tracks: history.trackKeyCount.toLocaleString(),
                                           })}
                                 </Text>

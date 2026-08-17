@@ -18,6 +18,10 @@ import {
     useListenIndex,
 } from '/@/renderer/features/discover/hooks/use-listen-index';
 import {
+    AlbumSpotlight,
+    pickAlbumSpotlight,
+} from '/@/renderer/features/discover/utils/album-spotlight';
+import {
     DiscoverItem,
     fromFreshRelease,
     fromPlaylistTrack,
@@ -49,6 +53,8 @@ export interface DiscoverProgress {
 }
 
 export interface DiscoverRow {
+    /** Set only on a `spotlight` row, which renders the album rather than the items. */
+    album?: AlbumSpotlight;
     /** Artists render as circles and cannot be previewed. */
     isArtist?: boolean;
     items: DiscoverItem[];
@@ -66,7 +72,7 @@ export interface DiscoverRow {
  * a property of the row rather than a global choice. `feature` is large hero cards, `strip` is
  * the standard carousel.
  */
-export type DiscoverRowLayout = 'feature' | 'strip';
+export type DiscoverRowLayout = 'feature' | 'spotlight' | 'strip';
 
 /**
  * The layout each row asks for, where it wants something other than a plain strip.
@@ -87,7 +93,7 @@ const ROW_LAYOUTS: Record<string, DiscoverRowLayout> = {
  * it arrives with an order of magnitude more items than anything else on the page. Giving every
  * row two rows would just be a wall, so this is a short list on purpose.
  */
-const TWO_ROW_KEYS = new Set(['new-to-you']);
+const TWO_ROW_KEYS = new Set<string>();
 
 /** Below this a second row would sit half empty, which looks like a rendering fault. */
 const MIN_ITEMS_FOR_TWO_ROWS = 10;
@@ -239,7 +245,7 @@ export function useDiscoverData(username: string) {
             );
 
             if (fresh.length < MIN_ROW_ITEMS) {
-                return;
+                return fresh;
             }
 
             const isTall = TWO_ROW_KEYS.has(key) && fresh.length >= MIN_ITEMS_FOR_TWO_ROWS;
@@ -256,12 +262,14 @@ export function useDiscoverData(username: string) {
                 rowCount: isTall ? 2 : 1,
                 title,
             });
+
+            return fresh;
         };
 
         // Every track source answers the same question, so they are one row. The order is the
         // interleave order: collaborative filtering first because it is the least derivative of
         // what the user already listens to, play counts last because they are the most.
-        push(
+        const merged = push(
             'new-to-you',
             t('page.discover.newToYou'),
             mergeDiscoverSources([
@@ -288,6 +296,30 @@ export function useDiscoverData(username: string) {
             ]),
             { limit: MERGED_ITEM_LIMIT },
         );
+
+        // Derived from what the merged row kept rather than from the raw sources, so the count
+        // means "suggestions that survived both filters", which is the only version of it that
+        // says anything. Its tracks are then dropped from the strip: the two blocks sit within
+        // a screen of each other and the same three covers appearing in both reads as a fault.
+        const spotlight = pickAlbumSpotlight(merged);
+
+        if (spotlight) {
+            const spotlit = new Set(spotlight.tracks.map((track) => track.id));
+            const strip = result.find((row) => row.key === 'new-to-you');
+
+            if (strip) {
+                strip.items = strip.items.filter((item) => !spotlit.has(item.id));
+            }
+
+            result.push({
+                album: spotlight,
+                items: spotlight.tracks,
+                key: 'spotlight',
+                layout: 'spotlight',
+                rowCount: 1,
+                title: t('page.discover.spotlight'),
+            });
+        }
         push(
             'fresh-releases',
             t('page.discover.freshReleases'),
@@ -409,10 +441,6 @@ export function useDiscoverData(username: string) {
     progress.loading = progress.total - progress.ready - progress.failed;
 
     return {
-        // The two index builds are the slow ones and are worth naming, because they are the
-        // waits the user cannot attribute to ListenBrainz simply being slow to answer.
-        // What the history filter currently knows, so the page can say so rather than leaving
-        // a partly-indexed history indistinguishable from a finished one.
         history: {
             indexedCount: listenIndex.indexedCount,
             isComplete: listenIndex.isComplete,
@@ -431,6 +459,15 @@ export function useDiscoverData(username: string) {
         // than it looks: it silently offers back tracks played before whatever date the walk
         // has reached, with nothing on screen to say which tracks those are.
         isPending: rowsWithImages.length === 0 && progress.loading > 0,
+        library: {
+            albumCount: libraryIndex.albumKeys.size,
+            isReady: libraryIndex.isReady,
+            trackCount: libraryIndex.trackKeys.size,
+        },
+        // The two index builds are the slow ones and are worth naming, because they are the
+        // waits the user cannot attribute to ListenBrainz simply being slow to answer.
+        // What the history filter currently knows, so the page can say so rather than leaving
+        // a partly-indexed history indistinguishable from a finished one.
         progress,
         rows: rowsWithImages,
     };

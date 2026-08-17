@@ -1,0 +1,81 @@
+/*
+ * A single record given the room a carousel row occupies.
+ *
+ * The panel is deliberately the only element on the page that is not a strip of cards. Its job
+ * is to break the rhythm, so it takes the full width and puts the cover at a size no card
+ * reaches, with the track list reading as a list rather than as more cards.
+ */
+.panel {
+    display: grid;
+    grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+    padding: 1.25rem;
+    background: var(--theme-colors-surface-foreground);
+    border-radius: var(--theme-radius-md);
+}
+
+/* Below this the cover and the list fight for width and both lose. */
+@media (width <= 48rem) {
+    .panel {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+.cover {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    background: var(--theme-colors-surface-background);
+    border-radius: var(--theme-radius-sm);
+}
+
+.tracks {
+    display: flex;
+    flex-direction: column;
+
+    /* No gap: the rows abut so the list reads as one block, and hover is what separates them. */
+    gap: 0;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.track {
+    display: grid;
+    grid-template-columns: 1.75rem minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.4rem 0.5rem;
+    border-radius: var(--theme-radius-sm);
+
+    /* Colour only, so the row does not shift under the cursor. */
+    transition: background-color 0.12s ease;
+}
+
+.track:hover,
+.track:focus-within {
+    background: var(--theme-colors-surface-background);
+}
+
+/* Lining figures so the track numbers form a straight column. */
+.index {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.link:hover .name {
+    text-decoration: underline;
+}

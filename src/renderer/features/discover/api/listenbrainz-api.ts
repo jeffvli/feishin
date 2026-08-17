@@ -142,18 +142,72 @@ const PEER_RANGE = 'month';
 const PEER_TRACK_COUNT = 100;
 
 /**
- * Shared cache and retry policy. ListenBrainz recomputes these daily at best, so cache hard.
+ * Retry policy, shared by every source. The freshness policies are separate, below.
  *
  * The retries are for the server rather than for the network. ListenBrainz sheds load by
  * answering 502 or closing the connection outright, and it recovers within seconds, so giving
  * up after one attempt turns a brief wobble into an empty page for the whole cache window.
  */
-const CACHE = {
-    gcTime: 1000 * 60 * 60 * 24,
+const RETRY = {
     retry: 3,
     retryDelay: (attempt: number) => Math.min(1000 * 2 ** attempt, 8000),
-    staleTime: 1000 * 60 * 60,
 };
+
+const HOUR = 1000 * 60 * 60;
+
+/**
+ * How long each kind of source stays fresh.
+ *
+ * Matched to how often the data upstream actually changes, rather than shared. A single
+ * one-hour policy was wrong in both directions at once: it refetched playlists that are
+ * regenerated once a week, and it refetched a similarity model that does not move between
+ * releases, while a page the user opens twice in an evening should not be re-fetching
+ * anything at all.
+ *
+ * The user-visible consequence is that Discover changes on a schedule rather than on every
+ * visit. A page that reshuffles each time it opens cannot be returned to: an album noticed in
+ * the morning is gone by the afternoon, and nothing can be deliberately come back to.
+ */
+const CACHE = {
+    /**
+     * A generated playlist, fresh until ListenBrainz next regenerates it.
+     *
+     * Jams and Exploration are rebuilt weekly, so this expires at the coming Monday rather
+     * than after a fixed span: a fixed week from first fetch would drift off the boundary and
+     * spend most of its life holding the previous week's playlist.
+     */
+    get playlist() {
+        return { ...RETRY, gcTime: HOUR * 24 * 14, staleTime: msUntilNextMonday() };
+    },
+    /** New records appear daily, and this is the row most worth being current. */
+    releases: { ...RETRY, gcTime: HOUR * 24 * 7, staleTime: HOUR * 12 },
+    /**
+     * A trained similarity model. It changes between ListenBrainz releases, not between days,
+     * so refetching it daily buys an identical answer.
+     */
+    similarity: { ...RETRY, gcTime: HOUR * 24 * 14, staleTime: HOUR * 24 * 7 },
+    /** Rolling windows over listens, which move continuously but slowly. */
+    stats: { ...RETRY, gcTime: HOUR * 24 * 3, staleTime: HOUR * 12 },
+    /** Recomputed on the service's own schedule, which is days rather than hours. */
+    suggestions: { ...RETRY, gcTime: HOUR * 24 * 7, staleTime: HOUR * 24 },
+};
+
+/**
+ * Milliseconds until the next Monday 00:00 local time, floored at an hour.
+ *
+ * Local rather than UTC because the point is that the user finds a new playlist waiting at the
+ * start of their week, not at a moment that lands mid-Sunday-evening for half the world. The
+ * floor keeps a fetch made just before the boundary from being stale on arrival.
+ */
+function msUntilNextMonday(): number {
+    const now = new Date();
+    const monday = new Date(now);
+
+    monday.setHours(0, 0, 0, 0);
+    monday.setDate(monday.getDate() + ((8 - monday.getDay()) % 7 || 7));
+
+    return Math.max(HOUR, monday.getTime() - now.getTime());
+}
 
 export const discoverKeys = {
     all: (username: string) => ['listenbrainz', username] as const,
@@ -193,7 +247,7 @@ export const listenbrainzQueries = {
      */
     freshReleases: (username: string, days = 90) =>
         queryOptions({
-            ...CACHE,
+            ...CACHE.releases,
             queryFn: ({ signal }) =>
                 lbFetch<{ payload: { releases: LbFreshRelease[] } }>(
                     `/user/${encodeURIComponent(username)}/fresh_releases?days=${days}`,
@@ -204,7 +258,7 @@ export const listenbrainzQueries = {
 
     playlist: (playlistMbid: null | string) =>
         queryOptions({
-            ...CACHE,
+            ...CACHE.playlist,
             enabled: Boolean(playlistMbid),
             queryFn: ({ signal }) =>
                 lbFetch<{ playlist: { track: LbPlaylistTrack[] } }>(
@@ -217,7 +271,7 @@ export const listenbrainzQueries = {
     /** Weekly Jams and Weekly Exploration arrive here as generated playlists. */
     playlistsCreatedFor: (username: string) =>
         queryOptions({
-            ...CACHE,
+            ...CACHE.playlist,
             queryFn: ({ signal }) =>
                 lbFetch<{ playlists: LbPlaylistSummary[] }>(
                     `/user/${encodeURIComponent(username)}/playlists/createdfor`,
@@ -229,7 +283,7 @@ export const listenbrainzQueries = {
     /** Collaborative-filter picks. Returns bare MBIDs; hydrate with fetchRecordingMetadata. */
     recommendations: (username: string, count = RECOMMENDATION_COUNT) =>
         queryOptions({
-            ...CACHE,
+            ...CACHE.suggestions,
             queryFn: ({ signal }) =>
                 lbFetch<{ payload: { mbids: LbRecommendation[] } }>(
                     `/cf/recommendation/user/${encodeURIComponent(username)}/recording?count=${count}`,
@@ -244,7 +298,7 @@ export const listenbrainzQueries = {
      */
     similarArtists: (seedMbids: string[]) =>
         queryOptions({
-            ...CACHE,
+            ...CACHE.similarity,
             enabled: seedMbids.length > 0,
             queryFn: ({ signal }) =>
                 labsFetch<LbSimilarArtist>(
@@ -272,7 +326,7 @@ export const listenbrainzQueries = {
      */
     similarListeners: (userNames: string[]) =>
         queryOptions({
-            ...CACHE,
+            ...CACHE.stats,
             enabled: userNames.length > 0,
             queryFn: ({ signal }) =>
                 Promise.all(
@@ -293,7 +347,7 @@ export const listenbrainzQueries = {
     /** Recordings similar to the given seeds. Carries artist name and cover art already. */
     similarRecordings: (seedMbids: string[]) =>
         queryOptions({
-            ...CACHE,
+            ...CACHE.similarity,
             enabled: seedMbids.length > 0,
             queryFn: ({ signal }) =>
                 labsFetch<LbSimilarRecording>(
@@ -309,7 +363,7 @@ export const listenbrainzQueries = {
     /** Listeners ranked by how close their taste is. Ordering is not guaranteed, so sort. */
     similarUsers: (username: string) =>
         queryOptions({
-            ...CACHE,
+            ...CACHE.similarity,
             queryFn: ({ signal }) =>
                 lbFetch<{ payload: LbSimilarUser[] }>(
                     `/user/${encodeURIComponent(username)}/similar-users`,
@@ -322,7 +376,7 @@ export const listenbrainzQueries = {
 
     topArtists: (username: string, range = 'month', count = 20) =>
         queryOptions({
-            ...CACHE,
+            ...CACHE.stats,
             queryFn: ({ signal }) =>
                 lbFetch<{ payload: { artists: LbArtistStat[] } }>(
                     `/stats/user/${encodeURIComponent(username)}/artists?range=${range}&count=${count}`,
@@ -333,7 +387,7 @@ export const listenbrainzQueries = {
 
     topRecordings: (username: string, range = 'month', count = 20) =>
         queryOptions({
-            ...CACHE,
+            ...CACHE.stats,
             queryFn: ({ signal }) =>
                 lbFetch<{ payload: { recordings: LbRecordingStat[] } }>(
                     `/stats/user/${encodeURIComponent(username)}/recordings?range=${range}&count=${count}`,

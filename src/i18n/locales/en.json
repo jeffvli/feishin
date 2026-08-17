@@ -636,8 +636,9 @@
         },
         "discover": {
             "freshReleases": "New from artists you play",
-            "historyReady": "Filtered against your full ListenBrainz history: {{total}} listens, {{tracks}} tracks recognised.",
-            "historyUnavailable": "ListenBrainz history could not be read, so only your library is being filtered out.",
+            "historyReady": "Also hiding everything you have played before: {{listens}} listens, {{tracks}} tracks recognized.",
+            "historyUnavailable": "Your ListenBrainz history could not be read, so music you have already played is not being hidden.",
+            "libraryFiltered": "Hiding the {{tracks}} tracks and {{albums}} albums already in your library.",
             "loadingHistory": "Reading your ListenBrainz history so you are only shown music you have not already played. {{done}} of {{total}} listens, about {{eta}} left.",
             "loadingHistoryPass": "Reading your ListenBrainz history. {{done}} of {{total}} listens so far.",
             "loadingHistoryStart": "Reading your ListenBrainz history so you are only shown music you have not already played. This happens once, then only new listens are read.",
@@ -648,6 +649,8 @@
             "setupDescription": "Add your ListenBrainz username in Settings to see recommendations, weekly playlists and new releases.",
             "setupTitle": "Connect ListenBrainz",
             "similarArtists": "Artists like the ones you play",
+            "spotlight": "Worth a full listen",
+            "spotlightSubtitle": "{{artist}} · {{count}} tracks from this record were recommended to you",
             "title": "Discover",
             "unavailable": "ListenBrainz could not be reached. Try again later."
         },
