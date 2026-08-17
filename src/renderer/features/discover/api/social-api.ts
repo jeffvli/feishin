@@ -39,6 +39,19 @@ export interface FriendListen {
     urlRels: LbUrlRel[];
 }
 
+/**
+ * When a listener was last heard from, for deciding whether to suggest following them.
+ *
+ * ListenBrainz's similar-users scores are computed over all time and never decay, so an account
+ * that stopped scrobbling in 2019 keeps its place near the top of the list forever. Suggesting
+ * it is a dead end: following it produces an empty feed.
+ */
+export interface PeerActivity {
+    /** Epoch milliseconds of their most recent listen, or null if they have never scrobbled. */
+    lastListenedAt: null | number;
+    username: string;
+}
+
 interface LbListensResponse {
     payload?: {
         listens?: Array<{
@@ -57,6 +70,22 @@ interface LbListensResponse {
             };
         }>;
     };
+}
+
+/**
+ * One listen, purely for its timestamp.
+ *
+ * `listen-count` would be a smaller response but it reports a total with no date attached, and
+ * the question here is when rather than how many.
+ */
+async function fetchLastListenAt(listener: string, signal?: AbortSignal): Promise<null | number> {
+    const response = await lbFetch<LbListensResponse>(
+        `/user/${encodeURIComponent(listener)}/listens?count=1`,
+        signal,
+    );
+    const listen = response?.payload?.listens?.[0];
+
+    return listen ? listen.listened_at * 1000 : null;
 }
 
 async function fetchListensFor(listener: string, signal?: AbortSignal): Promise<FriendListen[]> {
@@ -104,6 +133,7 @@ async function lbFetch<T>(path: string, signal?: AbortSignal): Promise<T | undef
 export const socialKeys = {
     following: (username: string) => ['listenbrainz', username, 'following'] as const,
     friendListens: (listeners: string[]) => ['listenbrainz', 'friend-listens', listeners] as const,
+    peerActivity: (usernames: string[]) => ['listenbrainz', 'peer-activity', usernames] as const,
 };
 
 export const socialQueries = {
@@ -150,6 +180,32 @@ export const socialQueries = {
             // The one part of Discover that is genuinely live. Anything longer and a section
             // titled "recent" is showing yesterday.
             staleTime: HOUR / 4,
+        }),
+
+    /**
+     * When each of these listeners last scrobbled, one request apiece.
+     *
+     * Same per-person catch as the fan-out above, and for the same reason, except that here a
+     * failure is reported as "never heard from" and the caller drops them. Suggesting an account
+     * that cannot be read is no better than suggesting a dormant one.
+     */
+    peerActivity: (usernames: string[]) =>
+        queryOptions({
+            ...RETRY,
+            enabled: usernames.length > 0,
+            gcTime: HOUR * 24,
+            queryFn: ({ signal }) =>
+                Promise.all(
+                    usernames.map((username) =>
+                        fetchLastListenAt(username, signal)
+                            .catch(() => null)
+                            .then((lastListenedAt) => ({ lastListenedAt, username })),
+                    ),
+                ),
+            queryKey: socialKeys.peerActivity(usernames),
+            // Whether someone has scrobbled this month does not change minute to minute, and
+            // this is the most expensive query in the section per person shown.
+            staleTime: HOUR * 6,
         }),
 };
 
