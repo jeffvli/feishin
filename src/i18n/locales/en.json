@@ -636,6 +636,7 @@
         },
         "discover": {
             "freshReleases": "New from artists you play",
+            "historyReady": "Filtered against your full ListenBrainz history: {{total}} listens, {{tracks}} tracks recognised.",
             "historyUnavailable": "ListenBrainz history could not be read, so only your library is being filtered out.",
             "loadingHistory": "Reading your ListenBrainz history so you are only shown music you have not already played. {{done}} of {{total}} listens, about {{eta}} left.",
             "loadingHistoryPass": "Reading your ListenBrainz history. {{done}} of {{total}} listens so far.",

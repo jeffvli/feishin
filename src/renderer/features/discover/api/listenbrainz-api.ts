@@ -110,6 +110,16 @@ async function lbFetch<T>(path: string, signal?: AbortSignal): Promise<T> {
 const METADATA_BATCH_SIZE = 25;
 
 /**
+ * How many collaborative-filter recommendations to ask for.
+ *
+ * The endpoint holds 1,000 and defaulted to 20 here, which was set before anything filtered
+ * the results. Owned and already-heard tracks are now both removed, and they remove most of a
+ * small sample, so the request has to be large enough that the survivors still fill a row.
+ * Each one costs a slot in the batched metadata lookup rather than a request of its own.
+ */
+const RECOMMENDATION_COUNT = 200;
+
+/**
  * Shared cache and retry policy. ListenBrainz recomputes these daily at best, so cache hard.
  *
  * The retries are for the server rather than for the network. ListenBrainz sheds load by
@@ -190,7 +200,7 @@ export const listenbrainzQueries = {
         }),
 
     /** Collaborative-filter picks. Returns bare MBIDs; hydrate with fetchRecordingMetadata. */
-    recommendations: (username: string, count = 20) =>
+    recommendations: (username: string, count = RECOMMENDATION_COUNT) =>
         queryOptions({
             ...CACHE,
             queryFn: ({ signal }) =>

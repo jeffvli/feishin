@@ -388,6 +388,7 @@ export function useDiscoverData(username: string) {
             isUnavailable: listenIndex.isUnavailable,
             listenCount: listenIndex.listenCount,
             oldestTs: listenIndex.oldestTs,
+            trackKeyCount: listenIndex.trackKeyCount,
         },
         // Every row fetches independently, so a slow or failing source never blanks the page.
         isError: queries.every((query) => query.isError),

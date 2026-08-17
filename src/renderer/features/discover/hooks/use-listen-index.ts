@@ -35,6 +35,14 @@ export interface ListenIndex {
     oldestTs: null | number;
     /** MusicBrainz recording ids, the exact key when ListenBrainz mapped the listen. */
     recordingMbids: Set<string>;
+    /**
+     * How many keys the index holds.
+     *
+     * Reported on the page because it is the one number that shows the filter is real. It runs
+     * well above the distinct-recording count, since a listen is indexed under every credit
+     * variant so that a suggestion credited to the lead artist alone still matches.
+     */
+    trackKeyCount: number;
     /** `artist|track`, both normalized. Carries the ~12% of listens with no mapping. */
     trackKeys: Set<string>;
 }
@@ -47,6 +55,7 @@ const EMPTY_INDEX: ListenIndex = {
     listenCount: 0,
     oldestTs: null,
     recordingMbids: new Set(),
+    trackKeyCount: 0,
     trackKeys: new Set(),
 };
 
@@ -106,6 +115,8 @@ export function useListenIndex(username: string): ListenIndex {
             return query.isError ? { ...EMPTY_INDEX, isUnavailable: true } : EMPTY_INDEX;
         }
 
+        const trackKeys = new Set(splitKeys(query.data.trackKeys));
+
         return {
             // Absent from indexes written by builds before the count existed, and those are
             // restored from IndexedDB rather than rebuilt, so it has to survive being missing.
@@ -116,7 +127,8 @@ export function useListenIndex(username: string): ListenIndex {
             listenCount: query.data.listenCount,
             oldestTs: query.data.oldestTs,
             recordingMbids: new Set(splitKeys(query.data.recordingMbids)),
-            trackKeys: new Set(splitKeys(query.data.trackKeys)),
+            trackKeyCount: trackKeys.size,
+            trackKeys,
         };
     }, [query.data, query.isError]);
 }

@@ -178,13 +178,20 @@ const DiscoverRoute = () => {
                                 />
                             );
                         })}
-                        {/* Rows only render once the history is in hand, so the one case left to
-                            explain is the history that could not be read at all. The page is
-                            still useful without it and says why it is weaker. */}
-                        {username && rows.length > 0 && history.isUnavailable && (
+                        {/* Stated on every visit rather than only when something is wrong.
+                            Rows render on a complete history and on a failed one alike, and the
+                            two produce very different pages: a short row means "you have heard
+                            nearly all of this" in the first case and nothing at all in the
+                            second. Without a line saying which, the page cannot be read. */}
+                        {username && rows.length > 0 && (
                             <Center>
                                 <Text isMuted size="sm">
-                                    {t('page.discover.historyUnavailable')}
+                                    {history.isUnavailable
+                                        ? t('page.discover.historyUnavailable')
+                                        : t('page.discover.historyReady', {
+                                              total: history.listenCount.toLocaleString(),
+                                              tracks: history.trackKeyCount.toLocaleString(),
+                                          })}
                                 </Text>
                             </Center>
                         )}
