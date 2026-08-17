@@ -6,6 +6,19 @@
  * response rather than taken from the documentation.
  */
 
+/**
+ * An entry from `/1/metadata/artist`, which answers with a bare array rather than a map.
+ *
+ * Tags are reported only under `artist` here, unlike the recording endpoint, which also carries
+ * release-group tags. An artist with none is common and is not an error.
+ */
+export interface LbArtistMetadataEntry {
+    artist_mbid: string;
+    name?: string;
+    tag?: { artist?: LbTag[] };
+    type?: null | string;
+}
+
 /** An entry in `payload.artists` of `/1/stats/user/{user}/artists`. */
 export interface LbArtistStat {
     /** Null for artists MusicBrainz cannot resolve, which is common for local files. */

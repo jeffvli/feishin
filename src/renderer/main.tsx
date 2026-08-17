@@ -15,7 +15,10 @@ import { queryClient } from '/@/renderer/lib/react-query';
 function createIDBPersister(idbValidKey: IDBValidKey = 'reactQuery') {
     return {
         persistClient: async (client: PersistedClient) => {
-            set(idbValidKey, client);
+            // Awaited, so the caller's throttling waits for the transaction to commit rather
+            // than for it to be queued. Unawaited, the last write before the window closes is
+            // still in flight when the renderer goes away, and whatever it held is lost.
+            await set(idbValidKey, client);
         },
         removeClient: async () => {
             await del(idbValidKey);
@@ -59,12 +62,22 @@ createRoot(document.getElementById('root')!).render(
                     // window then refreshes it in the background on the first visit after that.
                     const isNewsQueryKey = query.queryKey.includes(NEWS_KEY);
 
+                    /*
+                     * The two indexes are stored whenever they hold anything; everything else
+                     * waits for a clean success.
+                     *
+                     * They are built by a walk that runs for minutes over a six-figure history
+                     * and is expected to be interrupted. A pass that ends in an error still
+                     * leaves a correct, smaller index with a record of where to resume, so
+                     * requiring success throws away real work: the walk resumes from whatever
+                     * was stored, and storing nothing means the next launch starts at zero
+                     * however far the last one got.
+                     */
+                    const hasData = query.state.data !== undefined;
+
                     return (
-                        isSuccess &&
-                        (isLyricsQueryKey ||
-                            isLibraryIndexQueryKey ||
-                            isListenIndexQueryKey ||
-                            isNewsQueryKey)
+                        (isSuccess && (isLyricsQueryKey || isNewsQueryKey)) ||
+                        (hasData && (isLibraryIndexQueryKey || isListenIndexQueryKey))
                     );
                 },
             },

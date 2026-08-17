@@ -244,6 +244,10 @@ export function useDiscoverData(username: string) {
         [excludedRecordings.data],
     );
 
+    // Undefined while the check is outstanding, which the merge below reads as "not yet".
+    const peerFiltered =
+        peerHeadMbids.length > 0 && excludedRecordings.isPending ? undefined : peerRecordings.data;
+
     const similarArtists = useQuery(listenbrainzQueries.similarArtists(similarArtistSeeds));
     const similarRecordings = useQuery(
         listenbrainzQueries.similarRecordings(similarRecordingSeeds),
@@ -394,7 +398,13 @@ export function useDiscoverData(username: string) {
                 // alternates between listeners, so no single peer's fixation fills the row.
                 // A peer's month is not always one listener, so records in an excluded
                 // category are dropped here rather than being allowed to lead the row.
-                ...(peerRecordings.data ?? []).map((tracks) =>
+                //
+                // Held back entirely until the check has answered, rather than shown and then
+                // corrected. It resolves in one round trip and is cached for a week, so this
+                // costs a moment on a cold load; without it the excluded record is on screen
+                // for that moment, and ranking first for its peer is exactly what puts it at
+                // the front of the row.
+                ...(peerFiltered ?? []).map((tracks) =>
                     tracks
                         .filter(
                             (track) => !track.recording_mbid || !excluded.has(track.recording_mbid),
@@ -483,7 +493,7 @@ export function useDiscoverData(username: string) {
         similarRecordings.data,
         similarRecordingSeeds,
         freshReleases.data,
-        peerRecordings.data,
+        peerFiltered,
         topRecordings.data,
         excluded,
         cornerArtists.data,
@@ -497,6 +507,20 @@ export function useDiscoverData(username: string) {
     );
 
     const artistImages = useArtistImages(artistItems);
+
+    /*
+     * The genre to print under each artist name.
+     *
+     * Requested only for artists that survived filtering, like the images above, and only for
+     * artist rows, so this is a request or two for the whole page. The similarity endpoint
+     * offers a disambiguation comment instead, which is absent for most of these artists and
+     * reads "American rock band" on a row of American rock bands when it is not.
+     */
+    const artistGenres = useQuery(
+        listenbrainzQueries.artistGenres(artistItems.map((item) => item.id)),
+    );
+
+    const genreOf = useMemo(() => new Map(artistGenres.data ?? []), [artistGenres.data]);
 
     /**
      * Hero rows first, because the album lookup is capped.
@@ -516,7 +540,7 @@ export function useDiscoverData(username: string) {
     const albumImages = useAlbumImages(albumItems);
 
     const rowsWithImages = useMemo<DiscoverRow[]>(() => {
-        if (artistImages.size === 0 && albumImages.size === 0) {
+        if (artistImages.size === 0 && albumImages.size === 0 && genreOf.size === 0) {
             return rows;
         }
 
@@ -530,7 +554,12 @@ export function useDiscoverData(username: string) {
                     ? artistImages.get(item.id)
                     : albumImages.get(item.id);
 
-                return imageUrl ? { ...item, imageUrl } : item;
+                // The name is already the card's title, so repeating it underneath says
+                // nothing. A genre is what a reader scanning unfamiliar names can use.
+                const subtitle = row.isArtist ? (genreOf.get(item.id) ?? item.subtitle) : undefined;
+                const next = subtitle ? { ...item, subtitle } : item;
+
+                return imageUrl ? { ...next, imageUrl } : next;
             });
 
             // The spotlight keeps its own cover, so it has to be repaired alongside the tracks
@@ -541,7 +570,7 @@ export function useDiscoverData(username: string) {
 
             return { ...row, album, items };
         });
-    }, [rows, artistImages, albumImages]);
+    }, [rows, artistImages, albumImages, genreOf]);
 
     // The sources the page is actually built from. `createdFor` is excluded: it is a lookup
     // that feeds the two playlist queries rather than a row of its own, so counting it would

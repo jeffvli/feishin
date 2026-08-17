@@ -1,6 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 
 import {
+    LbArtistMetadataEntry,
     LbArtistStat,
     LbFreshRelease,
     LbPlaylistSummary,
@@ -33,6 +34,55 @@ const SIMILAR_ARTISTS_ALGORITHM =
 
 const SIMILAR_RECORDINGS_ALGORITHM =
     'session_based_days_7500_session_300_contribution_5_threshold_15_limit_50_skip_30';
+
+/**
+ * The genre each of these artists is best known for, keyed by MBID.
+ *
+ * What an artist card says underneath the name. The similarity endpoint carries only a
+ * disambiguation comment, which is absent for most artists and, when present, says "American
+ * rock band" on a row of American rock bands. A genre is the thing a reader scanning a row of
+ * unfamiliar names actually needs.
+ *
+ * Highest tag count wins, and only curated genres are considered, so this reads "post-grunge"
+ * rather than whatever an editor typed. Artists with no genre are simply absent.
+ */
+export async function fetchArtistGenres(
+    artistMbids: string[],
+    signal?: AbortSignal,
+): Promise<Array<[string, string]>> {
+    if (artistMbids.length === 0) {
+        return [];
+    }
+
+    const batches: string[][] = [];
+    for (let index = 0; index < artistMbids.length; index += METADATA_BATCH_SIZE) {
+        batches.push(artistMbids.slice(index, index + METADATA_BATCH_SIZE));
+    }
+
+    const results = await Promise.all(
+        batches.map((batch) =>
+            lbFetch<LbArtistMetadataEntry[]>(
+                `/metadata/artist/?artist_mbids=${batch.join(',')}&inc=tag`,
+                signal,
+            )
+                .then((result) => result ?? [])
+                .catch(() => []),
+        ),
+    );
+
+    const pairs: Array<[string, string]> = [];
+
+    for (const entry of results.flat()) {
+        const genres = (entry.tag?.artist ?? []).filter((tag) => tag.genre_mbid);
+        const best = genres.sort((a, b) => b.count - a.count)[0];
+
+        if (best) {
+            pairs.push([entry.artist_mbid, best.tag]);
+        }
+    }
+
+    return pairs;
+}
 
 /**
  * Recording metadata in batches, keyed by MBID.
@@ -213,6 +263,8 @@ function msUntilNextMonday(): number {
 
 export const discoverKeys = {
     all: (username: string) => ['listenbrainz', username] as const,
+    artistGenres: (artistMbids: string[]) =>
+        ['listenbrainz', 'artist-genres', artistMbids] as const,
     excludedRecordings: (recordingMbids: string[]) =>
         ['listenbrainz', 'excluded-recordings', recordingMbids] as const,
     freshReleases: (username: string) => ['listenbrainz', username, 'fresh-releases'] as const,
@@ -241,6 +293,18 @@ export const listenbrainzQueries = {
      * Artists similar to the given seeds. Despite `limit_50` in the algorithm name, one seed
      * returns around 100 artists, and seeds overlap, so callers should dedupe and slice.
      */
+    /**
+     * The genre to print under each artist card. Cached as long as the similarity model, since
+     * an artist's genre is a property of the artist rather than of the listener.
+     */
+    artistGenres: (artistMbids: string[]) =>
+        queryOptions({
+            ...CACHE.similarity,
+            enabled: artistMbids.length > 0,
+            queryFn: ({ signal }) => fetchArtistGenres(artistMbids, signal),
+            queryKey: discoverKeys.artistGenres(artistMbids),
+        }),
+
     /**
      * Which of these recordings fall in a category that is never a recommendation.
      *
