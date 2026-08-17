@@ -112,18 +112,6 @@ export interface LbRecordingStat {
     track_name: string;
 }
 
-/** An entry in `payload.releases` of `/1/stats/user/{user}/releases`. */
-export interface LbReleaseStat {
-    artist_mbids?: string[];
-    artist_name: string;
-    artists?: LbCreditedArtist[];
-    caa_id: null | number;
-    caa_release_mbid: null | string;
-    listen_count: number;
-    release_mbid: null | string;
-    release_name: string;
-}
-
 /**
  * An entry from the labs `/similar-artists/json` endpoint.
  *

@@ -639,18 +639,12 @@
             "loadingLibrary": "Indexing your library so you are only shown music you don't own. This happens once, then it is kept up to date in the background.",
             "loadingProgress": "Loading from ListenBrainz, {{ready}} of {{total}} ready",
             "loadingSlow": "ListenBrainz is slow to respond right now. Retrying.",
-            "recommended": "Recommended for you",
+            "newToYou": "New to you",
             "setupDescription": "Add your ListenBrainz username in Settings to see recommendations, weekly playlists and new releases.",
             "setupTitle": "Connect ListenBrainz",
             "similarArtists": "Artists like the ones you play",
-            "similarTracks": "Tracks like the ones you play",
             "title": "Discover",
-            "topArtists": "Artists you play but don't own",
-            "topReleases": "Albums you play but don't own",
-            "topTracks": "Tracks you play but don't own",
-            "unavailable": "ListenBrainz could not be reached. Try again later.",
-            "weeklyExploration": "Weekly Exploration",
-            "weeklyJams": "Weekly Jams"
+            "unavailable": "ListenBrainz could not be reached. Try again later."
         },
         "home": {
             "explore": "Explore from your library",

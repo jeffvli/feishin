@@ -7,6 +7,7 @@ import {
     listenbrainzQueries,
 } from '/@/renderer/features/discover/api/listenbrainz-api';
 import { LbPlaylistSummary } from '/@/renderer/features/discover/api/listenbrainz-types';
+import { useAlbumImages } from '/@/renderer/features/discover/hooks/use-album-images';
 import { useArtistImages } from '/@/renderer/features/discover/hooks/use-artist-images';
 import {
     filterOwnedItems,
@@ -15,14 +16,13 @@ import {
 import {
     DiscoverItem,
     filterFreshReleasesByArtists,
-    fromArtistStat,
     fromFreshRelease,
     fromPlaylistTrack,
     fromRecommendation,
     fromRecordingStat,
-    fromReleaseStat,
     fromSimilarArtist,
     fromSimilarRecording,
+    mergeDiscoverSources,
     rankSimilar,
 } from '/@/renderer/features/discover/utils/lb-adapters';
 
@@ -56,37 +56,53 @@ export interface DiscoverRow {
 /**
  * How a row presents itself.
  *
- * A page of nine identical card strips reads as one undifferentiated wall, so the layout is a
- * property of the row rather than a global choice. `feature` is large hero cards, `table` is a
- * dense ranked list, `strip` is the standard carousel.
+ * Three rows of identical card strips would read as one undifferentiated wall, so the layout is
+ * a property of the row rather than a global choice. `feature` is large hero cards, `strip` is
+ * the standard carousel.
  */
-export type DiscoverRowLayout = 'feature' | 'strip' | 'table';
+export type DiscoverRowLayout = 'feature' | 'strip';
 
 /**
  * The layout each row asks for, where it wants something other than a plain strip.
  *
- * Tracks suit a ranked list: they carry a position worth showing and no artwork worth
- * enlarging. The collaborative-filter picks earn the hero treatment because they are the most
- * personal thing on the page. Everything unlisted stays a strip, which keeps this short enough
- * to read as deliberate rather than as decoration applied everywhere.
+ * Fresh releases earn the hero treatment because they are the only row that is genuinely news:
+ * a handful of albums, each with real cover art, that did not exist last week. The merged
+ * suggestion row is deliberately not a hero, because a hero carousel shows three items at a
+ * time and that row exists to be browsed by the dozen.
  */
 const ROW_LAYOUTS: Record<string, DiscoverRowLayout> = {
-    recommended: 'feature',
-    'similar-tracks': 'table',
-    'top-tracks': 'table',
+    'fresh-releases': 'feature',
 };
 
 /**
  * Rows given a double-height block instead of a single strip.
  *
- * The weekly playlists are the ones worth the extra room: they are curated, they are the only
- * rows that change on a schedule, and they arrive with fifty tracks where the rest cap at
- * twenty. Giving every row two rows would just be a wall, so this is a short list on purpose.
+ * The merged row is the one worth the extra room: it is where every track suggestion lands, so
+ * it arrives with an order of magnitude more items than anything else on the page. Giving every
+ * row two rows would just be a wall, so this is a short list on purpose.
  */
-const FEATURE_ROWS = new Set(['weekly-exploration', 'weekly-jams']);
+const TWO_ROW_KEYS = new Set(['new-to-you']);
 
 /** Below this a second row would sit half empty, which looks like a rendering fault. */
 const MIN_ITEMS_FOR_TWO_ROWS = 10;
+
+/**
+ * Below this a row is not worth its own heading.
+ *
+ * A carousel holding one card does not read as a short list, it reads as a layout that broke.
+ * Library filtering is what makes this necessary: a source can start with fifty tracks and
+ * survive with one, and that one is better folded away than announced.
+ */
+const MIN_ROW_ITEMS = 3;
+
+/**
+ * How many merged suggestions survive to the row, counted after the owned ones are dropped.
+ *
+ * Five sources of up to fifty each is more than anyone scrolls, and every card past the fold
+ * still costs a DOM node and an artwork request. This is roughly three screens of a two-row
+ * strip, which is a browse rather than an inventory.
+ */
+const MERGED_ITEM_LIMIT = 40;
 
 /**
  * How many top entries seed a similarity call.
@@ -112,8 +128,9 @@ export function useDiscoverData(username: string) {
     const jams = useQuery(listenbrainzQueries.playlist(jamsMbid));
     const exploration = useQuery(listenbrainzQueries.playlist(explorationMbid));
 
+    // Fetched for its similarity seeds rather than for a row of its own: "artists you play"
+    // is a fact the user already knows, and one they cannot act on for anything unowned.
     const topArtists = useQuery({ ...listenbrainzQueries.topArtists(username), enabled });
-    const topReleases = useQuery({ ...listenbrainzQueries.topReleases(username), enabled });
     const topRecordings = useQuery({ ...listenbrainzQueries.topRecordings(username), enabled });
     const recommendations = useQuery({ ...listenbrainzQueries.recommendations(username), enabled });
 
@@ -177,53 +194,71 @@ export function useDiscoverData(username: string) {
     const rows = useMemo<DiscoverRow[]>(() => {
         const result: DiscoverRow[] = [];
 
-        const push = (key: string, title: string, items: DiscoverItem[], isArtist?: boolean) => {
-            const owned = filterOwnedItems(items, libraryIndex);
+        const push = (
+            key: string,
+            title: string,
+            items: DiscoverItem[],
+            options?: { isArtist?: boolean; limit?: number },
+        ) => {
+            // Capped after filtering rather than before. Whether a suggestion is any good and
+            // whether the user already owns it are unrelated, so a cap applied first would spend
+            // the whole budget on tracks that are about to be hidden. Measured on a real account:
+            // the merged list is 138 entries and the head of it is almost entirely owned.
+            const unowned = filterOwnedItems(items, libraryIndex).slice(0, options?.limit);
 
-            if (owned.length === 0) {
+            if (unowned.length < MIN_ROW_ITEMS) {
                 return;
             }
 
-            const rowCount =
-                FEATURE_ROWS.has(key) && owned.length >= MIN_ITEMS_FOR_TWO_ROWS ? 2 : 1;
+            const isTall = TWO_ROW_KEYS.has(key) && unowned.length >= MIN_ITEMS_FOR_TWO_ROWS;
 
-            // Artists are circles with no track to preview, so neither the ranked list nor the
-            // hero card suits them however the row is otherwise configured.
-            const layout = isArtist ? 'strip' : (ROW_LAYOUTS[key] ?? 'strip');
+            // Artists are circles with no track to preview, so the hero card does not suit them
+            // however the row is otherwise configured.
+            const layout = options?.isArtist ? 'strip' : (ROW_LAYOUTS[key] ?? 'strip');
 
-            result.push({ isArtist, items: owned, key, layout, rowCount, title });
+            result.push({
+                isArtist: options?.isArtist,
+                items: unowned,
+                key,
+                layout,
+                rowCount: isTall ? 2 : 1,
+                title,
+            });
         };
 
+        // Every track source answers the same question, so they are one row. The order is the
+        // interleave order: collaborative filtering first because it is the least derivative of
+        // what the user already listens to, play counts last because they are the most.
         push(
-            'weekly-jams',
-            t('page.discover.weeklyJams'),
-            (jams.data ?? []).map(fromPlaylistTrack),
+            'new-to-you',
+            t('page.discover.newToYou'),
+            mergeDiscoverSources([
+                recommendationMetadata.data
+                    ? recommendationMbids
+                          .map((mbid) => fromRecommendation(mbid, recommendationMetadata.data))
+                          .filter((item): item is DiscoverItem => item !== null)
+                    : [],
+                (jams.data ?? []).map(fromPlaylistTrack),
+                (exploration.data ?? []).map(fromPlaylistTrack),
+                // The seeds come back among their own results, and a track is not a suggestion
+                // of itself. Library filtering would usually catch these, but only for what the
+                // user owns, and a seed can be something they merely played somewhere else.
+                rankSimilar(
+                    (similarRecordings.data ?? []).filter(
+                        (entry) => !similarRecordingSeeds.includes(entry.recording_mbid),
+                    ),
+                    (entry) => entry.recording_mbid,
+                ).map(fromSimilarRecording),
+                (topRecordings.data ?? []).map(fromRecordingStat),
+            ]),
+            { limit: MERGED_ITEM_LIMIT },
         );
         push(
-            'weekly-exploration',
-            t('page.discover.weeklyExploration'),
-            (exploration.data ?? []).map(fromPlaylistTrack),
-        );
-        push(
-            'recommended',
-            t('page.discover.recommended'),
-            recommendationMetadata.data
-                ? recommendationMbids
-                      .map((mbid) => fromRecommendation(mbid, recommendationMetadata.data))
-                      .filter((item): item is DiscoverItem => item !== null)
-                : [],
-        );
-        // The seeds come back among their own results, and an artist is not a suggestion of
-        // itself. Library dedupe would usually catch these, but only for what the user owns.
-        push(
-            'similar-tracks',
-            t('page.discover.similarTracks'),
-            rankSimilar(
-                (similarRecordings.data ?? []).filter(
-                    (entry) => !similarRecordingSeeds.includes(entry.recording_mbid),
-                ),
-                (entry) => entry.recording_mbid,
-            ).map(fromSimilarRecording),
+            'fresh-releases',
+            t('page.discover.freshReleases'),
+            filterFreshReleasesByArtists(freshReleases.data ?? [], artistSeed.data ?? []).map(
+                fromFreshRelease,
+            ),
         );
         push(
             'similar-artists',
@@ -234,30 +269,7 @@ export function useDiscoverData(username: string) {
                 ),
                 (entry) => entry.artist_mbid,
             ).map(fromSimilarArtist),
-            true,
-        );
-        push(
-            'fresh-releases',
-            t('page.discover.freshReleases'),
-            filterFreshReleasesByArtists(freshReleases.data ?? [], artistSeed.data ?? []).map(
-                fromFreshRelease,
-            ),
-        );
-        push(
-            'top-tracks',
-            t('page.discover.topTracks'),
-            (topRecordings.data ?? []).map(fromRecordingStat),
-        );
-        push(
-            'top-releases',
-            t('page.discover.topReleases'),
-            (topReleases.data ?? []).map(fromReleaseStat),
-        );
-        push(
-            'top-artists',
-            t('page.discover.topArtists'),
-            (topArtists.data ?? []).map(fromArtistStat),
-            true,
+            { isArtist: true },
         );
 
         return result;
@@ -274,9 +286,7 @@ export function useDiscoverData(username: string) {
         similarRecordingSeeds,
         freshReleases.data,
         artistSeed.data,
-        topArtists.data,
         topRecordings.data,
-        topReleases.data,
     ]);
 
     // Looked up after filtering, so no request is spent on an artist that is about to be hidden.
@@ -287,26 +297,43 @@ export function useDiscoverData(username: string) {
 
     const artistImages = useArtistImages(artistItems);
 
+    /**
+     * Hero rows first, because the album lookup is capped.
+     *
+     * A missing cover is most conspicuous on a large card, so when the cap bites it should bite
+     * the small ones.
+     */
+    const albumItems = useMemo(
+        () =>
+            [...rows]
+                .filter((row) => !row.isArtist)
+                .sort((a, b) => Number(b.layout === 'feature') - Number(a.layout === 'feature'))
+                .flatMap((row) => row.items),
+        [rows],
+    );
+
+    const albumImages = useAlbumImages(albumItems);
+
     const rowsWithImages = useMemo<DiscoverRow[]>(() => {
-        if (artistImages.size === 0) {
+        if (artistImages.size === 0 && albumImages.size === 0) {
             return rows;
         }
 
-        return rows.map((row) => {
-            if (!row.isArtist) {
-                return row;
-            }
+        return rows.map((row) => ({
+            ...row,
+            items: row.items.map((item) => {
+                // A resolved name lookup wins over the Cover Art Archive URL the item was built
+                // with, because that URL is served by archive.org, which has been timing out
+                // rather than answering. A slow failure leaves the card blank for as long as the
+                // browser's connect timeout, where a lookup either has the cover or does not.
+                const imageUrl = row.isArtist
+                    ? artistImages.get(item.id)
+                    : albumImages.get(item.id);
 
-            return {
-                ...row,
-                items: row.items.map((item) => {
-                    const imageUrl = artistImages.get(item.id);
-
-                    return imageUrl ? { ...item, imageUrl } : item;
-                }),
-            };
-        });
-    }, [rows, artistImages]);
+                return imageUrl ? { ...item, imageUrl } : item;
+            }),
+        }));
+    }, [rows, artistImages, albumImages]);
 
     // The sources the page is actually built from. `createdFor` is excluded: it is a lookup
     // that feeds the two playlist queries rather than a row of its own, so counting it would
@@ -319,7 +346,6 @@ export function useDiscoverData(username: string) {
         similarRecordings,
         freshReleases,
         topArtists,
-        topReleases,
         topRecordings,
     ];
 

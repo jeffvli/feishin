@@ -4,11 +4,11 @@ import {
     LbPlaylistTrack,
     LbRecordingMetadata,
     LbRecordingStat,
-    LbReleaseStat,
     LbSimilarArtist,
     LbSimilarRecording,
     LbUrlRel,
 } from '/@/renderer/features/discover/api/listenbrainz-types';
+import { normalizeName } from '/@/renderer/features/discover/utils/library-match';
 
 /**
  * A ListenBrainz item flattened into the shape a card needs.
@@ -115,22 +115,6 @@ export function filterFreshReleasesByArtists(
         .slice(0, limit);
 }
 
-export function fromArtistStat(stat: LbArtistStat): DiscoverItem {
-    return {
-        albumName: null,
-        artistName: stat.artist_name,
-        id: stat.artist_mbid ?? `artist-${stat.artist_name}`,
-        // MusicBrainz has no canonical artist image, so artist cards fall back to a placeholder.
-        imageUrl: null,
-        kind: 'artist',
-        recordingMbid: null,
-        releaseMbids: [],
-        subtitle: null,
-        title: stat.artist_name,
-        urlRels: [],
-    };
-}
-
 export function fromFreshRelease(release: LbFreshRelease): DiscoverItem {
     return {
         albumName: release.release_name,
@@ -209,21 +193,6 @@ export function fromRecordingStat(stat: LbRecordingStat): DiscoverItem {
     };
 }
 
-export function fromReleaseStat(stat: LbReleaseStat): DiscoverItem {
-    return {
-        albumName: stat.release_name,
-        artistName: stat.artist_name,
-        id: stat.release_mbid ?? `${stat.artist_name}-${stat.release_name}`,
-        imageUrl: coverArtUrl(stat.caa_release_mbid, stat.caa_id),
-        kind: 'release',
-        recordingMbid: null,
-        releaseMbids: compact([stat.release_mbid, stat.caa_release_mbid]),
-        subtitle: stat.release_name,
-        title: stat.release_name,
-        urlRels: [],
-    };
-}
-
 export function fromSimilarArtist(artist: LbSimilarArtist): DiscoverItem {
     return {
         albumName: null,
@@ -254,6 +223,51 @@ export function fromSimilarRecording(recording: LbSimilarRecording): DiscoverIte
         title: recording.recording_name,
         urlRels: [],
     };
+}
+
+/**
+ * Several suggestion sources reduced to one list, best first and without repeats.
+ *
+ * ListenBrainz answers "what should I hear next" five different ways, and each way arrives
+ * under its own name: weekly jams, weekly exploration, collaborative filtering, similarity,
+ * play counts. Those names describe how the suggestion was derived, which is a fact about
+ * ListenBrainz rather than about the music, and splitting one page into five rows on that
+ * basis asks the reader to classify recommendations instead of listening to them.
+ *
+ * Interleaved rather than concatenated because the sources differ in length by an order of
+ * magnitude. A fifty track playlist appended in front of twenty collaborative filter picks
+ * would bury the picks past the end of the visible strip.
+ *
+ * Deduplicated on artist and title rather than on the recording MBID. MusicBrainz gives a
+ * single, an album cut and a remaster of one performance three separate recording ids, so
+ * comparing ids reports twenty unique entries where a reader plainly sees the same song
+ * repeated. The normalised name is the only key that matches what the eye matches.
+ */
+export function mergeDiscoverSources(sources: DiscoverItem[][]): DiscoverItem[] {
+    const seen = new Set<string>();
+    const merged: DiscoverItem[] = [];
+    const longest = Math.max(0, ...sources.map((source) => source.length));
+
+    for (let index = 0; index < longest; index += 1) {
+        for (const source of sources) {
+            const item = source[index];
+
+            if (!item) {
+                continue;
+            }
+
+            const key = `${normalizeName(item.artistName)}|${normalizeName(item.title)}`;
+
+            if (seen.has(key)) {
+                continue;
+            }
+
+            seen.add(key);
+            merged.push(item);
+        }
+    }
+
+    return merged;
 }
 
 /**

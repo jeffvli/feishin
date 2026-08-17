@@ -6,7 +6,6 @@ import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/nati
 import { DiscoverCarousel } from '/@/renderer/features/discover/components/discover-carousel';
 import { DiscoverFeatureCarousel } from '/@/renderer/features/discover/components/discover-feature-carousel';
 import { DiscoverSkeleton } from '/@/renderer/features/discover/components/discover-skeleton';
-import { DiscoverTrackTable } from '/@/renderer/features/discover/components/discover-track-table';
 import { useDiscoverData } from '/@/renderer/features/discover/hooks/use-discover-data';
 import { useMarkDiscoverSeen } from '/@/renderer/features/discover/hooks/use-discover-unread';
 import { usePreviewActions } from '/@/renderer/features/preview/preview-store';
@@ -112,16 +111,6 @@ const DiscoverRoute = () => {
                             if (row.layout === 'feature') {
                                 return (
                                     <DiscoverFeatureCarousel
-                                        items={row.items}
-                                        key={row.key}
-                                        title={row.title}
-                                    />
-                                );
-                            }
-
-                            if (row.layout === 'table') {
-                                return (
-                                    <DiscoverTrackTable
                                         items={row.items}
                                         key={row.key}
                                         title={row.title}

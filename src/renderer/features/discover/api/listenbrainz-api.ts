@@ -8,7 +8,6 @@ import {
     LbRecommendation,
     LbRecordingMetadata,
     LbRecordingStat,
-    LbReleaseStat,
     LbSimilarArtist,
     LbSimilarRecording,
 } from '/@/renderer/features/discover/api/listenbrainz-types';
@@ -140,8 +139,6 @@ export const discoverKeys = {
         ['listenbrainz', username, 'top-artists', range, count] as const,
     topRecordings: (username: string, range: string, count: number) =>
         ['listenbrainz', username, 'top-recordings', range, count] as const,
-    topReleases: (username: string, range: string, count: number) =>
-        ['listenbrainz', username, 'top-releases', range, count] as const,
 };
 
 export const listenbrainzQueries = {
@@ -251,16 +248,5 @@ export const listenbrainzQueries = {
                     signal,
                 ).then((response) => response.payload.recordings),
             queryKey: discoverKeys.topRecordings(username, range, count),
-        }),
-
-    topReleases: (username: string, range = 'month', count = 20) =>
-        queryOptions({
-            ...CACHE,
-            queryFn: ({ signal }) =>
-                lbFetch<{ payload: { releases: LbReleaseStat[] } }>(
-                    `/stats/user/${encodeURIComponent(username)}/releases?range=${range}&count=${count}`,
-                    signal,
-                ).then((response) => response.payload.releases),
-            queryKey: discoverKeys.topReleases(username, range, count),
         }),
 };
