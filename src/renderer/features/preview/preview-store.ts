@@ -1,8 +1,14 @@
 import { createWithEqualityFn } from 'zustand/traditional';
 
 import { getActivePlayer } from '/@/renderer/features/player/audio-player/ref/active-player';
+import { convertToLogVolume } from '/@/renderer/features/player/audio-player/utils/player-utils';
 import { resolveDeezerPreview } from '/@/renderer/features/preview/providers/deezer';
 import { PreviewQuery, resolveItunesPreview } from '/@/renderer/features/preview/providers/itunes';
+import {
+    subscribePlayerMute,
+    subscribePlayerVolume,
+    usePlayerStoreBase,
+} from '/@/renderer/store/player.store';
 import { logger } from '/@/renderer/utils/logger';
 
 interface PreviewStore {
@@ -35,6 +41,21 @@ let isDucked = false;
 /** Resolved preview URLs for this session. iTunes rate limits at roughly 20 requests/minute. */
 const resolved = new Map<string, null | string>();
 
+/**
+ * The player's own volume, shaped the way the player shapes it.
+ *
+ * A preview sounds through a separate element from the queue, so nothing carries the user's
+ * volume across to it unless this does, and a clip at full scale over music set to 30 is a
+ * genuine fright. Squaring is `convertToLogVolume`, which is what the web and wavesurfer
+ * engines apply to the same slider value, so a preview at a given position is as loud as a
+ * track at that position rather than merely proportional to it.
+ */
+function currentVolume(): number {
+    const { muted, volume } = usePlayerStoreBase.getState().player;
+
+    return muted ? 0 : convertToLogVolume(volume / 100 || 0);
+}
+
 function duck(): void {
     if (isDucked) {
         return;
@@ -52,6 +73,18 @@ function getAudio(): HTMLAudioElement {
         // this would opt into it and Apple's audio host would then have to allow the origin.
         audio.addEventListener('ended', () => usePreviewStore.getState().actions.stop());
         audio.addEventListener('error', () => usePreviewStore.getState().actions.stop());
+
+        // The slider and the mute button stay live while a preview sounds, so follow them
+        // instead of sampling once at play. Registered here rather than at module scope so a
+        // session that never previews anything holds no subscriptions.
+        const follow = () => {
+            if (audio) {
+                audio.volume = currentVolume();
+            }
+        };
+
+        subscribePlayerVolume(follow);
+        subscribePlayerMute(follow);
     }
 
     return audio;
@@ -152,6 +185,9 @@ export const usePreviewStore = createWithEqualityFn<PreviewStore>((set, get) => 
 
             const element = getAudio();
             element.src = url;
+            // Set here as well as on change, because the store hydrates from disk
+            // asynchronously and the element can outlive a stop without being recreated.
+            element.volume = currentVolume();
 
             try {
                 await element.play();

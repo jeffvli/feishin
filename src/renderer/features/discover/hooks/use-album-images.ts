@@ -11,6 +11,10 @@ import { DiscoverItem } from '/@/renderer/features/discover/utils/lb-adapters';
  * from this side. Release and track rows both feed this hook where only artist rows feed the
  * artist one, which is why the ceiling is a little higher than the 24 there; deduplication
  * already collapses a whole track row down to a few albums, so a page rarely reaches it.
+ *
+ * This is not what bounds the iTunes fallback. Apple's allowance is per address and per minute,
+ * not per page, and it is shared with the preview player, so the album-art source paces itself
+ * against the clock and a per-page cap would say nothing about it either way.
  */
 const MAX_LOOKUPS = 32;
 
@@ -22,12 +26,12 @@ interface AlbumLookup {
 }
 
 /**
- * Resolves album art from a second source, keyed by item id.
+ * Resolves album art from the sources behind the Cover Art Archive, keyed by item id.
  *
  * Answers for every release and track card that names an album, whether or not the card already
  * has an `imageUrl`: whether the Cover Art Archive copy loads is not something this hook can
- * see, so it resolves what TheAudioDB has and leaves the choice to the caller. Missing entries
- * are expected; an album TheAudioDB does not hold simply has none.
+ * see, so it resolves what the other sources have and leaves the choice to the caller. Missing
+ * entries are expected; an album none of them holds simply has none.
  */
 export function useAlbumImages(items: DiscoverItem[]): Map<string, string> {
     const albums = useMemo(() => {
