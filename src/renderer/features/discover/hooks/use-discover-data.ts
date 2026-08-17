@@ -119,6 +119,9 @@ const MERGED_ITEM_LIMIT = 40;
  */
 const SIMILARITY_SEED_COUNT = 5;
 
+/** How many similar listeners to read. Each is one request. */
+const PEER_COUNT = 8;
+
 /** How many similar artists reach the row, counted after the owned ones are dropped. */
 const ARTIST_ROW_LIMIT = 20;
 
@@ -177,6 +180,18 @@ export function useDiscoverData(username: string) {
                 .slice(0, SIMILARITY_SEED_COUNT),
         [topRecordings.data],
     );
+
+    // Listeners with comparable taste, and what they have been playing. The only source on the
+    // page that is not derived from this user's own history, so the only one that can offer
+    // something they have never encountered rather than something adjacent to what they own.
+    const similarUsers = useQuery({ ...listenbrainzQueries.similarUsers(username), enabled });
+
+    const peerNames = useMemo(
+        () => (similarUsers.data ?? []).slice(0, PEER_COUNT).map((peer) => peer.user_name),
+        [similarUsers.data],
+    );
+
+    const peerRecordings = useQuery(listenbrainzQueries.similarListeners(peerNames));
 
     const similarArtists = useQuery(listenbrainzQueries.similarArtists(similarArtistSeeds));
     const similarRecordings = useQuery(
@@ -267,6 +282,9 @@ export function useDiscoverData(username: string) {
                     (entry) => entry.recording_mbid,
                 ).map(fromSimilarRecording),
                 (topRecordings.data ?? []).map(fromRecordingStat),
+                // Spread rather than concatenated: one entry per peer means the interleave
+                // alternates between listeners, so no single peer's fixation fills the row.
+                ...(peerRecordings.data ?? []).map((tracks) => tracks.map(fromRecordingStat)),
             ]),
             { limit: MERGED_ITEM_LIMIT },
         );
@@ -302,6 +320,7 @@ export function useDiscoverData(username: string) {
         similarRecordings.data,
         similarRecordingSeeds,
         freshReleases.data,
+        peerRecordings.data,
         topRecordings.data,
     ]);
 
@@ -362,6 +381,8 @@ export function useDiscoverData(username: string) {
         similarRecordings,
         freshReleases,
         topArtists,
+        peerRecordings,
+        similarUsers,
         topRecordings,
     ];
 

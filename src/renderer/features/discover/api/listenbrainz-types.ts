@@ -146,6 +146,17 @@ export interface LbSimilarRecording {
     score: number;
 }
 
+/**
+ * An entry in `payload` of `/1/user/{user}/similar-users`.
+ *
+ * A listener the service considers close in taste, scored 0 to 1. Observed topping out around
+ * 0.25, so the number ranks peers against each other and means little on its own.
+ */
+export interface LbSimilarUser {
+    similarity: number;
+    user_name: string;
+}
+
 /** A relationship URL attached to a recording, e.g. an Apple Music or Deezer track page. */
 export interface LbUrlRel {
     type: string;
