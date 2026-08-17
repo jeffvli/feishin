@@ -295,11 +295,18 @@ export function mergeDiscoverSources(sources: DiscoverItem[][]): DiscoverItem[] 
  * A batched similarity call returns around 100 entries per seed in no particular order, and
  * seeds overlap: two seeds produced 200 entries of which 10 were the same artist twice. The raw
  * response is therefore neither ranked nor unique.
+ *
+ * The cap is deliberately loose, because this runs before the owned and heard filters and the
+ * two orderings work against each other. Sorting by similarity puts the artists most like the
+ * ones the user already plays at the top, which are exactly the ones the library is most
+ * likely to hold, so a tight cap here selects the entries most certain to be discarded. At 20
+ * it removed the whole similar-artists row: all 20 were owned. Rank widely and let the row cap
+ * what survives.
  */
 export function rankSimilar<T extends { score: number }>(
     entries: T[],
     idOf: (entry: T) => string,
-    limit = 20,
+    limit = 200,
 ): T[] {
     const best = new Map<string, T>();
 

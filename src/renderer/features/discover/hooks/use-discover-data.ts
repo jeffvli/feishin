@@ -119,6 +119,9 @@ const MERGED_ITEM_LIMIT = 40;
  */
 const SIMILARITY_SEED_COUNT = 5;
 
+/** How many similar artists reach the row, counted after the owned ones are dropped. */
+const ARTIST_ROW_LIMIT = 20;
+
 export function useDiscoverData(username: string) {
     const { t } = useTranslation();
     const enabled = Boolean(username);
@@ -281,7 +284,7 @@ export function useDiscoverData(username: string) {
                 ),
                 (entry) => entry.artist_mbid,
             ).map(fromSimilarArtist),
-            { isArtist: true },
+            { isArtist: true, limit: ARTIST_ROW_LIMIT },
         );
 
         return result;
