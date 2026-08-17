@@ -558,12 +558,27 @@ export function useDiscoverData(username: string) {
     ]);
 
     // Looked up after filtering, so no request is spent on an artist that is about to be hidden.
-    const artistItems = useMemo(
-        () => rows.filter((row) => row.isArtist).flatMap((row) => row.items),
+    const artistRows = useMemo(
+        () => rows.filter((row) => row.isArtist).map((row) => row.items),
         [rows],
     );
 
-    const artistImages = useArtistImages(artistItems);
+    const artistItems = useMemo(() => artistRows.flat(), [artistRows]);
+
+    const artistImages = useArtistImages(artistRows);
+
+    /*
+     * Sorted, so the key describes which artists are on the page rather than what order they
+     * landed in.
+     *
+     * The rows settle over several renders as their sources answer, and each reordering was
+     * producing a fresh query key and therefore a fresh request for artists already asked
+     * about. Those repeats were most of what was spending the rate limit.
+     */
+    const artistGenreMbids = useMemo(
+        () => [...new Set(artistItems.map((item) => item.id))].sort(),
+        [artistItems],
+    );
 
     /*
      * The genre to print under each artist name.
@@ -573,9 +588,7 @@ export function useDiscoverData(username: string) {
      * offers a disambiguation comment instead, which is absent for most of these artists and
      * reads "American rock band" on a row of American rock bands when it is not.
      */
-    const artistGenres = useQuery(
-        listenbrainzQueries.artistGenres(artistItems.map((item) => item.id)),
-    );
+    const artistGenres = useQuery(listenbrainzQueries.artistGenres(artistGenreMbids));
 
     const genreOf = useMemo(() => new Map(artistGenres.data ?? []), [artistGenres.data]);
 

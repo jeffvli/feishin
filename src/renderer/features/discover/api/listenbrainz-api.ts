@@ -14,6 +14,7 @@ import {
     LbSimilarUser,
 } from '/@/renderer/features/discover/api/listenbrainz-types';
 import { hasExcludedGenre } from '/@/renderer/features/discover/utils/genre-filter';
+import { genreLabel } from '/@/renderer/features/discover/utils/genre-label';
 import { normalizeName } from '/@/renderer/features/discover/utils/library-match';
 import { logger } from '/@/renderer/utils/logger';
 
@@ -83,11 +84,7 @@ export async function fetchArtistGenres(
         const best = genres.sort((a, b) => b.count - a.count)[0];
 
         if (best) {
-            // MusicBrainz stores genre names lower case throughout its vocabulary, so they
-            // arrive as "gothic metal". Sentence case rather than title case, because the
-            // vocabulary contains initialisms and stylised names, and title casing turns
-            // "r&b" into "R&b" and "ebm" into "Ebm" while sentence case leaves them alone.
-            pairs.push([entry.artist_mbid, best.tag.charAt(0).toUpperCase() + best.tag.slice(1)]);
+            pairs.push([entry.artist_mbid, genreLabel(best.tag)]);
         }
     }
 
