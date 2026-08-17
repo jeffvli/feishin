@@ -76,6 +76,17 @@ const RATE_FLOOR = 4;
  */
 const MAX_PAGES_PER_PASS = 20;
 
+/**
+ * How long a single request is given before it is abandoned.
+ *
+ * Load is not always shed by refusing a connection. A throttled address can be left hanging,
+ * with the request accepted and no response ever sent, and `fetch` has no timeout of its own,
+ * so without this a walk waits for ever: the query never settles, nothing reaches the stored
+ * index, and the page sits behind a progress line that has stopped moving. A hang has to be
+ * turned into an error before any of the handling below can see it at all.
+ */
+const REQUEST_TIMEOUT_MS = 20000;
+
 /** Marks the query as one the IndexedDB persister should keep. See `main.tsx`. */
 export const LISTEN_INDEX_KEY = 'discover-listen-index';
 
@@ -137,7 +148,7 @@ function estimateIndexed(previous: ListenIndexData, listenCount: number): number
 async function fetchListenCount(username: string, signal?: AbortSignal): Promise<number> {
     const response = await fetch(
         `https://api.listenbrainz.org/1/user/${encodeURIComponent(username)}/listen-count`,
-        { signal },
+        { signal: withTimeout(signal) },
     );
 
     if (!response.ok) {
@@ -168,7 +179,7 @@ async function fetchListenPage(
 
     const response = await fetch(
         `https://api.listenbrainz.org/1/user/${encodeURIComponent(username)}/listens?${query}`,
-        { signal },
+        { signal: withTimeout(signal) },
     );
 
     if (!response.ok) {
@@ -389,6 +400,19 @@ async function walkBack(
     }
 }
 
+/**
+ * The caller's signal, plus a deadline.
+ *
+ * Combined rather than replaced so the two reasons for giving up stay distinguishable: the
+ * caller aborting means the user left and the whole walk should stop, where the deadline
+ * firing should only end the pass and leave what it collected.
+ */
+function withTimeout(signal?: AbortSignal): AbortSignal {
+    const deadline = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+
+    return signal ? AbortSignal.any([signal, deadline]) : deadline;
+}
+
 /** Last.fm opened in 2002, so nothing imported into ListenBrainz predates it by much. */
 const FIRST_PLAUSIBLE_LISTEN_TS = 1030000000;
 
@@ -399,6 +423,18 @@ export const listenIndexQueries = {
             gcTime: Infinity,
             queryFn: ({ signal }) => syncListenIndex(username, client, signal),
             queryKey: [LISTEN_INDEX_KEY, username] as const,
+            /**
+             * While the history is still being backfilled, keep taking bites.
+             *
+             * One pass is twenty pages, so a six-figure history needs several. Waiting a whole
+             * `STALE_MS` between them would take most of a day to finish; running them back to
+             * back would reach the drop-the-socket ceiling again. A minute apart converges in
+             * a few minutes of ordinary use and averages well under a request every two
+             * seconds. Once complete this stops entirely and only the hourly catch-up remains.
+             */
+            refetchInterval: (query) =>
+                query.state.data && !query.state.data.isComplete ? BACKFILL_INTERVAL_MS : false,
+            refetchIntervalInBackground: true,
             refetchOnWindowFocus: false,
             // A partial index is still correct for everything it holds, so serving it while the
             // rest arrives is better than making the user wait for the whole history.
@@ -406,3 +442,6 @@ export const listenIndexQueries = {
             staleTime: STALE_MS,
         }),
 };
+
+/** Gap between backfill passes. See `refetchInterval` above. */
+const BACKFILL_INTERVAL_MS = 1000 * 60;
