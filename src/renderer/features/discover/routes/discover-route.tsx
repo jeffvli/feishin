@@ -170,34 +170,6 @@ const DiscoverRoute = () => {
                                 />
                             );
                         })}
-                        {/* Stated on every visit rather than only when something is wrong.
-                            Rows render on a complete history and on a failed one alike, and the
-                            two produce very different pages: a short row means "you have heard
-                            nearly all of this" in the first case and nothing at all in the
-                            second. Without a line saying which, the page cannot be read.
-
-                            The played-tracks half is claimed only once the walk has finished.
-                            While it is still running the banner above is describing the same
-                            filter in its unfinished state, and a count here would read as a
-                            second, settled answer to the question it has just raised. */}
-                        {username && rows.length > 0 && (
-                            <Center pb="3rem" pt="1rem">
-                                <Text isMuted size="sm" style={{ textAlign: 'center' }}>
-                                    {history.isComplete || history.isUnavailable
-                                        ? t('page.discover.libraryFiltered', {
-                                              tracks: library.trackCount.toLocaleString(),
-                                          })
-                                        : t('page.discover.libraryFilteredOnly', {
-                                              tracks: library.trackCount.toLocaleString(),
-                                          })}
-                                    {history.isUnavailable && t('page.discover.historyUnavailable')}
-                                    {history.isComplete &&
-                                        ` ${t('page.discover.historyReady', {
-                                            tracks: history.trackKeyCount.toLocaleString(),
-                                        })}`}
-                                </Text>
-                            </Center>
-                        )}
                         {/* Rows appear as they arrive, so say that more are still coming rather
                             than letting the page look finished when it is not. A spinner alone:
                             the count it used to carry was of internal sources, which is not a

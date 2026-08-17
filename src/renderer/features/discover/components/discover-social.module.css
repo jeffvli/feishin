@@ -183,8 +183,41 @@
     text-decoration: underline;
 }
 
+/*
+ * Bar plus number, because neither carries the whole answer on its own. The bar is scaled
+ * against the closest match so the ordering is readable at a glance; the number stays absolute
+ * so the bar never overstates how similar anyone actually is. See `EmptyState`.
+ */
 .peer-score {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.score-track {
+    position: relative;
+    width: 2.75rem;
+    height: 3px;
+    overflow: hidden;
+    background: alpha(var(--theme-colors-foreground), 0.12);
+    border-radius: 999px;
+}
+
+/*
+ * Neutral rather than accented. The chips are the only saturated colour in this section, and a
+ * coloured bar beside each one would read as a second signal competing with the identity.
+ */
+.score-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: var(--theme-colors-foreground-muted);
+    border-radius: inherit;
+}
+
+.score-value {
+    min-width: 2rem;
     font-variant-numeric: tabular-nums;
+    text-align: right;
 }
 
 .follow-link {
