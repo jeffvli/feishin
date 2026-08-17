@@ -28,7 +28,8 @@ export function artistVariants(artistName: string): string[] {
  * separator is space-delimited so it cannot fire inside a name: an unanchored "x" or "vs"
  * would split "Malcolm X" and any band with those letters mid-word.
  */
-const CREDIT_SEPARATOR = /,|\s&\s|\s\/\s|\sfeaturing\s|\sfeat\.?\s|\sft\.?\s|\swith\s|\svs\.?\s/i;
+export const CREDIT_SEPARATOR =
+    /,|\s&\s|\s\/\s|\sfeaturing\s|\sfeat\.?\s|\sft\.?\s|\swith\s|\svs\.?\s/i;
 
 /**
  * Case, punctuation, bracketed suffixes and a leading article all vary between what a server
