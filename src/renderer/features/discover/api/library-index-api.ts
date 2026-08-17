@@ -21,6 +21,15 @@ export interface LibraryIndexData {
     albumKeys: string[];
     albumMbids: string[];
     artistNames: string[];
+    /**
+     * Normalized artist name to total plays across their tracks, for artists with any.
+     *
+     * Pairs rather than an object because this is written to IndexedDB alongside the arrays
+     * above, and optional because an index persisted before this field existed will not have
+     * one. Artists with no plays are left out: they are the majority of the map and zero is
+     * what their absence already means.
+     */
+    artistPlays?: Array<[string, number]>;
     recordingMbids: string[];
     /** Track count at build time, recorded so a rebuild can be spotted as worthwhile. */
     songCount: number;
@@ -82,18 +91,27 @@ async function buildLibraryIndex(
 
     const trackKeys = new Set<string>();
     const recordingMbids = new Set<string>();
+    const artistPlays = new Map<string, number>();
 
     for (const song of songs.items) {
         const title = normalizeName(song.name);
 
         // Both credits are indexed because a track's own artist and its album artist differ on
-        // compilations, and ListenBrainz may report either one.
+        // compilations, and ListenBrainz may report either one. Collected as a set first so a
+        // track whose two credits agree, which is most of them, counts its plays once.
+        const credits = new Set<string>();
+
         for (const credit of [song.artistName, song.albumArtistName]) {
             for (const artist of artistVariants(credit ?? '')) {
                 if (artist) {
-                    trackKeys.add(`${artist}|${title}`);
+                    credits.add(artist);
                 }
             }
+        }
+
+        for (const artist of credits) {
+            trackKeys.add(`${artist}|${title}`);
+            artistPlays.set(artist, (artistPlays.get(artist) ?? 0) + (song.playCount ?? 0));
         }
 
         if (song.mbzRecordingId) {
@@ -143,6 +161,7 @@ async function buildLibraryIndex(
         albumKeys: [...albumKeys],
         albumMbids: [...albumMbids],
         artistNames: [...artistNames],
+        artistPlays: [...artistPlays].filter(([, plays]) => plays > 0),
         recordingMbids: [...recordingMbids],
         songCount: songs.items.length,
         syncedAt: Date.now(),

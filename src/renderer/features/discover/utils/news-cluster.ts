@@ -14,7 +14,11 @@ interface Candidate {
     tokens: Set<string>;
 }
 
-export function rankArticles(articles: MatchedArticle[], now: number): MatchedArticle[] {
+export function rankArticles(
+    articles: MatchedArticle[],
+    now: number,
+    artistPlays: Map<string, number>,
+): MatchedArticle[] {
     const recent = articles
         .filter((article) => article.publishedAt > 0 && now - article.publishedAt <= MAX_AGE_MS)
         .map((article) => ({ article, tokens: storyTokens(article) }))
@@ -44,14 +48,33 @@ export function rankArticles(articles: MatchedArticle[], now: number): MatchedAr
                 member.article.publishedAt < earliest.article.publishedAt ? member : earliest,
             ),
         )
-        .map((candidate) => candidate.article)
-        .sort((a, b) => b.publishedAt - a.publishedAt);
+        .map((candidate) => candidate.article);
+
+    /*
+     * Which stories get a slot is decided by how much the library listens to the artist; the
+     * order they are then shown in is by date.
+     *
+     * There is roughly five times as much supply as there are slots, so something has to choose,
+     * and recency on its own chooses badly: it ranks a story about an artist owning one track by
+     * one play above a story about the most played artist on the server. Worse, an artist can be
+     * in the library without the user ever having chosen them, because Navidrome creates an
+     * artist for every participant credit, so a single Spice Girls track is enough to file
+     * Melanie C's football sponsorship under news the user asked for.
+     *
+     * Plays rather than track count, because owning a discography someone ripped once is not the
+     * same as caring about it. Ties fall back to recency, which covers everything unplayed.
+     */
+    const contenders = [...stories].sort((a, b) => {
+        const byPlays = storyPlays(b, artistPlays) - storyPlays(a, artistPlays);
+
+        return byPlays !== 0 ? byPlays : b.publishedAt - a.publishedAt;
+    });
 
     const picked: MatchedArticle[] = [];
     const perOutlet = new Map<string, number>();
     const perArtist = new Map<string, number>();
 
-    for (const article of stories) {
+    for (const article of contenders) {
         if (picked.length >= ARTICLE_LIMIT) {
             break;
         }
@@ -72,7 +95,10 @@ export function rankArticles(articles: MatchedArticle[], now: number): MatchedAr
         }
     }
 
-    return picked;
+    // Read as a feed, so it is ordered like one. The selection above is the editorial judgement
+    // and it has already happened; leaving its order in place would show the day's news sorted
+    // by an interest ranking the reader cannot see.
+    return picked.sort((a, b) => b.publishedAt - a.publishedAt);
 }
 
 /**
@@ -106,6 +132,16 @@ function isSameStory(a: Candidate, b: Candidate): boolean {
     }
 
     return shared / Math.min(a.tokens.size, b.tokens.size) >= SAME_STORY_OVERLAP;
+}
+
+/**
+ * How much the library listens to the artist a story is about.
+ *
+ * The most played of its artists rather than the total, because an article naming two of them
+ * is one story either way and should not outrank a story about a single, better loved one.
+ */
+function storyPlays(article: MatchedArticle, artistPlays: Map<string, number>): number {
+    return article.artistKeys.reduce((most, key) => Math.max(most, artistPlays.get(key) ?? 0), 0);
 }
 
 /**

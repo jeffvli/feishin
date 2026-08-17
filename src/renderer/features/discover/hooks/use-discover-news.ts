@@ -37,8 +37,15 @@ export function useDiscoverNews(): DiscoverNews {
         return rankArticles(
             matchArticles(query.data, libraryIndex.artistNames),
             query.dataUpdatedAt,
+            libraryIndex.artistPlays,
         );
-    }, [query.data, query.dataUpdatedAt, libraryIndex.isReady, libraryIndex.artistNames]);
+    }, [
+        query.data,
+        query.dataUpdatedAt,
+        libraryIndex.isReady,
+        libraryIndex.artistNames,
+        libraryIndex.artistPlays,
+    ]);
 
     return {
         articles,

@@ -19,6 +19,14 @@ export interface LibraryIndex {
     /** MusicBrainz release and release-group ids. Empty on Subsonic, which reports neither. */
     albumMbids: Set<string>;
     artistNames: Set<string>;
+    /**
+     * Total plays per normalized artist name, absent for artists with none.
+     *
+     * How much of the library an artist actually accounts for, which `artistNames` cannot say:
+     * membership there is as flat for someone appearing once as a participant credit as it is
+     * for the most played artist on the server.
+     */
+    artistPlays: Map<string, number>;
     isReady: boolean;
     /** True while a newer index is fetched behind an already-usable stored one. */
     isRefreshing: boolean;
@@ -34,6 +42,7 @@ const EMPTY_INDEX: LibraryIndex = {
     albumKeys: new Set(),
     albumMbids: new Set(),
     artistNames: new Set(),
+    artistPlays: new Map(),
     isReady: false,
     isRefreshing: false,
     recordingMbids: new Set(),
@@ -109,6 +118,7 @@ export function useLibraryIndex(enabled: boolean): LibraryIndex {
             albumKeys: new Set(query.data.albumKeys),
             albumMbids: new Set(query.data.albumMbids),
             artistNames: new Set(query.data.artistNames),
+            artistPlays: new Map(query.data.artistPlays ?? []),
             isReady: true,
             isRefreshing: query.isFetching,
             recordingMbids: new Set(query.data.recordingMbids),
