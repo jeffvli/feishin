@@ -646,6 +646,8 @@
             "loadingProgress": "Loading from ListenBrainz, {{ready}} of {{total}} ready",
             "loadingSlow": "ListenBrainz is slow to respond right now. Retrying.",
             "newToYou": "New to you",
+            "news": "In the news",
+            "newsSubtitle": "Recent stories about artists in your library",
             "setupDescription": "Add your ListenBrainz username in Settings to see recommendations, weekly playlists and new releases.",
             "setupTitle": "Connect ListenBrainz",
             "similarArtists": "Artists like the ones you play",

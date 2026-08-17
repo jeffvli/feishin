@@ -1,6 +1,7 @@
 import './autodiscover';
 import './custom-themes';
 import './lyrics';
+import './news';
 import './player';
 import './preview';
 import './remote';

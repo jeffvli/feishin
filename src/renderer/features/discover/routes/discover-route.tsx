@@ -5,6 +5,7 @@ import { useGridCarouselContainerQuery } from '/@/renderer/components/grid-carou
 import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/native-scroll-area';
 import { DiscoverCarousel } from '/@/renderer/features/discover/components/discover-carousel';
 import { DiscoverFeatureCarousel } from '/@/renderer/features/discover/components/discover-feature-carousel';
+import { DiscoverNews } from '/@/renderer/features/discover/components/discover-news';
 import { DiscoverSkeleton } from '/@/renderer/features/discover/components/discover-skeleton';
 import { DiscoverSpotlight } from '/@/renderer/features/discover/components/discover-spotlight';
 import { useDiscoverSync } from '/@/renderer/features/discover/discover-sync-store';
@@ -224,6 +225,12 @@ const DiscoverRoute = () => {
                                 </Stack>
                             </Center>
                         )}
+                        {/* Last, and outside everything above it. The rows are recommendations
+                            and the footnote describes how they were filtered; this is neither,
+                            so it closes the page rather than joining that block. Gated on the
+                            username only so the library index is not built for a Discover page
+                            that has not been set up yet. It hides itself when nothing matches. */}
+                        {username && <DiscoverNews />}
                     </Stack>
                 </LibraryContainer>
             </NativeScrollArea>

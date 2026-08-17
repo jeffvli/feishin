@@ -1,0 +1,74 @@
+/*
+ * A digest, not another shelf.
+ *
+ * Two columns where there is room, because ten stories in a single column at the foot of an
+ * already long page is a scroll rather than a glance. Hairline rules instead of the spotlight's
+ * filled panel: both sections sit near each other, and giving them the same surface would make
+ * the page end in two blocks that look like one thing said twice.
+ */
+.articles {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+
+    /* Column gap only. The rules are what separate rows, so vertical space would double it. */
+    gap: 0 2.5rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+@media (width >= 60rem) {
+    .articles {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+.article {
+    border-bottom: 1px solid var(--theme-colors-border);
+}
+
+/*
+ * In one column the last row is the only one with nothing beneath it. In two the last row of
+ * each column is, and which items those are depends on the count, so both are addressed.
+ */
+.article:last-child,
+.article:nth-last-child(2):nth-child(odd) {
+    border-bottom: none;
+}
+
+@media (width < 60rem) {
+    .article:nth-last-child(2):nth-child(odd) {
+        border-bottom: 1px solid var(--theme-colors-border);
+    }
+
+    .article:last-child {
+        border-bottom: none;
+    }
+}
+
+.link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 0.5rem;
+    color: inherit;
+    text-decoration: none;
+    border-radius: var(--theme-radius-sm);
+
+    /* Colour only, so a row does not move under the cursor. */
+    transition: background-color 0.12s ease;
+}
+
+.link:hover,
+.link:focus-visible {
+    background: alpha(var(--theme-colors-foreground), 0.05);
+}
+
+.link:hover .headline {
+    text-decoration: underline;
+}
+
+/* Balances the two lines of a wrapped headline rather than leaving one word on the second. */
+.headline {
+    text-wrap: pretty;
+}

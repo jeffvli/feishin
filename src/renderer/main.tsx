@@ -9,6 +9,7 @@ import { createRoot } from 'react-dom/client';
 import { App } from '/@/renderer/app';
 import { LIBRARY_INDEX_KEY } from '/@/renderer/features/discover/api/library-index-api';
 import { LISTEN_INDEX_KEY } from '/@/renderer/features/discover/api/listen-index-api';
+import { NEWS_KEY } from '/@/renderer/features/discover/api/news-api';
 import { queryClient } from '/@/renderer/lib/react-query';
 
 function createIDBPersister(idbValidKey: IDBValidKey = 'reactQuery') {
@@ -53,9 +54,17 @@ createRoot(document.getElementById('root')!).render(
                     // resume instead of starting over, so they have to be stored too.
                     const isListenIndexQueryKey = query.queryKey.includes(LISTEN_INDEX_KEY);
 
+                    // Discover's news feed. Stored so that opening the app does not fetch
+                    // fourteen mastheads before anything can be shown; the hour-long staleness
+                    // window then refreshes it in the background on the first visit after that.
+                    const isNewsQueryKey = query.queryKey.includes(NEWS_KEY);
+
                     return (
                         isSuccess &&
-                        (isLyricsQueryKey || isLibraryIndexQueryKey || isListenIndexQueryKey)
+                        (isLyricsQueryKey ||
+                            isLibraryIndexQueryKey ||
+                            isListenIndexQueryKey ||
+                            isNewsQueryKey)
                     );
                 },
             },
