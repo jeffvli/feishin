@@ -256,7 +256,11 @@ async function syncListenIndex(
     };
 
     const snapshot = (): ListenIndexData => ({
-        indexedCount: Math.min(done, listenCount),
+        // Pinned to the total once the walk is finished, rather than left at whatever was
+        // counted. An index restored from a build that predates this field starts counting
+        // from zero and would otherwise report a permanent undercount for a history it holds
+        // in full.
+        indexedCount: isComplete ? listenCount : Math.min(done, listenCount),
         isComplete,
         latestTs,
         listenCount,
