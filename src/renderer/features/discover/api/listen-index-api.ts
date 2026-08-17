@@ -5,6 +5,7 @@ import {
     setSyncProgress,
 } from '/@/renderer/features/discover/discover-sync-store';
 import { artistVariants, normalizeName } from '/@/renderer/features/discover/utils/library-match';
+import { logger } from '/@/renderer/utils/logger';
 
 /**
  * Everything the user has ever played, reduced to the keys needed to recognise a track again.
@@ -54,12 +55,26 @@ const CHECKPOINT_PAGES = 10;
 /**
  * Requests left in the window at which the walk waits for the window to roll over.
  *
- * ListenBrainz allows 30 requests per 10 seconds and reports the remainder on every response.
- * Waiting a beat before the allowance is gone matters more than it sounds: a walk that blows
- * through the limit gets its socket closed rather than a 429, so there is no status code to
- * retry on and the failure looks like a network error.
+ * ListenBrainz reports an allowance of 30 requests per 10 seconds on every response. Respecting
+ * it is necessary and, on its own, not sufficient: see `MAX_PAGES_PER_PASS`.
  */
 const RATE_FLOOR = 4;
+
+/**
+ * Pages fetched per sync before the walk stops and waits for the next one.
+ *
+ * The stated rate limit is not the real one. Measured against a live account, a walk that kept
+ * `x-ratelimit-remaining` between 26 and 29 the whole way, well inside the published allowance,
+ * still had its connection dropped after about 30 pages and 5.9 MB with `UND_ERR_SOCKET, other
+ * side closed`. Nothing in the headers moved beforehand, so there is no signal to pace against
+ * and no status code to retry on: the failure arrives as a socket error.
+ *
+ * So a hundred-thousand-listen history is deliberately not fetched in one sitting. Each pass
+ * takes a bite under that ceiling, checkpoints what it got, and leaves the rest for next time.
+ * Newest first, which is what makes this acceptable: one pass already covers the recent years
+ * that ListenBrainz draws its suggestions from, and the older tail fills in over later visits.
+ */
+const MAX_PAGES_PER_PASS = 20;
 
 /** Marks the query as one the IndexedDB persister should keep. See `main.tsx`. */
 export const LISTEN_INDEX_KEY = 'discover-listen-index';
@@ -253,6 +268,8 @@ async function syncListenIndex(
     try {
         // Anything new since the last run, however far back the first walk got. Done first so an
         // index that is still backfilling stays current at the top, where the suggestions are.
+        // Not caught: with a stored index behind it this is a couple of requests, and if even
+        // that fails there is nothing useful to say about how current the index is.
         if (previous && previous.latestTs > 0) {
             await walkBack(username, {
                 fromTs: null,
@@ -265,24 +282,47 @@ async function syncListenIndex(
         if (!isComplete) {
             let pages = 0;
 
-            const result = await walkBack(username, {
-                fromTs: oldestTs,
-                onPage: (listens) => {
-                    absorb(listens);
-                    oldestTs = listens[listens.length - 1].listened_at;
-                    pages += 1;
+            try {
+                const result = await walkBack(username, {
+                    fromTs: oldestTs,
+                    maxPages: MAX_PAGES_PER_PASS,
+                    onPage: (listens) => {
+                        absorb(listens);
+                        oldestTs = listens[listens.length - 1].listened_at;
+                        pages += 1;
 
-                    // Written straight into the cache so the persister picks it up. Losing a
-                    // minutes-long walk to a closed window is the failure this exists to stop.
-                    if (pages % CHECKPOINT_PAGES === 0) {
-                        client.setQueryData(queryKey, snapshot());
-                    }
-                },
-                signal,
-                stopAtTs: previous?.latestTs ?? null,
-            });
+                        // Written straight into the cache so the persister picks it up. Losing
+                        // a long walk to a closed window is the failure this exists to stop.
+                        if (pages % CHECKPOINT_PAGES === 0) {
+                            client.setQueryData(queryKey, snapshot());
+                        }
+                    },
+                    signal,
+                    // No stop line. This walk is heading away from the newest listen, so
+                    // bounding it by the previous high-water mark would reject every page it
+                    // fetched: each one is older than that mark by construction, and the pass
+                    // would return having advanced nothing.
+                    stopAtTs: null,
+                });
 
-            isComplete = result.reachedEnd;
+                isComplete = result.reachedEnd;
+            } catch (error) {
+                // A backfill that stops early is a smaller index, not a broken one: every key
+                // already collected is still correct, and `oldestTs` records exactly where to
+                // pick up. The one exception is the user leaving the page, which should not be
+                // mistaken for the service refusing us.
+                if (signal?.aborted || (error as Error).name === 'AbortError') {
+                    throw error;
+                }
+
+                if (pages === 0 && !previous) {
+                    throw error;
+                }
+
+                logger.warn(
+                    `Listen history backfill stopped after ${pages} pages: ${(error as Error).message}`,
+                );
+            }
         }
     } finally {
         clearSyncProgress();
@@ -304,6 +344,7 @@ async function walkBack(
     username: string,
     options: {
         fromTs: null | number;
+        maxPages?: number;
         onPage: (listens: LbListen[]) => void;
         signal?: AbortSignal;
         stopAtTs: null | number;
@@ -311,8 +352,15 @@ async function walkBack(
 ): Promise<{ oldestTs: null | number; reachedEnd: boolean }> {
     let cursor = options.fromTs;
     let oldestTs: null | number = null;
+    let pages = 0;
 
     for (;;) {
+        if (options.maxPages !== undefined && pages >= options.maxPages) {
+            return { oldestTs, reachedEnd: false };
+        }
+
+        pages += 1;
+
         options.signal?.throwIfAborted();
 
         const page = await fetchListenPage(username, cursor, options.signal);
