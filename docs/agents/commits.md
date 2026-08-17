@@ -41,6 +41,7 @@ Scope is optional. When present, it must be one of (see `commitlint.config.mjs` 
 | `radio` | Radio stations / radio playback |
 | `lyrics` | Lyrics fetch, display, lyrics-specific options |
 | `library` | Albums, artists, songs, folders, genres, favorites, search, playlists |
+| `discover` | Discover page: ListenBrainz recommendations, previews, music news |
 | `servers` | Server list, login, connection |
 | `remote` | Remote-control SPA and remote server |
 | `theme` | Themes, CSS variables, custom themes |

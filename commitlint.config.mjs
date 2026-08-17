@@ -9,6 +9,7 @@ const config = {
                 'api',
                 'ci',
                 'deps',
+                'discover',
                 'i18n',
                 'library',
                 'lyrics',
