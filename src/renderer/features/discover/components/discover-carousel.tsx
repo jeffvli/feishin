@@ -28,10 +28,21 @@ interface DiscoverCarouselProps {
     title: React.ReactNode | string;
 }
 
+/*
+ * Title over one muted line.
+ *
+ * The second line prefers the item's own subtitle and falls back to the artist credit, because
+ * on an artist card the two are the same string and printing the name twice says nothing. What
+ * the subtitle holds there is the artist's genre, or failing that the MusicBrainz disambiguation
+ * comment. Only artist rows pass one in; everything else keeps the artist credit.
+ */
 const ROWS: DataRow[] = [
     { format: (data) => (data as { name?: string }).name ?? '', id: 'title' },
     {
-        format: (data) => (data as { artistName?: string }).artistName ?? '',
+        format: (data) =>
+            (data as { subtitle?: null | string }).subtitle ??
+            (data as { artistName?: string }).artistName ??
+            '',
         id: 'artist',
         isMuted: true,
     },
@@ -98,6 +109,10 @@ export function DiscoverCarousel(props: DiscoverCarouselProps) {
                 id: item.id,
                 imageUrl: item.imageUrl,
                 name: item.title,
+                // Passed only for artist cards. On an album or track the artist credit is
+                // already the useful second line, and the subtitle there is a release name
+                // the title line has usually said.
+                subtitle: isArtist ? item.subtitle : undefined,
             } as unknown as Album | AlbumArtist;
 
             // The preview button ends up inside the anchor below, but `ItemCardControls` calls
