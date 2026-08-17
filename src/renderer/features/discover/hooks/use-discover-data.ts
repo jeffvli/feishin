@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -14,6 +14,10 @@ import {
     useLibraryIndex,
 } from '/@/renderer/features/discover/hooks/use-library-index';
 import {
+    filterHeardItems,
+    useListenIndex,
+} from '/@/renderer/features/discover/hooks/use-listen-index';
+import {
     DiscoverItem,
     filterFreshReleasesByArtists,
     fromFreshRelease,
@@ -25,6 +29,7 @@ import {
     mergeDiscoverSources,
     rankSimilar,
 } from '/@/renderer/features/discover/utils/lb-adapters';
+import { useSettingsStore } from '/@/renderer/store';
 
 /**
  * How far along the page is, so the spinner can say something rather than just spin.
@@ -190,6 +195,18 @@ export function useDiscoverData(username: string) {
     );
 
     const libraryIndex = useLibraryIndex(enabled);
+    const listenIndex = useListenIndex(username);
+
+    /**
+     * Which items had been shown before this visit began.
+     *
+     * Snapshotted once, because the route marks everything on screen as seen and would
+     * otherwise erase the distinction before the first sort could use it. A stale snapshot is
+     * the harmless direction: it only means an item stays at the front for one more visit.
+     */
+    const [seenBefore] = useState(
+        () => new Set(useSettingsStore.getState().general.discoverSeenIds),
+    );
 
     const rows = useMemo<DiscoverRow[]>(() => {
         const result: DiscoverRow[] = [];
@@ -200,17 +217,21 @@ export function useDiscoverData(username: string) {
             items: DiscoverItem[],
             options?: { isArtist?: boolean; limit?: number },
         ) => {
-            // Capped after filtering rather than before. Whether a suggestion is any good and
-            // whether the user already owns it are unrelated, so a cap applied first would spend
-            // the whole budget on tracks that are about to be hidden. Measured on a real account:
-            // the merged list is 138 entries and the head of it is almost entirely owned.
-            const unowned = filterOwnedItems(items, libraryIndex).slice(0, options?.limit);
+            // Both filters, then the cap. Owning a record and having heard one are separate
+            // questions and the page has to survive both, but neither has anything to do with
+            // whether a suggestion was any good, so a cap applied first would spend the whole
+            // budget on entries that are about to be hidden. Measured on a real account: the
+            // merged list is 138 entries and the head of it is almost entirely already known.
+            const fresh = newFindsFirst(
+                filterHeardItems(filterOwnedItems(items, libraryIndex), listenIndex),
+                seenBefore,
+            ).slice(0, options?.limit);
 
-            if (unowned.length < MIN_ROW_ITEMS) {
+            if (fresh.length < MIN_ROW_ITEMS) {
                 return;
             }
 
-            const isTall = TWO_ROW_KEYS.has(key) && unowned.length >= MIN_ITEMS_FOR_TWO_ROWS;
+            const isTall = TWO_ROW_KEYS.has(key) && fresh.length >= MIN_ITEMS_FOR_TWO_ROWS;
 
             // Artists are circles with no track to preview, so the hero card does not suit them
             // however the row is otherwise configured.
@@ -218,7 +239,7 @@ export function useDiscoverData(username: string) {
 
             result.push({
                 isArtist: options?.isArtist,
-                items: unowned,
+                items: fresh,
                 key,
                 layout,
                 rowCount: isTall ? 2 : 1,
@@ -276,6 +297,8 @@ export function useDiscoverData(username: string) {
     }, [
         t,
         libraryIndex,
+        listenIndex,
+        seenBefore,
         jams.data,
         exploration.data,
         recommendationMbids,
@@ -349,14 +372,16 @@ export function useDiscoverData(username: string) {
         topRecordings,
     ];
 
-    // Counted on every render rather than memoized: it is four integers over ten sources, and
-    // the dependency would be the query statuses themselves, which is the whole computation.
-    // The library index counts as a source because the page genuinely waits on it.
+    // Counted on every render rather than memoized: it is four integers over a dozen sources,
+    // and the dependency would be the query statuses themselves, which is the whole
+    // computation. Both indexes count as sources because the page genuinely waits on both.
     const progress: DiscoverProgress = {
         failed: 0,
         loading: 0,
-        ready: libraryIndex.isReady ? 1 : 0,
-        total: queries.length + 1,
+        ready:
+            (libraryIndex.isReady ? 1 : 0) +
+            (listenIndex.isReady || listenIndex.isUnavailable ? 1 : 0),
+        total: queries.length + 2,
     };
 
     for (const query of queries) {
@@ -372,9 +397,9 @@ export function useDiscoverData(username: string) {
     return {
         // Every row fetches independently, so a slow or failing source never blanks the page.
         isError: queries.every((query) => query.isError),
-        // The first library scan is the slow one and is worth naming, because it is the only
-        // wait the user cannot attribute to ListenBrainz being slow.
-        isIndexing: !libraryIndex.isReady,
+        // The two index builds are the slow ones and are worth naming, because they are the
+        // waits the user cannot attribute to ListenBrainz simply being slow to answer.
+        isIndexing: !libraryIndex.isReady || (!listenIndex.isReady && !listenIndex.isUnavailable),
         // Nothing renders before the library index arrives, because a row built without it
         // would be a list of music the user already owns, which is the opposite of the point.
         isPending: rowsWithImages.length === 0 && progress.loading > 0,
@@ -386,6 +411,30 @@ export function useDiscoverData(username: string) {
 /** ListenBrainz returns generated playlists newest first, so the first match is this week's. */
 function findLatest(playlists: LbPlaylistSummary[] | undefined, prefix: string) {
     return playlists?.find((entry) => entry.playlist.title.startsWith(prefix));
+}
+
+/**
+ * Anything not shown on a previous visit, first.
+ *
+ * The nearest thing to sorting by when something was discovered. Most sources carry no date at
+ * all: collaborative filtering, similarity and play counts each return a bare ranked list, and
+ * the weekly playlists date the playlist rather than the tracks in it. What is knowable is
+ * whether this client has shown an item before, and since ListenBrainz regenerates the weekly
+ * playlists wholesale and the recommendation set turns over on its own schedule, "not seen
+ * before" is exactly the set of genuinely new finds.
+ *
+ * A stable partition rather than a sort, so the interleave the sources were merged in survives
+ * inside each half.
+ */
+function newFindsFirst(items: DiscoverItem[], seenBefore: Set<string>): DiscoverItem[] {
+    const fresh: DiscoverItem[] = [];
+    const familiar: DiscoverItem[] = [];
+
+    for (const item of items) {
+        (seenBefore.has(item.id) ? familiar : fresh).push(item);
+    }
+
+    return [...fresh, ...familiar];
 }
 
 /** The MBID is the last path segment of a `https://listenbrainz.org/playlist/{mbid}` URL. */

@@ -8,6 +8,7 @@ import { createRoot } from 'react-dom/client';
 
 import { App } from '/@/renderer/app';
 import { LIBRARY_INDEX_KEY } from '/@/renderer/features/discover/api/library-index-api';
+import { LISTEN_INDEX_KEY } from '/@/renderer/features/discover/api/listen-index-api';
 import { queryClient } from '/@/renderer/lib/react-query';
 
 function createIDBPersister(idbValidKey: IDBValidKey = 'reactQuery') {
@@ -45,7 +46,17 @@ createRoot(document.getElementById('root')!).render(
                     // and refreshed in the background. It holds only normalized strings.
                     const isLibraryIndexQueryKey = query.queryKey.includes(LIBRARY_INDEX_KEY);
 
-                    return isSuccess && (isLyricsQueryKey || isLibraryIndexQueryKey);
+                    // Discover's index of what the user has already played. Walking a hundred
+                    // thousand listens runs for minutes, so it is stored and then kept current
+                    // by a short catch-up walk. The walk also checkpoints into the cache as it
+                    // goes, and those partial writes are what let an interrupted first pass
+                    // resume instead of starting over, so they have to be stored too.
+                    const isListenIndexQueryKey = query.queryKey.includes(LISTEN_INDEX_KEY);
+
+                    return (
+                        isSuccess &&
+                        (isLyricsQueryKey || isLibraryIndexQueryKey || isListenIndexQueryKey)
+                    );
                 },
             },
             hydrateOptions: {

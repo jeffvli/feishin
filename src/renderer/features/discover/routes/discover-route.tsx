@@ -6,6 +6,7 @@ import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/nati
 import { DiscoverCarousel } from '/@/renderer/features/discover/components/discover-carousel';
 import { DiscoverFeatureCarousel } from '/@/renderer/features/discover/components/discover-feature-carousel';
 import { DiscoverSkeleton } from '/@/renderer/features/discover/components/discover-skeleton';
+import { useDiscoverSync } from '/@/renderer/features/discover/discover-sync-store';
 import { useDiscoverData } from '/@/renderer/features/discover/hooks/use-discover-data';
 import { useMarkDiscoverSeen } from '/@/renderer/features/discover/hooks/use-discover-unread';
 import { usePreviewActions } from '/@/renderer/features/preview/preview-store';
@@ -29,6 +30,7 @@ const DiscoverRoute = () => {
     const { isError, isIndexing, isPending, progress, rows } = useDiscoverData(username);
     const markSeen = useMarkDiscoverSeen();
     const { stop } = usePreviewActions();
+    const sync = useDiscoverSync();
 
     // Visiting the page is what counts as reading the feed, so the badge clears here.
     useEffect(() => {
@@ -82,9 +84,23 @@ const DiscoverRoute = () => {
                                                 total: progress.total,
                                             })}
                                         </Text>
-                                        {isIndexing && (
+                                        {isIndexing && sync.phase !== 'history' && (
                                             <Text isMuted size="sm" style={{ maxWidth: '32rem' }}>
                                                 {t('page.discover.loadingLibrary')}
+                                            </Text>
+                                        )}
+                                        {/* The history walk is the only wait measured in
+                                            minutes, so it is the only one that gets a count and
+                                            an estimate rather than a sentence. */}
+                                        {sync.phase === 'history' && (
+                                            <Text isMuted size="sm" style={{ maxWidth: '32rem' }}>
+                                                {sync.etaSeconds === null
+                                                    ? t('page.discover.loadingHistoryStart')
+                                                    : t('page.discover.loadingHistory', {
+                                                          done: sync.done.toLocaleString(),
+                                                          eta: formatEta(sync.etaSeconds),
+                                                          total: sync.total.toLocaleString(),
+                                                      })}
                                             </Text>
                                         )}
                                         {progress.failed > 0 && (
@@ -150,6 +166,21 @@ const DiscoverRoute = () => {
         </AnimatedPage>
     );
 };
+
+/**
+ * A duration a reader can act on, rather than a number of seconds.
+ *
+ * Rounded up to the minute above a minute, because an estimate that counts down in single
+ * seconds over a seven minute wait invites watching it, and its own accuracy does not justify
+ * that much precision.
+ */
+function formatEta(seconds: number): string {
+    if (seconds < 60) {
+        return `${Math.max(1, seconds)}s`;
+    }
+
+    return `${Math.ceil(seconds / 60)} min`;
+}
 
 const DiscoverRouteWithBoundary = () => {
     return (
