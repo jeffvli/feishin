@@ -1,0 +1,58 @@
+/*
+ * A notice, not a card and not an error.
+ *
+ * The page is now allowed to render against a history that is still being read, which is only
+ * honest if it says so. That makes this a caption on everything below it rather than a section
+ * of its own, so it is a single quiet strip: a wash rather than the spotlight's filled surface,
+ * and no heading, so it never competes with the rows it is describing.
+ */
+.banner {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+
+    /* Room at the foot for the bar, which is the strip's own edge. */
+    padding: 0.75rem 1rem 0.875rem;
+    overflow: hidden;
+    background: alpha(var(--theme-colors-foreground), 0.04);
+    border-radius: var(--theme-radius-md);
+}
+
+/*
+ * The progress bar is the bottom edge of the strip rather than a control sitting inside it.
+ *
+ * A full-width bar under two lines of text reads as a download, and this is not one: the reader
+ * is not waiting on it, they are reading the page while it finishes. As an edge that fills, it
+ * is legible when looked at and silent when not, which is the right weight for something that
+ * runs for minutes.
+ */
+.banner::before,
+.banner::after {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    content: '';
+}
+
+.banner::before {
+    right: 0;
+    background: alpha(var(--theme-colors-foreground), 0.08);
+}
+
+.banner::after {
+    width: var(--discover-history-progress, 0%);
+    background: var(--theme-colors-foreground-muted);
+    transition: width 0.4s ease;
+}
+
+/*
+ * Checkpoints land minutes apart, so without this the edge would jump in visible steps. The
+ * transition is on width alone and the element is 2px tall, so nothing reflows around it.
+ */
+@media (prefers-reduced-motion: reduce) {
+    .banner::after {
+        transition: none;
+    }
+}

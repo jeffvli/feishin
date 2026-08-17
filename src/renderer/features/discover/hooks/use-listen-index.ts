@@ -15,9 +15,14 @@ import { artistVariants, normalizeName } from '/@/renderer/features/discover/uti
 export interface ListenIndex {
     /** Listens absorbed so far, so partial coverage can be stated as a fraction. */
     indexedCount: number;
-    /** True once the whole history has been walked. Until then nothing is filtered. */
+    /**
+     * True once the whole history has been walked.
+     *
+     * Until then the filter runs against a partial history, so it is right about what it has
+     * read and blind to the rest. This is what the page says so out loud for.
+     */
     isComplete: boolean;
-    /** True once any index exists, complete or not. Drives the progress line, not the filter. */
+    /** True once any index exists, complete or not. Below this nothing can be filtered at all. */
     isReady: boolean;
     /**
      * The history could not be read and retrying has stopped.
@@ -66,20 +71,21 @@ const EMPTY_INDEX: ListenIndex = {
  * establish: having played one track by an artist is a reason to suggest more of them, not a
  * reason to hide them, and hiding a whole album because a single track from it was once played
  * would empty the page.
+ *
+ * Filters against whatever the index holds, including a history that is still being walked. A
+ * partial index is right about every listen it has read and silent about the rest, so the page
+ * it produces is correct but generous: some tracks on it will turn out to be familiar. Rows
+ * re-filter as the walk checkpoints, so those drop out on their own, and the page says
+ * plainly that this is happening rather than presenting a partial result as a finished one.
+ * The alternative, waiting for a complete history, left the user watching a progress bar for
+ * minutes on end with nothing to look at.
  */
 export function filterHeardItems(items: DiscoverItem[], index: ListenIndex): DiscoverItem[] {
     // Nothing can be said about what was heard, so say nothing and let the library filter
-    // stand on its own rather than hiding the whole page behind a service that is down.
-    if (index.isUnavailable) {
+    // stand on its own rather than hiding the whole page behind a service that is down. An
+    // index that has not produced a first page yet is in the same position.
+    if (index.isUnavailable || !index.isReady) {
         return items;
-    }
-
-    // Deliberately a complete history, not merely a usable one. A partial index filters
-    // correctly for every listen it holds and says nothing about the rest, so filtering
-    // against one produces a page that looks finished while quietly offering back music the
-    // user played before the walk reached that far.
-    if (!index.isComplete) {
-        return [];
     }
 
     return items.filter((item) => {

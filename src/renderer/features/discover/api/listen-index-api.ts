@@ -84,6 +84,28 @@ const RATE_FLOOR = 4;
 const MAX_PAGES_PER_PASS = 20;
 
 /**
+ * Wall-clock progress of the backfill, carried across passes so the estimate can be honest.
+ *
+ * A pass fetches its pages back to back and the walk then waits `BACKFILL_INTERVAL_MS` before
+ * starting the next one, so the rate inside a pass is several times the rate the backfill
+ * actually advances at. Timing a single pass therefore produced an estimate that sank while the
+ * pass ran, jumped when the next one restarted the measurement from one page, and never counted
+ * the gaps at all even though they are most of the elapsed time. Measuring from the first page
+ * of the first pass to now counts the waiting as waiting, and converges rather than swinging.
+ *
+ * Module scope rather than the stored index, because it describes this run of the app. A backfill
+ * resumed tomorrow knows nothing about how long today's passes took, and deriving it from
+ * `syncedAt` would fold in however long the app was closed.
+ */
+let backfill: null | {
+    /** `indexedCount` when the measurement began, so a resumed walk measures only its own work. */
+    fromDone: number;
+    passes: number;
+    sinceMs: number;
+    username: string;
+} = null;
+
+/**
  * How long a single request is given before it is abandoned.
  *
  * Load is not always shed by refusing a connection. A throttled address can be left hanging,
@@ -212,7 +234,16 @@ async function syncListenIndex(
     // rather than restarting it at zero.
     let done = previous?.indexedCount ?? 0;
     const startedAt = Date.now();
-    let fetched = 0;
+
+    if (!backfill || backfill.username !== username) {
+        backfill = { fromDone: done, passes: 0, sinceMs: startedAt, username };
+    }
+
+    backfill.passes += 1;
+
+    // Captured so the closure below reads one object for the whole pass rather than the
+    // module binding, which another user's sync would replace underneath it.
+    const rate = backfill;
 
     const absorb = (listens: LbListen[]) => {
         for (const listen of listens) {
@@ -236,19 +267,21 @@ async function syncListenIndex(
             }
         }
 
-        fetched += listens.length;
         done += listens.length;
         latestTs = Math.max(latestTs, listens[0]?.listened_at ?? 0);
 
-        const elapsed = Date.now() - startedAt;
+        const measured = done - rate.fromDone;
+        const elapsed = Date.now() - rate.sinceMs;
 
         setSyncProgress({
             done: Math.min(done, listenCount),
-            // Withheld until a page has actually timed, because an estimate from no data is a
-            // number the user would reasonably believe.
+            // Withheld until a second pass has begun, because until then no gap between passes
+            // has been observed and the only rate on offer is the in-pass burst rate, which the
+            // backfill as a whole never runs at. An estimate built from it is a number the user
+            // would reasonably believe and it is wrong by the ratio between the two.
             etaSeconds:
-                fetched > 0
-                    ? Math.round(((listenCount - done) * (elapsed / fetched)) / 1000)
+                rate.passes > 1 && measured > 0
+                    ? Math.round(((listenCount - done) * (elapsed / measured)) / 1000)
                     : null,
             phase: isComplete ? 'catchup' : 'history',
             total: listenCount,
@@ -331,6 +364,12 @@ async function syncListenIndex(
         }
     } finally {
         clearSyncProgress();
+
+        // A later rebuild of this index should time itself from scratch rather than inherit a
+        // rate measured against a history that was still being walked.
+        if (isComplete) {
+            backfill = null;
+        }
     }
 
     return snapshot();

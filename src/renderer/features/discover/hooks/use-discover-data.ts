@@ -48,8 +48,6 @@ export interface DiscoverProgress {
     failed: number;
     /** Sources still waiting, including those retrying after a failure. */
     loading: number;
-    ready: number;
-    total: number;
 }
 
 export interface DiscoverRow {
@@ -425,27 +423,28 @@ export function useDiscoverData(username: string) {
         topRecordings,
     ];
 
-    // Counted on every render rather than memoized: it is four integers over a dozen sources,
-    // and the dependency would be the query statuses themselves, which is the whole
-    // computation. Both indexes count as sources because the page genuinely waits on both.
-    const progress: DiscoverProgress = {
-        failed: 0,
-        loading: 0,
-        ready:
-            (libraryIndex.isReady ? 1 : 0) +
-            (listenIndex.isComplete || listenIndex.isUnavailable ? 1 : 0),
-        total: queries.length + 2,
-    };
+    // Counted on every render rather than memoized: it is two integers over a dozen sources, and
+    // the dependency would be the query statuses themselves, which is the whole computation.
+    //
+    // The library index counts as a source and the listen index no longer does. The difference
+    // is what each one does while it is missing: without the library index every row would be
+    // music the user already owns, so `filterOwnedItems` withholds them entirely and the page
+    // really is waiting. A missing listen history only makes the rows generous, and the page
+    // now renders and says so instead of waiting.
+    const total = queries.length + 1;
+    let ready = libraryIndex.isReady ? 1 : 0;
+
+    const progress: DiscoverProgress = { failed: 0, loading: 0 };
 
     for (const query of queries) {
         if (query.isError) {
             progress.failed += 1;
         } else if (query.isSuccess) {
-            progress.ready += 1;
+            ready += 1;
         }
     }
 
-    progress.loading = progress.total - progress.ready - progress.failed;
+    progress.loading = total - ready - progress.failed;
 
     return {
         history: {
@@ -459,22 +458,18 @@ export function useDiscoverData(username: string) {
         },
         // Every row fetches independently, so a slow or failing source never blanks the page.
         isError: queries.every((query) => query.isError),
-        isIndexing:
-            !libraryIndex.isReady || (!listenIndex.isComplete && !listenIndex.isUnavailable),
-        // Nothing renders before both indexes are in hand. A row built without the library is
-        // a list of music the user already owns, and a row built on a partial history is worse
-        // than it looks: it silently offers back tracks played before whatever date the walk
-        // has reached, with nothing on screen to say which tracks those are.
+        // Nothing renders before the library index is in hand, because a row built without it
+        // is a list of music the user already owns. The listen history is not waited on: rows
+        // render against however much of it has been read and re-filter as the rest arrives.
         isPending: rowsWithImages.length === 0 && progress.loading > 0,
         library: {
             albumCount: libraryIndex.albumKeys.size,
             isReady: libraryIndex.isReady,
             trackCount: libraryIndex.trackKeys.size,
         },
-        // The two index builds are the slow ones and are worth naming, because they are the
-        // waits the user cannot attribute to ListenBrainz simply being slow to answer.
-        // What the history filter currently knows, so the page can say so rather than leaving
-        // a partly-indexed history indistinguishable from a finished one.
+        // Only what the page still needs in order to say something true: how many sources are
+        // outstanding, and how many gave up. The history walk reports itself separately, in
+        // `history` above, because it is the one wait measured in minutes.
         progress,
         rows: rowsWithImages,
     };
