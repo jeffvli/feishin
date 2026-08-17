@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useGridCarouselContainerQuery } from '/@/renderer/components/grid-carousel/grid-carousel-v2';
@@ -11,14 +11,22 @@ import { DiscoverSkeleton } from '/@/renderer/features/discover/components/disco
 import { DiscoverSocial } from '/@/renderer/features/discover/components/discover-social';
 import { DiscoverSpotlight } from '/@/renderer/features/discover/components/discover-spotlight';
 import { useDiscoverSync } from '/@/renderer/features/discover/discover-sync-store';
-import { useDiscoverData } from '/@/renderer/features/discover/hooks/use-discover-data';
+import {
+    DiscoverRow,
+    useDiscoverData,
+} from '/@/renderer/features/discover/hooks/use-discover-data';
 import { useMarkDiscoverSeen } from '/@/renderer/features/discover/hooks/use-discover-unread';
 import { usePreviewActions } from '/@/renderer/features/preview/preview-store';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
-import { useDiscoverSettings, useWindowSettings } from '/@/renderer/store';
+import {
+    DiscoverSection,
+    useDiscoverItems,
+    useDiscoverSettings,
+    useWindowSettings,
+} from '/@/renderer/store';
 import { Center } from '/@/shared/components/center/center';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -35,6 +43,24 @@ const DiscoverRoute = () => {
     const markSeen = useMarkDiscoverSeen();
     const { stop } = usePreviewActions();
     const sync = useDiscoverSync();
+    const sections = useDiscoverItems();
+
+    const visibleSections = useMemo(() => sections.filter((s) => !s.disabled), [sections]);
+
+    /**
+     * The rows that are actually going to be drawn, in configured order.
+     *
+     * Sections the user turned off are dropped here rather than at render, because this list is
+     * also what marks items as seen: counting a hidden row's items as read would clear the
+     * sidebar badge for suggestions that were never put in front of anyone.
+     */
+    const visibleRows = useMemo(() => {
+        const byKey = new Map(rows.map((row) => [row.key, row]));
+
+        return visibleSections
+            .map((section) => byKey.get(section.id))
+            .filter((row): row is DiscoverRow => row !== undefined);
+    }, [rows, visibleSections]);
 
     // The live pass when one is running, the stored index when one is not. The walk runs as
     // bounded passes with a gap between them and the sync store empties when a pass ends, so
@@ -45,8 +71,8 @@ const DiscoverRoute = () => {
 
     // Visiting the page is what counts as reading the feed, so the badge clears here.
     useEffect(() => {
-        markSeen(rows.flatMap((row) => row.items.map((item) => item.id)));
-    }, [rows, markSeen]);
+        markSeen(visibleRows.flatMap((row) => row.items.map((item) => item.id)));
+    }, [visibleRows, markSeen]);
 
     // A preview is tied to the cards that started it; leaving should not keep it sounding.
     useEffect(() => stop, [stop]);
@@ -131,14 +157,36 @@ const DiscoverRoute = () => {
                         {/* Above the rows, because it is a caveat on all of them and a reader who
                             meets it after scrolling four carousels has already formed a view of
                             why a familiar track is there. */}
-                        {username && rows.length > 0 && isReadingHistory && (
+                        {username && visibleRows.length > 0 && isReadingHistory && (
                             <DiscoverHistoryBanner
                                 done={historyDone}
                                 etaSeconds={sync.etaSeconds}
                                 total={historyTotal}
                             />
                         )}
-                        {rows.map((row) => {
+                        {/* Order and visibility both come from settings, so the two sections
+                            that are not rows are dispatched from the same list as the rows
+                            rather than pinned after them. */}
+                        {visibleSections.map((section) => {
+                            if (section.id === DiscoverSection.SOCIAL) {
+                                return username ? (
+                                    <DiscoverSocial key={section.id} username={username} />
+                                ) : null;
+                            }
+
+                            if (section.id === DiscoverSection.NEWS) {
+                                // Gated on the username only so the library index is not built
+                                // for a Discover page that has not been set up yet. It hides
+                                // itself when nothing matches.
+                                return username ? <DiscoverNews key={section.id} /> : null;
+                            }
+
+                            const row = rows.find((candidate) => candidate.key === section.id);
+
+                            if (!row) {
+                                return null;
+                            }
+
                             if (row.layout === 'spotlight' && row.album) {
                                 return (
                                     <DiscoverSpotlight
@@ -174,23 +222,11 @@ const DiscoverRoute = () => {
                             than letting the page look finished when it is not. A spinner alone:
                             the count it used to carry was of internal sources, which is not a
                             unit the reader has any use for. */}
-                        {rows.length > 0 && progress.loading > 0 && (
+                        {visibleRows.length > 0 && progress.loading > 0 && (
                             <Center>
                                 <Spinner size={20} />
                             </Center>
                         )}
-                        {/* Between the recommendations and the news, which is where it belongs
-                            on both sides: it is still music to play, so it sits with the rows,
-                            but its recommendations come from named people rather than a model,
-                            so it does not join them. It hides itself when nobody is followed
-                            and nothing matched. */}
-                        {username && <DiscoverSocial username={username} />}
-                        {/* Last, and outside everything above it. The rows are recommendations
-                            and the footnote describes how they were filtered; this is neither,
-                            so it closes the page rather than joining that block. Gated on the
-                            username only so the library index is not built for a Discover page
-                            that has not been set up yet. It hides itself when nothing matches. */}
-                        {username && <DiscoverNews />}
                     </Stack>
                 </LibraryContainer>
             </NativeScrollArea>

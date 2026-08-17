@@ -1064,6 +1064,8 @@
         "discover": "Enable Discover",
         "discoverBadge_description": "Show how many items in this week's playlists you have not seen yet",
         "discoverBadge": "Show unread count",
+        "discoverConfiguration_description": "Configure what sections are shown, and in what order, on the Discover page",
+        "discoverConfiguration": "Discover page configuration",
         "listenbrainzUsername_description": "Your listenbrainz.org username. No API token is needed",
         "listenbrainzUsername": "ListenBrainz username",
         "lastfmApiKey_description": "The API key for {{lastfm}}. Required for cover art",

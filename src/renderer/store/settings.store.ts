@@ -76,6 +76,20 @@ const HomeItemSchema = z.enum([
     'recentlyReleased',
 ]);
 
+/**
+ * The ids here are the Discover route's own row keys, so a stored order maps straight onto what
+ * the page builds. `social` and `news` are not rows but are listed alongside them because to a
+ * reader they are sections of the same page.
+ */
+const DiscoverSectionSchema = z.enum([
+    'fresh-releases',
+    'news',
+    'new-to-you',
+    'similar-artists',
+    'social',
+    'spotlight',
+]);
+
 const AlbumGroupItemSchema = z.enum([
     'albumArtists',
     'duration',
@@ -523,6 +537,8 @@ export const GeneralSettingsSchema = z.object({
     disabledContextMenu: z.record(z.string(), z.boolean()),
     discoverBadge: z.boolean(),
     discoverEnabled: z.boolean(),
+    /** Which sections the Discover page shows, and in what order. */
+    discoverItems: z.array(SortableItemSchema(DiscoverSectionSchema)),
     /** Discover item ids already shown to the user, so the sidebar can count what is new. */
     discoverSeenIds: z.array(z.string()),
     enableGridMultiSelect: z.boolean(),
@@ -952,6 +968,15 @@ export enum DiscordLinkType {
     NONE = 'none',
 }
 
+export enum DiscoverSection {
+    FRESH_RELEASES = 'fresh-releases',
+    NEW_TO_YOU = 'new-to-you',
+    NEWS = 'news',
+    SIMILAR_ARTISTS = 'similar-artists',
+    SOCIAL = 'social',
+    SPOTLIGHT = 'spotlight',
+}
+
 export enum GenreTarget {
     ALBUM = 'album',
     TRACK = 'track',
@@ -1043,6 +1068,7 @@ export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
         setAlbumGroupItems: (items: SortableItem<AlbumGroupItem>[]) => void;
         setArtistItems: (item: SortableItem<ArtistItem>[]) => void;
         setArtistReleaseTypeItems: (item: SortableItem<ArtistReleaseTypeItem>[]) => void;
+        setDiscoverItems: (items: SortableItem<DiscoverSection>[]) => void;
         setGenreBehavior: (target: GenreTarget) => void;
         setHomeItems: (item: SortableItem<HomeItem>[]) => void;
         setList: (type: ItemListKey, data: DeepPartial<ItemListSettings>) => void;
@@ -1216,6 +1242,24 @@ const homeItems = Object.values(HomeItem).map((item) => ({
     id: item,
 }));
 
+/*
+ * Listed in page order rather than derived from the enum, because the enum is alphabetical and
+ * this is the sequence the page has always rendered in: the merged suggestions first, the album
+ * picked out of them directly below, then the narrower rows, and finally the two sections that
+ * are about people and the outside world rather than about recommendations.
+ */
+const discoverItems = [
+    DiscoverSection.NEW_TO_YOU,
+    DiscoverSection.SPOTLIGHT,
+    DiscoverSection.FRESH_RELEASES,
+    DiscoverSection.SIMILAR_ARTISTS,
+    DiscoverSection.SOCIAL,
+    DiscoverSection.NEWS,
+].map((item) => ({
+    disabled: false,
+    id: item,
+}));
+
 const artistItems = Object.values(ArtistItem).map((item) => ({
     disabled: false,
     id: item,
@@ -1312,6 +1356,7 @@ const initialState: SettingsState = {
         disabledContextMenu: {},
         discoverBadge: true,
         discoverEnabled: false,
+        discoverItems,
         discoverSeenIds: [],
         enableGridMultiSelect: false,
         externalLinks: true,
@@ -2278,6 +2323,11 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                                 state.general.artistReleaseTypeItems = items;
                             });
                         },
+                        setDiscoverItems: (items: SortableItem<DiscoverSection>[]) => {
+                            set((state) => {
+                                state.general.discoverItems = items;
+                            });
+                        },
                         setGenreBehavior: (target: GenreTarget) => {
                             set((state) => {
                                 state.general.genreTarget = target;
@@ -2895,10 +2945,14 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     );
                 }
 
+                if (version < 36) {
+                    state.general.discoverItems ??= discoverItems;
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 35,
+            version: 36,
         },
     ),
 );
@@ -3108,6 +3162,9 @@ export const useDiscoverSettings = () =>
         }),
         shallow,
     );
+
+export const useDiscoverItems = () =>
+    useSettingsStore((state) => state.general.discoverItems, shallow);
 
 export const useDiscoverSeenIds = () =>
     useSettingsStore((state) => state.general.discoverSeenIds, shallow);

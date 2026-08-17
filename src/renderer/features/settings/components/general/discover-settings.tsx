@@ -1,19 +1,34 @@
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { DraggableItems } from '/@/renderer/features/settings/components/general/draggable-items';
 import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
+import { DiscoverSection, SortableItem } from '/@/renderer/store';
 import { useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
 import { Switch } from '/@/shared/components/switch/switch';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
 
+/**
+ * Labelled with the page's own headings rather than with names invented for this list, so the
+ * row a reader is looking for is the one they read at the top of it.
+ */
+const DISCOVER_SECTIONS: Array<[string, string]> = [
+    [DiscoverSection.NEW_TO_YOU, 'page.discover.newToYou'],
+    [DiscoverSection.SPOTLIGHT, 'page.discover.spotlight'],
+    [DiscoverSection.FRESH_RELEASES, 'page.discover.freshReleases'],
+    [DiscoverSection.SIMILAR_ARTISTS, 'page.discover.similarArtists'],
+    [DiscoverSection.SOCIAL, 'page.discover.social'],
+    [DiscoverSection.NEWS, 'page.discover.news'],
+];
+
 export const DiscoverSettings = memo(() => {
     const { t } = useTranslation();
     const settings = useGeneralSettings();
-    const { setSettings } = useSettingsStoreActions();
+    const { setDiscoverItems, setSettings } = useSettingsStoreActions();
 
     const [localUsername, setLocalUsername] = useState(settings.listenBrainzUsername);
 
@@ -79,5 +94,21 @@ export const DiscoverSettings = memo(() => {
         },
     ];
 
-    return <SettingsSection options={options} title={t('page.discover.title')} />;
+    return (
+        <>
+            <SettingsSection options={options} title={t('page.discover.title')} />
+            {/* Below the switches rather than among them: the others are one control each, and
+                this is a list that reorders. Hidden with the rest when Discover is off, since
+                configuring a page that is not shown has nothing to configure. */}
+            {settings.discoverEnabled && (
+                <DraggableItems
+                    description="setting.discoverConfiguration"
+                    itemLabels={DISCOVER_SECTIONS}
+                    items={settings.discoverItems as SortableItem<DiscoverSection>[]}
+                    setItems={setDiscoverItems}
+                    title="setting.discoverConfiguration"
+                />
+            )}
+        </>
+    );
 });
