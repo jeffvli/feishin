@@ -138,13 +138,15 @@ export const discoverKeys = {
     freshReleases: (username: string) => ['listenbrainz', username, 'fresh-releases'] as const,
     playlist: (mbid: string) => ['listenbrainz', 'playlist', mbid] as const,
     playlistsCreatedFor: (username: string) => ['listenbrainz', username, 'created-for'] as const,
-    recommendations: (username: string) => ['listenbrainz', username, 'recommendations'] as const,
+    recommendations: (username: string, count: number) =>
+        ['listenbrainz', username, 'recommendations', count] as const,
     similarArtists: (seedMbids: string[]) =>
         ['listenbrainz', 'similar-artists', seedMbids] as const,
     similarRecordings: (seedMbids: string[]) =>
         ['listenbrainz', 'similar-recordings', seedMbids] as const,
-    // Range and count belong in the key, because a shared key would let two callers asking
-    // for different slices of the same stat clobber each other.
+    // Every parameter that changes the response belongs in the key. Omitting one does not
+    // merely risk two callers clobbering each other: a cached result outlives a change to the
+    // default, so raising a count silently kept serving the old, smaller response for a day.
     topArtists: (username: string, range: string, count: number) =>
         ['listenbrainz', username, 'top-artists', range, count] as const,
     topRecordings: (username: string, range: string, count: number) =>
@@ -208,7 +210,7 @@ export const listenbrainzQueries = {
                     `/cf/recommendation/user/${encodeURIComponent(username)}/recording?count=${count}`,
                     signal,
                 ).then((response) => response.payload.mbids),
-            queryKey: discoverKeys.recommendations(username),
+            queryKey: discoverKeys.recommendations(username, count),
         }),
 
     /**
