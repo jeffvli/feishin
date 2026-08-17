@@ -21,6 +21,7 @@ const DISCOVER_SECTIONS: Array<[string, string]> = [
     [DiscoverSection.SPOTLIGHT, 'page.discover.spotlight'],
     [DiscoverSection.FRESH_RELEASES, 'page.discover.freshReleases'],
     [DiscoverSection.SIMILAR_ARTISTS, 'page.discover.similarArtists'],
+    [DiscoverSection.LIBRARY_CORNERS, 'page.discover.libraryCorners'],
     [DiscoverSection.SOCIAL, 'page.discover.social'],
     [DiscoverSection.NEWS, 'page.discover.news'],
 ];

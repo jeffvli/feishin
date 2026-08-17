@@ -252,6 +252,58 @@ export function useDiscoverData(username: string) {
     const libraryIndex = useLibraryIndex(enabled);
     const listenIndex = useListenIndex(username);
 
+    /*
+     * Seeds from the parts of the library its owner stopped visiting, one per genre.
+     *
+     * Every other source on this page is seeded from recent listening, and measured on a real
+     * account they answer with less variety than that listening had: the user's own month was
+     * 82% rock, what came back was 88% to 99%. Nothing available escapes that, because every
+     * ListenBrainz surface is computed from the same history, so the only way out is to point
+     * the same similarity model somewhere else.
+     *
+     * The library is where to point it. It is several times more varied than any month of it,
+     * it was chosen deliberately rather than sampled, and a record bought and left unplayed is
+     * a direction its owner already expressed an interest in.
+     *
+     * One seed per genre, because the neglected list is ordered by neglect and the top of it
+     * would otherwise be five artists off the same forgotten shelf.
+     */
+    const cornerSeeds = useMemo(() => {
+        const genres = new Set<string>();
+        const seeds: string[] = [];
+
+        for (const artist of libraryIndex.neglectedArtists) {
+            // An artist with no genre is kept but cannot be grouped, so it stands for itself
+            // rather than blocking every other ungenred artist behind it.
+            const genre = artist.genre ?? artist.mbid;
+
+            if (genres.has(genre)) {
+                continue;
+            }
+
+            genres.add(genre);
+            seeds.push(artist.mbid);
+
+            if (seeds.length >= SIMILARITY_SEED_COUNT) {
+                break;
+            }
+        }
+
+        // The one thing this row depends on that the rest of the page does not: artists tagged
+        // with a MusicBrainz id. A library without them yields no seeds and an absent row, and
+        // that is indistinguishable on screen from a row the filters emptied, so it is logged.
+        if (libraryIndex.isReady) {
+            logger.info(
+                `Discover corners: ${libraryIndex.neglectedArtists.length} neglected artists, ` +
+                    `${seeds.length} seeds`,
+            );
+        }
+
+        return seeds;
+    }, [libraryIndex.neglectedArtists, libraryIndex.isReady]);
+
+    const cornerArtists = useQuery(listenbrainzQueries.similarArtists(cornerSeeds));
+
     /**
      * Which items had been shown before this visit began.
      *
@@ -397,6 +449,25 @@ export function useDiscoverData(username: string) {
             { isArtist: true, limit: ARTIST_ROW_LIMIT },
         );
 
+        // Same machinery as the row above, pointed at the library instead of at the month. What
+        // comes back is filtered against the library like everything else, so the row is only
+        // ever artists with nothing in it: the collection chooses the direction, never the cards.
+        push(
+            'library-corners',
+            t('page.discover.libraryCorners'),
+            mergeDiscoverSources(
+                bySeed(
+                    (cornerArtists.data ?? []).filter(
+                        (entry) => !cornerSeeds.includes(entry.artist_mbid),
+                    ),
+                    cornerSeeds,
+                ).map((entries) =>
+                    rankSimilar(entries, (entry) => entry.artist_mbid).map(fromSimilarArtist),
+                ),
+            ),
+            { isArtist: true, limit: ARTIST_ROW_LIMIT },
+        );
+
         return result;
     }, [
         t,
@@ -415,6 +486,8 @@ export function useDiscoverData(username: string) {
         peerRecordings.data,
         topRecordings.data,
         excluded,
+        cornerArtists.data,
+        cornerSeeds,
     ]);
 
     // Looked up after filtering, so no request is spent on an artist that is about to be hidden.
@@ -476,6 +549,7 @@ export function useDiscoverData(username: string) {
     const queries = [
         jams,
         exploration,
+        cornerArtists,
         recommendationMetadata,
         similarArtists,
         similarRecordings,

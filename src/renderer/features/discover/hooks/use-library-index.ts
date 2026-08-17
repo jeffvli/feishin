@@ -1,7 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
-import { libraryIndexQueries } from '/@/renderer/features/discover/api/library-index-api';
+import {
+    libraryIndexQueries,
+    NeglectedArtist,
+} from '/@/renderer/features/discover/api/library-index-api';
 import { DiscoverItem } from '/@/renderer/features/discover/utils/lb-adapters';
 import { artistVariants, normalizeName } from '/@/renderer/features/discover/utils/library-match';
 import { useCurrentServerId } from '/@/renderer/store';
@@ -30,6 +33,14 @@ export interface LibraryIndex {
     isReady: boolean;
     /** True while a newer index is fetched behind an already-usable stored one. */
     isRefreshing: boolean;
+    /**
+     * Artists the library holds in quantity and rarely plays, most neglected first.
+     *
+     * Discover seeds a similarity call from these to reach outside this month's rotation. They
+     * are a direction only: everything they turn up is filtered against the library like any
+     * other suggestion, so nothing already owned reaches a row.
+     */
+    neglectedArtists: NeglectedArtist[];
     /** MusicBrainz recording ids, the exact key for a track when the server has tagged one. */
     recordingMbids: Set<string>;
     /** When the index in use was built, or null if it never has been. */
@@ -45,6 +56,7 @@ const EMPTY_INDEX: LibraryIndex = {
     artistPlays: new Map(),
     isReady: false,
     isRefreshing: false,
+    neglectedArtists: [],
     recordingMbids: new Set(),
     syncedAt: null,
     trackKeys: new Set(),
@@ -121,6 +133,7 @@ export function useLibraryIndex(enabled: boolean): LibraryIndex {
             artistPlays: new Map(query.data.artistPlays ?? []),
             isReady: true,
             isRefreshing: query.isFetching,
+            neglectedArtists: query.data.neglectedArtists ?? [],
             recordingMbids: new Set(query.data.recordingMbids),
             syncedAt: query.data.syncedAt,
             trackKeys: new Set(query.data.trackKeys),

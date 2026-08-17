@@ -30,12 +30,35 @@ export interface LibraryIndexData {
      * what their absence already means.
      */
     artistPlays?: Array<[string, number]>;
+    /**
+     * Artists the library holds a real amount of and hardly ever plays.
+     *
+     * Kept so Discover can point its similarity calls somewhere other than this month's
+     * rotation. Every other source on that page is seeded from recent listening and therefore
+     * returns more of it; these are the corners of a collection the owner chose deliberately
+     * and then stopped visiting, which is a direction rather than a random one.
+     *
+     * Selected and capped here rather than in the renderer because the alternative is
+     * persisting every artist in the library to say something about a hundred of them.
+     */
+    neglectedArtists?: NeglectedArtist[];
     recordingMbids: string[];
     /** Track count at build time, recorded so a rebuild can be spotted as worthwhile. */
     songCount: number;
     /** Epoch millis, for showing how old the index is. */
     syncedAt: number;
     trackKeys: string[];
+}
+
+/** An artist in the library that is owned in quantity and played rarely. */
+export interface NeglectedArtist {
+    /** Their first genre, which is what spreads the seeds across the library rather than one shelf. */
+    genre: null | string;
+    /** MusicBrainz artist id. Required: the similarity endpoints take nothing else. */
+    mbid: string;
+    name: string;
+    plays: number;
+    tracks: number;
 }
 
 /**
@@ -47,6 +70,21 @@ export interface LibraryIndexData {
  * from the stored copy while a fresh one is fetched behind it.
  */
 const STALE_MS = 1000 * 60 * 60 * 24;
+
+/**
+ * How many tracks an artist has to be represented by before their neglect means anything.
+ *
+ * Four is roughly an EP. Below it the library is describing a guest credit or a compilation
+ * appearance rather than a collection, and those are exactly the entries that look neglected
+ * while saying nothing: a server that credits every participant lists a great many of them.
+ */
+const NEGLECTED_MIN_TRACKS = 4;
+
+/** Above one play per owned track an artist is in rotation, not neglected. */
+const NEGLECTED_MAX_PLAYS_PER_TRACK = 1;
+
+/** Enough to pick a spread of genres from without persisting the whole artist list. */
+const NEGLECTED_LIMIT = 100;
 
 /** Marks the query as one the IndexedDB persister should keep. See `main.tsx`. */
 export const LIBRARY_INDEX_KEY = 'discover-library-index';
@@ -157,11 +195,37 @@ async function buildLibraryIndex(
         }
     }
 
+    /*
+     * Owned in quantity, played rarely, and identifiable to MusicBrainz.
+     *
+     * The track floor is doing more work than it looks. It is what separates an artist the
+     * owner went and collected from one the library knows about only because a server credits
+     * every participant on a compilation, which is a real distinction here: a single guest
+     * appearance would otherwise be indistinguishable from a neglected discography, and
+     * seeding from it would say nothing about anyone's taste.
+     *
+     * Ranked by plays per owned track, so a record bought and never opened outranks one played
+     * twice, and a large neglected discography outranks a single neglected album.
+     */
+    const neglectedArtists = artists.items
+        .filter((artist) => artist.mbz && (artist.songCount ?? 0) >= NEGLECTED_MIN_TRACKS)
+        .map((artist) => ({
+            genre: artist.genres[0]?.name ?? null,
+            mbid: artist.mbz as string,
+            name: artist.name,
+            plays: artist.playCount ?? 0,
+            tracks: artist.songCount as number,
+        }))
+        .filter((artist) => artist.plays / artist.tracks <= NEGLECTED_MAX_PLAYS_PER_TRACK)
+        .sort((a, b) => a.plays / a.tracks - b.plays / b.tracks || b.tracks - a.tracks)
+        .slice(0, NEGLECTED_LIMIT);
+
     return {
         albumKeys: [...albumKeys],
         albumMbids: [...albumMbids],
         artistNames: [...artistNames],
         artistPlays: [...artistPlays].filter(([, plays]) => plays > 0),
+        neglectedArtists,
         recordingMbids: [...recordingMbids],
         songCount: songs.items.length,
         syncedAt: Date.now(),

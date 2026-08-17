@@ -83,6 +83,7 @@ const HomeItemSchema = z.enum([
  */
 const DiscoverSectionSchema = z.enum([
     'fresh-releases',
+    'library-corners',
     'news',
     'new-to-you',
     'similar-artists',
@@ -970,6 +971,7 @@ export enum DiscordLinkType {
 
 export enum DiscoverSection {
     FRESH_RELEASES = 'fresh-releases',
+    LIBRARY_CORNERS = 'library-corners',
     NEW_TO_YOU = 'new-to-you',
     NEWS = 'news',
     SIMILAR_ARTISTS = 'similar-artists',
@@ -1253,6 +1255,7 @@ const discoverItems = [
     DiscoverSection.SPOTLIGHT,
     DiscoverSection.FRESH_RELEASES,
     DiscoverSection.SIMILAR_ARTISTS,
+    DiscoverSection.LIBRARY_CORNERS,
     DiscoverSection.SOCIAL,
     DiscoverSection.NEWS,
 ].map((item) => ({
@@ -2949,10 +2952,20 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     state.general.discoverItems ??= discoverItems;
                 }
 
+                if (version < 37) {
+                    // Merged in rather than appended, so a list saved before this section
+                    // existed gains it in its intended place instead of at the end.
+                    state.general.discoverItems = discoverItems.map(
+                        (fallback) =>
+                            state.general.discoverItems.find((saved) => saved.id === fallback.id) ??
+                            fallback,
+                    );
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 36,
+            version: 37,
         },
     ),
 );
