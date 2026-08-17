@@ -55,6 +55,13 @@ interface FeatureCarouselProps {
     data: Album[] | undefined;
     /** Turn off for items that have no library id to link to. */
     enableNavigation?: boolean;
+    /**
+     * Sends the card to a page outside the app instead, when internal navigation is off.
+     *
+     * Return null for an item that has no such page. Consulted only when `enableNavigation`
+     * is false, so a library carousel keeps linking to the album detail route.
+     */
+    getExternalUrl?: (album: Album) => null | string;
     onNearEnd?: () => void;
     /** Replaces the queue controls, for items the server cannot play. */
     renderControls?: (album: Album) => ReactNode;
@@ -80,10 +87,16 @@ const getItemsPerRow = (breakpoints: {
 interface CarouselItemProps {
     album: Album;
     enableNavigation: boolean;
+    getExternalUrl?: (album: Album) => null | string;
     renderControls?: (album: Album) => ReactNode;
 }
 
-const CarouselItem = ({ album, enableNavigation, renderControls }: CarouselItemProps) => {
+const CarouselItem = ({
+    album,
+    enableNavigation,
+    getExternalUrl,
+    renderControls,
+}: CarouselItemProps) => {
     const imageUrl = useItemImageUrl({
         id: album.imageId || undefined,
         // An album carrying its own art skips the server lookup, which it has no id for.
@@ -175,6 +188,8 @@ const CarouselItem = ({ album, enableNavigation, renderControls }: CarouselItemP
         </div>
     );
 
+    const externalUrl = enableNavigation ? null : (getExternalUrl?.(album) ?? null);
+
     return (
         <div className={styles.carouselItem}>
             <BackgroundOverlay backgroundColor={backgroundColor} opacity={0.7} />
@@ -188,6 +203,15 @@ const CarouselItem = ({ album, enableNavigation, renderControls }: CarouselItemP
                 >
                     {content}
                 </Link>
+            ) : externalUrl ? (
+                <a
+                    className={styles.carouselLink}
+                    href={externalUrl}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                >
+                    {content}
+                </a>
             ) : (
                 <div className={styles.carouselLink}>{content}</div>
             )}
@@ -198,6 +222,7 @@ const CarouselItem = ({ album, enableNavigation, renderControls }: CarouselItemP
 export const FeatureCarousel = ({
     data,
     enableNavigation = true,
+    getExternalUrl,
     onNearEnd,
     renderControls,
 }: FeatureCarouselProps) => {
@@ -327,6 +352,7 @@ export const FeatureCarousel = ({
                             <CarouselItem
                                 album={album}
                                 enableNavigation={enableNavigation}
+                                getExternalUrl={getExternalUrl}
                                 renderControls={renderControls}
                             />
                         </motion.div>

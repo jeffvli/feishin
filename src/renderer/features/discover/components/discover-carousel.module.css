@@ -1,0 +1,7 @@
+/* Wraps a whole card, so it has to fill the grid cell the card would otherwise fill itself. */
+.card-link {
+    display: block;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+}

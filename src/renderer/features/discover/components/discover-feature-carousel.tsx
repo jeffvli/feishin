@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import { FeatureCarousel } from '/@/renderer/components/feature-carousel/feature-carousel';
-import { DiscoverItem } from '/@/renderer/features/discover/utils/lb-adapters';
+import { DiscoverItem, listenBrainzUrl } from '/@/renderer/features/discover/utils/lb-adapters';
 import {
     usePreviewActions,
     usePreviewPlayingId,
@@ -22,9 +22,10 @@ interface DiscoverFeatureCarouselProps {
 /**
  * ListenBrainz suggestions given the hero treatment the home page uses for featured albums.
  *
- * `FeatureCarousel` is built around library albums, so the two escape hatches carry the
+ * `FeatureCarousel` is built around library albums, so three escape hatches carry the
  * difference: `enableNavigation={false}` because a Discover item has no library id to link to,
- * and `renderControls` because the only thing playable here is a thirty second external clip.
+ * `getExternalUrl` to send the card to listenbrainz.org instead, and `renderControls` because
+ * the only thing playable here is a thirty second external clip.
  */
 export function DiscoverFeatureCarousel(props: DiscoverFeatureCarouselProps) {
     const { items, title } = props;
@@ -54,6 +55,15 @@ export function DiscoverFeatureCarousel(props: DiscoverFeatureCarouselProps) {
         });
     }, [items]);
 
+    const getExternalUrl = useCallback(
+        (album: Album) => {
+            const item = itemsById.get(album.id);
+
+            return item ? listenBrainzUrl(item) : null;
+        },
+        [itemsById],
+    );
+
     const renderControls = useCallback(
         (album: Album) => {
             // The projection above is what the carousel hands back, and it carries neither the
@@ -64,6 +74,8 @@ export function DiscoverFeatureCarousel(props: DiscoverFeatureCarouselProps) {
                 return null;
             }
 
+            // `PlayButton` cancels and stops its own click before invoking this, so starting a
+            // clip does not also follow the ListenBrainz link the card now sits inside.
             return (
                 <PlayButton
                     fill
@@ -98,6 +110,7 @@ export function DiscoverFeatureCarousel(props: DiscoverFeatureCarouselProps) {
             <FeatureCarousel
                 data={albums}
                 enableNavigation={false}
+                getExternalUrl={getExternalUrl}
                 renderControls={renderControls}
             />
         </Stack>

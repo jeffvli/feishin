@@ -26,12 +26,25 @@ export interface DiscoverItem {
      */
     albumName: null | string;
     artistName: string;
-    /** Stable React key. Not a library id and never navigable. */
+    /**
+     * Stable React key. Not a library id, so it cannot address anything on the user's server.
+     *
+     * For an artist it is the artist MBID, which `listenBrainzUrl` links out on. For a track it
+     * is the recording MBID when ListenBrainz supplied one and a synthesised
+     * `"${artist}-${title}"` string otherwise, so it is not safe to put in a URL unchecked.
+     */
     id: string;
     imageUrl: null | string;
     kind: DiscoverItemKind;
     /** Present when the item is a track. Enables exact preview resolution. */
     recordingMbid: null | string;
+    /**
+     * The release group, which is the id both ListenBrainz and MusicBrainz treat as "the album".
+     *
+     * Separate from `releaseMbids` because that list is a bag of candidates for matching, where
+     * an extra id costs nothing, while a URL needs the one id its route accepts.
+     */
+    releaseGroupMbid: null | string;
     /** Release and release-group ids, for matching against a library that records them. */
     releaseMbids: string[];
     /** Album name for tracks, or the release date for releases. Rendered as the second row. */
@@ -125,6 +138,7 @@ export function fromFreshRelease(release: LbFreshRelease): DiscoverItem {
             releaseGroupArtUrl(release.release_group_mbid),
         kind: 'release',
         recordingMbid: null,
+        releaseGroupMbid: release.release_group_mbid,
         releaseMbids: compact([release.release_mbid, release.release_group_mbid]),
         subtitle: release.release_date,
         title: release.release_name,
@@ -144,6 +158,7 @@ export function fromPlaylistTrack(track: LbPlaylistTrack): DiscoverItem {
         imageUrl: coverArtUrl(metadata?.caa_release_mbid, metadata?.caa_id),
         kind: 'track',
         recordingMbid,
+        releaseGroupMbid: null,
         releaseMbids: compact([metadata?.caa_release_mbid]),
         subtitle: track.album ?? null,
         title: track.title,
@@ -171,6 +186,7 @@ export function fromRecommendation(
             releaseGroupArtUrl(entry.release?.release_group_mbid),
         kind: 'track',
         recordingMbid,
+        releaseGroupMbid: entry.release?.release_group_mbid ?? null,
         releaseMbids: compact([entry.release?.caa_release_mbid, entry.release?.release_group_mbid]),
         subtitle: entry.release?.name ?? null,
         title: entry.recording.name,
@@ -186,6 +202,7 @@ export function fromRecordingStat(stat: LbRecordingStat): DiscoverItem {
         imageUrl: coverArtUrl(stat.caa_release_mbid, stat.caa_id),
         kind: 'track',
         recordingMbid: stat.recording_mbid,
+        releaseGroupMbid: null,
         releaseMbids: compact([stat.caa_release_mbid]),
         subtitle: stat.release_name,
         title: stat.track_name,
@@ -201,6 +218,7 @@ export function fromSimilarArtist(artist: LbSimilarArtist): DiscoverItem {
         imageUrl: null,
         kind: 'artist',
         recordingMbid: null,
+        releaseGroupMbid: null,
         releaseMbids: [],
         // The disambiguation comment, e.g. "American rock band", is the only extra thing the
         // endpoint knows about an artist and reads better than a raw similarity score.
@@ -218,11 +236,39 @@ export function fromSimilarRecording(recording: LbSimilarRecording): DiscoverIte
         imageUrl: coverArtUrl(recording.caa_release_mbid, recording.caa_id),
         kind: 'track',
         recordingMbid: recording.recording_mbid,
+        releaseGroupMbid: null,
         releaseMbids: compact([recording.release_mbid, recording.caa_release_mbid]),
         subtitle: recording.release_name,
         title: recording.recording_name,
         urlRels: [],
     };
+}
+
+/**
+ * The item's page on listenbrainz.org, or null when nothing identifies it there.
+ *
+ * Each of the three routes accepts exactly one kind of MusicBrainz id and silently renders the
+ * generic ListenBrainz shell for anything else, so a wrong id produces a page that looks like
+ * the site working rather than an error. `/album/` in particular wants the release group:
+ * served a release id it returns a response byte-identical to one for an invented uuid.
+ *
+ * Returning null is the ordinary case for a track ListenBrainz named without identifying, which
+ * the adapters key on artist and title instead. That card stays unlinked rather than pointing
+ * at a route no id of its own resolves.
+ */
+export function listenBrainzUrl(item: DiscoverItem): null | string {
+    switch (item.kind) {
+        case 'artist':
+            return isMbid(item.id) ? `https://listenbrainz.org/artist/${item.id}/` : null;
+        case 'release':
+            return isMbid(item.releaseGroupMbid)
+                ? `https://listenbrainz.org/album/${item.releaseGroupMbid}/`
+                : null;
+        case 'track':
+            return isMbid(item.recordingMbid)
+                ? `https://listenbrainz.org/track/${item.recordingMbid}/`
+                : null;
+    }
 }
 
 /**
@@ -298,4 +344,9 @@ export function rankSimilar<T extends { score: number }>(
 /** Most ListenBrainz id fields are nullable, and an id list should carry only real ids. */
 function compact(values: (null | string | undefined)[]): string[] {
     return values.filter((value): value is string => Boolean(value));
+}
+
+/** Tells a real MusicBrainz id from the synthesised keys the adapters fall back to. */
+function isMbid(value: null | string | undefined): value is string {
+    return typeof value === 'string' && UUID_PATTERN.test(value);
 }

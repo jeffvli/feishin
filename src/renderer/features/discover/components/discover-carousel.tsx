@@ -1,12 +1,14 @@
 import { useMemo } from 'react';
 
+import styles from './discover-carousel.module.css';
+
 import {
     GridCarousel,
     useGridCarouselContainerQuery,
 } from '/@/renderer/components/grid-carousel/grid-carousel-v2';
 import { DataRow, MemoizedItemCard } from '/@/renderer/components/item-card/item-card';
 import { ItemControls } from '/@/renderer/components/item-list/types';
-import { DiscoverItem } from '/@/renderer/features/discover/utils/lb-adapters';
+import { DiscoverItem, listenBrainzUrl } from '/@/renderer/features/discover/utils/lb-adapters';
 import {
     usePreviewActions,
     usePreviewPlayingId,
@@ -42,6 +44,11 @@ const ROWS: DataRow[] = [
  * already degrades for items that have no server behind them: `useItemImageUrl` short-circuits
  * on an external `imageUrl`, and `enableNavigation={false}` keeps the card from linking to a
  * library id that does not exist. So nothing here needs new card chrome.
+ *
+ * A suggestion does have a home on listenbrainz.org, though, which is where the anchor below
+ * points. `target="_blank"` is enough to reach the default browser: the main process answers
+ * `setWindowOpenHandler` with `shell.openExternal` and denies the in-app navigation, and the
+ * static web build needs no special handling at all.
  */
 export function DiscoverCarousel(props: DiscoverCarouselProps) {
     const { containerQuery, isArtist, items, rowCount = 1, title } = props;
@@ -93,27 +100,45 @@ export function DiscoverCarousel(props: DiscoverCarouselProps) {
                 name: item.title,
             } as unknown as Album | AlbumArtist;
 
+            // The preview button ends up inside the anchor below, but `ItemCardControls` calls
+            // `stopPropagation` and `preventDefault` on its own click, so pressing it starts a
+            // clip without also opening the browser.
+            const card = (
+                <MemoizedItemCard
+                    controls={controls}
+                    data={data}
+                    enableNavigation={false}
+                    imageFetchPriority="low"
+                    isRound={isArtist}
+                    itemType={isArtist ? LibraryItem.ALBUM_ARTIST : LibraryItem.ALBUM}
+                    previewState={
+                        canPreview
+                            ? {
+                                  isLoading: resolvingId === item.id,
+                                  isPlaying: playingId === item.id,
+                              }
+                            : undefined
+                    }
+                    rows={ROWS}
+                    type="poster"
+                    withControls={canPreview}
+                />
+            );
+
+            const url = listenBrainzUrl(item);
+
             return {
-                content: (
-                    <MemoizedItemCard
-                        controls={controls}
-                        data={data}
-                        enableNavigation={false}
-                        imageFetchPriority="low"
-                        isRound={isArtist}
-                        itemType={isArtist ? LibraryItem.ALBUM_ARTIST : LibraryItem.ALBUM}
-                        previewState={
-                            canPreview
-                                ? {
-                                      isLoading: resolvingId === item.id,
-                                      isPlaying: playingId === item.id,
-                                  }
-                                : undefined
-                        }
-                        rows={ROWS}
-                        type="poster"
-                        withControls={canPreview}
-                    />
+                content: url ? (
+                    <a
+                        className={styles.cardLink}
+                        href={url}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                    >
+                        {card}
+                    </a>
+                ) : (
+                    card
                 ),
                 id: item.id,
             };
