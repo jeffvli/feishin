@@ -19,6 +19,13 @@ import { logger } from '/@/renderer/utils/logger';
  * history has to be walked once and held locally.
  */
 export interface ListenIndexData {
+    /**
+     * Listens absorbed so far.
+     *
+     * Counted rather than derived from the timespan covered, because listens are not spread
+     * evenly over the years and a resumed walk has to report where it actually is.
+     */
+    indexedCount: number;
     /** True once the backward walk has reached the beginning of history. */
     isComplete: boolean;
     /** Newest listen indexed. The stop line for the next catch-up walk. */
@@ -127,24 +134,6 @@ function delay(ms: number, signal?: AbortSignal): Promise<void> {
     });
 }
 
-/**
- * How much of the history a stored index already covers.
- *
- * Listens are not evenly spread over time, so this is a fraction of the timespan rather than a
- * count, and it is only ever used to place a progress bar. A complete index short-circuits to
- * the real total.
- */
-function estimateIndexed(previous: ListenIndexData, listenCount: number): number {
-    if (previous.isComplete || previous.oldestTs === null) {
-        return previous.isComplete ? listenCount : 0;
-    }
-
-    const covered = previous.latestTs - previous.oldestTs;
-    const whole = previous.latestTs - FIRST_PLAUSIBLE_LISTEN_TS;
-
-    return whole > 0 ? Math.round(listenCount * Math.min(1, covered / whole)) : 0;
-}
-
 async function fetchListenCount(username: string, signal?: AbortSignal): Promise<number> {
     const response = await fetch(
         `https://api.listenbrainz.org/1/user/${encodeURIComponent(username)}/listen-count`,
@@ -219,9 +208,9 @@ async function syncListenIndex(
     let oldestTs = previous?.oldestTs ?? null;
     let isComplete = previous?.isComplete ?? false;
 
-    // Everything already held counts as done, so a resumed walk reports the fraction of the
-    // whole history it has covered rather than restarting its progress bar at zero.
-    let done = previous ? estimateIndexed(previous, listenCount) : 0;
+    // Everything already absorbed counts as done, so a resumed walk continues its progress bar
+    // rather than restarting it at zero.
+    let done = previous?.indexedCount ?? 0;
     const startedAt = Date.now();
     let fetched = 0;
 
@@ -267,6 +256,7 @@ async function syncListenIndex(
     };
 
     const snapshot = (): ListenIndexData => ({
+        indexedCount: Math.min(done, listenCount),
         isComplete,
         latestTs,
         listenCount,
@@ -413,9 +403,6 @@ function withTimeout(signal?: AbortSignal): AbortSignal {
     return signal ? AbortSignal.any([signal, deadline]) : deadline;
 }
 
-/** Last.fm opened in 2002, so nothing imported into ListenBrainz predates it by much. */
-const FIRST_PLAUSIBLE_LISTEN_TS = 1030000000;
-
 export const listenIndexQueries = {
     index: (username: string, client: QueryClient) =>
         queryOptions({
@@ -426,22 +413,32 @@ export const listenIndexQueries = {
             /**
              * While the history is still being backfilled, keep taking bites.
              *
-             * One pass is twenty pages, so a six-figure history needs several. Waiting a whole
-             * `STALE_MS` between them would take most of a day to finish; running them back to
-             * back would reach the drop-the-socket ceiling again. A minute apart converges in
-             * a few minutes of ordinary use and averages well under a request every two
-             * seconds. Once complete this stops entirely and only the hourly catch-up remains.
+             * One pass is twenty pages, so a six-figure history needs several, and the page
+             * waits for all of them. Waiting a whole `STALE_MS` between passes would take most
+             * of a day; running them back to back would reach the drop-the-socket ceiling
+             * again, which is what bounded the pass in the first place. The gap below is the
+             * compromise, and it dominates the first run: it is dead time the user spends
+             * watching a progress bar. Once complete this stops entirely and only the hourly
+             * catch-up remains.
              */
             refetchInterval: (query) =>
                 query.state.data && !query.state.data.isComplete ? BACKFILL_INTERVAL_MS : false,
             refetchIntervalInBackground: true,
             refetchOnWindowFocus: false,
-            // A partial index is still correct for everything it holds, so serving it while the
-            // rest arrives is better than making the user wait for the whole history.
+            // One retry, then the page stops waiting and falls back to the library filter
+            // alone. A walk that cannot start at all is an outage, not a slow index.
             retry: 1,
             staleTime: STALE_MS,
         }),
 };
 
-/** Gap between backfill passes. See `refetchInterval` above. */
-const BACKFILL_INTERVAL_MS = 1000 * 60;
+/**
+ * Gap between backfill passes. See `refetchInterval` above.
+ *
+ * Twenty seconds rather than a minute because the page now blocks on a complete history, so
+ * this interval is the user's wait rather than background upkeep. Averaged over a pass it is
+ * still well under a request per second, an order of magnitude inside the documented
+ * allowance, and the ceiling that actually bit was pages fetched back to back, which the pass
+ * bound already prevents.
+ */
+const BACKFILL_INTERVAL_MS = 1000 * 20;

@@ -13,9 +13,11 @@ import { artistVariants, normalizeName } from '/@/renderer/features/discover/uti
  * ownership filter and is presented as a discovery.
  */
 export interface ListenIndex {
-    /** True once the whole history has been walked. A partial index still filters correctly. */
+    /** Listens absorbed so far, so partial coverage can be stated as a fraction. */
+    indexedCount: number;
+    /** True once the whole history has been walked. Until then nothing is filtered. */
     isComplete: boolean;
-    /** False until enough of an index exists to filter against at all. */
+    /** True once any index exists, complete or not. Drives the progress line, not the filter. */
     isReady: boolean;
     /**
      * The history could not be read and retrying has stopped.
@@ -27,7 +29,7 @@ export interface ListenIndex {
      * as the service was unwell. Better a page filtered only by the library than no page.
      */
     isUnavailable: boolean;
-    /** Listens ListenBrainz reports in total, so partial coverage can be stated as a fraction. */
+    /** Listens ListenBrainz reports in total. */
     listenCount: number;
     /** Oldest listen reached so far, or null before the first pass. Epoch seconds. */
     oldestTs: null | number;
@@ -38,6 +40,7 @@ export interface ListenIndex {
 }
 
 const EMPTY_INDEX: ListenIndex = {
+    indexedCount: 0,
     isComplete: false,
     isReady: false,
     isUnavailable: false,
@@ -62,7 +65,11 @@ export function filterHeardItems(items: DiscoverItem[], index: ListenIndex): Dis
         return items;
     }
 
-    if (!index.isReady) {
+    // Deliberately a complete history, not merely a usable one. A partial index filters
+    // correctly for every listen it holds and says nothing about the rest, so filtering
+    // against one produces a page that looks finished while quietly offering back music the
+    // user played before the walk reached that far.
+    if (!index.isComplete) {
         return [];
     }
 
@@ -86,9 +93,8 @@ export function filterHeardItems(items: DiscoverItem[], index: ListenIndex): Dis
 /**
  * The listen index, restored from IndexedDB whenever one has been built before.
  *
- * Usable as soon as any of it exists rather than only when complete: a walk that has covered
- * the last two years already recognises almost everything ListenBrainz is likely to suggest,
- * and waiting for the remaining decade would hold the page hostage to old history.
+ * Restoring is what makes the wait bearable. The first run pays for the whole history once;
+ * every run after it resumes from what was stored and only has to catch up.
  */
 export function useListenIndex(username: string): ListenIndex {
     const client = useQueryClient();
@@ -101,6 +107,9 @@ export function useListenIndex(username: string): ListenIndex {
         }
 
         return {
+            // Absent from indexes written by builds before the count existed, and those are
+            // restored from IndexedDB rather than rebuilt, so it has to survive being missing.
+            indexedCount: query.data.indexedCount ?? 0,
             isComplete: query.data.isComplete,
             isReady: true,
             isUnavailable: false,

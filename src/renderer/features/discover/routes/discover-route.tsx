@@ -16,6 +16,7 @@ import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { useDiscoverSettings, useWindowSettings } from '/@/renderer/store';
 import { Center } from '/@/shared/components/center/center';
+import { Progress } from '/@/shared/components/progress/progress';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
@@ -31,6 +32,11 @@ const DiscoverRoute = () => {
     const markSeen = useMarkDiscoverSeen();
     const { stop } = usePreviewActions();
     const sync = useDiscoverSync();
+
+    // The live pass when one is running, the stored index when one is not. See the bar below.
+    const isReadingHistory = !history.isComplete && !history.isUnavailable;
+    const historyDone = sync.phase === 'history' ? sync.done : history.indexedCount;
+    const historyTotal = sync.total || history.listenCount;
 
     // Visiting the page is what counts as reading the feed, so the badge clears here.
     useEffect(() => {
@@ -77,31 +83,58 @@ const DiscoverRoute = () => {
                         {username && isPending && (
                             <>
                                 <Center>
-                                    <Stack align="center" gap="sm">
+                                    <Stack
+                                        align="center"
+                                        gap="sm"
+                                        style={{ maxWidth: '32rem', width: '100%' }}
+                                    >
                                         <Text size="md">
                                             {t('page.discover.loadingProgress', {
                                                 ready: progress.ready,
                                                 total: progress.total,
                                             })}
                                         </Text>
-                                        {isIndexing && sync.phase !== 'history' && (
-                                            <Text isMuted size="sm" style={{ maxWidth: '32rem' }}>
+                                        {isIndexing && !isReadingHistory && (
+                                            <Text isMuted size="sm">
                                                 {t('page.discover.loadingLibrary')}
                                             </Text>
                                         )}
-                                        {/* The history walk is the only wait measured in
-                                            minutes, so it is the only one that gets a count and
-                                            an estimate rather than a sentence. */}
-                                        {sync.phase === 'history' && (
-                                            <Text isMuted size="sm" style={{ maxWidth: '32rem' }}>
-                                                {sync.etaSeconds === null
-                                                    ? t('page.discover.loadingHistoryStart')
-                                                    : t('page.discover.loadingHistory', {
-                                                          done: sync.done.toLocaleString(),
-                                                          eta: formatEta(sync.etaSeconds),
-                                                          total: sync.total.toLocaleString(),
-                                                      })}
-                                            </Text>
+                                        {/* The history walk is the only wait measured in minutes,
+                                            so it is the only one that gets a bar and a count
+                                            rather than a sentence. It runs as a series of bounded
+                                            passes with a gap between them, and the count has to
+                                            survive those gaps: the live sync store empties when a
+                                            pass ends, so the stored index is what the bar falls
+                                            back to. Without that the page spends most of the wait
+                                            showing nothing at all. */}
+                                        {isReadingHistory && (
+                                            <>
+                                                <Text
+                                                    isMuted
+                                                    size="sm"
+                                                    style={{ textAlign: 'center' }}
+                                                >
+                                                    {historyTotal === 0
+                                                        ? t('page.discover.loadingHistoryStart')
+                                                        : sync.etaSeconds !== null
+                                                          ? t('page.discover.loadingHistory', {
+                                                                done: historyDone.toLocaleString(),
+                                                                eta: formatEta(sync.etaSeconds),
+                                                                total: historyTotal.toLocaleString(),
+                                                            })
+                                                          : t('page.discover.loadingHistoryPass', {
+                                                                done: historyDone.toLocaleString(),
+                                                                total: historyTotal.toLocaleString(),
+                                                            })}
+                                                </Text>
+                                                {historyTotal > 0 && (
+                                                    <Progress
+                                                        size="sm"
+                                                        style={{ width: '100%' }}
+                                                        value={(historyDone / historyTotal) * 100}
+                                                    />
+                                                )}
+                                            </>
                                         )}
                                         {progress.failed > 0 && (
                                             <Text isMuted size="sm">
@@ -145,23 +178,13 @@ const DiscoverRoute = () => {
                                 />
                             );
                         })}
-                        {/* The history filter is only as good as how much of the history it has
-                            read, and a page filtered on two years of listens looks exactly like
-                            one filtered on twenty. Say which it is, for as long as it matters. */}
-                        {username && rows.length > 0 && !history.isComplete && (
+                        {/* Rows only render once the history is in hand, so the one case left to
+                            explain is the history that could not be read at all. The page is
+                            still useful without it and says why it is weaker. */}
+                        {username && rows.length > 0 && history.isUnavailable && (
                             <Center>
                                 <Text isMuted size="sm">
-                                    {history.isUnavailable
-                                        ? t('page.discover.historyUnavailable')
-                                        : sync.phase === 'history' || sync.phase === 'catchup'
-                                          ? t('page.discover.historyPass', {
-                                                done: sync.done.toLocaleString(),
-                                                total: sync.total.toLocaleString(),
-                                            })
-                                          : t('page.discover.historyIndexing', {
-                                                since: formatSince(history.oldestTs),
-                                                total: history.listenCount.toLocaleString(),
-                                            })}
+                                    {t('page.discover.historyUnavailable')}
                                 </Text>
                             </Center>
                         )}
@@ -200,18 +223,6 @@ function formatEta(seconds: number): string {
     }
 
     return `${Math.ceil(seconds / 60)} min`;
-}
-
-/** How far back the history reaches, at the precision the number deserves. */
-function formatSince(oldestTs: null | number): string {
-    if (oldestTs === null) {
-        return '-';
-    }
-
-    return new Date(oldestTs * 1000).toLocaleDateString(undefined, {
-        month: 'short',
-        year: 'numeric',
-    });
 }
 
 const DiscoverRouteWithBoundary = () => {

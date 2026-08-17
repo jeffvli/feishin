@@ -22,8 +22,8 @@ const MAX_SEEN_IDS = 1000;
  * How many items in this week's generated playlists the user has not seen yet.
  *
  * Deliberately limited to the two weekly playlists. They are the only genuinely periodic
- * ListenBrainz feed, and they are small, whereas `explore/fresh-releases` is several megabytes
- * and must not be fetched merely to render a sidebar badge.
+ * ListenBrainz feed: a fresh release appears whenever a label ships something, so counting
+ * those would leave the badge permanently lit.
  */
 export function useDiscoverUnreadCount(): number {
     const { badge, enabled, username } = useDiscoverSettings();

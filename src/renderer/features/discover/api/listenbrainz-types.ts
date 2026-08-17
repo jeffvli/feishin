@@ -21,15 +21,17 @@ export interface LbCreditedArtist {
     join_phrase: string;
 }
 
-/** An entry in `payload.releases` of `/1/explore/fresh-releases`. */
+/** An entry in `payload.releases` of `/1/user/<name>/fresh_releases`. */
 export interface LbFreshRelease {
     artist_credit_name: string;
     artist_mbids: string[];
     caa_id: null | number;
     caa_release_mbid: null | string;
+    /** How strongly the release ties to the user's listening. Only the user-scoped feed sets it. */
+    confidence: number;
     /**
-     * Documented as the caller's own listen count, but observed to be 0 on every entry
-     * even when `username` is supplied. Do not rely on it for personalisation.
+     * Documented as the caller's own listen count, but observed to be 0 on every entry of
+     * both fresh-release feeds. Do not rely on it; `confidence` is the usable signal.
      */
     listen_count: number;
     release_date: string;

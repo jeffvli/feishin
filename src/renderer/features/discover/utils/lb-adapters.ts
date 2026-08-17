@@ -1,5 +1,4 @@
 import {
-    LbArtistStat,
     LbFreshRelease,
     LbPlaylistTrack,
     LbRecordingMetadata,
@@ -101,32 +100,6 @@ export function releaseGroupArtUrl(releaseGroupMbid: null | string | undefined):
 }
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-/**
- * Narrow the global fresh-release feed to artists the user actually listens to.
- *
- * The `username` parameter on `/explore/fresh-releases` is documented as personalising the
- * response but was observed returning `listen_count: 0` on all ~8,000 entries, so the
- * filtering has to happen here. Top artists are already fetched for their own carousel.
- */
-export function filterFreshReleasesByArtists(
-    releases: LbFreshRelease[],
-    topArtists: LbArtistStat[],
-    limit = 20,
-): LbFreshRelease[] {
-    const wanted = new Set(
-        topArtists.map((artist) => artist.artist_mbid).filter((mbid): mbid is string => !!mbid),
-    );
-
-    if (wanted.size === 0) {
-        return [];
-    }
-
-    return releases
-        .filter((release) => release.artist_mbids.some((mbid) => wanted.has(mbid)))
-        .sort((a, b) => b.release_date.localeCompare(a.release_date))
-        .slice(0, limit);
-}
 
 export function fromFreshRelease(release: LbFreshRelease): DiscoverItem {
     return {
@@ -339,6 +312,30 @@ export function rankSimilar<T extends { score: number }>(
     }
 
     return [...best.values()].sort((a, b) => b.score - a.score).slice(0, limit);
+}
+
+/**
+ * Order fresh releases newest first, but only among records that are actually out.
+ *
+ * `release_date` is a scheduled date, so it can be in the future, and a plain descending sort
+ * therefore leads with records nobody can hear yet. On the global feed that was most of the
+ * row: twelve of the twenty visible cards were unreleased, and the month's actual releases
+ * sat below the cut. Released records lead, newest first; the upcoming ones follow, soonest
+ * first, which is the order they become interesting in.
+ */
+export function sortByReleaseDate(releases: LbFreshRelease[], limit = 20): LbFreshRelease[] {
+    const today = new Date().toISOString().slice(0, 10);
+    const out: LbFreshRelease[] = [];
+    const upcoming: LbFreshRelease[] = [];
+
+    for (const release of releases) {
+        (release.release_date > today ? upcoming : out).push(release);
+    }
+
+    out.sort((a, b) => b.release_date.localeCompare(a.release_date));
+    upcoming.sort((a, b) => a.release_date.localeCompare(b.release_date));
+
+    return [...out, ...upcoming].slice(0, limit);
 }
 
 /** Most ListenBrainz id fields are nullable, and an id list should carry only real ids. */

@@ -133,8 +133,8 @@ export const discoverKeys = {
         ['listenbrainz', 'similar-artists', seedMbids] as const,
     similarRecordings: (seedMbids: string[]) =>
         ['listenbrainz', 'similar-recordings', seedMbids] as const,
-    // Range and count belong in the key: the fresh-release seed and the visible "top artists"
-    // row ask for wildly different slices, and a shared key would let them clobber each other.
+    // Range and count belong in the key, because a shared key would let two callers asking
+    // for different slices of the same stat clobber each other.
     topArtists: (username: string, range: string, count: number) =>
         ['listenbrainz', username, 'top-artists', range, count] as const,
     topRecordings: (username: string, range: string, count: number) =>
@@ -143,15 +143,23 @@ export const discoverKeys = {
 
 export const listenbrainzQueries = {
     /**
-     * The global fresh-release feed. Note this is ~8,000 releases and several megabytes;
-     * `username` does not filter it server side, so callers must narrow it themselves.
+     * New records from artists the user listens to, scored and narrowed server side.
+     *
+     * Not `/explore/fresh-releases/`, which despite taking a `username` returns the same
+     * ~7,400 releases to everyone. Narrowing that client side worked, but only against a
+     * second request for the user's top 1,000 artists, and it could not see past that cutoff:
+     * an artist ranked 1,001st had their new record silently dropped. This endpoint scores the
+     * same question server side and answers in tens of releases rather than megabytes.
+     *
+     * `days` is capped at 90; anything larger is a 400. `confidence` is how strongly the
+     * release ties to the user's listening, and is the only field the global feed lacks.
      */
-    freshReleases: (username: string, days = 30) =>
+    freshReleases: (username: string, days = 90) =>
         queryOptions({
             ...CACHE,
             queryFn: ({ signal }) =>
                 lbFetch<{ payload: { releases: LbFreshRelease[] } }>(
-                    `/explore/fresh-releases/?username=${encodeURIComponent(username)}&days=${days}`,
+                    `/user/${encodeURIComponent(username)}/fresh_releases?days=${days}`,
                     signal,
                 ).then((response) => response.payload.releases),
             queryKey: discoverKeys.freshReleases(username),

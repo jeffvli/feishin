@@ -19,7 +19,6 @@ import {
 } from '/@/renderer/features/discover/hooks/use-listen-index';
 import {
     DiscoverItem,
-    filterFreshReleasesByArtists,
     fromFreshRelease,
     fromPlaylistTrack,
     fromRecommendation,
@@ -28,6 +27,7 @@ import {
     fromSimilarRecording,
     mergeDiscoverSources,
     rankSimilar,
+    sortByReleaseDate,
 } from '/@/renderer/features/discover/utils/lb-adapters';
 import { useSettingsStore } from '/@/renderer/store';
 
@@ -154,22 +154,7 @@ export function useDiscoverData(username: string) {
         staleTime: 1000 * 60 * 60,
     });
 
-    /**
-     * A deliberately wide artist seed, used only to narrow the global fresh-release feed.
-     *
-     * This is not the same slice as the visible "top artists" row. Matching the feed against a
-     * month's top 20 artists found exactly 1 of 3,093 releases; all-time top 1,000 finds 140 of
-     * 8,300. The row is worth having only at the wider setting.
-     */
-    const artistSeed = useQuery({
-        ...listenbrainzQueries.topArtists(username, 'all_time', 1000),
-        enabled,
-    });
-
-    const freshReleases = useQuery({
-        ...listenbrainzQueries.freshReleases(username),
-        enabled: enabled && (artistSeed.data?.length ?? 0) > 0,
-    });
+    const freshReleases = useQuery({ ...listenbrainzQueries.freshReleases(username), enabled });
 
     const similarArtistSeeds = useMemo(
         () =>
@@ -277,9 +262,7 @@ export function useDiscoverData(username: string) {
         push(
             'fresh-releases',
             t('page.discover.freshReleases'),
-            filterFreshReleasesByArtists(freshReleases.data ?? [], artistSeed.data ?? []).map(
-                fromFreshRelease,
-            ),
+            sortByReleaseDate(freshReleases.data ?? []).map(fromFreshRelease),
         );
         push(
             'similar-artists',
@@ -308,7 +291,6 @@ export function useDiscoverData(username: string) {
         similarRecordings.data,
         similarRecordingSeeds,
         freshReleases.data,
-        artistSeed.data,
         topRecordings.data,
     ]);
 
@@ -380,7 +362,7 @@ export function useDiscoverData(username: string) {
         loading: 0,
         ready:
             (libraryIndex.isReady ? 1 : 0) +
-            (listenIndex.isReady || listenIndex.isUnavailable ? 1 : 0),
+            (listenIndex.isComplete || listenIndex.isUnavailable ? 1 : 0),
         total: queries.length + 2,
     };
 
@@ -400,6 +382,7 @@ export function useDiscoverData(username: string) {
         // What the history filter currently knows, so the page can say so rather than leaving
         // a partly-indexed history indistinguishable from a finished one.
         history: {
+            indexedCount: listenIndex.indexedCount,
             isComplete: listenIndex.isComplete,
             isReady: listenIndex.isReady,
             isUnavailable: listenIndex.isUnavailable,
@@ -408,9 +391,12 @@ export function useDiscoverData(username: string) {
         },
         // Every row fetches independently, so a slow or failing source never blanks the page.
         isError: queries.every((query) => query.isError),
-        isIndexing: !libraryIndex.isReady || (!listenIndex.isReady && !listenIndex.isUnavailable),
-        // Nothing renders before the library index arrives, because a row built without it
-        // would be a list of music the user already owns, which is the opposite of the point.
+        isIndexing:
+            !libraryIndex.isReady || (!listenIndex.isComplete && !listenIndex.isUnavailable),
+        // Nothing renders before both indexes are in hand. A row built without the library is
+        // a list of music the user already owns, and a row built on a partial history is worse
+        // than it looks: it silently offers back tracks played before whatever date the walk
+        // has reached, with nothing on screen to say which tracks those are.
         isPending: rowsWithImages.length === 0 && progress.loading > 0,
         progress,
         rows: rowsWithImages,
