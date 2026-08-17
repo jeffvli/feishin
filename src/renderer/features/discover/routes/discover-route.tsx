@@ -8,6 +8,7 @@ import { DiscoverFeatureCarousel } from '/@/renderer/features/discover/component
 import { DiscoverHistoryBanner } from '/@/renderer/features/discover/components/discover-history-banner';
 import { DiscoverNews } from '/@/renderer/features/discover/components/discover-news';
 import { DiscoverSkeleton } from '/@/renderer/features/discover/components/discover-skeleton';
+import { DiscoverSocial } from '/@/renderer/features/discover/components/discover-social';
 import { DiscoverSpotlight } from '/@/renderer/features/discover/components/discover-spotlight';
 import { useDiscoverSync } from '/@/renderer/features/discover/discover-sync-store';
 import { useDiscoverData } from '/@/renderer/features/discover/hooks/use-discover-data';
@@ -206,6 +207,12 @@ const DiscoverRoute = () => {
                                 <Spinner size={20} />
                             </Center>
                         )}
+                        {/* Between the recommendations and the news, which is where it belongs
+                            on both sides: it is still music to play, so it sits with the rows,
+                            but its recommendations come from named people rather than a model,
+                            so it does not join them. It hides itself when nobody is followed
+                            and nothing matched. */}
+                        {username && <DiscoverSocial username={username} />}
                         {/* Last, and outside everything above it. The rows are recommendations
                             and the footnote describes how they were filtered; this is neither,
                             so it closes the page rather than joining that block. Gated on the

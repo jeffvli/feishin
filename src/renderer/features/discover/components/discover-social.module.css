@@ -1,0 +1,201 @@
+/*
+ * A list, not another shelf.
+ *
+ * Four card rows precede this one, and the question it answers is "who played what", which is a
+ * sentence rather than a poster. Rows also give the play control a natural leading slot that a
+ * card has to overlay.
+ */
+.listens {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.listen {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr) auto auto;
+    gap: 0.875rem;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: var(--theme-radius-sm);
+
+    /* Colour only, so a row does not move under the cursor. */
+    transition: background-color 0.12s ease;
+}
+
+.listen:hover {
+    background: alpha(var(--theme-colors-foreground), 0.05);
+}
+
+/* A rule between rows rather than under each, so the last row has no trailing line. */
+.listen + .listen {
+    box-shadow: 0 -1px 0 var(--theme-colors-border);
+}
+
+.play {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    overflow: hidden;
+    cursor: pointer;
+    background: var(--theme-colors-surface);
+    border: none;
+    border-radius: var(--theme-radius-xs);
+}
+
+.art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: filter 0.12s ease;
+}
+
+/* The control is the artwork, so it only announces itself on approach. */
+.play-icon {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.12s ease;
+}
+
+.listen:hover .play-icon,
+.play:focus-visible .play-icon,
+.play-icon[data-active='true'] {
+    opacity: 1;
+}
+
+.listen:hover .art,
+.play:focus-visible .art,
+.play-icon[data-active='true'] + .art {
+    filter: brightness(0.45);
+}
+
+.title {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    overflow: hidden;
+}
+
+.title-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/*
+ * Owned tracks are the minority here by design, so the marker reads as the exception it is.
+ * It also explains why a track the user already has is in a section about discovery.
+ */
+.owned {
+    flex: none;
+    padding: 0 0.25rem;
+    font-size: 0.625rem;
+    color: var(--theme-colors-foreground-muted);
+    letter-spacing: 0.02em;
+    background: alpha(var(--theme-colors-foreground), 0.08);
+    border-radius: var(--theme-radius-xs);
+}
+
+.subtitle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cluster {
+    display: flex;
+    align-items: center;
+}
+
+/*
+ * Each chip links to that listener, so it has to lift clear of the chips stacked over it
+ * before it can be aimed at. The ring is the row background, so the overlap reads as depth.
+ */
+.avatar {
+    display: block;
+    margin-left: -0.375rem;
+    border: 2px solid var(--theme-colors-background);
+    border-radius: 50%;
+    transition:
+        transform 0.12s ease,
+        border-color 0.12s ease;
+}
+
+.avatar:first-child {
+    margin-left: 0;
+}
+
+.avatar:hover,
+.avatar:focus-visible {
+    z-index: 2;
+    outline: none;
+    border-color: var(--theme-colors-foreground-muted);
+    transform: translateY(-2px);
+}
+
+.time {
+    min-width: 3rem;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+/* Empty state */
+.empty {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: var(--theme-colors-surface);
+    border-radius: var(--theme-radius-md);
+}
+
+.peers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 0.5rem 1.5rem;
+}
+
+.peer {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.625rem;
+    align-items: center;
+}
+
+.peer-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: inherit;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.peer-name:hover {
+    text-decoration: underline;
+}
+
+.peer-score {
+    font-variant-numeric: tabular-nums;
+}
+
+.follow-link {
+    align-self: flex-start;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .avatar,
+    .art,
+    .play-icon,
+    .listen {
+        transition: none;
+    }
+}
