@@ -54,8 +54,15 @@ export interface LibraryIndexData {
 export interface NeglectedArtist {
     /** Their first genre, which is what spreads the seeds across the library rather than one shelf. */
     genre: null | string;
-    /** MusicBrainz artist id. Required: the similarity endpoints take nothing else. */
-    mbid: string;
+    /**
+     * MusicBrainz artist id, when the server has one.
+     *
+     * Null for most libraries. Navidrome reports what the files carry, and a collection ripped
+     * or downloaded outside the MusicBrainz ecosystem carries no MusicBrainz tags at all. The
+     * similarity endpoints take nothing but an id, so the renderer resolves the null ones by
+     * name against the listener's own ListenBrainz statistics.
+     */
+    mbid: null | string;
     name: string;
     plays: number;
     tracks: number;
@@ -83,8 +90,13 @@ const NEGLECTED_MIN_TRACKS = 4;
 /** Above one play per owned track an artist is in rotation, not neglected. */
 const NEGLECTED_MAX_PLAYS_PER_TRACK = 1;
 
-/** Enough to pick a spread of genres from without persisting the whole artist list. */
-const NEGLECTED_LIMIT = 100;
+/**
+ * Enough to pick a spread of genres from without persisting the whole artist list.
+ *
+ * Held higher than the handful of seeds it feeds because most entries cannot be resolved to a
+ * MusicBrainz id, and an unresolvable one is skipped rather than seeded from.
+ */
+const NEGLECTED_LIMIT = 300;
 
 /** Marks the query as one the IndexedDB persister should keep. See `main.tsx`. */
 export const LIBRARY_INDEX_KEY = 'discover-library-index';
@@ -98,7 +110,7 @@ export const LIBRARY_INDEX_KEY = 'discover-library-index';
  * which is indistinguishable from one the filters emptied. Part of the query key, so a bump
  * simply misses the stored copy and rebuilds.
  */
-const INDEX_VERSION = 2;
+const INDEX_VERSION = 3;
 
 async function buildLibraryIndex(
     serverId: string,
@@ -207,7 +219,7 @@ async function buildLibraryIndex(
     }
 
     /*
-     * Owned in quantity, played rarely, and identifiable to MusicBrainz.
+     * Owned in quantity and played rarely.
      *
      * The track floor is doing more work than it looks. It is what separates an artist the
      * owner went and collected from one the library knows about only because a server credits
@@ -219,10 +231,10 @@ async function buildLibraryIndex(
      * twice, and a large neglected discography outranks a single neglected album.
      */
     const neglectedArtists = artists.items
-        .filter((artist) => artist.mbz && (artist.songCount ?? 0) >= NEGLECTED_MIN_TRACKS)
+        .filter((artist) => (artist.songCount ?? 0) >= NEGLECTED_MIN_TRACKS)
         .map((artist) => ({
             genre: artist.genres[0]?.name ?? null,
-            mbid: artist.mbz as string,
+            mbid: artist.mbz,
             name: artist.name,
             plays: artist.playCount ?? 0,
             tracks: artist.songCount as number,

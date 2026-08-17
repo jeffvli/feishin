@@ -35,6 +35,7 @@ import {
     rankSimilar,
     sortByReleaseDate,
 } from '/@/renderer/features/discover/utils/lb-adapters';
+import { normalizeName } from '/@/renderer/features/discover/utils/library-match';
 import { useSettingsStore } from '/@/renderer/store';
 import { logger } from '/@/renderer/utils/logger';
 
@@ -129,6 +130,25 @@ const MERGED_ITEM_LIMIT = 40;
  */
 const SIMILARITY_SEED_COUNT = 5;
 
+/**
+ * `count` evenly spaced picks from `items`, always including the first.
+ *
+ * Taking the head instead is what made the similar-artist row read as one genre. The statistics
+ * it seeds from are ranked by play count, and the top of that ranking is whatever the listener
+ * has been on lately: five consecutive entries are usually five records off the same shelf.
+ * Spreading over the whole list keeps the most played seed and reaches the rest of the twenty,
+ * which is a wider account of the same month rather than a different one.
+ */
+function spread<T>(items: T[], count: number): T[] {
+    if (items.length <= count) {
+        return items;
+    }
+
+    const step = items.length / count;
+
+    return Array.from({ length: count }, (_, index) => items[Math.floor(index * step)]);
+}
+
 /** How many similar listeners to read. Each is one request. */
 const PEER_COUNT = 8;
 
@@ -183,21 +203,44 @@ export function useDiscoverData(username: string) {
 
     const freshReleases = useQuery({ ...listenbrainzQueries.freshReleases(username), enabled });
 
+    // Fills in the MusicBrainz ids the library server does not have. Only the library-seeded
+    // row needs this; everything else is seeded from ListenBrainz, which answers in ids.
+    const artistMbids = useQuery({
+        ...listenbrainzQueries.artistMbidsByName(username),
+        enabled,
+    });
+
+    /*
+     * Reversed before the map is built, so the first entry for a name wins rather than the last.
+     *
+     * Two different artists can normalize to the same name, measured at one pair in nine hundred
+     * on a real account. The list arrives ordered by play count, so the earlier of the two is
+     * the one the listener actually plays, and that is the one worth seeding from.
+     */
+    const artistMbidByName = useMemo(
+        () => new Map([...(artistMbids.data ?? [])].reverse()),
+        [artistMbids.data],
+    );
+
     const similarArtistSeeds = useMemo(
         () =>
-            (topArtists.data ?? [])
-                .map((artist) => artist.artist_mbid)
-                .filter((mbid): mbid is string => Boolean(mbid))
-                .slice(0, SIMILARITY_SEED_COUNT),
+            spread(
+                (topArtists.data ?? [])
+                    .map((artist) => artist.artist_mbid)
+                    .filter((mbid): mbid is string => Boolean(mbid)),
+                SIMILARITY_SEED_COUNT,
+            ),
         [topArtists.data],
     );
 
     const similarRecordingSeeds = useMemo(
         () =>
-            (topRecordings.data ?? [])
-                .map((recording) => recording.recording_mbid)
-                .filter((mbid): mbid is string => Boolean(mbid))
-                .slice(0, SIMILARITY_SEED_COUNT),
+            spread(
+                (topRecordings.data ?? [])
+                    .map((recording) => recording.recording_mbid)
+                    .filter((mbid): mbid is string => Boolean(mbid)),
+                SIMILARITY_SEED_COUNT,
+            ),
         [topRecordings.data],
     );
 
@@ -270,41 +313,55 @@ export function useDiscoverData(username: string) {
      * a direction its owner already expressed an interest in.
      *
      * One seed per genre, because the neglected list is ordered by neglect and the top of it
-     * would otherwise be five artists off the same forgotten shelf.
+     * would otherwise be five artists off the same forgotten shelf. Seeding needs a MusicBrainz
+     * id, which most library servers do not have, so the ones without are looked up by name in
+     * the listener's own statistics before the genre spread is applied.
      */
     const cornerSeeds = useMemo(() => {
         const genres = new Set<string>();
         const seeds: string[] = [];
+        let resolved = 0;
 
         for (const artist of libraryIndex.neglectedArtists) {
+            // The server's id where there is one, and otherwise the listener's own statistics,
+            // which name the same artist and do carry ids. Neither may know it, and an artist
+            // with no id cannot be a seed, so it is passed over rather than counted.
+            const mbid = artist.mbid ?? artistMbidByName.get(normalizeName(artist.name));
+
+            if (!mbid) {
+                continue;
+            }
+
+            resolved += 1;
+
             // An artist with no genre is kept but cannot be grouped, so it stands for itself
             // rather than blocking every other ungenred artist behind it.
-            const genre = artist.genre ?? artist.mbid;
+            const genre = artist.genre ?? mbid;
 
             if (genres.has(genre)) {
                 continue;
             }
 
             genres.add(genre);
-            seeds.push(artist.mbid);
+            seeds.push(mbid);
 
             if (seeds.length >= SIMILARITY_SEED_COUNT) {
                 break;
             }
         }
 
-        // The one thing this row depends on that the rest of the page does not: artists tagged
-        // with a MusicBrainz id. A library without them yields no seeds and an absent row, and
-        // that is indistinguishable on screen from a row the filters emptied, so it is logged.
+        // How far each stage got. A short row here has three causes that look identical on
+        // screen, and the interesting one is the middle number: it is how many of the library's
+        // neglected artists could be named to ListenBrainz at all.
         if (libraryIndex.isReady) {
             logger.info(
                 `Discover corners: ${libraryIndex.neglectedArtists.length} neglected artists, ` +
-                    `${seeds.length} seeds`,
+                    `${resolved} with an mbid, ${seeds.length} seeds`,
             );
         }
 
         return seeds;
-    }, [libraryIndex.neglectedArtists, libraryIndex.isReady]);
+    }, [libraryIndex.neglectedArtists, libraryIndex.isReady, artistMbidByName]);
 
     const cornerArtists = useQuery(listenbrainzQueries.similarArtists(cornerSeeds));
 

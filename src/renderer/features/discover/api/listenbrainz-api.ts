@@ -14,6 +14,7 @@ import {
     LbSimilarUser,
 } from '/@/renderer/features/discover/api/listenbrainz-types';
 import { hasExcludedGenre } from '/@/renderer/features/discover/utils/genre-filter';
+import { normalizeName } from '/@/renderer/features/discover/utils/library-match';
 import { logger } from '/@/renderer/utils/logger';
 
 const LB_API = 'https://api.listenbrainz.org/1';
@@ -82,7 +83,11 @@ export async function fetchArtistGenres(
         const best = genres.sort((a, b) => b.count - a.count)[0];
 
         if (best) {
-            pairs.push([entry.artist_mbid, best.tag]);
+            // MusicBrainz stores genre names lower case throughout its vocabulary, so they
+            // arrive as "gothic metal". Sentence case rather than title case, because the
+            // vocabulary contains initialisms and stylised names, and title casing turns
+            // "r&b" into "R&b" and "ebm" into "Ebm" while sentence case leaves them alone.
+            pairs.push([entry.artist_mbid, best.tag.charAt(0).toUpperCase() + best.tag.slice(1)]);
         }
     }
 
@@ -203,6 +208,14 @@ async function lbFetch<T>(path: string, signal?: AbortSignal): Promise<T | undef
 const METADATA_BATCH_SIZE = 25;
 
 /**
+ * How many of a listener's artists to pull ids for. 1000 is the documented per-request maximum.
+ *
+ * One request, and the tail is where the neglected artists live, so asking for less would drop
+ * exactly the entries this is for.
+ */
+const ARTIST_MBID_LOOKUP_COUNT = 1000;
+
+/**
  * How many times to wait out a rate limit before giving up on a request.
  *
  * The allowance refills every ten seconds, so two waits covers any burst this page creates.
@@ -302,6 +315,8 @@ export const discoverKeys = {
     all: (username: string) => ['listenbrainz', username] as const,
     artistGenres: (artistMbids: string[]) =>
         ['listenbrainz', 'artist-genres', artistMbids] as const,
+    artistMbidsByName: (username: string) =>
+        ['listenbrainz', username, 'artist-mbids-by-name'] as const,
     excludedRecordings: (recordingMbids: string[]) =>
         ['listenbrainz', 'excluded-recordings', recordingMbids] as const,
     freshReleases: (username: string) => ['listenbrainz', username, 'fresh-releases'] as const,
@@ -327,10 +342,6 @@ export const discoverKeys = {
 
 export const listenbrainzQueries = {
     /**
-     * Artists similar to the given seeds. Despite `limit_50` in the algorithm name, one seed
-     * returns around 100 artists, and seeds overlap, so callers should dedupe and slice.
-     */
-    /**
      * The genre to print under each artist card. Cached as long as the similarity model, since
      * an artist's genre is a property of the artist rather than of the listener.
      */
@@ -340,6 +351,42 @@ export const listenbrainzQueries = {
             enabled: artistMbids.length > 0,
             queryFn: ({ signal }) => fetchArtistGenres(artistMbids, signal),
             queryKey: discoverKeys.artistGenres(artistMbids),
+        }),
+
+    /**
+     * Every artist this listener has played, as normalized name to MusicBrainz id.
+     *
+     * Exists because a library's own artists usually have no MusicBrainz id: Navidrome reports
+     * what the files carry, and a collection assembled outside the MusicBrainz ecosystem
+     * carries nothing. The similarity endpoints accept nothing else, so without this the rows
+     * seeded from the library have almost no seeds to work with.
+     *
+     * ListenBrainz has already done this resolution against the listener's own scrobbles, so
+     * it is exact rather than a name search that has to guess between four bands called Nirvana.
+     * The limit is the documented maximum for one request, and the cost is that request.
+     *
+     * The gap it cannot close: an artist owned and never once played is in nobody's statistics.
+     */
+    artistMbidsByName: (username: string) =>
+        queryOptions({
+            ...CACHE.stats,
+            enabled: username.length > 0,
+            queryFn: ({ signal }) =>
+                lbFetch<{ payload: { artists: LbArtistStat[] } }>(
+                    `/stats/user/${encodeURIComponent(username)}/artists?range=all_time&count=${ARTIST_MBID_LOOKUP_COUNT}`,
+                    signal,
+                ).then((response) =>
+                    (response?.payload.artists ?? [])
+                        .filter((artist) => artist.artist_mbid)
+                        .map(
+                            (artist) =>
+                                [
+                                    normalizeName(artist.artist_name),
+                                    artist.artist_mbid as string,
+                                ] as [string, string],
+                        ),
+                ),
+            queryKey: discoverKeys.artistMbidsByName(username),
         }),
 
     /**
@@ -422,6 +469,10 @@ export const listenbrainzQueries = {
             queryKey: discoverKeys.recommendations(username, count),
         }),
 
+    /**
+     * Artists similar to the given seeds. Despite `limit_50` in the algorithm name, one seed
+     * returns around 100 artists, and seeds overlap, so callers should dedupe and slice.
+     */
     similarArtists: (seedMbids: string[]) =>
         queryOptions({
             ...CACHE.similarity,
