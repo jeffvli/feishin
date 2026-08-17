@@ -14,6 +14,7 @@ import {
     LbSimilarUser,
 } from '/@/renderer/features/discover/api/listenbrainz-types';
 import { hasExcludedGenre } from '/@/renderer/features/discover/utils/genre-filter';
+import { logger } from '/@/renderer/utils/logger';
 
 const LB_API = 'https://api.listenbrainz.org/1';
 
@@ -59,20 +60,24 @@ export async function fetchArtistGenres(
         batches.push(artistMbids.slice(index, index + METADATA_BATCH_SIZE));
     }
 
-    const results = await Promise.all(
-        batches.map((batch) =>
-            lbFetch<LbArtistMetadataEntry[]>(
+    const entries: LbArtistMetadataEntry[] = [];
+
+    for (const batch of batches) {
+        try {
+            const result = await lbFetch<LbArtistMetadataEntry[]>(
                 `/metadata/artist/?artist_mbids=${batch.join(',')}&inc=tag`,
                 signal,
-            )
-                .then((result) => result ?? [])
-                .catch(() => []),
-        ),
-    );
+            );
+
+            entries.push(...(result ?? []));
+        } catch (error) {
+            logger.warn(`Discover artist metadata batch failed: ${String(error)}`);
+        }
+    }
 
     const pairs: Array<[string, string]> = [];
 
-    for (const entry of results.flat()) {
+    for (const entry of entries) {
         const genres = (entry.tag?.artist ?? []).filter((tag) => tag.genre_mbid);
         const best = genres.sort((a, b) => b.count - a.count)[0];
 
@@ -105,18 +110,27 @@ export async function fetchRecordingMetadata(
         batches.push(recordingMbids.slice(index, index + METADATA_BATCH_SIZE));
     }
 
-    const results = await Promise.all(
-        batches.map((batch) =>
-            lbFetch<LbRecordingMetadata>(
+    // One batch at a time rather than all at once. Twenty-five ids is one request, and firing
+    // eight of them together is most of a ten second allowance spent in a single burst while
+    // the history walk is spending the same allowance.
+    const merged: LbRecordingMetadata = {};
+
+    for (const batch of batches) {
+        try {
+            const result = await lbFetch<LbRecordingMetadata>(
                 `/metadata/recording/?recording_mbids=${batch.join(',')}&inc=artist+release+tag`,
                 signal,
-            )
-                .then((result) => result ?? ({} as LbRecordingMetadata))
-                .catch(() => ({}) as LbRecordingMetadata),
-        ),
-    );
+            );
 
-    return Object.assign({}, ...results) as LbRecordingMetadata;
+            Object.assign(merged, result ?? {});
+        } catch (error) {
+            // Logged rather than swallowed. Callers treat a missing entry as "no genre", which
+            // silently turns the children's-music filter into a filter that passes everything.
+            logger.warn(`Discover recording metadata batch failed: ${String(error)}`);
+        }
+    }
+
+    return merged;
 }
 
 /**
@@ -153,7 +167,23 @@ async function labsFetch<T>(
  * image is static nginx and has no main process to move it to.
  */
 async function lbFetch<T>(path: string, signal?: AbortSignal): Promise<T | undefined> {
-    const response = await fetch(`${LB_API}${path}`, { signal });
+    let response = await fetch(`${LB_API}${path}`, { signal });
+
+    /*
+     * The allowance is thirty requests per ten seconds, per address, shared by everything here.
+     *
+     * That is easy to exhaust: the history walk spends it continuously while it backfills, and
+     * this page then asks for metadata in batches alongside it. The service says exactly how
+     * long to wait, so waiting is both cheap and correct, where failing means a caller quietly
+     * gets an empty answer and a filter it depends on stops filtering.
+     */
+    for (let attempt = 0; response.status === 429 && attempt < RATE_LIMIT_RETRIES; attempt += 1) {
+        const resetIn = Number(response.headers.get('x-ratelimit-reset-in') ?? 1);
+
+        await new Promise((resolve) => setTimeout(resolve, resetIn * 1000 + 250));
+
+        response = await fetch(`${LB_API}${path}`, { signal });
+    }
 
     if (!response.ok) {
         throw new Error(`ListenBrainz ${response.status} for ${path}`);
@@ -171,6 +201,13 @@ async function lbFetch<T>(path: string, signal?: AbortSignal): Promise<T | undef
 }
 
 const METADATA_BATCH_SIZE = 25;
+
+/**
+ * How many times to wait out a rate limit before giving up on a request.
+ *
+ * The allowance refills every ten seconds, so two waits covers any burst this page creates.
+ */
+const RATE_LIMIT_RETRIES = 2;
 
 /**
  * How many collaborative-filter recommendations to ask for.
