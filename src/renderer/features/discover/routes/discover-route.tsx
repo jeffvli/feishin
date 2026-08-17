@@ -27,7 +27,7 @@ const DiscoverRoute = () => {
     const { windowBarStyle } = useWindowSettings();
     const { username } = useDiscoverSettings();
     const containerQuery = useGridCarouselContainerQuery();
-    const { isError, isIndexing, isPending, progress, rows } = useDiscoverData(username);
+    const { history, isError, isIndexing, isPending, progress, rows } = useDiscoverData(username);
     const markSeen = useMarkDiscoverSeen();
     const { stop } = usePreviewActions();
     const sync = useDiscoverSync();
@@ -145,6 +145,26 @@ const DiscoverRoute = () => {
                                 />
                             );
                         })}
+                        {/* The history filter is only as good as how much of the history it has
+                            read, and a page filtered on two years of listens looks exactly like
+                            one filtered on twenty. Say which it is, for as long as it matters. */}
+                        {username && rows.length > 0 && !history.isComplete && (
+                            <Center>
+                                <Text isMuted size="sm">
+                                    {history.isUnavailable
+                                        ? t('page.discover.historyUnavailable')
+                                        : sync.phase === 'history' || sync.phase === 'catchup'
+                                          ? t('page.discover.historyPass', {
+                                                done: sync.done.toLocaleString(),
+                                                total: sync.total.toLocaleString(),
+                                            })
+                                          : t('page.discover.historyIndexing', {
+                                                since: formatSince(history.oldestTs),
+                                                total: history.listenCount.toLocaleString(),
+                                            })}
+                                </Text>
+                            </Center>
+                        )}
                         {/* Rows appear as they arrive, so say that more are still coming rather
                             than letting the page look finished when it is not. */}
                         {rows.length > 0 && progress.loading > 0 && (
@@ -180,6 +200,18 @@ function formatEta(seconds: number): string {
     }
 
     return `${Math.ceil(seconds / 60)} min`;
+}
+
+/** How far back the history reaches, at the precision the number deserves. */
+function formatSince(oldestTs: null | number): string {
+    if (oldestTs === null) {
+        return '-';
+    }
+
+    return new Date(oldestTs * 1000).toLocaleDateString(undefined, {
+        month: 'short',
+        year: 'numeric',
+    });
 }
 
 const DiscoverRouteWithBoundary = () => {

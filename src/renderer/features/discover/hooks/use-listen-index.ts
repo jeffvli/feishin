@@ -27,6 +27,10 @@ export interface ListenIndex {
      * as the service was unwell. Better a page filtered only by the library than no page.
      */
     isUnavailable: boolean;
+    /** Listens ListenBrainz reports in total, so partial coverage can be stated as a fraction. */
+    listenCount: number;
+    /** Oldest listen reached so far, or null before the first pass. Epoch seconds. */
+    oldestTs: null | number;
     /** MusicBrainz recording ids, the exact key when ListenBrainz mapped the listen. */
     recordingMbids: Set<string>;
     /** `artist|track`, both normalized. Carries the ~12% of listens with no mapping. */
@@ -37,6 +41,8 @@ const EMPTY_INDEX: ListenIndex = {
     isComplete: false,
     isReady: false,
     isUnavailable: false,
+    listenCount: 0,
+    oldestTs: null,
     recordingMbids: new Set(),
     trackKeys: new Set(),
 };
@@ -98,6 +104,8 @@ export function useListenIndex(username: string): ListenIndex {
             isComplete: query.data.isComplete,
             isReady: true,
             isUnavailable: false,
+            listenCount: query.data.listenCount,
+            oldestTs: query.data.oldestTs,
             recordingMbids: new Set(splitKeys(query.data.recordingMbids)),
             trackKeys: new Set(splitKeys(query.data.trackKeys)),
         };

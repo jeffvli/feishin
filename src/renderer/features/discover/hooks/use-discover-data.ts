@@ -395,10 +395,19 @@ export function useDiscoverData(username: string) {
     progress.loading = progress.total - progress.ready - progress.failed;
 
     return {
-        // Every row fetches independently, so a slow or failing source never blanks the page.
-        isError: queries.every((query) => query.isError),
         // The two index builds are the slow ones and are worth naming, because they are the
         // waits the user cannot attribute to ListenBrainz simply being slow to answer.
+        // What the history filter currently knows, so the page can say so rather than leaving
+        // a partly-indexed history indistinguishable from a finished one.
+        history: {
+            isComplete: listenIndex.isComplete,
+            isReady: listenIndex.isReady,
+            isUnavailable: listenIndex.isUnavailable,
+            listenCount: listenIndex.listenCount,
+            oldestTs: listenIndex.oldestTs,
+        },
+        // Every row fetches independently, so a slow or failing source never blanks the page.
+        isError: queries.every((query) => query.isError),
         isIndexing: !libraryIndex.isReady || (!listenIndex.isReady && !listenIndex.isUnavailable),
         // Nothing renders before the library index arrives, because a row built without it
         // would be a list of music the user already owns, which is the opposite of the point.
