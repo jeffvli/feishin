@@ -158,10 +158,20 @@
     border-radius: var(--theme-radius-md);
 }
 
+/*
+ * One narrow column rather than a grid across the panel.
+ *
+ * Laid out edge to edge these six short rows became five stretched columns on a wide window,
+ * which read as a table of nothing and truncated usernames that had room to spare. Capping the
+ * width sizes each row to its content, and it puts the dials in a single vertical line, which
+ * is what makes them comparable at a glance.
+ */
 .peers {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-    gap: 0.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    width: 100%;
+    max-width: 22rem;
 }
 
 .peer {
@@ -169,6 +179,7 @@
     grid-template-columns: auto minmax(0, 1fr) auto;
     gap: 0.625rem;
     align-items: center;
+    padding: 0.25rem 0;
 }
 
 .peer-name {
@@ -184,34 +195,14 @@
 }
 
 /*
- * Bar plus number, because neither carries the whole answer on its own. The bar is scaled
- * against the closest match so the ordering is readable at a glance; the number stays absolute
- * so the bar never overstates how similar anyone actually is. See `EmptyState`.
+ * Dial plus number, because neither carries the whole answer on its own. How full the dial is
+ * comes partly from the group so the ordering is readable at a glance; the number stays
+ * absolute so the dial never overstates how similar anyone actually is. See `similarityScale`.
  */
 .peer-score {
     display: flex;
     gap: 0.5rem;
     align-items: center;
-}
-
-.score-track {
-    position: relative;
-    width: 2.75rem;
-    height: 3px;
-    overflow: hidden;
-    background: alpha(var(--theme-colors-foreground), 0.12);
-    border-radius: 999px;
-}
-
-/*
- * Neutral rather than accented. The chips are the only saturated colour in this section, and a
- * coloured bar beside each one would read as a second signal competing with the identity.
- */
-.score-fill {
-    position: absolute;
-    inset: 0 auto 0 0;
-    background: var(--theme-colors-foreground-muted);
-    border-radius: inherit;
 }
 
 .score-value {

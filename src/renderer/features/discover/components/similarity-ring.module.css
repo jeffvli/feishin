@@ -1,0 +1,16 @@
+/*
+ * Neutral rather than accented. The listener chips are the only saturated colour in this
+ * section, and a coloured dial beside each one would read as a second signal competing with
+ * the identity it sits next to.
+ */
+.track {
+    fill: none;
+    stroke: alpha(var(--theme-colors-foreground), 0.12);
+    stroke-width: 6;
+}
+
+.value {
+    fill: none;
+    stroke: var(--theme-colors-foreground-muted);
+    stroke-width: 6;
+}

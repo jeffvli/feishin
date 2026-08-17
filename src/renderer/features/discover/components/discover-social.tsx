@@ -1,10 +1,13 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './discover-social.module.css';
 
 import { ListenerChip } from '/@/renderer/features/discover/components/listener-chip';
+import { SimilarityRing } from '/@/renderer/features/discover/components/similarity-ring';
 import { useDiscoverSocial } from '/@/renderer/features/discover/hooks/use-discover-social';
 import { coverArtUrl } from '/@/renderer/features/discover/utils/lb-adapters';
+import { similarityScale } from '/@/renderer/features/discover/utils/similarity-scale';
 import { FeedEntry } from '/@/renderer/features/discover/utils/social-feed';
 import {
     usePreviewActions,
@@ -75,18 +78,10 @@ export function DiscoverSocial(props: DiscoverSocialProps) {
 function EmptyState({ peers }: { peers: Array<{ similarity: number; username: string }> }) {
     const { t } = useTranslation();
 
-    /*
-     * The bars are scaled against the closest match rather than against 100%.
-     *
-     * Similarity scores arrive in a narrow band near the bottom of their range, and an absolute
-     * bar spends its whole width saying so: measured on three real accounts the top six peers
-     * spanned 3.9, 6.1 and 30.8 percentage points, so in the common case every bar would be a
-     * fifth full and differ from its neighbour by under two pixels. Against the leader the
-     * spread is legible, and it answers the question actually being asked here, which is who is
-     * closest rather than how close anyone is in the absolute. The number alongside stays
-     * absolute, so nothing is overstated.
-     */
-    const closest = Math.max(...peers.map((peer) => peer.similarity), 0);
+    // Dial and number together, because neither carries the whole answer alone: the dial is
+    // partly relative to the group so the ordering is legible, and the number is absolute so
+    // nothing is overstated. See `similarityScale`.
+    const fillFor = useMemo(() => similarityScale(peers.map((peer) => peer.similarity)), [peers]);
 
     return (
         <div className={styles.empty}>
@@ -107,14 +102,7 @@ function EmptyState({ peers }: { peers: Array<{ similarity: number; username: st
                                 <Text size="sm">{peer.username}</Text>
                             </a>
                             <div className={styles.peerScore}>
-                                <span aria-hidden className={styles.scoreTrack}>
-                                    <span
-                                        className={styles.scoreFill}
-                                        style={{
-                                            width: `${closest > 0 ? (peer.similarity / closest) * 100 : 0}%`,
-                                        }}
-                                    />
-                                </span>
+                                <SimilarityRing fill={fillFor(peer.similarity)} />
                                 <Text className={styles.scoreValue} isMuted size="xs">
                                     {Math.round(peer.similarity * 100)}%
                                 </Text>
