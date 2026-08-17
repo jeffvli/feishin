@@ -21,7 +21,9 @@ import {
     AlbumSpotlight,
     pickAlbumSpotlight,
 } from '/@/renderer/features/discover/utils/album-spotlight';
+import { hasExcludedGenre } from '/@/renderer/features/discover/utils/genre-filter';
 import {
+    bySeed,
     DiscoverItem,
     fromFreshRelease,
     fromPlaylistTrack,
@@ -118,8 +120,12 @@ const MERGED_ITEM_LIMIT = 40;
  * How many top entries seed a similarity call.
  *
  * Seeds are sent in one batched request, and each returns around 100 results that overlap
- * heavily, so more seeds buy breadth rather than volume. Five is enough to stop the row being
- * a portrait of a single artist.
+ * heavily, so more seeds buy breadth rather than volume.
+ *
+ * Five only buys that breadth because the results are ranked per seed and then interleaved. On
+ * the pooled ordering this replaced, the count made no difference at all: scores are not
+ * comparable between seeds, so the most played seed took nineteen of twenty cards however many
+ * seeds were sent. See `bySeed`.
  */
 const SIMILARITY_SEED_COUNT = 5;
 
@@ -128,6 +134,16 @@ const PEER_COUNT = 8;
 
 /** How many similar artists reach the row, counted after the owned ones are dropped. */
 const ARTIST_ROW_LIMIT = 20;
+
+/**
+ * How far down each peer's list the category check reaches.
+ *
+ * Genres cost a request per 25 recordings and the peers together return several hundred, so
+ * this is bounded. It is not a compromise on the case it exists for: a record reaches the row
+ * by ranking high for its peer, and one listener playing a single thing repeatedly is by
+ * definition the top of their list.
+ */
+const GENRE_CHECK_PER_PEER = 15;
 
 export function useDiscoverData(username: string) {
     const { t } = useTranslation();
@@ -196,6 +212,37 @@ export function useDiscoverData(username: string) {
     );
 
     const peerRecordings = useQuery(listenbrainzQueries.similarListeners(peerNames));
+
+    /*
+     * The head of each peer's list, which is the part that can actually reach the row.
+     *
+     * Bounded rather than exhaustive because genres cost a request per 25 recordings and the
+     * peers between them return several hundred. The bound is not a compromise on the case that
+     * matters: a record gets into this row by ranking high for its peer, and the failure this
+     * exists to stop is somebody playing one thing on repeat, which is the top of the list by
+     * definition. The nursery rhyme that prompted it was that peer's single most played
+     * recording of the month.
+     */
+    const peerHeadMbids = useMemo(
+        () => [
+            ...new Set(
+                (peerRecordings.data ?? []).flatMap((tracks) =>
+                    tracks
+                        .slice(0, GENRE_CHECK_PER_PEER)
+                        .map((track) => track.recording_mbid)
+                        .filter((mbid): mbid is string => Boolean(mbid)),
+                ),
+            ),
+        ],
+        [peerRecordings.data],
+    );
+
+    const excludedRecordings = useQuery(listenbrainzQueries.excludedRecordings(peerHeadMbids));
+
+    const excluded = useMemo(
+        () => new Set(excludedRecordings.data ?? []),
+        [excludedRecordings.data],
+    );
 
     const similarArtists = useQuery(listenbrainzQueries.similarArtists(similarArtistSeeds));
     const similarRecordings = useQuery(
@@ -273,6 +320,9 @@ export function useDiscoverData(username: string) {
             mergeDiscoverSources([
                 recommendationMetadata.data
                     ? recommendationMbids
+                          // Free here: the metadata this row already fetches now carries genres,
+                          // so the same category exclusion applied to peers costs no request.
+                          .filter((mbid) => !hasExcludedGenre(recommendationMetadata.data?.[mbid]))
                           .map((mbid) => fromRecommendation(mbid, recommendationMetadata.data))
                           .filter((item): item is DiscoverItem => item !== null)
                     : [],
@@ -290,7 +340,15 @@ export function useDiscoverData(username: string) {
                 (topRecordings.data ?? []).map(fromRecordingStat),
                 // Spread rather than concatenated: one entry per peer means the interleave
                 // alternates between listeners, so no single peer's fixation fills the row.
-                ...(peerRecordings.data ?? []).map((tracks) => tracks.map(fromRecordingStat)),
+                // A peer's month is not always one listener, so records in an excluded
+                // category are dropped here rather than being allowed to lead the row.
+                ...(peerRecordings.data ?? []).map((tracks) =>
+                    tracks
+                        .filter(
+                            (track) => !track.recording_mbid || !excluded.has(track.recording_mbid),
+                        )
+                        .map(fromRecordingStat),
+                ),
             ]),
             { limit: MERGED_ITEM_LIMIT },
         );
@@ -326,12 +384,16 @@ export function useDiscoverData(username: string) {
         push(
             'similar-artists',
             t('page.discover.similarArtists'),
-            rankSimilar(
-                (similarArtists.data ?? []).filter(
-                    (entry) => !similarArtistSeeds.includes(entry.artist_mbid),
+            mergeDiscoverSources(
+                bySeed(
+                    (similarArtists.data ?? []).filter(
+                        (entry) => !similarArtistSeeds.includes(entry.artist_mbid),
+                    ),
+                    similarArtistSeeds,
+                ).map((entries) =>
+                    rankSimilar(entries, (entry) => entry.artist_mbid).map(fromSimilarArtist),
                 ),
-                (entry) => entry.artist_mbid,
-            ).map(fromSimilarArtist),
+            ),
             { isArtist: true, limit: ARTIST_ROW_LIMIT },
         );
 
@@ -352,6 +414,7 @@ export function useDiscoverData(username: string) {
         freshReleases.data,
         peerRecordings.data,
         topRecordings.data,
+        excluded,
     ]);
 
     // Looked up after filtering, so no request is spent on an artist that is about to be hidden.

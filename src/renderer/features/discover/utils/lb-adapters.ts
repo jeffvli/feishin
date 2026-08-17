@@ -101,6 +101,44 @@ export function releaseGroupArtUrl(releaseGroupMbid: null | string | undefined):
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/**
+ * Similarity results split back into one list per seed, in seed order.
+ *
+ * A batched similarity call answers for every seed at once and the scores it returns are raw
+ * co-occurrence counts, so they scale with how widely played the seed is rather than with how
+ * similar the result is. Pooling the response and sorting it by score therefore ranks the seeds
+ * against each other instead of ranking each seed's neighbours, and the most popular seed takes
+ * the row.
+ *
+ * Measured on a real account whose five seeds were all the same genre: the top scores per seed
+ * ran from 9,239 down to 706, a thirteenfold spread, and nineteen of the twenty visible cards
+ * came from the single most popular seed. One seed contributed 97 of the 251 candidates and
+ * none of the visible ones, because its neighbours could not out-score another seed's.
+ *
+ * Splitting them lets each seed be ranked on its own scale, after which the caller interleaves,
+ * which is the same shape already used for peer listeners and for the same reason.
+ */
+export function bySeed<T extends { reference_mbid: null | string }>(
+    entries: T[],
+    seedMbids: string[],
+): T[][] {
+    const groups = new Map<string, T[]>(seedMbids.map((mbid) => [mbid, []]));
+
+    // `reference_mbid` is observed null on some entries, and one unattributable list is a
+    // better home for those than dropping them or crediting them to an arbitrary seed.
+    const unattributed: T[] = [];
+
+    for (const entry of entries) {
+        const group = entry.reference_mbid ? groups.get(entry.reference_mbid) : undefined;
+
+        (group ?? unattributed).push(entry);
+    }
+
+    const grouped = [...groups.values()].filter((group) => group.length > 0);
+
+    return unattributed.length > 0 ? [...grouped, unattributed] : grouped;
+}
+
 export function fromFreshRelease(release: LbFreshRelease): DiscoverItem {
     return {
         albumName: release.release_name,
@@ -295,6 +333,9 @@ export function mergeDiscoverSources(sources: DiscoverItem[][]): DiscoverItem[] 
  * A batched similarity call returns around 100 entries per seed in no particular order, and
  * seeds overlap: two seeds produced 200 entries of which 10 were the same artist twice. The raw
  * response is therefore neither ranked nor unique.
+ *
+ * Scores are only comparable within one seed, so callers pass one seed's entries at a time.
+ * See `bySeed` for what happens when they do not.
  *
  * The cap is deliberately loose, because this runs before the owned and heard filters and the
  * two orderings work against each other. Sorting by similarity puts the artists most like the
