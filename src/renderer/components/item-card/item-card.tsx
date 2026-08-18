@@ -37,7 +37,9 @@ import { Icon } from '/@/shared/components/icon/icon';
 import { Separator } from '/@/shared/components/separator/separator';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { Text } from '/@/shared/components/text/text';
+import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { useDoubleClick } from '/@/shared/hooks/use-double-click';
+import { useOverflowTooltip } from '/@/shared/hooks/use-overflow-tooltip';
 import {
     Album,
     AlbumArtist,
@@ -1464,6 +1466,8 @@ const ItemCardRow = memo(
         const isMuted = index > 0 || row.isMuted;
         const isArtistRow = row.id === 'albumArtists' || row.id === 'artists';
 
+        const overflow = useOverflowTooltip();
+
         const formattedContent = useMemo(() => {
             if (!data) {
                 return null;
@@ -1486,20 +1490,28 @@ const ItemCardRow = memo(
             );
         }
 
+        // Every row here is a single line clipped with an ellipsis, and how much of it survives
+        // depends on the width the grid happens to give the card. The tooltip reveals the rest,
+        // and only appears where there is a rest to reveal. It reads the text back off the
+        // element, so a row whose content is a set of artist links is covered too.
         return (
-            <Text
-                className={clsx(styles.row, alignmentClass, {
-                    [styles.artistsRow]: isArtistRow,
-                    [styles.bold]: index === 0,
-                    [styles.compact]: type === 'compact',
-                    [styles.default]: type === 'default',
-                    [styles.muted]: isMuted,
-                    [styles.poster]: type === 'poster',
-                })}
-                size={index > 0 ? 'sm' : 'md'}
-            >
-                {formattedContent}
-            </Text>
+            <Tooltip label={overflow.label} opened={overflow.opened} position="bottom">
+                <Text
+                    className={clsx(styles.row, alignmentClass, {
+                        [styles.artistsRow]: isArtistRow,
+                        [styles.bold]: index === 0,
+                        [styles.compact]: type === 'compact',
+                        [styles.default]: type === 'default',
+                        [styles.muted]: isMuted,
+                        [styles.poster]: type === 'poster',
+                    })}
+                    onMouseEnter={overflow.onMouseEnter}
+                    onMouseLeave={overflow.onMouseLeave}
+                    size={index > 0 ? 'sm' : 'md'}
+                >
+                    {formattedContent}
+                </Text>
+            </Tooltip>
         );
     },
 );

@@ -3,7 +3,7 @@ import { useCallback, useMemo } from 'react';
 
 import { listenbrainzQueries } from '/@/renderer/features/discover/api/listenbrainz-api';
 import { LbPlaylistSummary } from '/@/renderer/features/discover/api/listenbrainz-types';
-import { fromPlaylistTrack } from '/@/renderer/features/discover/utils/lb-adapters';
+import { fromPlaylistTrack, isDiscoverItem } from '/@/renderer/features/discover/utils/lb-adapters';
 import {
     useDiscoverSeenIds,
     useDiscoverSettings,
@@ -57,8 +57,9 @@ export function useDiscoverUnreadCount(): number {
         const seen = new Set(seenIds);
 
         return [...(jams.data ?? []), ...(exploration.data ?? [])]
-            .map((track) => fromPlaylistTrack(track).id)
-            .filter((id) => !seen.has(id)).length;
+            .map(fromPlaylistTrack)
+            .filter(isDiscoverItem)
+            .filter((item) => !seen.has(item.id)).length;
     }, [active, seenIds, jams.data, exploration.data]);
 }
 
@@ -79,7 +80,10 @@ export function useMarkDiscoverSeen() {
                 return;
             }
 
-            setSettings({ general: { discoverSeenIds: merged.slice(-MAX_SEEN_IDS) } });
+            // Kept from the front. `merged` is newest first, so taking the tail discarded
+            // exactly what had just been seen: once the list reached its cap the same
+            // suggestions stayed marked new for ever and the badge never cleared.
+            setSettings({ general: { discoverSeenIds: merged.slice(0, MAX_SEEN_IDS) } });
         },
         [setSettings],
     );

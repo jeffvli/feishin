@@ -35,6 +35,17 @@ export interface DiscoverItem {
      */
     id: string;
     imageUrl: null | string;
+    /**
+     * True when `subtitle` is a stand-in that something better may replace.
+     *
+     * The artist row draws from sources whose second lines mean different things. A similar
+     * artist arrives with a MusicBrainz disambiguation comment, which is absent for most of
+     * them and reads "American rock band" on a row of American rock bands, so a genre lookup
+     * exists precisely to replace it. A side project arrives with the member and band that
+     * reached it, which is the entire reason the card is on the page. Both are strings in the
+     * same field, and without this the genre overwrote whichever it found.
+     */
+    isSubtitlePlaceholder?: boolean;
     kind: DiscoverItemKind;
     /** Present when the item is a track. Enables exact preview resolution. */
     recordingMbid: null | string;
@@ -65,6 +76,18 @@ export interface DiscoverItem {
 
 /** What a card stands for, which decides how it is matched against the library. */
 export type DiscoverItemKind = 'artist' | 'release' | 'track';
+
+/**
+ * One seed's share of a `bySeed` split.
+ *
+ * `seedMbid` is null for the one group `bySeed` cannot attribute to any seed. Carried because a
+ * caller wanting to name which artist a group of suggestions came from needs to know which seed
+ * produced it, not just the suggestions themselves.
+ */
+export interface SeedGroup<T> {
+    entries: T[];
+    seedMbid: null | string;
+}
 
 /**
  * Cover art for a release, taken from the Cover Art Archive's copy on archive.org.
@@ -127,11 +150,15 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{
  *
  * Splitting them lets each seed be ranked on its own scale, after which the caller interleaves,
  * which is the same shape already used for peer listeners and for the same reason.
+ *
+ * Each group carries the seed's own id alongside its entries, because ranking on its own scale
+ * is not the only reason a caller needs to keep a seed's results apart: naming which of several
+ * artists a suggestion came from needs to know which seed produced the group it is in.
  */
 export function bySeed<T extends { reference_mbid: null | string }>(
     entries: T[],
     seedMbids: string[],
-): T[][] {
+): SeedGroup<T>[] {
     const groups = new Map<string, T[]>(seedMbids.map((mbid) => [mbid, []]));
 
     // `reference_mbid` is observed null on some entries, and one unattributable list is a
@@ -144,9 +171,15 @@ export function bySeed<T extends { reference_mbid: null | string }>(
         (group ?? unattributed).push(entry);
     }
 
-    const grouped = [...groups.values()].filter((group) => group.length > 0);
+    // `seedMbid` travels with each group from here on, because a caller naming which artist a
+    // suggestion came from needs the seed identity, not just the suggestions it produced.
+    const grouped: SeedGroup<T>[] = [...groups.entries()]
+        .filter(([, group]) => group.length > 0)
+        .map(([seedMbid, group]) => ({ entries: group, seedMbid }));
 
-    return unattributed.length > 0 ? [...grouped, unattributed] : grouped;
+    return unattributed.length > 0
+        ? [...grouped, { entries: unattributed, seedMbid: null }]
+        : grouped;
 }
 
 export function fromFreshRelease(release: LbFreshRelease): DiscoverItem {
@@ -167,10 +200,23 @@ export function fromFreshRelease(release: LbFreshRelease): DiscoverItem {
     };
 }
 
-export function fromPlaylistTrack(track: LbPlaylistTrack): DiscoverItem {
+/**
+ * A JSPF track, or null when ListenBrainz named neither the artist nor the recording.
+ *
+ * The generated playlists carry the occasional entry that is an `identifier` and nothing else:
+ * a recording the pipeline selected and then could not resolve. One turned up in roughly four
+ * thousand tracks across the generated playlists sampled. It cannot be drawn as a card and it
+ * cannot be matched against a library, so it is dropped here rather than left for a downstream
+ * caller to trip over.
+ */
+export function fromPlaylistTrack(track: LbPlaylistTrack): DiscoverItem | null {
     const extension = track.extension?.['https://musicbrainz.org/doc/jspf#track'];
     const metadata = extension?.additional_metadata;
     const recordingMbid = recordingMbidFromIdentifier(track.identifier);
+
+    if (!track.creator || !track.title) {
+        return null;
+    }
 
     return {
         albumName: track.album ?? null,
@@ -234,8 +280,14 @@ export function fromRecordingStat(stat: LbRecordingStat): DiscoverItem {
 /**
  * A band reached through MusicBrainz relationships.
  *
- * The subtitle is the connection rather than a genre, because the connection is the entire
- * reason the card is on the page and it is not something a listener can infer from the name.
+ * The connection is the entire reason the card is on the page and is not something a listener
+ * can infer from the name, so it is what the card says rather than a genre. It is split across
+ * the two lines under the title, the member on one and the band the listener already plays on
+ * the other, because written as one line it was "Jeremy Hummel, of Breaking Be..." at every
+ * card width the strip uses. The half that is cut there is the half that means something.
+ *
+ * The `via` line carries no label of its own. The row is headed "Their other bands", which
+ * already says whose, and repeating it on each card spent the width twice.
  */
 export function fromRelatedBand(band: MbRelatedArtist): DiscoverItem {
     return {
@@ -247,7 +299,7 @@ export function fromRelatedBand(band: MbRelatedArtist): DiscoverItem {
         recordingMbid: null,
         releaseGroupMbid: null,
         releaseMbids: [],
-        subtitle: `${band.via}, of ${band.seedName}`,
+        subtitle: band.via,
         title: band.name,
         urlRels: [],
     };
@@ -259,12 +311,14 @@ export function fromSimilarArtist(artist: LbSimilarArtist): DiscoverItem {
         artistName: artist.name,
         id: artist.artist_mbid,
         imageUrl: null,
+        isSubtitlePlaceholder: true,
         kind: 'artist',
         recordingMbid: null,
         releaseGroupMbid: null,
         releaseMbids: [],
         // The disambiguation comment, e.g. "American rock band", is the only extra thing the
-        // endpoint knows about an artist and reads better than a raw similarity score.
+        // endpoint knows about an artist and reads better than a raw similarity score. Marked
+        // as a stand-in, because the genre lookup downstream is there to better it.
         subtitle: artist.comment,
         title: artist.name,
         urlRels: [],
@@ -285,6 +339,11 @@ export function fromSimilarRecording(recording: LbSimilarRecording): DiscoverIte
         title: recording.recording_name,
         urlRels: [],
     };
+}
+
+/** Narrows an adapter's output, for the adapters that reject an entry they cannot render. */
+export function isDiscoverItem(item: DiscoverItem | null): item is DiscoverItem {
+    return item !== null;
 }
 
 /**
@@ -381,7 +440,7 @@ export function mergeDiscoverSources(
  * two orderings work against each other. Sorting by similarity puts the artists most like the
  * ones the user already plays at the top, which are exactly the ones the library is most
  * likely to hold, so a tight cap here selects the entries most certain to be discarded. At 20
- * it removed the whole similar-artists row: all 20 were owned. Rank widely and let the row cap
+ * it emptied the similarity lane outright: all 20 were owned. Rank widely and let the row cap
  * what survives.
  */
 export function rankSimilar<T extends { score: number }>(

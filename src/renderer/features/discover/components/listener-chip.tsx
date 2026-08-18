@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
 
+import { hashName } from '/@/renderer/features/discover/utils/hash-name';
+
 /**
  * A ListenBrainz listener, drawn from their username alone.
  *
@@ -39,24 +41,6 @@ export function ListenerChip({ size = 20, username }: ListenerChipProps) {
             </text>
         </svg>
     );
-}
-
-/**
- * FNV-1a over the whole username.
- *
- * The whole name rather than the initial, which is the point: two people whose names begin with
- * the same letter have to land on different colours, and seeding from anything the letter already
- * tells you would guarantee the collision instead of avoiding it.
- */
-function hashName(value: string): number {
-    let hash = 0x811c9dc5;
-
-    for (let index = 0; index < value.length; index += 1) {
-        hash ^= value.charCodeAt(index);
-        hash = Math.imul(hash, 0x01000193) >>> 0;
-    }
-
-    return hash >>> 0;
 }
 
 function paletteFor(username: string) {

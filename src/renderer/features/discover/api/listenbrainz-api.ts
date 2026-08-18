@@ -1,5 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 
+import { lbRequest } from '/@/renderer/features/discover/api/listenbrainz-rate-limit';
 import {
     LbArtistMetadataEntry,
     LbArtistStat,
@@ -13,6 +14,7 @@ import {
     LbSimilarRecording,
     LbSimilarUser,
 } from '/@/renderer/features/discover/api/listenbrainz-types';
+import { isAbortError } from '/@/renderer/features/discover/utils/abort';
 import { hasExcludedGenre } from '/@/renderer/features/discover/utils/genre-filter';
 import { genreLabel } from '/@/renderer/features/discover/utils/genre-label';
 import { normalizeName } from '/@/renderer/features/discover/utils/library-match';
@@ -73,6 +75,10 @@ export async function fetchArtistGenres(
 
             entries.push(...(result ?? []));
         } catch (error) {
+            if (isAbortError(error)) {
+                throw error;
+            }
+
             logger.warn(`Discover artist metadata batch failed: ${String(error)}`);
         }
     }
@@ -106,15 +112,15 @@ export async function fetchRecordingMetadata(
         return {};
     }
 
-    // The endpoint rejects oversized query strings, so batch rather than sending 50 MBIDs.
+    // The endpoint rejects oversized query strings. See `METADATA_BATCH_SIZE`.
     const batches: string[][] = [];
     for (let index = 0; index < recordingMbids.length; index += METADATA_BATCH_SIZE) {
         batches.push(recordingMbids.slice(index, index + METADATA_BATCH_SIZE));
     }
 
-    // One batch at a time rather than all at once. Twenty-five ids is one request, and firing
-    // eight of them together is most of a ten second allowance spent in a single burst while
-    // the history walk is spending the same allowance.
+    // One batch at a time rather than all at once. The shared rate limiter would serialise
+    // them anyway, and issuing them in order keeps the first rows of the page ahead of the
+    // last, where firing them together would have every row waiting on the slowest.
     const merged: LbRecordingMetadata = {};
 
     for (const batch of batches) {
@@ -126,8 +132,14 @@ export async function fetchRecordingMetadata(
 
             Object.assign(merged, result ?? {});
         } catch (error) {
-            // Logged rather than swallowed. Callers treat a missing entry as "no genre", which
-            // silently turns the children's-music filter into a filter that passes everything.
+            // An abort has to stay a failure. Callers treat a missing entry as "no genre",
+            // so a cancelled batch returned as a partial success is a children's-music filter
+            // that passes everything, cached on the same terms as a real answer.
+            if (isAbortError(error)) {
+                throw error;
+            }
+
+            // Logged rather than swallowed, for the same reason.
             logger.warn(`Discover recording metadata batch failed: ${String(error)}`);
         }
     }
@@ -167,24 +179,16 @@ async function labsFetch<T>(
  * ListenBrainz sends `access-control-allow-origin: *`, so this runs in the renderer on both
  * the Electron and the web build. Nothing here may move to the main process: the Docker
  * image is static nginx and has no main process to move it to.
+ *
+ * Issued through `lbRequest`, which holds the request until the shared allowance can afford it.
+ * A 429 should therefore be rare rather than routine; when one does arrive the gate has already
+ * recorded that the window is spent, so retrying simply waits for it to roll over.
  */
 async function lbFetch<T>(path: string, signal?: AbortSignal): Promise<T | undefined> {
-    let response = await fetch(`${LB_API}${path}`, { signal });
+    let response = await lbRequest(`${LB_API}${path}`, { signal });
 
-    /*
-     * The allowance is thirty requests per ten seconds, per address, shared by everything here.
-     *
-     * That is easy to exhaust: the history walk spends it continuously while it backfills, and
-     * this page then asks for metadata in batches alongside it. The service says exactly how
-     * long to wait, so waiting is both cheap and correct, where failing means a caller quietly
-     * gets an empty answer and a filter it depends on stops filtering.
-     */
     for (let attempt = 0; response.status === 429 && attempt < RATE_LIMIT_RETRIES; attempt += 1) {
-        const resetIn = Number(response.headers.get('x-ratelimit-reset-in') ?? 1);
-
-        await new Promise((resolve) => setTimeout(resolve, resetIn * 1000 + 250));
-
-        response = await fetch(`${LB_API}${path}`, { signal });
+        response = await lbRequest(`${LB_API}${path}`, { signal });
     }
 
     if (!response.ok) {
@@ -202,7 +206,24 @@ async function lbFetch<T>(path: string, signal?: AbortSignal): Promise<T | undef
     return response.json() as Promise<T>;
 }
 
-const METADATA_BATCH_SIZE = 25;
+/**
+ * MusicBrainz ids per metadata request.
+ *
+ * Bounded by the length of the query string rather than by any documented count: the ids go in
+ * the URL and something in front of the service refuses a long one. Measured against the live
+ * endpoint with real ids, 100 (3,789 characters) is answered and 125 (4,714) is not, so the
+ * ceiling sits at about 4,000 characters, which is a 4 KB request line. Both the recording and
+ * the artist endpoint break at the same width.
+ *
+ * The refusal is a 502 carrying an HTML error page, not a 400, so an oversized batch does not
+ * announce itself as a request problem: it looks exactly like the service being unwell, and the
+ * caller loses every genre in the batch. 75 leaves a quarter of the width spare against that.
+ *
+ * It was 25, which cost four requests for every one needed. Latency barely moves with size,
+ * 0.8 seconds at 50 against 0.9 at 100, so the smaller batch bought nothing and spent an
+ * allowance the whole page shares.
+ */
+const METADATA_BATCH_SIZE = 75;
 
 /**
  * How many of a listener's artists to pull ids for. 1000 is the documented per-request maximum.
@@ -213,9 +234,9 @@ const METADATA_BATCH_SIZE = 25;
 const ARTIST_MBID_LOOKUP_COUNT = 1000;
 
 /**
- * How many times to wait out a rate limit before giving up on a request.
+ * How many times to go back through the gate after a 429 before giving up on a request.
  *
- * The allowance refills every ten seconds, so two waits covers any burst this page creates.
+ * Each attempt waits for the window to roll over, so two covers any burst this page creates.
  */
 const RATE_LIMIT_RETRIES = 2;
 
@@ -248,7 +269,11 @@ const PEER_TRACK_COUNT = 100;
  * up after one attempt turns a brief wobble into an empty page for the whole cache window.
  */
 const RETRY = {
-    retry: 3,
+    // Never a 429. `lbFetch` has already waited out the window twice by the time one surfaces
+    // here, and a query-level retry multiplies a single rate-limited request into four more,
+    // which is how a busy page turned one refusal into a burst that guaranteed the next.
+    retry: (failureCount: number, error: Error) =>
+        failureCount < 3 && !error.message.includes('429'),
     retryDelay: (attempt: number) => Math.min(1000 * 2 ** attempt, 8000),
 };
 
@@ -266,6 +291,10 @@ const HOUR = 1000 * 60 * 60;
  * The user-visible consequence is that Discover changes on a schedule rather than on every
  * visit. A page that reshuffles each time it opens cannot be returned to: an album noticed in
  * the morning is gone by the afternoon, and nothing can be deliberately come back to.
+ *
+ * These spans only mean anything because the answers are stored: the results are written to
+ * IndexedDB and read back on the next launch, so a policy measured in days is not quietly
+ * reset by closing the app. See `shouldPersistDiscoverQuery`.
  */
 const CACHE = {
     /**
@@ -511,8 +540,16 @@ export const listenbrainzQueries = {
                         )
                             .then((response) => response?.payload.recordings ?? [])
                             // One quiet peer must not cost the row. They answer 204 when they
-                            // have no stats for the range, and 404 if the account has gone.
-                            .catch(() => [] as LbRecordingStat[]),
+                            // have no stats for the range, and 404 if the account has gone. An
+                            // abort is not one quiet peer, so it stays a failure rather than
+                            // being cached as a peer with nothing to play.
+                            .catch((error) => {
+                                if (isAbortError(error)) {
+                                    throw error;
+                                }
+
+                                return [] as LbRecordingStat[];
+                            }),
                     ),
                 ),
             queryKey: discoverKeys.similarListeners(userNames),

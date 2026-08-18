@@ -1,5 +1,6 @@
 import { QueryClient, queryOptions } from '@tanstack/react-query';
 
+import { lbRequest } from '/@/renderer/features/discover/api/listenbrainz-rate-limit';
 import {
     clearSyncProgress,
     setSyncProgress,
@@ -58,14 +59,6 @@ const PAGE_SIZE = 1000;
  * checkpoint records how far back it reached, so the next run resumes rather than restarts.
  */
 const CHECKPOINT_PAGES = 10;
-
-/**
- * Requests left in the window at which the walk waits for the window to roll over.
- *
- * ListenBrainz reports an allowance of 30 requests per 10 seconds on every response. Respecting
- * it is necessary and, on its own, not sufficient: see `MAX_PAGES_PER_PASS`.
- */
-const RATE_FLOOR = 4;
 
 /**
  * Pages fetched per sync before the walk stops and waits for the next one.
@@ -140,26 +133,11 @@ export function splitKeys(joined: string): string[] {
     return joined ? joined.split('\n') : [];
 }
 
-function delay(ms: number, signal?: AbortSignal): Promise<void> {
-    return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-            signal?.removeEventListener('abort', onAbort);
-            resolve();
-        }, ms);
-
-        const onAbort = () => {
-            clearTimeout(timer);
-            reject(new DOMException('Aborted', 'AbortError'));
-        };
-
-        signal?.addEventListener('abort', onAbort, { once: true });
-    });
-}
-
 async function fetchListenCount(username: string, signal?: AbortSignal): Promise<number> {
-    const response = await fetch(
+    const response = await lbRequest(
         `https://api.listenbrainz.org/1/user/${encodeURIComponent(username)}/listen-count`,
         { signal: withTimeout(signal) },
+        { isBackground: true },
     );
 
     if (!response.ok) {
@@ -174,8 +152,10 @@ async function fetchListenCount(username: string, signal?: AbortSignal): Promise
 /**
  * One page of listens, newest first, older than `maxTs`.
  *
- * Paces itself against the allowance the response reports rather than a fixed delay, so a walk
- * that starts with a full window runs at full speed and only slows when it has to.
+ * Paced by `lbRequest`, which is the same gate the Discover page's own queries pass through.
+ * That shared view is the point: this walk runs for minutes and used to pace against its own
+ * reading of the allowance, so it stayed inside the limit on its own while leaving the page it
+ * was running underneath nothing to spend.
  */
 async function fetchListenPage(
     username: string,
@@ -188,22 +168,17 @@ async function fetchListenPage(
         query.set('max_ts', String(maxTs));
     }
 
-    const response = await fetch(
+    const response = await lbRequest(
         `https://api.listenbrainz.org/1/user/${encodeURIComponent(username)}/listens?${query}`,
         { signal: withTimeout(signal) },
+        { isBackground: true },
     );
 
     if (!response.ok) {
         throw new Error(`ListenBrainz ${response.status}`);
     }
 
-    const remaining = Number(response.headers.get('x-ratelimit-remaining') ?? RATE_FLOOR + 1);
-    const resetIn = Number(response.headers.get('x-ratelimit-reset-in') ?? 1);
     const body = (await response.json()) as { payload?: { listens?: LbListen[] } };
-
-    if (remaining <= RATE_FLOOR) {
-        await delay(resetIn * 1000 + 250, signal);
-    }
 
     return body.payload?.listens ?? [];
 }
@@ -456,13 +431,11 @@ export const listenIndexQueries = {
             /**
              * While the history is still being backfilled, keep taking bites.
              *
-             * One pass is twenty pages, so a six-figure history needs several, and the page
-             * waits for all of them. Waiting a whole `STALE_MS` between passes would take most
-             * of a day; running them back to back would reach the drop-the-socket ceiling
-             * again, which is what bounded the pass in the first place. The gap below is the
-             * compromise, and it dominates the first run: it is dead time the user spends
-             * watching a progress bar. Once complete this stops entirely and only the hourly
-             * catch-up remains.
+             * One pass is twenty pages, so a six-figure history needs several. Waiting a whole
+             * `STALE_MS` between passes would take most of a day; running them back to back
+             * would reach the drop-the-socket ceiling again, which is what bounded the pass in
+             * the first place. The gap below is the compromise. Once complete this stops
+             * entirely and only the hourly catch-up remains.
              */
             refetchInterval: (query) =>
                 query.state.data && !query.state.data.isComplete ? BACKFILL_INTERVAL_MS : false,
@@ -478,10 +451,12 @@ export const listenIndexQueries = {
 /**
  * Gap between backfill passes. See `refetchInterval` above.
  *
- * Twenty seconds rather than a minute because the page now blocks on a complete history, so
- * this interval is the user's wait rather than background upkeep. Averaged over a pass it is
- * still well under a request per second, an order of magnitude inside the documented
- * allowance, and the ceiling that actually bit was pages fetched back to back, which the pass
- * bound already prevents.
+ * Twenty seconds rather than a minute because the rows re-filter as the walk checkpoints, so
+ * this interval is how quickly a page the user is looking at stops offering them things they
+ * have already heard. It is no longer what keeps the walk inside the rate limit: `lbRequest`
+ * does that, and it holds the walk to the tail of the allowance so the page in front of it is
+ * always served first. The ceiling this interval does still respect is the one the headers
+ * never showed, the dropped connection after about thirty pages fetched back to back, which
+ * `MAX_PAGES_PER_PASS` bounds and this gap separates.
  */
 const BACKFILL_INTERVAL_MS = 1000 * 20;

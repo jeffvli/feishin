@@ -1,6 +1,8 @@
 import { queryOptions } from '@tanstack/react-query';
 
+import { lbRequest } from '/@/renderer/features/discover/api/listenbrainz-rate-limit';
 import { LbUrlRel } from '/@/renderer/features/discover/api/listenbrainz-types';
+import { isAbortError } from '/@/renderer/features/discover/utils/abort';
 
 const LB_API = 'https://api.listenbrainz.org/1';
 
@@ -114,8 +116,17 @@ async function fetchListensFor(listener: string, signal?: AbortSignal): Promise<
     });
 }
 
+/**
+ * Through the same gate as the rest of the feature.
+ *
+ * This section fans out one request per followed listener and another per peer for their last
+ * listen, which on a well-followed account is more requests than the whole recommendation page
+ * makes. Issued outside the shared allowance they were invisible to it, so the gate believed it
+ * had budget the section had already spent, and the two halves of the same page refused each
+ * other.
+ */
 async function lbFetch<T>(path: string, signal?: AbortSignal): Promise<T | undefined> {
-    const response = await fetch(`${LB_API}${path}`, { signal });
+    const response = await lbRequest(`${LB_API}${path}`, { signal });
 
     if (!response.ok) {
         throw new Error(`ListenBrainz ${response.status} for ${path}`);
@@ -173,7 +184,13 @@ export const socialQueries = {
             queryFn: ({ signal }) =>
                 Promise.all(
                     listeners.map((listener) =>
-                        fetchListensFor(listener, signal).catch(() => [] as FriendListen[]),
+                        fetchListensFor(listener, signal).catch((error) => {
+                            if (isAbortError(error)) {
+                                throw error;
+                            }
+
+                            return [] as FriendListen[];
+                        }),
                     ),
                 ).then((batches) => batches.flat()),
             queryKey: socialKeys.friendListens(listeners),
@@ -198,7 +215,13 @@ export const socialQueries = {
                 Promise.all(
                     usernames.map((username) =>
                         fetchLastListenAt(username, signal)
-                            .catch(() => null)
+                            .catch((error) => {
+                                if (isAbortError(error)) {
+                                    throw error;
+                                }
+
+                                return null;
+                            })
                             .then((lastListenedAt) => ({ lastListenedAt, username })),
                     ),
                 ),

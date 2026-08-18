@@ -39,7 +39,7 @@ const DiscoverRoute = () => {
     const { windowBarStyle } = useWindowSettings();
     const { username } = useDiscoverSettings();
     const containerQuery = useGridCarouselContainerQuery();
-    const { history, isError, isPending, library, progress, rows } = useDiscoverData(username);
+    const { history, isError, library, progress, rows } = useDiscoverData(username);
     const markSeen = useMarkDiscoverSeen();
     const { stop } = usePreviewActions();
     const sync = useDiscoverSync();
@@ -114,40 +114,29 @@ const DiscoverRoute = () => {
                         {/* Only the library index blanks the page now, so it is the only wait
                             this block explains. The history walk is far longer but no longer
                             holds anything back, and it reports itself in the banner below,
-                            alongside the rows it is describing. */}
-                        {username && isPending && (
-                            <>
-                                {(!library.isReady || progress.failed > 0) && (
-                                    <Center>
-                                        <Stack
-                                            align="center"
-                                            gap="sm"
-                                            style={{ maxWidth: '32rem', width: '100%' }}
-                                        >
-                                            {!library.isReady && (
-                                                <Text
-                                                    isMuted
-                                                    size="sm"
-                                                    style={{ textAlign: 'center' }}
-                                                >
-                                                    {t('page.discover.loadingLibrary')}
-                                                </Text>
-                                            )}
-                                            {progress.failed > 0 && (
-                                                <Text isMuted size="sm">
-                                                    {t('page.discover.loadingSlow')}
-                                                </Text>
-                                            )}
-                                        </Stack>
-                                    </Center>
-                                )}
-                                {/* Placeholders rather than a spinner: this wait runs to tens of
-                                    seconds, and showing the page's shape reads as loading where a
-                                    spinner reads as a hang. */}
-                                <DiscoverSkeleton />
-                            </>
+                            alongside the rows it is describing. The rows themselves each draw
+                            their own placeholders, so nothing here stands in for them. */}
+                        {username && (!library.isReady || progress.failed > 0) && (
+                            <Center>
+                                <Stack
+                                    align="center"
+                                    gap="sm"
+                                    style={{ maxWidth: '32rem', width: '100%' }}
+                                >
+                                    {!library.isReady && (
+                                        <Text isMuted size="sm" style={{ textAlign: 'center' }}>
+                                            {t('page.discover.loadingLibrary')}
+                                        </Text>
+                                    )}
+                                    {progress.failed > 0 && (
+                                        <Text isMuted size="sm">
+                                            {t('page.discover.loadingSlow')}
+                                        </Text>
+                                    )}
+                                </Stack>
+                            </Center>
                         )}
-                        {username && !isPending && isError && rows.length === 0 && (
+                        {username && isError && rows.length === 0 && (
                             <Center>
                                 <Text isMuted size="md">
                                     {t('page.discover.unavailable')}
@@ -187,6 +176,15 @@ const DiscoverRoute = () => {
                                 return null;
                             }
 
+                            // A row whose sources are still answering keeps its slot and
+                            // draws placeholders. Rendering however much has arrived instead
+                            // is what made the page look like it was loading three different
+                            // times: each source landing reordered the merge and re-cut the
+                            // cap, so the strip was rewritten rather than extended.
+                            if (row.isPending) {
+                                return <DiscoverSkeleton key={row.key} rowCount={1} />;
+                            }
+
                             if (row.layout === 'spotlight' && row.album) {
                                 return (
                                     <DiscoverSpotlight
@@ -218,15 +216,6 @@ const DiscoverRoute = () => {
                                 />
                             );
                         })}
-                        {/* Rows appear as they arrive, so say that more are still coming rather
-                            than letting the page look finished when it is not. A spinner alone:
-                            the count it used to carry was of internal sources, which is not a
-                            unit the reader has any use for. */}
-                        {visibleRows.length > 0 && progress.loading > 0 && (
-                            <Center>
-                                <Spinner size={20} />
-                            </Center>
-                        )}
                     </Stack>
                 </LibraryContainer>
             </NativeScrollArea>

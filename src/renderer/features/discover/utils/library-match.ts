@@ -12,8 +12,15 @@
  * A credit can name several people where the library names one, so "J Balvin, Ryan Castro" has
  * to also be tried as "J Balvin". Splitting is one level deep on purpose: matching on any
  * contributor would let a compilation hide an unrelated track.
+ *
+ * Total in the same way `normalizeName` is: a credit that is absent yields no variants, so a
+ * caller iterating the result simply matches nothing.
  */
-export function artistVariants(artistName: string): string[] {
+export function artistVariants(artistName: null | string | undefined): string[] {
+    if (!artistName) {
+        return [];
+    }
+
     const full = normalizeName(artistName);
     const lead = normalizeName(artistName.split(CREDIT_SEPARATOR)[0] ?? '');
 
@@ -35,8 +42,19 @@ export const CREDIT_SEPARATOR =
  * Case, punctuation, bracketed suffixes and a leading article all vary between what a server
  * stores and what MusicBrainz calls the same record. "Self Esteem (2008 Remaster)" has to match
  * "Self Esteem", and ListenBrainz's "Offspring" has to match a library's "The Offspring".
+ *
+ * Total rather than typed to a string, because every caller feeds it third-party data whose
+ * shape is a promise rather than a guarantee. ListenBrainz generates playlists holding the
+ * occasional track with no `creator` and no `title` at all, one in roughly four thousand
+ * across the generated playlists sampled, and passing one of those to a `.toLowerCase()` took
+ * down the whole Discover page through the error boundary. An unnameable record matches
+ * nothing, which is the answer every caller here wants for it.
  */
-export function normalizeName(value: string): string {
+export function normalizeName(value: null | string | undefined): string {
+    if (!value) {
+        return '';
+    }
+
     return value
         .toLowerCase()
         .replace(/\(.*?\)|\[.*?\]/g, '')

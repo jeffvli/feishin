@@ -82,12 +82,10 @@ const HomeItemSchema = z.enum([
  * reader they are sections of the same page.
  */
 const DiscoverSectionSchema = z.enum([
+    'artists',
     'fresh-releases',
-    'library-corners',
     'news',
     'new-to-you',
-    'related-bands',
-    'similar-artists',
     'social',
     'spotlight',
 ]);
@@ -538,6 +536,14 @@ export const GeneralSettingsSchema = z.object({
     confirmQueueChanges: z.boolean(),
     disabledContextMenu: z.record(z.string(), z.boolean()),
     discoverBadge: z.boolean(),
+    /**
+     * Item ids the user dismissed from Discover, so they never come back.
+     *
+     * Unlike `discoverSeenIds`, never capped or evicted: a dismissal is a promise not to show
+     * something again, and silently breaking that promise once enough other things had been
+     * dismissed would be worse than never making it.
+     */
+    discoverBlockedIds: z.array(z.string()),
     discoverEnabled: z.boolean(),
     /** Which sections the Discover page shows, and in what order. */
     discoverItems: z.array(SortableItemSchema(DiscoverSectionSchema)),
@@ -971,12 +977,11 @@ export enum DiscordLinkType {
 }
 
 export enum DiscoverSection {
+    /** Every artist suggestion, whatever reached it. Was three rows until version 39. */
+    ARTISTS = 'artists',
     FRESH_RELEASES = 'fresh-releases',
-    LIBRARY_CORNERS = 'library-corners',
     NEW_TO_YOU = 'new-to-you',
     NEWS = 'news',
-    RELATED_BANDS = 'related-bands',
-    SIMILAR_ARTISTS = 'similar-artists',
     SOCIAL = 'social',
     SPOTLIGHT = 'spotlight',
 }
@@ -1256,9 +1261,7 @@ const discoverItems = [
     DiscoverSection.NEW_TO_YOU,
     DiscoverSection.SPOTLIGHT,
     DiscoverSection.FRESH_RELEASES,
-    DiscoverSection.SIMILAR_ARTISTS,
-    DiscoverSection.LIBRARY_CORNERS,
-    DiscoverSection.RELATED_BANDS,
+    DiscoverSection.ARTISTS,
     DiscoverSection.SOCIAL,
     DiscoverSection.NEWS,
 ].map((item) => ({
@@ -1361,6 +1364,7 @@ const initialState: SettingsState = {
         confirmQueueChanges: true,
         disabledContextMenu: {},
         discoverBadge: true,
+        discoverBlockedIds: [],
         discoverEnabled: false,
         discoverItems,
         discoverSeenIds: [],
@@ -2955,11 +2959,15 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     state.general.discoverItems ??= discoverItems;
                 }
 
-                if (version < 38) {
+                if (version < 39) {
                     // Merged in rather than appended, so a list saved before a section existed
                     // gains it in its intended place instead of at the end. Written to cover
                     // every version below it, since the merge is idempotent and a reader should
                     // not have to keep one of these per section.
+                    //
+                    // Retiring a section needs nothing else: rebuilding from the defaults drops
+                    // any saved id the defaults no longer name, which is how the three separate
+                    // artist rows gave way to the single one that replaced them.
                     state.general.discoverItems = discoverItems.map(
                         (fallback) =>
                             state.general.discoverItems.find((saved) => saved.id === fallback.id) ??
@@ -2967,10 +2975,14 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     );
                 }
 
+                if (version < 40) {
+                    state.general.discoverBlockedIds ??= [];
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 38,
+            version: 40,
         },
     ),
 );
@@ -3186,6 +3198,9 @@ export const useDiscoverItems = () =>
 
 export const useDiscoverSeenIds = () =>
     useSettingsStore((state) => state.general.discoverSeenIds, shallow);
+
+export const useDiscoverBlockedIds = () =>
+    useSettingsStore((state) => state.general.discoverBlockedIds, shallow);
 
 export const useArtistBackground = () =>
     useSettingsStore(

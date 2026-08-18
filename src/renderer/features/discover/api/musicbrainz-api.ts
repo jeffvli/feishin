@@ -1,5 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 
+import { isAbortError } from '/@/renderer/features/discover/utils/abort';
 import { logger } from '/@/renderer/utils/logger';
 
 /**
@@ -124,6 +125,14 @@ export async function fetchRelatedBands(
                 }
             }
         } catch (error) {
+            // A seed that fails costs its own bands and no more, so the walk carries on. An
+            // abort is not that: it means this answer is being discarded, and returning the
+            // seeds reached so far would have React Query store a truncated walk as the
+            // finished one for a week.
+            if (isAbortError(error)) {
+                throw error;
+            }
+
             logger.warn(`Discover related bands failed for ${seed.name}: ${String(error)}`);
         }
     }

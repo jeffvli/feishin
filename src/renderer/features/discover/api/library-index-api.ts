@@ -110,7 +110,7 @@ export const LIBRARY_INDEX_KEY = 'discover-library-index';
  * which is indistinguishable from one the filters emptied. Part of the query key, so a bump
  * simply misses the stored copy and rebuilds.
  */
-const INDEX_VERSION = 3;
+export const INDEX_VERSION = 3;
 
 async function buildLibraryIndex(
     serverId: string,

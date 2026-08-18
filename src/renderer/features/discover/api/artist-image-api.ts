@@ -1,5 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 
+import { isAbortError } from '/@/renderer/features/discover/utils/abort';
+
 /**
  * Artist images from TheAudioDB.
  *
@@ -84,7 +86,17 @@ export const artistImageQueries = {
             ...CACHE,
             queryFn: ({ signal }) =>
                 resolveArtistImage(UUID_PATTERN.test(id) ? id : null, name, signal).catch(
-                    () => null,
+                    (error) => {
+                        // An artist the service does not hold has no image, and that is worth
+                        // caching for the day. A cancelled lookup is not an answer, so it must
+                        // not be stored as one: the card would keep its placeholder until the
+                        // cache expired.
+                        if (isAbortError(error)) {
+                            throw error;
+                        }
+
+                        return null;
+                    },
                 ),
             queryKey: ['audiodb', 'artist-image', id, name] as const,
         }),

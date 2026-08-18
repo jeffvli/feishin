@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import styles from './discover-carousel.module.css';
 
@@ -8,6 +9,7 @@ import {
 } from '/@/renderer/components/grid-carousel/grid-carousel-v2';
 import { DataRow, MemoizedItemCard } from '/@/renderer/components/item-card/item-card';
 import { ItemControls } from '/@/renderer/components/item-list/types';
+import { useDismissDiscoverItem } from '/@/renderer/features/discover/hooks/use-discover-blocklist';
 import { DiscoverItem, listenBrainzUrl } from '/@/renderer/features/discover/utils/lb-adapters';
 import {
     usePreviewActions,
@@ -15,6 +17,8 @@ import {
     usePreviewResolvingId,
 } from '/@/renderer/features/preview/preview-store';
 import { usePlaybackType } from '/@/renderer/store';
+import { Icon } from '/@/shared/components/icon/icon';
+import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { Album, AlbumArtist, LibraryItem } from '/@/shared/types/domain-types';
 import { PlayerType } from '/@/shared/types/types';
 
@@ -66,7 +70,9 @@ const SOURCE_ROW: DataRow = {
  * `GridCarousel` takes `{ id, content }` and is indifferent to what an item is, and `ItemCard`
  * already degrades for items that have no server behind them: `useItemImageUrl` short-circuits
  * on an external `imageUrl`, and `enableNavigation={false}` keeps the card from linking to a
- * library id that does not exist. So nothing here needs new card chrome.
+ * library id that does not exist. The only chrome this file adds itself is the dismiss button,
+ * because "never suggest this again" is a Discover-only idea that has no business in the
+ * generic `ItemCardControls` every library grid shares.
  *
  * A suggestion does have a home on listenbrainz.org, though, which is where the anchor below
  * points. `target="_blank"` is enough to reach the default browser: the main process answers
@@ -75,10 +81,12 @@ const SOURCE_ROW: DataRow = {
  */
 export function DiscoverCarousel(props: DiscoverCarouselProps) {
     const { containerQuery, isArtist, items, rowCount = 1, title } = props;
+    const { t } = useTranslation();
     const playbackType = usePlaybackType();
     const playingId = usePreviewPlayingId();
     const resolvingId = usePreviewResolvingId();
     const { toggle } = usePreviewActions();
+    const dismissItem = useDismissDiscoverItem();
 
     // Jukebox plays through the server's own sound card, so a preview on this machine could
     // neither be heard alongside it nor duck it. Offer nothing rather than something broken.
@@ -162,23 +170,51 @@ export function DiscoverCarousel(props: DiscoverCarouselProps) {
 
             const url = listenBrainzUrl(item);
 
+            // Outside the anchor above rather than inside it, so a click here never also opens
+            // the ListenBrainz link underneath. `GridCarousel`'s own swipe handling already
+            // ignores a drag that started on a `<button>`, so this needs nothing beyond the
+            // click and mousedown guards every other card control already carries.
             return {
-                content: url ? (
-                    <a
-                        className={styles.cardLink}
-                        href={url}
-                        rel="noopener noreferrer"
-                        target="_blank"
-                    >
-                        {card}
-                    </a>
-                ) : (
-                    card
+                content: (
+                    <div className={styles.cardShell}>
+                        {url ? (
+                            <a
+                                className={styles.cardLink}
+                                href={url}
+                                rel="noopener noreferrer"
+                                target="_blank"
+                            >
+                                {card}
+                            </a>
+                        ) : (
+                            card
+                        )}
+                        <Tooltip
+                            classNames={{ tooltip: styles.dismissTooltip }}
+                            label={t('page.discover.dismiss')}
+                        >
+                            <button
+                                aria-label={t('page.discover.dismiss')}
+                                className={styles.dismissButton}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                    dismissItem(item);
+                                }}
+                                onMouseDown={(e) => {
+                                    e.stopPropagation();
+                                    e.preventDefault();
+                                }}
+                            >
+                                <Icon icon="xCircle" size="sm" />
+                            </button>
+                        </Tooltip>
+                    </div>
                 ),
                 id: item.id,
             };
         });
-    }, [items, rows, controls, canPreview, isArtist, playingId, resolvingId]);
+    }, [items, rows, controls, canPreview, isArtist, playingId, resolvingId, dismissItem, t]);
 
     if (cards.length === 0) {
         return null;

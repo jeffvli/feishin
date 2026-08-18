@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
 
 import {
+    LibraryIndexData,
     libraryIndexQueries,
     NeglectedArtist,
 } from '/@/renderer/features/discover/api/library-index-api';
@@ -31,8 +31,6 @@ export interface LibraryIndex {
      */
     artistPlays: Map<string, number>;
     isReady: boolean;
-    /** True while a newer index is fetched behind an already-usable stored one. */
-    isRefreshing: boolean;
     /**
      * Artists the library holds in quantity and rarely plays, most neglected first.
      *
@@ -55,7 +53,6 @@ const EMPTY_INDEX: LibraryIndex = {
     artistNames: new Set(),
     artistPlays: new Map(),
     isReady: false,
-    isRefreshing: false,
     neglectedArtists: [],
     recordingMbids: new Set(),
     syncedAt: null,
@@ -107,11 +104,26 @@ export function filterOwnedItems(items: DiscoverItem[], index: LibraryIndex): Di
 }
 
 /**
+ * The stored arrays inflated into the sets the matcher wants, once per stored index.
+ *
+ * Keyed on the query's own data object rather than memoized per hook call, because two callers
+ * want this index: `useDiscoverData` for filtering and `useDiscoverNews` for artist matching.
+ * Per-call memoization gave them a set each, so a library of tens of thousands of tracks was
+ * inflated twice and held twice. Weak, so it goes when React Query drops the data.
+ */
+const inflated = new WeakMap<LibraryIndexData, LibraryIndex>();
+
+/**
  * The library index, restored from IndexedDB whenever one has been built before.
  *
  * The underlying query is persisted and revalidated daily rather than refetched on a short
  * timer, so the full library scan happens once and every later visit renders immediately from
  * the stored copy while a fresh one is fetched behind it.
+ *
+ * Nothing here reflects whether a refresh is in flight. It used to, and the cost was out of all
+ * proportion to a field no caller read: a background revalidation starting and finishing rebuilt
+ * every set over the whole library twice and handed out a new object each time, which is the
+ * dependency the whole Discover row computation hangs off.
  */
 export function useLibraryIndex(enabled: boolean): LibraryIndex {
     const serverId = useCurrentServerId();
@@ -121,22 +133,29 @@ export function useLibraryIndex(enabled: boolean): LibraryIndex {
         enabled: enabled && Boolean(serverId),
     });
 
-    return useMemo(() => {
-        if (!query.data) {
-            return EMPTY_INDEX;
-        }
+    return query.data ? inflate(query.data) : EMPTY_INDEX;
+}
 
-        return {
-            albumKeys: new Set(query.data.albumKeys),
-            albumMbids: new Set(query.data.albumMbids),
-            artistNames: new Set(query.data.artistNames),
-            artistPlays: new Map(query.data.artistPlays ?? []),
-            isReady: true,
-            isRefreshing: query.isFetching,
-            neglectedArtists: query.data.neglectedArtists ?? [],
-            recordingMbids: new Set(query.data.recordingMbids),
-            syncedAt: query.data.syncedAt,
-            trackKeys: new Set(query.data.trackKeys),
-        };
-    }, [query.data, query.isFetching]);
+function inflate(data: LibraryIndexData): LibraryIndex {
+    const existing = inflated.get(data);
+
+    if (existing) {
+        return existing;
+    }
+
+    const index: LibraryIndex = {
+        albumKeys: new Set(data.albumKeys),
+        albumMbids: new Set(data.albumMbids),
+        artistNames: new Set(data.artistNames),
+        artistPlays: new Map(data.artistPlays ?? []),
+        isReady: true,
+        neglectedArtists: data.neglectedArtists ?? [],
+        recordingMbids: new Set(data.recordingMbids),
+        syncedAt: data.syncedAt,
+        trackKeys: new Set(data.trackKeys),
+    };
+
+    inflated.set(data, index);
+
+    return index;
 }

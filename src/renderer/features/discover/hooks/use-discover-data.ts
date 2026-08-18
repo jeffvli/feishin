@@ -33,26 +33,31 @@ import {
     fromRelatedBand,
     fromSimilarArtist,
     fromSimilarRecording,
+    isDiscoverItem,
     mergeDiscoverSources,
     rankSimilar,
     sortByReleaseDate,
 } from '/@/renderer/features/discover/utils/lb-adapters';
 import { normalizeName } from '/@/renderer/features/discover/utils/library-match';
-import { useSettingsStore } from '/@/renderer/store';
+import { pickVariant } from '/@/renderer/features/discover/utils/phrase-variety';
+import { useDiscoverBlockedIds, useSettingsStore } from '/@/renderer/store';
 import { logger } from '/@/renderer/utils/logger';
 
 /**
- * How far along the page is, so the spinner can say something rather than just spin.
+ * How many sources have given up, so the page can say ListenBrainz is unwell rather than
+ * silently showing less.
  *
- * Worth reporting because ListenBrainz is not a fast or a reliable dependency: a cold request
- * can take twenty seconds, and the service sheds load with 502s. Without this the page is
- * indistinguishable from a hang.
+ * Worth reporting because ListenBrainz is not a reliable dependency: it sheds load with 502s
+ * and by closing the connection, and a row that failed and a row the filters emptied look
+ * identical on screen.
+ *
+ * How many are still outstanding is no longer counted here. Each row now draws its own
+ * placeholders while it waits, which says the same thing in the place the reader is looking,
+ * and a page-level total said it in a unit nobody has a use for.
  */
 export interface DiscoverProgress {
     /** Sources that gave up after their retries. */
     failed: number;
-    /** Sources still waiting, including those retrying after a failure. */
-    loading: number;
 }
 
 export interface DiscoverRow {
@@ -60,6 +65,16 @@ export interface DiscoverRow {
     album?: AlbumSpotlight;
     /** Artists render as circles and cannot be previewed. */
     isArtist?: boolean;
+    /**
+     * True while a source this row is built from has yet to answer.
+     *
+     * The row is drawn as placeholders rather than as however much of it has arrived. Its
+     * sources land seconds apart and each landing changes what the row holds, so a row rendered
+     * from a partial set is not a row filling up: it is a different row each time, reordered by
+     * the merge and re-cut by the cap, and the reader watches the same strip rewrite itself
+     * three times. `items` is empty while this is set.
+     */
+    isPending?: boolean;
     items: DiscoverItem[];
     key: string;
     layout: DiscoverRowLayout;
@@ -170,8 +185,15 @@ const MISSED_YEARS = 2;
  */
 const TOP_ARTIST_COUNT = 40;
 
-/** How many similar artists reach the row, counted after the owned ones are dropped. */
-const ARTIST_ROW_LIMIT = 20;
+/**
+ * How many artists reach the row, counted after the owned ones are dropped.
+ *
+ * Higher than the twenty each of the three separate rows used to show, because it is now one
+ * row drawing from all three and a cap that did for one source would cut two of them off
+ * entirely. Still well under the merged track row's forty: these are circles with a name under
+ * them and a strip of them is scanned rather than read.
+ */
+const ARTIST_ROW_LIMIT = 30;
 
 /**
  * How far down each peer's list the category check reaches.
@@ -292,31 +314,49 @@ export function useDiscoverData(username: string) {
      * Half from each, so the row keeps describing what the listener is on now while also
      * reaching what they have loved for years. Deduplicated, because an artist played steadily
      * for a decade appears at the top of both lists and would otherwise take two of five seats.
+     *
+     * Names travel with the ids, in a map alongside the seed list rather than a second pass
+     * over the same statistics, because the row's cards need to say which specific artist led
+     * to each suggestion rather than one sentence repeated on every card the lane produces.
      */
-    const similarArtistSeeds = useMemo(() => {
+    const similarArtistSeedData = useMemo(() => {
+        // Held back until both statistics are in. Built from whichever had arrived, the seed
+        // list changed from three ids to five a second later, and since the seeds are the query
+        // key that is a second similarity request and a discarded answer to the first.
+        if (!topArtists.data || !topArtistsAllTime.data) {
+            return { names: new Map<string, string>(), seeds: [] as string[] };
+        }
+
         const month = spread(
-            (topArtists.data ?? [])
-                .map((artist) => artist.artist_mbid)
-                .filter((mbid): mbid is string => Boolean(mbid)),
+            topArtists.data.filter((artist) => artist.artist_mbid),
             Math.ceil(SIMILARITY_SEED_COUNT / 2),
-        );
+        ).map((artist) => ({ mbid: artist.artist_mbid as string, name: artist.artist_name }));
+
+        const monthMbids = new Set(month.map((artist) => artist.mbid));
 
         const allTime = spread(
-            (topArtistsAllTime.data ?? [])
-                .map((artist) => artist.artist_mbid)
-                .filter((mbid): mbid is string => Boolean(mbid))
-                .filter((mbid) => !month.includes(mbid)),
+            topArtistsAllTime.data.filter(
+                (artist) => artist.artist_mbid && !monthMbids.has(artist.artist_mbid),
+            ),
             SIMILARITY_SEED_COUNT - month.length,
-        );
+        ).map((artist) => ({ mbid: artist.artist_mbid as string, name: artist.artist_name }));
 
-        return [...month, ...allTime];
+        const combined = [...month, ...allTime];
+
+        return {
+            names: new Map(combined.map((artist) => [artist.mbid, artist.name])),
+            seeds: combined.map((artist) => artist.mbid),
+        };
     }, [topArtists.data, topArtistsAllTime.data]);
+
+    const similarArtistSeeds = similarArtistSeedData.seeds;
+    const similarArtistSeedNames = similarArtistSeedData.names;
 
     /*
      * Bands to expand through their members, named rather than just identified.
      *
-     * The name is carried because the row's whole value is being able to say "via Chino Moreno,
-     * who is in Deftones". A bare id would leave the card as unexplained as everything else was.
+     * The name is carried because the row's whole value is being able to say "Also in Deftones".
+     * A bare id would leave the card as unexplained as everything else was.
      */
     const relatedSeeds = useMemo(
         () =>
@@ -395,6 +435,11 @@ export function useDiscoverData(username: string) {
     const libraryIndex = useLibraryIndex(enabled);
     const listenIndex = useListenIndex(username);
 
+    // Reactive rather than snapshotted like `seenBefore` below: a dismissal has to remove its
+    // item from the row the moment it happens, not on the next visit.
+    const blockedIds = useDiscoverBlockedIds();
+    const blocked = useMemo(() => new Set(blockedIds), [blockedIds]);
+
     /*
      * Seeds from the parts of the library its owner stopped visiting, one per genre.
      *
@@ -413,9 +458,22 @@ export function useDiscoverData(username: string) {
      * id, which most library servers do not have, so the ones without are looked up by name in
      * the listener's own statistics before the genre spread is applied.
      */
-    const cornerSeeds = useMemo(() => {
+    const cornerSeedData = useMemo(() => {
+        // Held back until the id lookup is in, for the same reason as the similarity seeds
+        // above. Most library artists carry no MusicBrainz id of their own, so a seed list
+        // built before the lookup answers holds the one or two that do, and that list is the
+        // query key: the row fetched a one-seed answer, discarded it, and fetched again.
+        if (!artistMbids.data) {
+            return { names: new Map<string, string>(), seeds: [] as string[] };
+        }
+
         const genres = new Set<string>();
         const seeds: string[] = [];
+        // The artist's own name, alongside its id, so the row's cards can say which specific
+        // neglected artist led to a suggestion rather than one sentence on every card the lane
+        // produces. Built in the same pass that resolves and selects the seeds themselves, so
+        // the two can never disagree about which artists ended up seeding the row.
+        const names = new Map<string, string>();
         let resolved = 0;
 
         for (const artist of libraryIndex.neglectedArtists) {
@@ -440,6 +498,7 @@ export function useDiscoverData(username: string) {
 
             genres.add(genre);
             seeds.push(mbid);
+            names.set(mbid, artist.name);
 
             if (seeds.length >= SIMILARITY_SEED_COUNT) {
                 break;
@@ -456,10 +515,53 @@ export function useDiscoverData(username: string) {
             );
         }
 
-        return seeds;
-    }, [libraryIndex.neglectedArtists, libraryIndex.isReady, artistMbidByName]);
+        return { names, seeds };
+    }, [libraryIndex.neglectedArtists, libraryIndex.isReady, artistMbids.data, artistMbidByName]);
+
+    const cornerSeeds = cornerSeedData.seeds;
+    const cornerSeedNames = cornerSeedData.names;
 
     const cornerArtists = useQuery(listenbrainzQueries.similarArtists(cornerSeeds));
+
+    /*
+     * Which sources each row is built from, so a row can be drawn as placeholders until they
+     * are all in rather than rewritten as each one lands.
+     *
+     * The lookups a row's own query is keyed on are listed alongside it, because a query whose
+     * key has not been computed yet is disabled rather than loading and reports itself as
+     * finished. `createdFor` supplies five of the merged row's lanes; the two top-artist
+     * statistics supply the similarity seeds; the library index and the id lookup supply the
+     * corner seeds.
+     */
+    const mergedPending =
+        !libraryIndex.isReady ||
+        isWaiting(createdFor) ||
+        isWaiting(jams) ||
+        isWaiting(exploration) ||
+        isWaiting(daily) ||
+        isWaiting(missedFirst) ||
+        isWaiting(missedSecond) ||
+        isWaiting(recommendations) ||
+        isWaiting(recommendationMetadata) ||
+        isWaiting(topRecordings) ||
+        isWaiting(similarRecordings) ||
+        isWaiting(similarUsers) ||
+        isWaiting(peerRecordings) ||
+        isWaiting(excludedRecordings);
+
+    const freshPending = !libraryIndex.isReady || isWaiting(freshReleases);
+
+    const similarArtistsPending =
+        !libraryIndex.isReady ||
+        isWaiting(topArtists) ||
+        isWaiting(topArtistsAllTime) ||
+        isWaiting(similarArtists);
+
+    const relatedBandsPending =
+        !libraryIndex.isReady || isWaiting(topArtistsAllTime) || isWaiting(relatedBands);
+
+    const cornersPending =
+        !libraryIndex.isReady || isWaiting(artistMbids) || isWaiting(cornerArtists);
 
     /**
      * Which items had been shown before this visit began.
@@ -479,23 +581,46 @@ export function useDiscoverData(username: string) {
             key: string,
             title: string,
             items: DiscoverItem[],
-            options?: { isArtist?: boolean; limit?: number },
+            options?: { isArtist?: boolean; limit?: number; pending?: boolean },
         ) => {
+            // Drawn as placeholders until every source is in, rather than as whatever has
+            // arrived. Returned empty so a caller deriving from this row, the spotlight, waits
+            // on the same condition instead of picking an album out of a partial set.
+            if (options?.pending) {
+                result.push({
+                    isArtist: options.isArtist,
+                    isPending: true,
+                    items: [],
+                    key,
+                    layout: options.isArtist ? 'strip' : (ROW_LAYOUTS[key] ?? 'strip'),
+                    rowCount: 1,
+                    title,
+                });
+
+                return [];
+            }
+
+            // Dismissed first, ahead of both filters below: a user's own "never again" is a
+            // stronger signal than anything derived from the library or listen history, and
+            // checking it first means it costs nothing on top of them.
+            const notBlocked = items.filter((item) => !blocked.has(item.id));
+
             // Both filters, then the cap. Owning a record and having heard one are separate
             // questions and the page has to survive both, but neither has anything to do with
             // whether a suggestion was any good, so a cap applied first would spend the whole
             // budget on entries that are about to be hidden. Measured on a real account: the
             // merged list is 138 entries and the head of it is almost entirely already known.
-            const owned = filterOwnedItems(items, libraryIndex);
+            const owned = filterOwnedItems(notBlocked, libraryIndex);
             const unheard = filterHeardItems(owned, listenIndex);
             const fresh = newFindsFirst(unheard, seenBefore).slice(0, options?.limit);
 
             // A short row has several possible causes that look identical on screen, and the
             // counts are the only way to tell which one it was. Logged for every row on every
-            // build: they are four integers, and without them diagnosing this costs a rebuild.
+            // build: they are five integers, and without them diagnosing this costs a rebuild.
             logger.info(
                 `Discover row "${key}": ${items.length} suggested, ` +
-                    `${owned.length} unowned, ${unheard.length} unheard, ${fresh.length} shown`,
+                    `${notBlocked.length} not dismissed, ${owned.length} unowned, ` +
+                    `${unheard.length} unheard, ${fresh.length} shown`,
             );
 
             if (fresh.length < MIN_ROW_ITEMS) {
@@ -524,10 +649,19 @@ export function useDiscoverData(username: string) {
         // interleave order: collaborative filtering first because it is the least derivative of
         // what the user already listens to, play counts last because they are the most.
         //
-        // Each lane carries a label, printed on the card. Without one the row was a dozen
-        // sources rendered identically, so a suggestion that looked wrong gave a reader no way
-        // to tell a bad recommendation from a bug, and gave a maintainer nothing to grep for.
-        const peerLabels = (peerFiltered ?? []).map(() => t('page.discover.viaPeers'));
+        // Each non-peer lane carries a label, printed on the card. Without one the row was a
+        // dozen sources rendered identically, so a suggestion that looked wrong gave a reader no
+        // way to tell a bad recommendation from a bug, and gave a maintainer nothing to grep for.
+        // Peers are the exception: a peer's account is not named on the card, so a lane label
+        // would be the same anonymous sentence on every peer's tracks. Each item stamps its own
+        // pick from the pool instead, keyed off its own id, so adjacent cards from different
+        // peers still read differently from each other.
+        const peerPool = [
+            t('page.discover.viaPeers1'),
+            t('page.discover.viaPeers2'),
+            t('page.discover.viaPeers3'),
+            t('page.discover.viaPeers4'),
+        ];
 
         const merged = push(
             'new-to-you',
@@ -544,11 +678,11 @@ export function useDiscoverData(username: string) {
                               .map((mbid) => fromRecommendation(mbid, recommendationMetadata.data))
                               .filter((item): item is DiscoverItem => item !== null)
                         : [],
-                    (jams.data ?? []).map(fromPlaylistTrack),
-                    (exploration.data ?? []).map(fromPlaylistTrack),
-                    (daily.data ?? []).map(fromPlaylistTrack),
-                    (missedFirst.data ?? []).map(fromPlaylistTrack),
-                    (missedSecond.data ?? []).map(fromPlaylistTrack),
+                    (jams.data ?? []).map(fromPlaylistTrack).filter(isDiscoverItem),
+                    (exploration.data ?? []).map(fromPlaylistTrack).filter(isDiscoverItem),
+                    (daily.data ?? []).map(fromPlaylistTrack).filter(isDiscoverItem),
+                    (missedFirst.data ?? []).map(fromPlaylistTrack).filter(isDiscoverItem),
+                    (missedSecond.data ?? []).map(fromPlaylistTrack).filter(isDiscoverItem),
                     // The seeds come back among their own results, and a track is not a suggestion
                     // of itself. Library filtering would usually catch these, but only for what the
                     // user owns, and a seed can be something they merely played somewhere else.
@@ -564,6 +698,17 @@ export function useDiscoverData(username: string) {
                     // A peer's month is not always one listener, so records in an excluded
                     // category are dropped here rather than being allowed to lead the row.
                     //
+                    // A track ListenBrainz could not map is dropped with them, because the
+                    // category check is a lookup by recording id and an unmapped track is one
+                    // the check cannot run on at all. That is not an edge case here, it is the
+                    // shape of the problem: the record that prompted this filter, a Brazilian
+                    // children's song a peer had on repeat, is not in MusicBrainz under any
+                    // spelling, and neither is its artist. The suggestions least likely to be
+                    // catalogued are exactly the ones most likely to be somebody's child's
+                    // playlist, so passing the unmapped ones through unchecked let the filter
+                    // miss the case it exists for. Measured across 24 peers, 11% of their
+                    // recordings are unmapped, and the row is capped well below what survives.
+                    //
                     // Held back entirely until the check has answered, rather than shown and then
                     // corrected. It resolves in one round trip and is cached for a week, so this
                     // costs a moment on a cold load; without it the excluded record is on screen
@@ -573,9 +718,14 @@ export function useDiscoverData(username: string) {
                         tracks
                             .filter(
                                 (track) =>
-                                    !track.recording_mbid || !excluded.has(track.recording_mbid),
+                                    Boolean(track.recording_mbid) &&
+                                    !excluded.has(track.recording_mbid as string),
                             )
-                            .map(fromRecordingStat),
+                            .map(fromRecordingStat)
+                            .map((item) => ({
+                                ...item,
+                                source: pickVariant(item.id, peerPool),
+                            })),
                     ),
                 ],
                 [
@@ -587,10 +737,10 @@ export function useDiscoverData(username: string) {
                     t('page.discover.viaMissed'),
                     t('page.discover.viaSimilarTracks'),
                     t('page.discover.viaTopTracks'),
-                    ...peerLabels,
+                    ...(peerFiltered ?? []).map(() => null),
                 ],
             ),
-            { limit: MERGED_ITEM_LIMIT },
+            { limit: MERGED_ITEM_LIMIT, pending: mergedPending },
         );
 
         // Derived from what the merged row kept rather than from the raw sources, so the count
@@ -620,55 +770,109 @@ export function useDiscoverData(username: string) {
             'fresh-releases',
             t('page.discover.freshReleases'),
             sortByReleaseDate(freshReleases.data ?? []).map(fromFreshRelease),
+            { pending: freshPending },
         );
-        push(
-            'similar-artists',
-            t('page.discover.similarArtists'),
-            mergeDiscoverSources(
-                bySeed(
-                    (similarArtists.data ?? []).filter(
-                        (entry) => !similarArtistSeeds.includes(entry.artist_mbid),
-                    ),
-                    similarArtistSeeds,
-                ).map((entries) =>
-                    rankSimilar(entries, (entry) => entry.artist_mbid).map(fromSimilarArtist),
-                ),
-            ),
-            { isArtist: true, limit: ARTIST_ROW_LIMIT },
-        );
+        /*
+         * Every artist suggestion in one row, whatever reached it.
+         *
+         * Three rows of circular cards read as one undifferentiated block whichever order they
+         * were in, and splitting them said only which ListenBrainz surface answered, which is a
+         * fact about ListenBrainz rather than about the music. The same argument already put
+         * every track source into `new-to-you`, and the same machinery does it here: the lanes
+         * are interleaved rather than concatenated, so the row alternates between them instead
+         * of running one out before starting the next.
+         *
+         * Ordered by how far each reaches from what the listener already plays. Side projects
+         * first, because co-occurrence cannot find them at all; the library's own neglected
+         * corners next; plain similarity last, since it is the most derivative of the three and
+         * also the longest, so it fills whatever the others leave.
+         *
+         * Every lane stamps its own `source` on each item as it is built, rather than one label
+         * applied to the whole lane by `mergeDiscoverSources`. A `similarArtists` lane covers up
+         * to five different seed artists, and a single label on the whole lane could only ever
+         * say one sentence regardless of which of those five produced a given card, which is
+         * exactly what made every similar-artist card and every corner card read identically. A
+         * few wordings share the pool too, chosen deterministically from the card's own id so a
+         * given card reads the same way on every visit rather than reshuffling on each render.
+         * Because every item already carries its `source`, the merge below passes no labels at
+         * all: `mergeDiscoverSources` only overwrites a lane's items when a label is given, so
+         * passing one here, even a correctly varied one, would replace what the item already
+         * carries.
+         */
+        const otherBandLane = (relatedBands.data ?? []).map((band) => {
+            const item = fromRelatedBand(band);
 
-        // Not a similarity model at all: these are bands whose members are in a band the
-        // listener already plays. Co-occurrence cannot reach them, because the whole point is
-        // that hardly anyone plays the side project and the parent band together.
-        push(
-            'related-bands',
-            t('page.discover.relatedBands'),
-            (relatedBands.data ?? []).map(fromRelatedBand),
-            { isArtist: true, limit: ARTIST_ROW_LIMIT },
-        );
+            return {
+                ...item,
+                source: pickVariant(item.id, [
+                    t('page.discover.viaOtherBands1', { band: band.seedName }),
+                    t('page.discover.viaOtherBands2', { band: band.seedName }),
+                    t('page.discover.viaOtherBands3', { band: band.seedName }),
+                ]),
+            };
+        });
 
-        // Same machinery as the row above, pointed at the library instead of at the month. What
-        // comes back is filtered against the library like everything else, so the row is only
-        // ever artists with nothing in it: the collection chooses the direction, never the cards.
-        push(
-            'library-corners',
-            t('page.discover.libraryCorners'),
-            mergeDiscoverSources(
-                bySeed(
-                    (cornerArtists.data ?? []).filter(
-                        (entry) => !cornerSeeds.includes(entry.artist_mbid),
-                    ),
-                    cornerSeeds,
-                ).map((entries) =>
-                    rankSimilar(entries, (entry) => entry.artist_mbid).map(fromSimilarArtist),
-                ),
+        const cornerLanes = bySeed(
+            (cornerArtists.data ?? []).filter((entry) => !cornerSeeds.includes(entry.artist_mbid)),
+            cornerSeeds,
+        ).map(({ entries, seedMbid }) => {
+            const name = seedMbid ? cornerSeedNames.get(seedMbid) : undefined;
+
+            return rankSimilar(entries, (entry) => entry.artist_mbid)
+                .map(fromSimilarArtist)
+                .map((item) => ({
+                    ...item,
+                    source: name
+                        ? pickVariant(item.id, [
+                              t('page.discover.viaOwnShelves1', { artist: name }),
+                              t('page.discover.viaOwnShelves2', { artist: name }),
+                              t('page.discover.viaOwnShelves3', { artist: name }),
+                          ])
+                        : t('page.discover.viaOwnShelvesFallback'),
+                }));
+        });
+
+        const similarLanes = bySeed(
+            (similarArtists.data ?? []).filter(
+                (entry) => !similarArtistSeeds.includes(entry.artist_mbid),
             ),
-            { isArtist: true, limit: ARTIST_ROW_LIMIT },
+            similarArtistSeeds,
+        ).map(({ entries, seedMbid }) => {
+            const name = seedMbid ? similarArtistSeedNames.get(seedMbid) : undefined;
+
+            return rankSimilar(entries, (entry) => entry.artist_mbid)
+                .map(fromSimilarArtist)
+                .map((item) => ({
+                    ...item,
+                    source: name
+                        ? pickVariant(item.id, [
+                              t('page.discover.viaSimilarArtists1', { artist: name }),
+                              t('page.discover.viaSimilarArtists2', { artist: name }),
+                              t('page.discover.viaSimilarArtists3', { artist: name }),
+                          ])
+                        : t('page.discover.viaSimilarArtistsFallback'),
+                }));
+        });
+
+        push(
+            'artists',
+            t('page.discover.artists'),
+            mergeDiscoverSources([otherBandLane, ...cornerLanes, ...similarLanes]),
+            {
+                isArtist: true,
+                limit: ARTIST_ROW_LIMIT,
+                pending: similarArtistsPending || relatedBandsPending || cornersPending,
+            },
         );
 
         return result;
     }, [
         t,
+        mergedPending,
+        freshPending,
+        similarArtistsPending,
+        relatedBandsPending,
+        cornersPending,
         daily.data,
         missedFirst.data,
         missedSecond.data,
@@ -676,12 +880,14 @@ export function useDiscoverData(username: string) {
         libraryIndex,
         listenIndex,
         seenBefore,
+        blocked,
         jams.data,
         exploration.data,
         recommendationMbids,
         recommendationMetadata.data,
         similarArtists.data,
         similarArtistSeeds,
+        similarArtistSeedNames,
         similarRecordings.data,
         similarRecordingSeeds,
         freshReleases.data,
@@ -690,6 +896,7 @@ export function useDiscoverData(username: string) {
         excluded,
         cornerArtists.data,
         cornerSeeds,
+        cornerSeedNames,
     ]);
 
     // Looked up after filtering, so no request is spent on an artist that is about to be hidden.
@@ -698,21 +905,38 @@ export function useDiscoverData(username: string) {
         [rows],
     );
 
-    const artistItems = useMemo(() => artistRows.flat(), [artistRows]);
+    /*
+     * The artists whose genre is worth asking for, which is not all of them.
+     *
+     * Only the ones whose second line is a stand-in. A side project's card already says which
+     * member of which band led there, and a genre would not add a line, it would replace that
+     * one. Not asking is also a request or two saved.
+     */
+    const artistItems = useMemo(
+        () =>
+            rows
+                .filter((row) => row.isArtist)
+                .flatMap((row) => row.items)
+                .filter((item) => item.isSubtitlePlaceholder || !item.subtitle),
+        [rows],
+    );
 
     const artistImages = useArtistImages(artistRows);
 
     /*
-     * Sorted, so the key describes which artists are on the page rather than what order they
-     * landed in.
+     * Sorted, and withheld until every artist row has settled.
      *
-     * The rows settle over several renders as their sources answer, and each reordering was
-     * producing a fresh query key and therefore a fresh request for artists already asked
-     * about. Those repeats were most of what was spending the rate limit.
+     * The whole set is the query key here, so any change to it is a different query: a fresh
+     * request for artists already asked about, and an abort of the batch still in flight for
+     * the previous set. Sorting removed the reorderings; waiting removes the three separate
+     * sets the three artist rows would otherwise produce as they land one after another.
      */
     const artistGenreMbids = useMemo(
-        () => [...new Set(artistItems.map((item) => item.id))].sort(),
-        [artistItems],
+        () =>
+            similarArtistsPending || relatedBandsPending || cornersPending
+                ? []
+                : [...new Set(artistItems.map((item) => item.id))].sort(),
+        [artistItems, similarArtistsPending, relatedBandsPending, cornersPending],
     );
 
     /*
@@ -760,8 +984,11 @@ export function useDiscoverData(username: string) {
                     : albumImages.get(item.id);
 
                 // The name is already the card's title, so repeating it underneath says
-                // nothing. A genre is what a reader scanning unfamiliar names can use.
-                const subtitle = row.isArtist ? (genreOf.get(item.id) ?? item.subtitle) : undefined;
+                // nothing. A genre is what a reader scanning unfamiliar names can use, but only
+                // where the line it would take is a stand-in: a card that says which member of
+                // which band led here is already saying the more useful thing.
+                const genre = row.isArtist ? genreOf.get(item.id) : undefined;
+                const subtitle = item.isSubtitlePlaceholder || !item.subtitle ? genre : undefined;
                 const next = subtitle ? { ...item, subtitle } : item;
 
                 return imageUrl ? { ...next, imageUrl } : next;
@@ -778,16 +1005,15 @@ export function useDiscoverData(username: string) {
     }, [rows, artistImages, albumImages, genreOf]);
 
     // The sources the page is actually built from. `createdFor` is excluded: it is a lookup
-    // that feeds the two playlist queries rather than a row of its own, so counting it would
+    // that feeds the playlist queries rather than a row of its own, so counting it would
     // report a source the reader never sees.
     /*
      * `relatedBands` is deliberately absent.
      *
-     * Everything counted here is ListenBrainz, and the progress line the count feeds says so
-     * when it is slow. MusicBrainz is a different service with a different failure meaning, and
-     * it is paced at a request per second by design, so counting it would report a healthy walk
-     * as a stalled page and blame the wrong dependency when it broke. Its own failures are
-     * logged where they happen.
+     * Everything counted here is ListenBrainz, and the line this count feeds names it. A
+     * MusicBrainz failure means something different and would blame the wrong dependency. Its
+     * own failures are logged where they happen, and the row it feeds shows placeholders while
+     * it walks like any other.
      */
     const queries = [
         jams,
@@ -807,28 +1033,11 @@ export function useDiscoverData(username: string) {
         topRecordings,
     ];
 
-    // Counted on every render rather than memoized: it is two integers over a dozen sources, and
+    // Counted on every render rather than memoized: it is one integer over a dozen sources, and
     // the dependency would be the query statuses themselves, which is the whole computation.
-    //
-    // The library index counts as a source and the listen index no longer does. The difference
-    // is what each one does while it is missing: without the library index every row would be
-    // music the user already owns, so `filterOwnedItems` withholds them entirely and the page
-    // really is waiting. A missing listen history only makes the rows generous, and the page
-    // now renders and says so instead of waiting.
-    const total = queries.length + 1;
-    let ready = libraryIndex.isReady ? 1 : 0;
-
-    const progress: DiscoverProgress = { failed: 0, loading: 0 };
-
-    for (const query of queries) {
-        if (query.isError) {
-            progress.failed += 1;
-        } else if (query.isSuccess) {
-            ready += 1;
-        }
-    }
-
-    progress.loading = total - ready - progress.failed;
+    const progress: DiscoverProgress = {
+        failed: queries.filter((query) => query.isError).length,
+    };
 
     return {
         history: {
@@ -842,10 +1051,7 @@ export function useDiscoverData(username: string) {
         },
         // Every row fetches independently, so a slow or failing source never blanks the page.
         isError: queries.every((query) => query.isError),
-        // Nothing renders before the library index is in hand, because a row built without it
-        // is a list of music the user already owns. The listen history is not waited on: rows
-        // render against however much of it has been read and re-filter as the rest arrives.
-        isPending: rowsWithImages.length === 0 && progress.loading > 0,
+
         library: {
             albumCount: libraryIndex.albumKeys.size,
             isReady: libraryIndex.isReady,
@@ -862,6 +1068,23 @@ export function useDiscoverData(username: string) {
 /** ListenBrainz returns generated playlists newest first, so the first match is this week's. */
 function findLatest(playlists: LbPlaylistSummary[] | undefined, prefix: string) {
     return playlists?.find((entry) => entry.playlist.title.startsWith(prefix));
+}
+
+/**
+ * Whether a source has yet to answer at all.
+ *
+ * Not `isPending`, which stays true for ever on a query that is deliberately disabled: the two
+ * `Top Missed` lanes have no playlist to ask for on an account that has none, and half the page
+ * would have waited on them permanently. Not `isFetching` either, which turns true again for a
+ * background revalidation and would redraw a finished row as placeholders. Waiting means the
+ * query is actually in flight, or queued behind the rate limiter, and has produced nothing yet.
+ */
+function isWaiting(query: {
+    fetchStatus: 'fetching' | 'idle' | 'paused';
+    isError: boolean;
+    isSuccess: boolean;
+}): boolean {
+    return !query.isSuccess && !query.isError && query.fetchStatus !== 'idle';
 }
 
 /**

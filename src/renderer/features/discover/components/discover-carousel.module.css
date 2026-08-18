@@ -5,3 +5,61 @@
     color: inherit;
     text-decoration: none;
 }
+
+/* Positions the dismiss button relative to the card underneath rather than to the carousel. */
+.card-shell {
+    position: relative;
+    height: 100%;
+}
+
+/*
+ * Top left, clear of the rating/favorite badges `ItemCard` already draws in the top right.
+ * Hidden until the card is hovered, matching how ItemCard's own corner controls only appear on
+ * hover. Above ItemCardControls' z-index of 100: it sits outside that component entirely, as a
+ * sibling of the card rather than something passed into it, so it needs its own layer to stay on
+ * top of the play button and favorite badge underneath.
+ */
+.dismiss-button {
+    position: absolute;
+    top: var(--theme-spacing-xs);
+    left: var(--theme-spacing-xs);
+    z-index: 101;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    color: white;
+    cursor: pointer;
+    background-color: rgb(0 0 0 / 55%);
+    border: none;
+    border-radius: var(--theme-radius-sm);
+    opacity: 0;
+    transition:
+        opacity 0.15s ease-in-out,
+        background-color 0.15s ease-in-out;
+
+    /* Solid rather than a darker translucency, so the hovered state reads as a distinct color
+       rather than just a deeper shadow of the idle one. */
+    &:hover {
+        background-color: rgb(0 0 0);
+    }
+}
+
+.card-shell:hover .dismiss-button {
+    opacity: 1;
+}
+
+/*
+ * The shared `Tooltip` is sized for its usual job of naming a whole play/queue action, not a
+ * two-word hint on a 20px corner button, and at that size it read as bigger than the button it
+ * was labelling. Overridden here rather than in the shared component, which every other tooltip
+ * in the app still wants at its normal size. `!important` because the override class and the
+ * shared module's own `.tooltip` land on the same element at equal specificity, so which one
+ * wins would otherwise depend on CSS module bundling order rather than intent.
+ */
+.dismiss-tooltip {
+    padding: var(--theme-spacing-xs) var(--theme-spacing-sm) !important;
+    font-size: var(--theme-font-size-xs) !important;
+}

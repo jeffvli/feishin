@@ -1,6 +1,7 @@
 import { queryOptions } from '@tanstack/react-query';
 
 import { resolveItunesAlbumArt } from '/@/renderer/features/discover/api/itunes-album-art';
+import { isAbortError } from '/@/renderer/features/discover/utils/abort';
 import { CREDIT_SEPARATOR } from '/@/renderer/features/discover/utils/library-match';
 
 /**
@@ -149,7 +150,15 @@ export const albumImageQueries = {
         queryOptions({
             ...CACHE,
             queryFn: ({ signal }) =>
-                resolveAlbumImage(artistName, albumName, signal).catch(() => null),
+                resolveAlbumImage(artistName, albumName, signal).catch((error) => {
+                    // A record none of the sources holds has no cover, which is worth caching.
+                    // A cancelled lookup is not that answer and must not be stored as one.
+                    if (isAbortError(error)) {
+                        throw error;
+                    }
+
+                    return null;
+                }),
             queryKey: ['discover', 'album-image', artistName, albumName] as const,
         }),
 };

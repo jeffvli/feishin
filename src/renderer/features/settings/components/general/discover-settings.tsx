@@ -1,3 +1,4 @@
+import { openModal } from '@mantine/modals';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -6,10 +7,13 @@ import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { DiscoverSection, SortableItem } from '/@/renderer/store';
+import { DiscoverSection, SortableItem, useDiscoverBlockedIds } from '/@/renderer/store';
 import { useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+import { Button } from '/@/shared/components/button/button';
+import { ConfirmModal } from '/@/shared/components/modal/modal';
 import { Switch } from '/@/shared/components/switch/switch';
 import { TextInput } from '/@/shared/components/text-input/text-input';
+import { toast } from '/@/shared/components/toast/toast';
 import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
 
 /**
@@ -20,9 +24,7 @@ const DISCOVER_SECTIONS: Array<[string, string]> = [
     [DiscoverSection.NEW_TO_YOU, 'page.discover.newToYou'],
     [DiscoverSection.SPOTLIGHT, 'page.discover.spotlight'],
     [DiscoverSection.FRESH_RELEASES, 'page.discover.freshReleases'],
-    [DiscoverSection.SIMILAR_ARTISTS, 'page.discover.similarArtists'],
-    [DiscoverSection.LIBRARY_CORNERS, 'page.discover.libraryCorners'],
-    [DiscoverSection.RELATED_BANDS, 'page.discover.relatedBands'],
+    [DiscoverSection.ARTISTS, 'page.discover.artists'],
     [DiscoverSection.SOCIAL, 'page.discover.social'],
     [DiscoverSection.NEWS, 'page.discover.news'],
 ];
@@ -31,6 +33,7 @@ export const DiscoverSettings = memo(() => {
     const { t } = useTranslation();
     const settings = useGeneralSettings();
     const { setDiscoverItems, setSettings } = useSettingsStoreActions();
+    const blockedIds = useDiscoverBlockedIds();
 
     const [localUsername, setLocalUsername] = useState(settings.listenBrainzUsername);
 
@@ -41,6 +44,22 @@ export const DiscoverSettings = memo(() => {
     const debouncedSetUsername = useDebouncedCallback((value: string) => {
         setSettings({ general: { listenBrainzUsername: value.trim() } });
     }, 500);
+
+    const openClearBlockedConfirm = () => {
+        openModal({
+            children: (
+                <ConfirmModal
+                    onConfirm={() => {
+                        setSettings({ general: { discoverBlockedIds: [] } });
+                        toast.success({ message: t('setting.discoverBlockedItemsCleared') });
+                    }}
+                >
+                    {t('common.areYouSure')}
+                </ConfirmModal>
+            ),
+            title: t('setting.discoverBlockedItems'),
+        });
+    };
 
     const options: SettingOption[] = [
         {
@@ -93,6 +112,19 @@ export const DiscoverSettings = memo(() => {
             description: t('setting.discoverBadge', { context: 'description' }),
             isHidden: !settings.discoverEnabled,
             title: t('setting.discoverBadge'),
+        },
+        {
+            control: (
+                <Button onClick={openClearBlockedConfirm} size="compact-md" variant="filled">
+                    {t('common.clear')}
+                </Button>
+            ),
+            description: t('setting.discoverBlockedItems', {
+                context: 'description',
+                count: blockedIds.length,
+            }),
+            isHidden: !settings.discoverEnabled || blockedIds.length === 0,
+            title: t('setting.discoverBlockedItems'),
         },
     ];
 

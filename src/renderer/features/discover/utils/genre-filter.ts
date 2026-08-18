@@ -31,7 +31,11 @@ export function hasExcludedGenre(entry: LbRecordingMetadataEntry | undefined): b
 
     for (const scope of [entry.tag.artist, entry.tag.recording, entry.tag.release_group]) {
         for (const tag of scope ?? []) {
-            if (tag.genre_mbid && EXCLUDED_GENRES.has(tag.tag.toLowerCase())) {
+            // The name is lower-cased defensively rather than trusted. This runs during
+            // render over metadata from a third party, so a field that is absent where the
+            // type says it is a string does not degrade the filter, it takes the page down
+            // through the error boundary.
+            if (tag.genre_mbid && EXCLUDED_GENRES.has(tag.tag?.toLowerCase())) {
                 return true;
             }
         }
