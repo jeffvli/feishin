@@ -7,6 +7,7 @@ import {
     listenbrainzQueries,
 } from '/@/renderer/features/discover/api/listenbrainz-api';
 import { LbPlaylistSummary } from '/@/renderer/features/discover/api/listenbrainz-types';
+import { musicbrainzQueries } from '/@/renderer/features/discover/api/musicbrainz-api';
 import { useAlbumImages } from '/@/renderer/features/discover/hooks/use-album-images';
 import { useArtistImages } from '/@/renderer/features/discover/hooks/use-artist-images';
 import {
@@ -29,6 +30,7 @@ import {
     fromPlaylistTrack,
     fromRecommendation,
     fromRecordingStat,
+    fromRelatedBand,
     fromSimilarArtist,
     fromSimilarRecording,
     mergeDiscoverSources,
@@ -152,6 +154,22 @@ function spread<T>(items: T[], count: number): T[] {
 /** How many similar listeners to read. Each is one request. */
 const PEER_COUNT = 8;
 
+/**
+ * How many years of Top Missed Recordings to pull. Each is a request.
+ *
+ * Ten exist. Two is a hundred tracks before any filtering, which already exceeds what the merged
+ * row shows, and the rest of the allowance is needed by the metadata batches.
+ */
+const MISSED_YEARS = 2;
+
+/**
+ * How deep to read each top-artist statistic before spreading seeds across it.
+ *
+ * Wider than the default twenty because the all-time list is the one expected to be varied, and
+ * spreading over a longer list is what reaches past the few artists that dominate a decade.
+ */
+const TOP_ARTIST_COUNT = 40;
+
 /** How many similar artists reach the row, counted after the owned ones are dropped. */
 const ARTIST_ROW_LIMIT = 20;
 
@@ -177,12 +195,58 @@ export function useDiscoverData(username: string) {
     const jamsMbid = playlistMbid(findLatest(createdFor.data, 'Weekly Jams'));
     const explorationMbid = playlistMbid(findLatest(createdFor.data, 'Weekly Exploration'));
 
+    /*
+     * Daily Jams, which is the only source on this page that differs between two visits in a week.
+     *
+     * Everything else is computed weekly or cached for a day, so a listener opening Discover on
+     * Wednesday sees exactly what they saw on Monday. That is the difference between a page worth
+     * returning to and a page worth reading once.
+     */
+    const dailyMbid = playlistMbid(findLatest(createdFor.data, 'Daily Jams'));
+
+    /*
+     * Top Missed Recordings, which ListenBrainz builds and this page was ignoring.
+     *
+     * In their words it "features recordings that were listened to by users similar to you" and
+     * "aims to introduce you to new music". Missed is the operative word: it is defined as what
+     * comparable listeners played and this one did not, so unlike every other source here it is
+     * new by construction rather than new after filtering.
+     *
+     * One exists per year back to 2016 and taking all of them would spend ten requests out of an
+     * allowance of thirty per ten seconds, which is what starved the metadata batches before.
+     * Two years is a hundred candidates, already more than the row can show.
+     */
+    const missedMbids = useMemo(
+        () =>
+            (createdFor.data ?? [])
+                .filter((entry) => entry.playlist.title.startsWith('Top Missed Recordings'))
+                .slice(0, MISSED_YEARS)
+                .map((entry) => playlistMbid(entry)),
+        [createdFor.data],
+    );
+
     const jams = useQuery(listenbrainzQueries.playlist(jamsMbid));
     const exploration = useQuery(listenbrainzQueries.playlist(explorationMbid));
+    const daily = useQuery(listenbrainzQueries.playlist(dailyMbid));
+    const missedFirst = useQuery(listenbrainzQueries.playlist(missedMbids[0] ?? ''));
+    const missedSecond = useQuery(listenbrainzQueries.playlist(missedMbids[1] ?? ''));
 
     // Fetched for its similarity seeds rather than for a row of its own: "artists you play"
     // is a fact the user already knows, and one they cannot act on for anything unowned.
     const topArtists = useQuery({ ...listenbrainzQueries.topArtists(username), enabled });
+
+    /*
+     * The same statistic over the whole history rather than the last month.
+     *
+     * Every similarity row on the page was seeded from `range=month`, so all of them describe
+     * the same four weeks and come back with the same neighbourhood. Measured on a real account
+     * that neighbourhood was 88% to 99% one genre while the listening it came from was 82%.
+     * A listener's decade is more varied than their month, and reaching it costs one request.
+     */
+    const topArtistsAllTime = useQuery({
+        ...listenbrainzQueries.topArtists(username, 'all_time', TOP_ARTIST_COUNT),
+        enabled,
+    });
     const topRecordings = useQuery({ ...listenbrainzQueries.topRecordings(username), enabled });
     const recommendations = useQuery({ ...listenbrainzQueries.recommendations(username), enabled });
 
@@ -222,16 +286,48 @@ export function useDiscoverData(username: string) {
         [artistMbids.data],
     );
 
-    const similarArtistSeeds = useMemo(
+    /*
+     * Seeds drawn from both time windows rather than from the month alone.
+     *
+     * Half from each, so the row keeps describing what the listener is on now while also
+     * reaching what they have loved for years. Deduplicated, because an artist played steadily
+     * for a decade appears at the top of both lists and would otherwise take two of five seats.
+     */
+    const similarArtistSeeds = useMemo(() => {
+        const month = spread(
+            (topArtists.data ?? [])
+                .map((artist) => artist.artist_mbid)
+                .filter((mbid): mbid is string => Boolean(mbid)),
+            Math.ceil(SIMILARITY_SEED_COUNT / 2),
+        );
+
+        const allTime = spread(
+            (topArtistsAllTime.data ?? [])
+                .map((artist) => artist.artist_mbid)
+                .filter((mbid): mbid is string => Boolean(mbid))
+                .filter((mbid) => !month.includes(mbid)),
+            SIMILARITY_SEED_COUNT - month.length,
+        );
+
+        return [...month, ...allTime];
+    }, [topArtists.data, topArtistsAllTime.data]);
+
+    /*
+     * Bands to expand through their members, named rather than just identified.
+     *
+     * The name is carried because the row's whole value is being able to say "via Chino Moreno,
+     * who is in Deftones". A bare id would leave the card as unexplained as everything else was.
+     */
+    const relatedSeeds = useMemo(
         () =>
             spread(
-                (topArtists.data ?? [])
-                    .map((artist) => artist.artist_mbid)
-                    .filter((mbid): mbid is string => Boolean(mbid)),
+                (topArtistsAllTime.data ?? []).filter((artist) => artist.artist_mbid),
                 SIMILARITY_SEED_COUNT,
-            ),
-        [topArtists.data],
+            ).map((artist) => ({ mbid: artist.artist_mbid as string, name: artist.artist_name })),
+        [topArtistsAllTime.data],
     );
+
+    const relatedBands = useQuery(musicbrainzQueries.relatedBands(relatedSeeds));
 
     const similarRecordingSeeds = useMemo(
         () =>
@@ -427,48 +523,73 @@ export function useDiscoverData(username: string) {
         // Every track source answers the same question, so they are one row. The order is the
         // interleave order: collaborative filtering first because it is the least derivative of
         // what the user already listens to, play counts last because they are the most.
+        //
+        // Each lane carries a label, printed on the card. Without one the row was a dozen
+        // sources rendered identically, so a suggestion that looked wrong gave a reader no way
+        // to tell a bad recommendation from a bug, and gave a maintainer nothing to grep for.
+        const peerLabels = (peerFiltered ?? []).map(() => t('page.discover.viaPeers'));
+
         const merged = push(
             'new-to-you',
             t('page.discover.newToYou'),
-            mergeDiscoverSources([
-                recommendationMetadata.data
-                    ? recommendationMbids
-                          // Free here: the metadata this row already fetches now carries genres,
-                          // so the same category exclusion applied to peers costs no request.
-                          .filter((mbid) => !hasExcludedGenre(recommendationMetadata.data?.[mbid]))
-                          .map((mbid) => fromRecommendation(mbid, recommendationMetadata.data))
-                          .filter((item): item is DiscoverItem => item !== null)
-                    : [],
-                (jams.data ?? []).map(fromPlaylistTrack),
-                (exploration.data ?? []).map(fromPlaylistTrack),
-                // The seeds come back among their own results, and a track is not a suggestion
-                // of itself. Library filtering would usually catch these, but only for what the
-                // user owns, and a seed can be something they merely played somewhere else.
-                rankSimilar(
-                    (similarRecordings.data ?? []).filter(
-                        (entry) => !similarRecordingSeeds.includes(entry.recording_mbid),
+            mergeDiscoverSources(
+                [
+                    recommendationMetadata.data
+                        ? recommendationMbids
+                              // Free here: the metadata this row already fetches now carries genres,
+                              // so the same category exclusion applied to peers costs no request.
+                              .filter(
+                                  (mbid) => !hasExcludedGenre(recommendationMetadata.data?.[mbid]),
+                              )
+                              .map((mbid) => fromRecommendation(mbid, recommendationMetadata.data))
+                              .filter((item): item is DiscoverItem => item !== null)
+                        : [],
+                    (jams.data ?? []).map(fromPlaylistTrack),
+                    (exploration.data ?? []).map(fromPlaylistTrack),
+                    (daily.data ?? []).map(fromPlaylistTrack),
+                    (missedFirst.data ?? []).map(fromPlaylistTrack),
+                    (missedSecond.data ?? []).map(fromPlaylistTrack),
+                    // The seeds come back among their own results, and a track is not a suggestion
+                    // of itself. Library filtering would usually catch these, but only for what the
+                    // user owns, and a seed can be something they merely played somewhere else.
+                    rankSimilar(
+                        (similarRecordings.data ?? []).filter(
+                            (entry) => !similarRecordingSeeds.includes(entry.recording_mbid),
+                        ),
+                        (entry) => entry.recording_mbid,
+                    ).map(fromSimilarRecording),
+                    (topRecordings.data ?? []).map(fromRecordingStat),
+                    // Spread rather than concatenated: one entry per peer means the interleave
+                    // alternates between listeners, so no single peer's fixation fills the row.
+                    // A peer's month is not always one listener, so records in an excluded
+                    // category are dropped here rather than being allowed to lead the row.
+                    //
+                    // Held back entirely until the check has answered, rather than shown and then
+                    // corrected. It resolves in one round trip and is cached for a week, so this
+                    // costs a moment on a cold load; without it the excluded record is on screen
+                    // for that moment, and ranking first for its peer is exactly what puts it at
+                    // the front of the row.
+                    ...(peerFiltered ?? []).map((tracks) =>
+                        tracks
+                            .filter(
+                                (track) =>
+                                    !track.recording_mbid || !excluded.has(track.recording_mbid),
+                            )
+                            .map(fromRecordingStat),
                     ),
-                    (entry) => entry.recording_mbid,
-                ).map(fromSimilarRecording),
-                (topRecordings.data ?? []).map(fromRecordingStat),
-                // Spread rather than concatenated: one entry per peer means the interleave
-                // alternates between listeners, so no single peer's fixation fills the row.
-                // A peer's month is not always one listener, so records in an excluded
-                // category are dropped here rather than being allowed to lead the row.
-                //
-                // Held back entirely until the check has answered, rather than shown and then
-                // corrected. It resolves in one round trip and is cached for a week, so this
-                // costs a moment on a cold load; without it the excluded record is on screen
-                // for that moment, and ranking first for its peer is exactly what puts it at
-                // the front of the row.
-                ...(peerFiltered ?? []).map((tracks) =>
-                    tracks
-                        .filter(
-                            (track) => !track.recording_mbid || !excluded.has(track.recording_mbid),
-                        )
-                        .map(fromRecordingStat),
-                ),
-            ]),
+                ],
+                [
+                    t('page.discover.viaRecommended'),
+                    t('page.discover.viaJams'),
+                    t('page.discover.viaExploration'),
+                    t('page.discover.viaDaily'),
+                    t('page.discover.viaMissed'),
+                    t('page.discover.viaMissed'),
+                    t('page.discover.viaSimilarTracks'),
+                    t('page.discover.viaTopTracks'),
+                    ...peerLabels,
+                ],
+            ),
             { limit: MERGED_ITEM_LIMIT },
         );
 
@@ -516,6 +637,16 @@ export function useDiscoverData(username: string) {
             { isArtist: true, limit: ARTIST_ROW_LIMIT },
         );
 
+        // Not a similarity model at all: these are bands whose members are in a band the
+        // listener already plays. Co-occurrence cannot reach them, because the whole point is
+        // that hardly anyone plays the side project and the parent band together.
+        push(
+            'related-bands',
+            t('page.discover.relatedBands'),
+            (relatedBands.data ?? []).map(fromRelatedBand),
+            { isArtist: true, limit: ARTIST_ROW_LIMIT },
+        );
+
         // Same machinery as the row above, pointed at the library instead of at the month. What
         // comes back is filtered against the library like everything else, so the row is only
         // ever artists with nothing in it: the collection chooses the direction, never the cards.
@@ -538,6 +669,10 @@ export function useDiscoverData(username: string) {
         return result;
     }, [
         t,
+        daily.data,
+        missedFirst.data,
+        missedSecond.data,
+        relatedBands.data,
         libraryIndex,
         listenIndex,
         seenBefore,
@@ -645,9 +780,22 @@ export function useDiscoverData(username: string) {
     // The sources the page is actually built from. `createdFor` is excluded: it is a lookup
     // that feeds the two playlist queries rather than a row of its own, so counting it would
     // report a source the reader never sees.
+    /*
+     * `relatedBands` is deliberately absent.
+     *
+     * Everything counted here is ListenBrainz, and the progress line the count feeds says so
+     * when it is slow. MusicBrainz is a different service with a different failure meaning, and
+     * it is paced at a request per second by design, so counting it would report a healthy walk
+     * as a stalled page and blame the wrong dependency when it broke. Its own failures are
+     * logged where they happen.
+     */
     const queries = [
         jams,
         exploration,
+        daily,
+        missedFirst,
+        missedSecond,
+        topArtistsAllTime,
         cornerArtists,
         recommendationMetadata,
         similarArtists,

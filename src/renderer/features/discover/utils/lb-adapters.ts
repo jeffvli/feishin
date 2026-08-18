@@ -7,6 +7,7 @@ import {
     LbSimilarRecording,
     LbUrlRel,
 } from '/@/renderer/features/discover/api/listenbrainz-types';
+import { MbRelatedArtist } from '/@/renderer/features/discover/api/musicbrainz-api';
 import { normalizeName } from '/@/renderer/features/discover/utils/library-match';
 
 /**
@@ -46,6 +47,15 @@ export interface DiscoverItem {
     releaseGroupMbid: null | string;
     /** Release and release-group ids, for matching against a library that records them. */
     releaseMbids: string[];
+    /**
+     * Which source put this item on the page, ready to print.
+     *
+     * The merged row draws from a dozen lanes and the card gave no way to tell them apart, so a
+     * suggestion that looked wrong was indistinguishable from a bug. Stamped during the merge
+     * rather than in the adapters, because a lane is a property of how an item was chosen and
+     * the same adapter serves several lanes.
+     */
+    source?: null | string;
     /** Album name for tracks, or the release date for releases. Rendered as the second row. */
     subtitle: null | string;
     title: string;
@@ -221,6 +231,28 @@ export function fromRecordingStat(stat: LbRecordingStat): DiscoverItem {
     };
 }
 
+/**
+ * A band reached through MusicBrainz relationships.
+ *
+ * The subtitle is the connection rather than a genre, because the connection is the entire
+ * reason the card is on the page and it is not something a listener can infer from the name.
+ */
+export function fromRelatedBand(band: MbRelatedArtist): DiscoverItem {
+    return {
+        albumName: null,
+        artistName: band.name,
+        id: band.mbid,
+        imageUrl: null,
+        kind: 'artist',
+        recordingMbid: null,
+        releaseGroupMbid: null,
+        releaseMbids: [],
+        subtitle: `${band.via}, of ${band.seedName}`,
+        title: band.name,
+        urlRels: [],
+    };
+}
+
 export function fromSimilarArtist(artist: LbSimilarArtist): DiscoverItem {
     return {
         albumName: null,
@@ -300,13 +332,16 @@ export function listenBrainzUrl(item: DiscoverItem): null | string {
  * comparing ids reports twenty unique entries where a reader plainly sees the same song
  * repeated. The normalised name is the only key that matches what the eye matches.
  */
-export function mergeDiscoverSources(sources: DiscoverItem[][]): DiscoverItem[] {
+export function mergeDiscoverSources(
+    sources: DiscoverItem[][],
+    labels?: Array<null | string>,
+): DiscoverItem[] {
     const seen = new Set<string>();
     const merged: DiscoverItem[] = [];
     const longest = Math.max(0, ...sources.map((source) => source.length));
 
     for (let index = 0; index < longest; index += 1) {
-        for (const source of sources) {
+        for (const [lane, source] of sources.entries()) {
             const item = source[index];
 
             if (!item) {
@@ -320,7 +355,12 @@ export function mergeDiscoverSources(sources: DiscoverItem[][]): DiscoverItem[] 
             }
 
             seen.add(key);
-            merged.push(item);
+
+            // The first lane to offer an item wins it, so the label names the lane that
+            // actually supplied it rather than every lane that could have.
+            const label = labels?.[lane];
+
+            merged.push(label ? { ...item, source: label } : item);
         }
     }
 

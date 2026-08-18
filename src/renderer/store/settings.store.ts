@@ -86,6 +86,7 @@ const DiscoverSectionSchema = z.enum([
     'library-corners',
     'news',
     'new-to-you',
+    'related-bands',
     'similar-artists',
     'social',
     'spotlight',
@@ -974,6 +975,7 @@ export enum DiscoverSection {
     LIBRARY_CORNERS = 'library-corners',
     NEW_TO_YOU = 'new-to-you',
     NEWS = 'news',
+    RELATED_BANDS = 'related-bands',
     SIMILAR_ARTISTS = 'similar-artists',
     SOCIAL = 'social',
     SPOTLIGHT = 'spotlight',
@@ -1256,6 +1258,7 @@ const discoverItems = [
     DiscoverSection.FRESH_RELEASES,
     DiscoverSection.SIMILAR_ARTISTS,
     DiscoverSection.LIBRARY_CORNERS,
+    DiscoverSection.RELATED_BANDS,
     DiscoverSection.SOCIAL,
     DiscoverSection.NEWS,
 ].map((item) => ({
@@ -2952,9 +2955,11 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     state.general.discoverItems ??= discoverItems;
                 }
 
-                if (version < 37) {
-                    // Merged in rather than appended, so a list saved before this section
-                    // existed gains it in its intended place instead of at the end.
+                if (version < 38) {
+                    // Merged in rather than appended, so a list saved before a section existed
+                    // gains it in its intended place instead of at the end. Written to cover
+                    // every version below it, since the merge is idempotent and a reader should
+                    // not have to keep one of these per section.
                     state.general.discoverItems = discoverItems.map(
                         (fallback) =>
                             state.general.discoverItems.find((saved) => saved.id === fallback.id) ??
@@ -2965,7 +2970,7 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                 return persistedState;
             },
             name: 'store_settings',
-            version: 37,
+            version: 38,
         },
     ),
 );

@@ -49,6 +49,18 @@ const ROWS: DataRow[] = [
 ];
 
 /**
+ * A third line naming where the suggestion came from.
+ *
+ * Only added when the row actually has provenance, because a formatter returning an empty string
+ * still reserves its line and would put a blank gap under every card on the rows that have none.
+ */
+const SOURCE_ROW: DataRow = {
+    format: (data) => (data as { source?: null | string }).source ?? '',
+    id: 'source',
+    isMuted: true,
+};
+
+/**
  * A row of ListenBrainz suggestions, rendered with the same carousel and cards the library uses.
  *
  * `GridCarousel` takes `{ id, content }` and is indifferent to what an item is, and `ItemCard`
@@ -99,6 +111,13 @@ export function DiscoverCarousel(props: DiscoverCarouselProps) {
         };
     }, [canPreview, itemsById, toggle]);
 
+    // Computed per row rather than per card: the extra line is a property of the row having
+    // provenance at all, and a strip where only some cards carry it would sit unevenly.
+    const rows = useMemo(
+        () => (items.some((item) => item.source) ? [...ROWS, SOURCE_ROW] : ROWS),
+        [items],
+    );
+
     const cards = useMemo(() => {
         return items.map((item) => {
             // ItemCard's `data` is the union of library entities. A ListenBrainz item satisfies
@@ -109,6 +128,7 @@ export function DiscoverCarousel(props: DiscoverCarouselProps) {
                 id: item.id,
                 imageUrl: item.imageUrl,
                 name: item.title,
+                source: item.source,
                 // Passed only for artist cards. On an album or track the artist credit is
                 // already the useful second line, and the subtitle there is a release name
                 // the title line has usually said.
@@ -134,7 +154,7 @@ export function DiscoverCarousel(props: DiscoverCarouselProps) {
                               }
                             : undefined
                     }
-                    rows={ROWS}
+                    rows={rows}
                     type="poster"
                     withControls={canPreview}
                 />
@@ -158,7 +178,7 @@ export function DiscoverCarousel(props: DiscoverCarouselProps) {
                 id: item.id,
             };
         });
-    }, [items, controls, canPreview, isArtist, playingId, resolvingId]);
+    }, [items, rows, controls, canPreview, isArtist, playingId, resolvingId]);
 
     if (cards.length === 0) {
         return null;
