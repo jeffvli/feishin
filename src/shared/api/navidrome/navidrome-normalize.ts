@@ -476,7 +476,9 @@ const normalizePlaylist = (
     item: z.infer<typeof ndType._response.playlist>,
     server?: null | ServerListItem,
 ): Playlist => {
-    const imageId = navidromeImageIdWithCacheBust(item.id, item.uploadedImage, item.updatedAt);
+    // Always bust, not only for uploaded images: the server regenerates the
+    // auto-generated cover when the playlist contents change.
+    const imageId = `${item.id}&_=${item.updatedAt}`;
 
     return {
         _itemType: LibraryItem.PLAYLIST,

@@ -380,6 +380,8 @@ const normalizePlaylist = (
         | z.infer<typeof ssType._response.playlistListEntry>,
     server?: null | ServerListItemWithCredential,
 ): Playlist => {
+    const coverArt = item.coverArt?.toString() || null;
+
     return {
         _itemType: LibraryItem.PLAYLIST,
         _serverId: server?.id || 'unknown',
@@ -388,7 +390,9 @@ const normalizePlaylist = (
         duration: item.duration * 1000,
         genres: [],
         id: item.id.toString(),
-        imageId: item.coverArt?.toString() || null,
+        // Bust the browser image cache when the playlist changes, since the
+        // server may regenerate its auto-generated cover.
+        imageId: coverArt && item.changed ? `${coverArt}&_=${item.changed}` : coverArt,
         imageUrl: null,
         name: item.name,
         owner: item.owner,
