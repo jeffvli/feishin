@@ -1289,8 +1289,8 @@
         "queryBuilderCustomFields_description": "Add custom fields to use in query builders",
         "microtonalPitchControls": "Microtonal pitch controls",
         "microtonalPitchControls_description": "Add more pitch controls to go between semi-tones",
-        "sidebarImageExpand": "Expand album art button",
-        "sidebarImageExpand_description": "Show a button on the player bar's album art to expand it into the sidebar. Disabling this also hides the button and collapses the album art if it is currently expanded"
+        "sidebarImageEnabled": "Expand album art button",
+        "sidebarImageEnabled_description": "Show a button on the player bar's album art to expand it into the sidebar. Disabling this also hides the button and collapses the album art if it is currently expanded"
     },
     "table": {
         "column": {

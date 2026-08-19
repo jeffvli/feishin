@@ -567,7 +567,7 @@ export const GeneralSettingsSchema = z.object({
     showVisualizerInSidebar: z.boolean(),
     sidebarCollapsedNavigation: z.boolean(),
     sidebarCollapseShared: z.boolean(),
-    sidebarImageExpand: z.boolean(),
+    sidebarImageEnabled: z.boolean(),
     sidebarItems: z.array(SidebarItemTypeSchema),
     sidebarPanelOrder: z.array(SidebarPanelTypeSchema),
     sidebarPlaylistFolders: z.boolean(),
@@ -1387,7 +1387,7 @@ const initialState: SettingsState = {
         showVisualizerInSidebar: true,
         sidebarCollapsedNavigation: true,
         sidebarCollapseShared: false,
-        sidebarImageExpand: true,
+        sidebarImageEnabled: true,
         sidebarItems,
         sidebarPanelOrder: ['queue', 'lyrics', 'visualizer'],
         sidebarPlaylistFolders: false,
@@ -3019,8 +3019,8 @@ export const useFollowCurrentSong = () =>
 export const useFullscreenAutoOpenTimeout = () =>
     useSettingsStore((state) => state.general.fullscreenAutoOpenTimeout, shallow);
 
-export const useSidebarImageExpand = () =>
-    useSettingsStore((state) => state.general.sidebarImageExpand, shallow);
+export const useSidebarImageEnabled = () =>
+    useSettingsStore((state) => state.general.sidebarImageEnabled, shallow);
 
 export const useThemeSettings = () =>
     useSettingsStore(

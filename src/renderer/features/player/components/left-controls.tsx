@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { AnimatePresence, LayoutGroup, motion } from 'motion/react';
-import { MouseEvent, useEffect } from 'react';
+import { MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router';
 import { shallow } from 'zustand/shallow';
@@ -27,7 +27,7 @@ import {
     useHotkeySettings,
     usePlayerSong,
     useSetFullScreenPlayerStore,
-    useSidebarImageExpand,
+    useSidebarImageEnabled,
 } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Center } from '/@/shared/components/center/center';
@@ -47,7 +47,7 @@ export const LeftControls = () => {
     } = useFullScreenPlayerStore();
     const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
 
-    const { collapsed, image } = useAppStore(
+    const { collapsed: sidebarCollapsed, image: sidebarImageShown } = useAppStore(
         (state) => ({
             collapsed: state.sidebar.collapsed,
             image: state.sidebar.image,
@@ -59,20 +59,14 @@ export const LeftControls = () => {
     const isRadioActive = useIsRadioActive();
     const { currentStationArt } = useRadioPlayer();
     const { bindings } = useHotkeySettings();
-    const sidebarImageExpand = useSidebarImageExpand();
+    const sidebarImageEnabled = useSidebarImageEnabled();
 
     const isRadioMode = isRadioActive;
     const hasRadioStationImage = Boolean(currentStationArt?.imageId || currentStationArt?.imageUrl);
-    const hideImage = image && !collapsed;
+    const hideImage = !sidebarCollapsed && sidebarImageEnabled && sidebarImageShown;
     const isSongDefined = Boolean(currentSong?.id) && !isRadioMode;
     const title = currentSong?.name;
     const artists = currentSong?.artists;
-
-    useEffect(() => {
-        if (!sidebarImageExpand && image) {
-            setSideBar({ image: false });
-        }
-    }, [sidebarImageExpand, image, setSideBar]);
 
     const handleToggleFullScreenPlayer = (e?: KeyboardEvent | MouseEvent<HTMLDivElement>) => {
         // don't toggle if right click
@@ -185,7 +179,7 @@ export const LeftControls = () => {
                                         />
                                     )}
                                 </Tooltip>
-                                {!collapsed && sidebarImageExpand && (
+                                {!sidebarCollapsed && sidebarImageEnabled && (
                                     <ActionIcon
                                         icon="arrowUpS"
                                         iconProps={{ size: 'xl' }}

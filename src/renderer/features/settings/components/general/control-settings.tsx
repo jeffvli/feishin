@@ -202,23 +202,23 @@ export const ControlSettings = memo(() => {
         {
             control: (
                 <Switch
-                    aria-label="Toggle sidebar image expand"
-                    defaultChecked={settings.sidebarImageExpand}
+                    aria-label="Toggle sidebar image enabled"
+                    defaultChecked={settings.sidebarImageEnabled}
                     onChange={(e) =>
                         setSettings({
                             general: {
                                 ...settings,
-                                sidebarImageExpand: e.currentTarget.checked,
+                                sidebarImageEnabled: e.currentTarget.checked,
                             },
                         })
                     }
                 />
             ),
-            description: t('setting.sidebarImageExpand', {
+            description: t('setting.sidebarImageEnabled', {
                 context: 'description',
             }),
             isHidden: false,
-            title: t('setting.sidebarImageExpand'),
+            title: t('setting.sidebarImageEnabled'),
         },
         {
             control: (
