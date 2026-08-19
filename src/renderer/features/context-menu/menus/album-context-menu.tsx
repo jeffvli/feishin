@@ -38,7 +38,7 @@ export const AlbumContextMenu = ({ items, type }: AlbumContextMenuProps) => {
             <SetRatingAction ids={ids} itemType={LibraryItem.ALBUM} />
             <ContextMenu.Divider />
             <DownloadAction ids={ids} />
-            <ShareAction ids={ids} itemType={LibraryItem.ALBUM} />
+            <ShareAction items={items} itemType={LibraryItem.ALBUM} />
             <ContextMenu.Divider />
             <GoToAction items={items} />
             <ContextMenu.Divider />

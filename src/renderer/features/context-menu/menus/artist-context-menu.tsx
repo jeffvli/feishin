@@ -36,7 +36,7 @@ export const ArtistContextMenu = ({ items, type }: ArtistContextMenuProps) => {
             <SetRatingAction ids={ids} itemType={LibraryItem.ARTIST} />
             <ContextMenu.Divider />
             <DownloadAction ids={ids} />
-            <ShareAction ids={ids} itemType={LibraryItem.ARTIST} />
+            <ShareAction items={items} itemType={LibraryItem.ARTIST} />
             <ContextMenu.Divider />
             <GetInfoAction disabled={items.length === 0} items={items} />
         </ContextMenu.Content>

@@ -565,6 +565,8 @@
             "setRating": "$t(action.setRating)",
             "playShuffled": "$t(player.shuffle)",
             "shareItem": "Share item",
+            "createShareLink": "Create share link",
+            "linkCopied": "Link copied to clipboard",
             "goTo": "Go to",
             "goToAlbum": "Go to $t(entity.album, {\"count\": 1})",
             "goToAlbumArtist": "Go to $t(entity.albumArtist, {\"count\": 1})",
