@@ -454,6 +454,24 @@ const ENV_SETTING_SPECS: EnvSettingSpec[] = [
         type: 'enum',
     },
     {
+        key: 'FS_LYRICS_PADDING_LEFT',
+        path: ['lyricsDisplay', 'default', 'paddingLeft'],
+        transform: (s) => {
+            const n = parseNum(s);
+            return n !== undefined ? Math.min(20, Math.max(0, Math.round(n))) : undefined;
+        },
+        type: 'num',
+    },
+    {
+        key: 'FS_LYRICS_PADDING_RIGHT',
+        path: ['lyricsDisplay', 'default', 'paddingRight'],
+        transform: (s) => {
+            const n = parseNum(s);
+            return n !== undefined ? Math.min(20, Math.max(0, Math.round(n))) : undefined;
+        },
+        type: 'num',
+    },
+    {
         enumSet: AUTO_DJ_STRATEGIES,
         key: 'FS_AUTO_DJ_ALBUM_STRATEGY',
         path: ['autoDJ', 'albumStrategy'],

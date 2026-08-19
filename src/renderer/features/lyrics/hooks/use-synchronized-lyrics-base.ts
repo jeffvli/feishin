@@ -40,6 +40,8 @@ export const useSynchronizedLyricsBase = (settingsKey = 'default', offsetMs?: nu
                     : 24,
             gap: displaySettings.gap && displaySettings.gap !== 0 ? displaySettings.gap : 24,
             opacityNonActive: displaySettings.opacityNonActive,
+            paddingLeft: displaySettings.paddingLeft ?? 0,
+            paddingRight: displaySettings.paddingRight ?? 0,
             scaleNonActive:
                 displaySettings.scaleNonActive && displaySettings.scaleNonActive !== 0
                     ? displaySettings.scaleNonActive

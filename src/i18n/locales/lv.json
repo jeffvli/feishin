@@ -512,6 +512,8 @@
                 "lyricOffset": "Tekstu nobīde (ms)",
                 "lyricGap": "Dziesmas teksta pauze",
                 "lyricLineLeadTime": "Rindas apstrādes laiks (ms)",
+                "lyricPaddingLeft": "Teksta kreisā apmale (%)",
+                "lyricPaddingRight": "Teksta labās malas apmale (%)",
                 "lyricSize": "Dziesmu teksta izmērs",
                 "lyricOpacityNonActive": "Neaktīvo tekstu caurspīdīgums",
                 "lyricScaleNonActive": "Neaktīvs dziesmu tekstu mērogs",

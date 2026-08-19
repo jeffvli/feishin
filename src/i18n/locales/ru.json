@@ -535,7 +535,8 @@
                 "lyricScaleNonActive": "Масштаб неактивного текста",
                 "lyricFollowScrollAlignment": "Текст песни следует за выравниванием",
                 "lyricLineLeadTime": "Задержка между строками (мс)",
-                "lyricLineLeadTime": "Задержка между строками (мс)"
+                "lyricPaddingLeft": "Отступ слева для текста песни (%)",
+                "lyricPaddingRight": "Отступ справа для текста песни (%)"
             },
             "upNext": "Далее",
             "lyrics": "Текст песни",

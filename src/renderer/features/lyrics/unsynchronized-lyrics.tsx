@@ -61,6 +61,8 @@ export const UnsynchronizedLyrics = ({
             <LyricsScrollContent
                 bottomScrollPadding="6vh"
                 gap={settings.gapUnsync}
+                paddingLeft={preview ? 0 : (displaySettings.paddingLeft ?? 0)}
+                paddingRight={preview ? 0 : (displaySettings.paddingRight ?? 0)}
                 preview={preview}
             >
                 {settings.showProvider && source && (

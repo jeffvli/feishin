@@ -891,6 +891,8 @@
                 "lyricOffset": "Desplazamiento de letras (ms)",
                 "lyricScaleNonActive": "Escala de letra no activa",
                 "lyricOpacityNonActive": "Opacidad de letra no activa",
+                "lyricPaddingLeft": "Relleno a la izquierda de las letras (%)",
+                "lyricPaddingRight": "Relleno a la derecha de las letras (%)",
                 "lyricLineLeadTime": "Tiempo de respuesta de la línea (ms)",
                 "lyricFollowScrollAlignment": "Las letras siguen la alineación",
                 "showLyricProvider_description": "Muestra qué proveedor proporciona la letra actual",
@@ -904,7 +906,9 @@
                 "lyricAlignment_description": "Alineación horizontal del texto de letra",
                 "lyricGapSynchronized_description": "Espaciado vertical entre líneas de letra sincronizadas",
                 "lyricGapUnsynchronized_description": "Espaciado vertical entre líneas de letra no sincronizadas",
-                "lyricLineLeadTime_description": "Adelanta la línea activa todos estos milisegundos antes de su marca de tiempo"
+                "lyricLineLeadTime_description": "Adelanta la línea activa todos estos milisegundos antes de su marca de tiempo",
+                "lyricPaddingLeft_description": "Relleno izquierdo como porcentaje del área de letra",
+                "lyricPaddingRight_description": "Relleno derecho como porcentaje del área de letra"
             },
             "lyrics": "Letras",
             "related": "Relacionado",

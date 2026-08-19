@@ -8,6 +8,8 @@ export interface LyricsScrollContentProps {
     children: React.ReactNode;
     className?: string;
     gap?: number;
+    paddingLeft?: number;
+    paddingRight?: number;
     preview?: boolean;
     style?: React.CSSProperties;
 }
@@ -17,6 +19,8 @@ export const LyricsScrollContent = ({
     children,
     className,
     gap,
+    paddingLeft = 0,
+    paddingRight = 0,
     preview = false,
     style,
 }: LyricsScrollContentProps) => {
@@ -30,12 +34,16 @@ export const LyricsScrollContent = ({
         }
 
         return {
+            '--lyric-padding-left': `${paddingLeft}%`,
+            '--lyric-padding-right': `${paddingRight}%`,
             gap: gap !== undefined ? `${gap}px` : undefined,
             paddingBottom: bottomScrollPadding,
-            paddingTop: '2rem',
+            paddingLeft: `${paddingLeft}%`,
+            paddingRight: `${paddingRight}%`,
+            paddingTop: '10vh',
             ...style,
         } as React.CSSProperties;
-    }, [bottomScrollPadding, gap, preview, style]);
+    }, [bottomScrollPadding, gap, paddingLeft, paddingRight, preview, style]);
 
     return (
         <div

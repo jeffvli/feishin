@@ -169,6 +169,56 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
         },
         {
             component: (
+                <Slider
+                    defaultValue={displaySettings.paddingLeft ?? 0}
+                    label={(value) => `${value}%`}
+                    marks={[
+                        { label: '0', value: 0 },
+                        { label: '25', value: 25 },
+                        { label: '50', value: 50 },
+                    ]}
+                    max={50}
+                    min={0}
+                    onChangeEnd={(value) => {
+                        updateDisplaySetting({ paddingLeft: value });
+                    }}
+                    step={1}
+                    w="100%"
+                />
+            ),
+            description: t('page.fullscreenPlayer.config.lyricPaddingLeft', {
+                context: 'description',
+            }),
+            id: 'paddingLeft',
+            label: t('page.fullscreenPlayer.config.lyricPaddingLeft'),
+        },
+        {
+            component: (
+                <Slider
+                    defaultValue={displaySettings.paddingRight ?? 0}
+                    label={(value) => `${value}%`}
+                    marks={[
+                        { label: '0', value: 0 },
+                        { label: '25', value: 25 },
+                        { label: '50', value: 50 },
+                    ]}
+                    max={50}
+                    min={0}
+                    onChangeEnd={(value) => {
+                        updateDisplaySetting({ paddingRight: value });
+                    }}
+                    step={1}
+                    w="100%"
+                />
+            ),
+            description: t('page.fullscreenPlayer.config.lyricPaddingRight', {
+                context: 'description',
+            }),
+            id: 'paddingRight',
+            label: t('page.fullscreenPlayer.config.lyricPaddingRight'),
+        },
+        {
+            component: (
                 <SegmentedControl
                     data={[
                         { label: t('common.left'), value: 'left' },
