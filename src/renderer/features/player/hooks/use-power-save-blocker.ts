@@ -31,11 +31,13 @@ export const usePowerSaveBlocker = () => {
     }, []);
 
     useEffect(() => {
-        if (!preventSleepOnPlayback || !preventSuspendOnPlayback) return;
+        if (!preventSleepOnPlayback && !preventSuspendOnPlayback) return;
 
         if (status === PlayerStatus.PLAYING) {
+            console.info('Playback started - starting power save blocker');
             startPowerSaveBlocker();
         } else {
+            console.info('Playback stopped - stopping power save blocker');
             stopPowerSaveBlocker();
         }
     }, [
@@ -65,7 +67,7 @@ export const PowerSaveBlockerHook = () => {
         (state) => state.window.preventSuspendOnPlayback,
     );
 
-    if (!isElectronEnv || !preventSleepOnPlayback || !preventSuspendOnPlayback) {
+    if (!isElectronEnv || (!preventSleepOnPlayback && !preventSuspendOnPlayback)) {
         return null;
     }
 
