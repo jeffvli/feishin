@@ -290,13 +290,13 @@ export const AppMenu = () => {
             type: 'custom',
         },
         {
-            id: 'divider-5',
-            type: 'divider',
-        },
-        {
             condition: settings.sideQueueType === 'sideQueue',
             id: 'layout-toggle-group',
             items: [
+                {
+                    id: 'divider-5',
+                    type: 'divider',
+                },
                 {
                     component: (
                         <Group gap="xs" grow pb="xs" pt="sm" px="xs" w="100%">
