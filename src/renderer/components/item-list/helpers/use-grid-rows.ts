@@ -126,6 +126,6 @@ export const useGridRows = (
             })
             .filter((row): row is NonNullable<typeof row> => row !== null && row !== undefined);
 
-        return configuredRows.length > 0 ? configuredRows : allRows;
+        return configuredRows;
     }, [itemType, listKey, gridRowsConfig, type]);
 };
