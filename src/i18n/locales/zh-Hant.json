@@ -264,7 +264,13 @@
                 "lyricOpacityNonActive_description": "非目前歌詞的透明度",
                 "lyricScaleNonActive_description": "非目前歌詞的縮放比例",
                 "showLyricMatch_description": "顯示匹配歌詞的歌曲名稱與藝人",
-                "showLyricProvider_description": "顯示哪個提供者提供了目前的歌詞"
+                "showLyricProvider_description": "顯示哪個提供者提供了目前的歌詞",
+                "coverArtSize": "封面圖尺寸",
+                "titleDisplayType": "標題顯示樣式",
+                "titleDisplayType_optionMultiLine": "多行",
+                "titleDisplayType_optionScroll": "捲動",
+                "titleLineCount": "標題行數",
+                "playerItemAlignment": "播放器項目對齊方式"
             },
             "lyrics": "歌詞",
             "related": "相關歌曲",
@@ -715,7 +721,7 @@
         "discordDisplayType_songname": "歌曲名稱",
         "discordDisplayType_artistname": "藝人名稱",
         "discordLinkType": "{{discord}} presence 連結",
-        "discordLinkType_description": "在 {{discord}} Rich Presence 中，為歌曲和藝人欄位新增 {{lastfm}} 或 {{musicbrainz}} 的外部連結。{{musicbrainz}} 的準確度最高，但需要標籤且不提供藝人連結；而 {{lastfm}} 通常都能提供連結。此功能不會產生額外的網路請求",
+        "discordLinkType_description": "在 {{discord}} Rich Presence 中新增 {{lastfm}} 或 {{musicbrainz}} 連結。{{musicbrainz}} 的準確度最高，但需要標籤且不提供藝人連結；而 {{lastfm}} 通常都能提供連結。此功能不會產生額外的網路請求",
         "discordLinkType_none": "$t(common.none)",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}} 並以 {{lastfm}} 備用",
         "hotkey_navigateHome": "導航至首頁",
@@ -949,7 +955,11 @@
         "shareExpiration_description": "新分享連結預設的過期時間。在分享對話框中清除日期即可改用伺服器預設值",
         "shareExpiration": "預設分享過期時間",
         "shareExpirationUseServerDefault_description": "建立分享時不指定過期時間，以便伺服器套用其設定的預設值 (例如 Navidrome 的 DefaultShareExpiration)",
-        "shareExpirationUseServerDefault": "使用伺服器預設過期時間"
+        "shareExpirationUseServerDefault": "使用伺服器預設過期時間",
+        "fullscreenAutoOpenTimeout_description": "播放歌曲期間，閒置達指定時間後自動開啟全螢幕播放器。設定至0來停用此功能",
+        "fullscreenAutoOpenTimeout": "全螢幕播放器自動開啟時間 (分鐘)",
+        "sidebarImageEnabled": "展開專輯封面按鈕",
+        "sidebarImageEnabled_description": "在播放器欄的專輯封面上顯示按鈕，可將專輯封面展開至側邊欄。停用此選項會隱藏按鈕，且若專輯封面處於展開狀態會將其收合"
     },
     "table": {
         "config": {

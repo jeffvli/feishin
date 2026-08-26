@@ -1,6 +1,6 @@
 import clsx from 'clsx';
-import { motion } from 'motion/react';
-import { CSSProperties, lazy, Suspense, useMemo } from 'react';
+import { AnimatePresence, motion, Variants } from 'motion/react';
+import { lazy, Suspense, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './full-screen-player-queue.module.css';
@@ -8,13 +8,14 @@ import styles from './full-screen-player-queue.module.css';
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { FullScreenSimilarSongs } from '/@/renderer/features/player/components/full-screen-similar-songs';
-import { usePlaybackSettings, useSettingsStore } from '/@/renderer/store';
+import { useListSettings, usePlaybackSettings, useSettingsStore } from '/@/renderer/store';
 import {
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
 } from '/@/renderer/store/full-screen-player.store';
-import { Button } from '/@/shared/components/button/button';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
+import { AppIcon } from '/@/shared/components/icon/icon';
 import { ItemListKey } from '/@/shared/types/types';
 
 const AudioMotionAnalyzerVisualizer = lazy(() =>
@@ -29,105 +30,180 @@ const ButterchurnVisualizer = lazy(() =>
     })),
 );
 
-export const FullScreenPlayerQueue = () => {
+const moduleContentVariants: Variants = {
+    animate: {
+        opacity: 1,
+        transition: {
+            duration: 0.4,
+            ease: 'easeOut',
+        },
+        x: 0,
+    },
+    exit: {
+        opacity: 0,
+        transition: {
+            duration: 0.4,
+            ease: 'easeOut',
+        },
+        x: '10%',
+    },
+    initial: {
+        opacity: 0,
+        x: '10%',
+    },
+};
+
+interface ControlItem {
+    active: boolean;
+    icon: keyof typeof AppIcon;
+    label: string;
+    onClick: () => void;
+}
+
+const Controls = () => {
     const { t } = useTranslation();
-    const { activeTab, opacity } = useFullScreenPlayerStore();
+    const { activeTab } = useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
     const { webAudio } = usePlaybackSettings();
-    const visualizerType = useSettingsStore((store) => store.visualizer.type);
+
+    const toggleTab = (tab: string) => {
+        setStore({ activeTab: activeTab === tab ? '' : tab });
+    };
 
     const headerItems = useMemo(() => {
-        const items = [
+        const items: ControlItem[] = [
             {
                 active: activeTab === 'queue',
+                icon: 'queue',
                 label: t('page.fullscreenPlayer.upNext'),
-                onClick: () => setStore({ activeTab: 'queue' }),
+                onClick: () => toggleTab('queue'),
             },
             {
                 active: activeTab === 'related',
+                icon: 'related',
                 label: t('page.fullscreenPlayer.related'),
-                onClick: () => setStore({ activeTab: 'related' }),
+                onClick: () => toggleTab('related'),
             },
             {
                 active: activeTab === 'lyrics',
+                icon: 'microphone',
                 label: t('page.fullscreenPlayer.lyrics'),
-                onClick: () => setStore({ activeTab: 'lyrics' }),
+                onClick: () => toggleTab('lyrics'),
             },
         ];
 
         if (webAudio) {
             items.push({
                 active: activeTab === 'visualizer',
+                icon: 'audioLines',
                 label: t('page.fullscreenPlayer.visualizer'),
-                onClick: () => setStore({ activeTab: 'visualizer' }),
+                onClick: () => toggleTab('visualizer'),
             });
         }
 
         return items;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeTab, setStore, t, webAudio]);
 
     return (
-        <div
-            className={clsx(styles.gridContainer, 'full-screen-player-queue-container')}
-            style={
-                {
-                    '--opacity': opacity / 100,
-                } as CSSProperties
-            }
+        <Group
+            className={clsx(styles.controlsContainer, 'full-screen-player-controls-container')}
+            gap="xs"
+            p="0.5rem"
+            pos="absolute"
         >
-            <Group
-                align="center"
-                className="full-screen-player-queue-header"
-                gap={0}
-                grow
-                justify="center"
-                pb="md"
-            >
-                {headerItems.map((item) => (
-                    <div className={styles.headerItemWrapper} key={`tab-${item.label}`}>
-                        <Button
-                            flex={1}
-                            fw="600"
-                            onClick={item.onClick}
-                            pos="relative"
-                            size="lg"
-                            uppercase
-                            variant="transparent"
-                        >
-                            {item.label}
-                        </Button>
-                        {item.active ? (
-                            <motion.div
-                                className={styles.activeTabIndicator}
-                                layoutId="underline"
-                            />
-                        ) : null}
-                    </div>
-                ))}
-            </Group>
-            {activeTab === 'queue' ? (
-                <div className={styles.queueContainer}>
-                    <PlayQueue
-                        enableScrollShadow={false}
-                        listKey={ItemListKey.FULL_SCREEN}
-                        searchTerm={undefined}
-                    />
+            {headerItems.map((item) => (
+                <div key={`tab-${item.label}`}>
+                    <ActionIcon
+                        icon={item.icon}
+                        iconProps={{
+                            color: item.active ? 'primary' : undefined,
+                            size: 'lg',
+                        }}
+                        onClick={item.onClick}
+                        tooltip={{ label: item.label }}
+                        variant="subtle"
+                    ></ActionIcon>
                 </div>
-            ) : activeTab === 'related' ? (
-                <div className={styles.queueContainer}>
-                    <FullScreenSimilarSongs />
-                </div>
-            ) : activeTab === 'lyrics' ? (
-                <Lyrics fadeOutNoLyricsMessage={false} />
-            ) : activeTab === 'visualizer' && webAudio ? (
-                <Suspense fallback={<></>}>
-                    {visualizerType === 'butterchurn' ? (
-                        <ButterchurnVisualizer />
-                    ) : (
-                        <AudioMotionAnalyzerVisualizer />
-                    )}
-                </Suspense>
-            ) : null}
+            ))}
+        </Group>
+    );
+};
+
+export const FullScreenPlayerControls = Controls;
+
+export const FullScreenPlayerQueue = () => {
+    const { activeTab } = useFullScreenPlayerStore();
+    const { webAudio } = usePlaybackSettings();
+    const visualizerType = useSettingsStore((store) => store.visualizer.type);
+    const { table } = useListSettings(ItemListKey.FULL_SCREEN) || {};
+    const queueContainerClassName = clsx(styles.queueContainer, {
+        [styles.queueContainerFadeTopBottom]: !table?.enableHeader,
+    });
+
+    return (
+        <div
+            className={clsx(styles.gridContainer, 'full-screen-player-queue-container', {
+                [styles.gridContainerCollapsed]: !activeTab,
+            })}
+        >
+            <AnimatePresence mode="wait">
+                {activeTab === 'queue' ? (
+                    <motion.div
+                        animate="animate"
+                        className={queueContainerClassName}
+                        exit="exit"
+                        initial="initial"
+                        key="queue"
+                        variants={moduleContentVariants}
+                    >
+                        <PlayQueue
+                            enableScrollShadow={false}
+                            listKey={ItemListKey.FULL_SCREEN}
+                            searchTerm={undefined}
+                        />
+                    </motion.div>
+                ) : activeTab === 'related' ? (
+                    <motion.div
+                        animate="animate"
+                        className={queueContainerClassName}
+                        exit="exit"
+                        initial="initial"
+                        key="related"
+                        variants={moduleContentVariants}
+                    >
+                        <FullScreenSimilarSongs />
+                    </motion.div>
+                ) : activeTab === 'lyrics' ? (
+                    <motion.div
+                        animate="animate"
+                        className={styles.moduleContent}
+                        exit="exit"
+                        initial="initial"
+                        key="lyrics"
+                        variants={moduleContentVariants}
+                    >
+                        <Lyrics fadeOutNoLyricsMessage={false} />
+                    </motion.div>
+                ) : activeTab === 'visualizer' && webAudio ? (
+                    <motion.div
+                        animate="animate"
+                        className={styles.moduleContent}
+                        exit="exit"
+                        initial="initial"
+                        key="visualizer"
+                        variants={moduleContentVariants}
+                    >
+                        <Suspense fallback={<></>}>
+                            {visualizerType === 'butterchurn' ? (
+                                <ButterchurnVisualizer />
+                            ) : (
+                                <AudioMotionAnalyzerVisualizer />
+                            )}
+                        </Suspense>
+                    </motion.div>
+                ) : null}
+            </AnimatePresence>
         </div>
     );
 };

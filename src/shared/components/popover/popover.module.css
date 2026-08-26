@@ -1,5 +1,7 @@
 .dropdown {
+    max-height: 80vh;
     padding: var(--theme-spacing-sm);
+    overflow-y: auto;
     color: var(--theme-colors-foreground);
     background: var(--theme-colors-background);
     border: 2px solid var(--theme-colors-border);

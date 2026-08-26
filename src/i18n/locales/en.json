@@ -573,6 +573,7 @@
         },
         "fullscreenPlayer": {
             "config": {
+                "coverArtSize": "Cover art size",
                 "dynamicBackground": "Dynamic background",
                 "dynamicImageBlur": "Image blur size",
                 "dynamicIsImage": "Enable background image",
@@ -600,11 +601,16 @@
                 "lyricScaleNonActive": "Non-active lyric scale",
                 "lyricScaleNonActive_description": "Scale of lyric lines that are not currently active",
                 "opacity": "Opacity",
+                "playerItemAlignment": "Player item alignment",
                 "showLyricMatch": "Show lyric match",
                 "showLyricMatch_description": "Show the song name and artist of the matched lyrics",
                 "showLyricProvider": "Show lyric provider",
                 "showLyricProvider_description": "Show which provider supplied the current lyrics",
                 "synchronized": "Synchronized",
+                "titleDisplayType": "Title display style",
+                "titleDisplayType_optionMultiLine": "Multi-line",
+                "titleDisplayType_optionScroll": "Scroll",
+                "titleLineCount": "Title line count",
                 "unsynchronized": "Unsynchronized",
                 "useImageAspectRatio": "Use image aspect ratio"
             },
@@ -905,7 +911,7 @@
         "discordDisplayType": "{{discord}} presence display type",
         "discordIdleStatus_description": "When enabled, update status while player is idle",
         "discordIdleStatus": "Show rich presence idle status",
-        "discordLinkType_description": "Adds external links to {{lastfm}} or {{musicbrainz}} to the song and artist fields in {{discord}} rich presence. {{musicbrainz}} is the most accurate but requires tags and doesn't provide artist links while {{lastfm}} should always provide a link. Makes no extra network requests",
+        "discordLinkType_description": "Adds {{lastfm}} or {{musicbrainz}} links to {{discord}} rich presence. {{musicbrainz}} is the most accurate but requires tags and doesn't provide artist links while {{lastfm}} should always provide a link. Makes no extra network requests",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}} with {{lastfm}} fallback",
         "discordLinkType_none": "$t(common.none)",
         "discordLinkType": "{{discord}} presence links",
@@ -965,6 +971,8 @@
         "followLyric": "Follow current lyric",
         "font_description": "Sets the font to use for the application",
         "font": "Font",
+        "fullscreenAutoOpenTimeout_description": "Automatically opens the fullscreen player after this many minutes of inactivity while a song is playing. Set to 0 to disable",
+        "fullscreenAutoOpenTimeout": "Fullscreen player auto-open timeout (minutes)",
         "fontType_description": "Built-in font selects one of the fonts provided by Feishin. System font allows you to select any font provided by your operating system. Custom allows you to provide your own font",
         "fontType_optionBuiltIn": "Built-in font",
         "fontType_optionCustom": "Custom font",
@@ -1155,10 +1163,10 @@
         "preservePitch": "Preserve pitch",
         "audioFadeOnStatusChange": "Audio fade on status change",
         "audioFadeOnStatusChange_description": "Enables fade out and fade in when play/pause status changes",
-        "preventSleepOnPlayback_description": "Prevent the display from sleeping while music is playing",
-        "preventSleepOnPlayback": "Prevent sleep on playback",
-        "preventSuspendOnPlayback_description": "Prevent the application from suspending while music is playing",
-        "preventSuspendOnPlayback": "Prevent suspend on playback",
+        "preventSleepOnPlayback_description": "Prevent the display from turning off while music is playing",
+        "preventSleepOnPlayback": "Prevent display sleep on playback",
+        "preventSuspendOnPlayback_description": "Prevent the system from going to sleep while music is playing",
+        "preventSuspendOnPlayback": "Prevent system sleep on playback",
         "remotePassword_description": "Sets the password for the remote control server. These credentials are by default transferred insecurely, so you should use a unique password that you do not care about",
         "remotePassword": "Remote control server password",
         "remotePort_description": "Sets the port for the remote control server",
@@ -1284,7 +1292,9 @@
         "queryBuilderCustomFields": "Custom fields",
         "queryBuilderCustomFields_description": "Add custom fields to use in query builders",
         "microtonalPitchControls": "Microtonal pitch controls",
-        "microtonalPitchControls_description": "Add more pitch controls to go between semi-tones"
+        "microtonalPitchControls_description": "Add more pitch controls to go between semi-tones",
+        "sidebarImageEnabled": "Expand album art button",
+        "sidebarImageEnabled_description": "Show a button on the player bar's album art to expand it into the sidebar. Disabling this also hides the button and collapses the album art if it is currently expanded"
     },
     "table": {
         "column": {

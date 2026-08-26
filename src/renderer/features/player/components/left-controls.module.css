@@ -4,6 +4,7 @@
     align-items: center;
     justify-content: center;
     padding: var(--theme-spacing-md) var(--theme-spacing-md) var(--theme-spacing-md) 0;
+
 }
 
 .metadata-stack {

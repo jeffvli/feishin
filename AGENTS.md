@@ -1,7 +1,7 @@
 ## General guidelines
 
 - Never use the em dash "—". Use plain dash "-" instead.
-- Code changes are unfinished until `pnpm lint` passes. Use `pnpm lint:fix` to auto-fix what it can, then re-run `pnpm lint`. Skip when the turn did not modify code.
+- On an explicit commit request: `git add` the changes, run `pnpm lint:staged`, then commit. It lints only staged TS/TSX/CSS/SCSS via eslint+stylelint and auto-fixes; typecheck runs in CI (`test.yml`), not locally. Do not stage or run it outside a commit request.
 
 ## Agent skills
 

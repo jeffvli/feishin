@@ -40,7 +40,11 @@ interface ControlProps {
 }
 
 const Control = ({ children }: ControlProps) => {
-    return <Flex justify="flex-end">{children}</Flex>;
+    return (
+        <Flex justify="flex-end" style={{ width: '100%' }}>
+            {children}
+        </Flex>
+    );
 };
 
 Option.Label = Label;

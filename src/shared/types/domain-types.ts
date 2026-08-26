@@ -400,6 +400,7 @@ export type Song = {
     imageUrl: null | string;
     lastPlayedAt: null | string;
     lyrics: null | string;
+    mbzAlbumId: null | string;
     mbzRecordingId: null | string;
     mbzTrackId: null | string;
     name: string;

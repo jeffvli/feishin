@@ -471,17 +471,12 @@ export const MobileFullscreenPlayer = () => {
                 onMouseLeave={() => setIsPageHovered(false)}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
-                <MobileFullscreenPlayerHeader
-                    currentSong={currentSong}
-                    isPageHovered={isPageHovered}
-                    onClose={handleToggleFullScreenPlayer}
-                />
+                <MobileFullscreenPlayerHeader />
                 <MobileFullscreenPlayerAlbumArt />
                 <MobileFullscreenPlayerMetadata
                     currentSong={currentSong}
                     onToggleFavorite={handleToggleFavorite}
                     onUpdateRating={handleUpdateRating}
-                    radioArtist={isPlayingRadio ? (radioMetadata?.artist ?? undefined) : undefined}
                     radioStationName={isPlayingRadio ? (stationName ?? undefined) : undefined}
                     radioTitle={isPlayingRadio ? (radioMetadata?.title ?? undefined) : undefined}
                     showFavorite={showFavorites}

@@ -7,6 +7,7 @@ export function closeLocalVisualizerSurfaces(): void {
             ? { activeTab: 'queue' as const }
             : {}),
         visualizerExpanded: false,
+        visualizerReturnToPlayer: false,
     });
 
     useSettingsStore.getState().actions.setSettings({

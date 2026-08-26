@@ -491,7 +491,13 @@
                 "lyricSizeSynchronized_description": "Rozmiar czcionki dla zsynchronizowanego (czasowego) tekstu",
                 "lyricSizeUnsynchronized_description": "Rozmiar czcionki dla niezsynchronizowanego (zwykłego) tekstu",
                 "lyricOpacityNonActive_description": "Przeźroczystość linijek tekstu które nie są aktualnie aktywne",
-                "lyricScaleNonActive_description": "Skala linijek tekstu które nie są aktualnie aktywne"
+                "lyricScaleNonActive_description": "Skala linijek tekstu które nie są aktualnie aktywne",
+                "coverArtSize": "Rozmiar okładki",
+                "playerItemAlignment": "Ułożenie elementów odtwarzacza",
+                "titleDisplayType": "Styl wyświetlania tytułu",
+                "titleDisplayType_optionMultiLine": "Wieloliniowy",
+                "titleLineCount": "Ilość linijek tytułu",
+                "titleDisplayType_optionScroll": "Przewijanie"
             },
             "upNext": "Następne",
             "lyrics": "Tekst",
@@ -1007,7 +1013,7 @@
         "discordDisplayType_description": "Zmienia co jest pokazywane jako słuchane w twoim statusie",
         "discordDisplayType_songname": "Nazwa piosenki",
         "discordDisplayType": "Typ wyświetlania statusu {{discord}}",
-        "discordLinkType_description": "Dodaje zewnętrzny link do {{lastfm}} lub {{musicbrainz}} do pól piosenki i wykonawcy w rich presence {{discord}}. {{musicbrainz}} jest najbardziej dokładnym, ale wymaga tagów i nie daje linków do wykonawców, gdy {{lastfm}} zawsze daje link. nie wywołuje dodatkowych żądań sieciowych",
+        "discordLinkType_description": "Dodaje linki {{lastfm}} lub {{musicbrainz}} do rich presence {{discord}}. {{musicbrainz}} jest najbardziej dokładnym, ale wymaga tagów i nie daje linków do wykonawców, gdy {{lastfm}} zawsze daje link. nie wywołuje dodatkowych żądań sieciowych",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}} z zastępczym {{lastfm}}",
         "discordLinkType_none": "$t(common.none)",
         "discordLinkType": "Linki w statusie {{discord}}",
@@ -1046,8 +1052,8 @@
         "showVisualizerInSidebar": "Pokazuj wizualizację w bocznym pasku odtwarzacza",
         "preservePitch_description": "Utrzymuje ton gdy zmieniana jest prędkość odtwarzania",
         "preservePitch": "Utrzymuj ton",
-        "preventSleepOnPlayback_description": "Powstrzymuje ekran przed uśpieniem, gdy muzyka jest odtwarzana",
-        "preventSleepOnPlayback": "Powstrzymuj uśpienie podczas odtwarzania",
+        "preventSleepOnPlayback_description": "Powstrzymuje ekran przed wyłączeniem, gdy muzyka jest odtwarzana",
+        "preventSleepOnPlayback": "Powstrzymuj uśpienie ekranu podczas odtwarzania",
         "mediaSession_description": "Włącza integrację z Media Session, wyświetlając sterowanie mediami i metadane w systemowym oknie zmiany głośności i na ekranie blokad. Wymaga odtwarzacza web audio.",
         "mediaSession": "Włącz media session",
         "transcode": "Włącz transkodowanie",
@@ -1146,8 +1152,8 @@
         "waveformLoadingDelay_description": "Opóźnienie w sekundach przed załadowaniem fali. zwiększ tą wartość jeżeli doświadczasz zawieszania się odtwarzacza przeglądarkowego.",
         "playerbarWaveformStretch": "Rozciąganie przebiegu",
         "playerbarWaveformStretch_description": "Rozciąga przebieg aby wypełnić dostępną przestrzeń",
-        "preventSuspendOnPlayback_description": "Powstrzymuj wstrzymanie podczas odtwarzania muzyki",
-        "preventSuspendOnPlayback": "Powstrzymuje wstrzymanie przy odtwarzaniu",
+        "preventSuspendOnPlayback_description": "Powstrzymuj uśpienie komputera podczas odtwarzania muzyki",
+        "preventSuspendOnPlayback": "Powstrzymuje uśpienie komputera przy odtwarzaniu",
         "hotkey_listShowPlayingSong": "Pokaż odtwarzaną piosenkę w liście",
         "sidebarPlaylistFolders_description": "Utwórz widok folderu dla playlist który zawiera skonfigurowany separator w nazwie",
         "sidebarPlaylistFolders": "Włącz foldery",
@@ -1242,7 +1248,11 @@
         "shareExpiration_description": "Jak daleko w przyszłości będą domyślnie wygasać nowe linki udostępniania. Wyczyść datę w oknie udostępniania, aby użyć domyślnego czasu z serwera",
         "shareExpiration": "Domyślne wygasanie udostępniania",
         "shareExpirationUseServerDefault_description": "Pomiń dodawanie wygaśnięcia podczas tworzenia udostępnień, aby serwer mógł zastosować swoje skonfigurowane domyślne wygasanie (np. Navidrome DefaultShareExpiration)",
-        "shareExpirationUseServerDefault": "Używaj domyślnego wygasania serwera"
+        "shareExpirationUseServerDefault": "Używaj domyślnego wygasania serwera",
+        "fullscreenAutoOpenTimeout_description": "Automatycznie otwiera odtwarzacz pełnoekranowy po tylu minutach nieaktywności podczas odtwarzania piosenki. Ustaw na 0, aby wyłączyć",
+        "fullscreenAutoOpenTimeout": "Czas do automatycznego otwarcia odtwarzacza pełnoekranowego (w minutach)",
+        "sidebarImageEnabled": "Przycisk powiększania okładki",
+        "sidebarImageEnabled_description": "Pokazuje przycisk na okładce w pasku odtwarzacza, aby powiększyć okładkę do paska bocznego. Wyłączenie tego ukrywa też ten przycisk i pomniejsza okładkę jeśli jest aktualnie powiększona"
     },
     "table": {
         "config": {

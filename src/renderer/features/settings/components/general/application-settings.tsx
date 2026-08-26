@@ -685,6 +685,33 @@ export const ApplicationSettings = memo(() => {
         },
         {
             control: (
+                <NumberInput
+                    max={120}
+                    min={0}
+                    onBlur={(e) => {
+                        const rawValue = e.currentTarget.value;
+
+                        const newVal = Math.min(Math.max(Number(rawValue), 0), 120);
+
+                        setSettings({
+                            general: {
+                                ...settings,
+                                fullscreenAutoOpenTimeout: newVal,
+                            },
+                        });
+                    }}
+                    placeholder={t('common.none')}
+                    value={settings.fullscreenAutoOpenTimeout}
+                />
+            ),
+            description: t('setting.fullscreenAutoOpenTimeout', {
+                context: 'description',
+            }),
+            isHidden: false,
+            title: t('setting.fullscreenAutoOpenTimeout'),
+        },
+        {
+            control: (
                 <Switch
                     aria-label={t('setting.autosave')}
                     defaultChecked={settings.autoSave.enabled}

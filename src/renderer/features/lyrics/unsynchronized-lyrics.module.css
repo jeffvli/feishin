@@ -5,7 +5,7 @@
     width: 100%;
     min-height: 0;
     overflow: hidden auto;
-    transform: translateY(-2rem);
+    word-break: break-all;
 }
 
 .preview {

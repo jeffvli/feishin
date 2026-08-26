@@ -218,7 +218,8 @@
         "addNextShuffled": "Hurrengoa (ausaz)",
         "artistRadio": "Artista irratia",
         "trackRadio": "Pista irratia",
-        "sleepTimer_custom": "Pertsonalizatua"
+        "sleepTimer_custom": "Pertsonalizatua",
+        "albumRadio": "Albumaren irratia"
     },
     "table": {
         "config": {
@@ -777,7 +778,8 @@
         "sidebarPlaylistList": "Alboko barrako erreprodukzio-zerrendak",
         "sidebarPlaylistMode_description": "Nola bistaratzen den erreprodukzio-zerrenda bakoitza alboko barrako zerrendan",
         "equalizerPreset": "Aurrezarpena",
-        "equalizerPresetGroupBuiltIn": "Barneratua"
+        "equalizerPresetGroupBuiltIn": "Barneratua",
+        "hotkey_playbackNextAlbum": "Hurrengo albuma"
     },
     "form": {
         "addServer": {

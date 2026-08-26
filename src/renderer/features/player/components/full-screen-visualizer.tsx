@@ -8,7 +8,10 @@ import { FullScreenVisualizerSongInfo } from '/@/renderer/features/player/compon
 import { VISUALIZER_FULLSCREEN_TARGET_ID } from '/@/renderer/hooks/use-fullscreen-toggle';
 import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import { useIsMobile } from '/@/renderer/hooks/use-is-mobile';
-import { useFullScreenPlayerStoreActions } from '/@/renderer/store/full-screen-player.store';
+import {
+    useFullScreenPlayerStore,
+    useFullScreenPlayerStoreActions,
+} from '/@/renderer/store/full-screen-player.store';
 import {
     usePlaybackSettings,
     useSettingsStore,
@@ -131,6 +134,7 @@ VisualizerContainer.displayName = 'VisualizerContainer';
 
 export const FullScreenVisualizer = () => {
     const { setStore } = useFullScreenPlayerStoreActions();
+    const { visualizerReturnToPlayer } = useFullScreenPlayerStore();
     const { windowBarStyle } = useWindowSettings();
     const { webAudio } = usePlaybackSettings();
     const visualizerType = useSettingsStore((store) => store.visualizer.type);
@@ -144,7 +148,11 @@ export const FullScreenVisualizer = () => {
         // Let it drop back to the expanded-but-windowed visualizer instead of closing.
         if (document.fullscreenElement) return;
 
-        setStore({ visualizerExpanded: false });
+        setStore({
+            expanded: visualizerReturnToPlayer,
+            visualizerExpanded: false,
+            visualizerReturnToPlayer: false,
+        });
     };
 
     useHotkeys([['Escape', handleCloseVisualizer]]);
@@ -161,7 +169,7 @@ export const FullScreenVisualizer = () => {
 
     useLayoutEffect(() => {
         if (isOpenedRef.current !== null) {
-            setStore({ visualizerExpanded: false });
+            setStore({ visualizerExpanded: false, visualizerReturnToPlayer: false });
         }
 
         isOpenedRef.current = true;

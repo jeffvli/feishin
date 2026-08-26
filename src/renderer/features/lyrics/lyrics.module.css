@@ -67,7 +67,7 @@
         transparent 0%,
         rgb(0 0 0 / 100%) 15%,
         rgb(0 0 0 / 100%) 85%,
-        transparent 95%
+        transparent 100%
     );
 
     > * {

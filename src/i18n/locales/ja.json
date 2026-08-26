@@ -523,7 +523,11 @@
         "customThemes": "カスタムテーマ",
         "compressorRelease": "解放",
         "compressorMakeupGain_description": "圧縮後に出力を増幅させて音量を復元します。",
-        "compressorMakeupGain": "出力ゲイン"
+        "compressorMakeupGain": "出力ゲイン",
+        "fullscreenAutoOpenTimeout_description": "曲の再生中に、この時間操作がないまま放置されると、自動的に全画面プレーヤーが開きます。無効にするには「0」に設定してください",
+        "fullscreenAutoOpenTimeout": "全画面プレーヤーの自動起動タイムアウト（分）",
+        "sidebarImageEnabled_description": "プレイヤーバーのアルバムアートに、サイドバーに展開するためのボタンを表示します。この機能を無効にすると、ボタンも非表示になり、アルバムアートが展開されている場合は折りたたまれます",
+        "sidebarImageEnabled": "アルバムアートを展開するボタン"
     },
     "action": {
         "editPlaylist": "$t(entity.playlist, {\"count\": 1})を編集",
@@ -957,7 +961,13 @@
                 "showLyricMatch_description": "一致した歌詞の曲名とアーティスト名を表示します",
                 "showLyricProvider_description": "現在の歌詞を提供したプロバイダーを表示します",
                 "lyricOpacityNonActive_description": "現在アクティブではない歌詞行の不透明度",
-                "lyricScaleNonActive_description": "現在アクティブではない歌詞行の縮小率"
+                "lyricScaleNonActive_description": "現在アクティブではない歌詞行の縮小率",
+                "coverArtSize": "カバーアートのサイズ",
+                "playerItemAlignment": "プレーヤーの表示項目の配置",
+                "titleDisplayType": "タイトルの表示スタイル",
+                "titleDisplayType_optionMultiLine": "複数行",
+                "titleDisplayType_optionScroll": "スクロール",
+                "titleLineCount": "タイトル行数"
             },
             "upNext": "次へ",
             "lyrics": "歌詞",

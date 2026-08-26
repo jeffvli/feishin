@@ -13,11 +13,19 @@ interface SettingsOptionProps {
     description?: React.ReactNode | string;
     indent?: boolean;
     note?: string;
+    showDescription?: boolean;
     title: React.ReactNode | string;
 }
 
 export const SettingsOptions = memo(
-    ({ control, description, indent, note, title }: SettingsOptionProps) => {
+    ({
+        control,
+        description,
+        indent,
+        note,
+        showDescription = true,
+        title,
+    }: SettingsOptionProps) => {
         return (
             <>
                 <Group
@@ -28,7 +36,6 @@ export const SettingsOptions = memo(
                     <Stack
                         gap="xs"
                         style={{
-                            alignSelf: 'flex-start',
                             display: 'flex',
                             maxWidth: '50%',
                         }}
@@ -43,13 +50,14 @@ export const SettingsOptions = memo(
                                 </Tooltip>
                             )}
                         </Group>
-                        {React.isValidElement(description) ? (
-                            description
-                        ) : (
-                            <Text isMuted isNoSelect size="sm">
-                                {description}
-                            </Text>
-                        )}
+                        {showDescription &&
+                            (React.isValidElement(description) ? (
+                                description
+                            ) : (
+                                <Text isMuted isNoSelect size="sm">
+                                    {description}
+                                </Text>
+                            ))}
                     </Stack>
                     <Group justify="flex-end">{control}</Group>
                 </Group>

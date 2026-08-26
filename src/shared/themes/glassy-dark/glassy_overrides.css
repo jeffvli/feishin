@@ -262,7 +262,11 @@ table {
     height: 100vh !important;
 
     .fs-full-screen-player-module-responsive-container {
-        height: calc(100% - 250px);
+        height: calc(100% - 180px);
+    }
+
+    .fs-full-screen-player-queue-module-controls-container {
+        bottom: 120px;
     }
 }
 

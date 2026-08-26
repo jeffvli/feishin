@@ -92,6 +92,7 @@ export const useMPRIS = () => {
             imageUrl: null,
             lastPlayedAt: null,
             lyrics: null,
+            mbzAlbumId: null,
             mbzRecordingId: null,
             mbzTrackId: null,
             name: title,

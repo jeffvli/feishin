@@ -1,18 +1,19 @@
 import clsx from 'clsx';
-import { t } from 'i18next';
 import { AnimatePresence, HTMLMotionProps, motion, Variants } from 'motion/react';
-import { Fragment, useEffect, useRef } from 'react';
-import { generatePath, Link } from 'react-router';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import styles from './full-screen-player-image.module.css';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { SharedFullscreenPlayerMetadata } from '/@/renderer/features/player/components/shared-full-screen-player-metadata';
 import {
     useIsRadioActive,
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
-import { AppRoute } from '/@/renderer/router/routes';
 import {
+    PlayerItem,
+    useFullScreenPlayerStore,
     useGeneralSettings,
     useNativeAspectRatio,
     usePlayerData,
@@ -22,10 +23,7 @@ import { formatPartialIsoDateUTC } from '/@/renderer/utils';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Center } from '/@/shared/components/center/center';
 import { Flex } from '/@/shared/components/flex/flex';
-import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
-import { Stack } from '/@/shared/components/stack/stack';
-import { Text } from '/@/shared/components/text/text';
 import { useSetState } from '/@/shared/hooks/use-set-state';
 import { ExplicitStatus, LibraryItem } from '/@/shared/types/domain-types';
 
@@ -96,14 +94,17 @@ const ImageWithPlaceholder = ({
 };
 
 export const FullScreenPlayerImage = () => {
+    const { t } = useTranslation();
     const mainImageRef = useRef<HTMLImageElement | null>(null);
+    const [imageContainerWidth, setImageContainerWidth] = useState<null | number>(null);
 
     const isRadioActive = useIsRadioActive();
-    const { isPlaying: isRadioPlaying, metadata: radioMetadata, stationName } = useRadioPlayer();
+    const { isPlaying: isRadioPlaying } = useRadioPlayer();
 
     const currentSong = usePlayerSong();
     const { nextSong } = usePlayerData();
     const { blurExplicitImages, playerItems } = useGeneralSettings();
+    const { coverArtSize, titleDisplayType, titleLineCount } = useFullScreenPlayerStore();
 
     const isPlayingRadio = isRadioActive && isRadioPlaying;
 
@@ -129,9 +130,82 @@ export const FullScreenPlayerImage = () => {
         topImage: currentImageUrl,
     });
 
+    const isItemEnabled = (item: PlayerItem) =>
+        !playerItems.find((entry) => entry.id === item)?.disabled;
+    const showTitle = isItemEnabled(PlayerItem.TITLE);
+    const showArtist = isItemEnabled(PlayerItem.ARTIST);
+    const showAlbum = isItemEnabled(PlayerItem.ALBUM);
+
     // Track previous song to detect changes
     const previousSongRef = useRef<string | undefined>(currentSong?._uniqueId);
     const imageStateRef = useRef(imageState);
+
+    const builtDataItems = {
+        bit_depth: currentSong?.bitDepth && <Badge>{currentSong?.bitDepth} bit</Badge>,
+        bit_rate: currentSong?.bitRate && <Badge>{currentSong?.bitRate} kbps</Badge>,
+        bpm: currentSong?.bpm && (
+            <Badge>
+                {currentSong?.bpm} {t('common.bpm')}
+            </Badge>
+        ),
+        codec: currentSong?.container && <Badge>{currentSong?.container}</Badge>,
+        date: currentSong?.date && <Badge>{formatPartialIsoDateUTC(currentSong?.date)}</Badge>,
+        disc_number: currentSong?.discNumber && (
+            <Badge>
+                {t('common.disc')} {currentSong?.discNumber}
+            </Badge>
+        ),
+        genres:
+            currentSong?.genres &&
+            currentSong?.genres
+                .slice(0, 2)
+                .map((genre) => <Badge key={genre.id}>{genre.name}</Badge>),
+        release_date: currentSong?.releaseDate && (
+            <Badge>{formatPartialIsoDateUTC(currentSong?.releaseDate)}</Badge>
+        ),
+        release_type: currentSong?.tags?.releasetype && (
+            <Badge>{currentSong?.tags?.releasetype[0]}</Badge>
+        ),
+        release_year: currentSong?.releaseYear && <Badge>{currentSong?.releaseYear}</Badge>,
+        sample_rate: currentSong?.sampleRate && <Badge>{currentSong?.sampleRate / 1000} kHz</Badge>,
+        track_number: currentSong?.trackNumber && (
+            <Badge>
+                {t('common.trackNumber')} {currentSong?.trackNumber}
+            </Badge>
+        ),
+        year: currentSong?.year && <Badge>{currentSong?.year}</Badge>,
+    };
+
+    const showMetadata =
+        playerItems.some((i) => !i.disabled && builtDataItems[i.id]) ||
+        showTitle ||
+        showArtist ||
+        showAlbum;
+
+    useLayoutEffect(() => {
+        const updateImageContainerWidth = () => {
+            if (mainImageRef.current) {
+                const width = mainImageRef.current.getBoundingClientRect().width;
+                setImageContainerWidth(width);
+            }
+        };
+
+        updateImageContainerWidth();
+        window.addEventListener('resize', updateImageContainerWidth);
+
+        return () => window.removeEventListener('resize', updateImageContainerWidth);
+    }, []);
+
+    useLayoutEffect(() => {
+        const updateImageContainerWidth = () => {
+            if (mainImageRef.current) {
+                const width = mainImageRef.current.getBoundingClientRect().width;
+                setImageContainerWidth(width);
+            }
+        };
+
+        updateImageContainerWidth();
+    }, [titleDisplayType, titleLineCount, coverArtSize]);
 
     // Keep ref in sync
     useEffect(() => {
@@ -173,51 +247,24 @@ export const FullScreenPlayerImage = () => {
         nextSong?.explicitStatus,
     ]);
 
-    const builtDataItems = {
-        bit_depth: currentSong?.bitDepth && <Badge>{currentSong?.bitDepth} bit</Badge>,
-        bit_rate: currentSong?.bitRate && <Badge>{currentSong?.bitRate} kbps</Badge>,
-        bpm: currentSong?.bpm && (
-            <Badge>
-                {currentSong?.bpm} {t('common.bpm')}
-            </Badge>
-        ),
-        codec: currentSong?.container && <Badge>{currentSong?.container}</Badge>,
-        date: currentSong?.date && <Badge>{formatPartialIsoDateUTC(currentSong?.date)}</Badge>,
-        disc_number: currentSong?.discNumber && (
-            <Badge>
-                {t('common.disc')} {currentSong?.discNumber}
-            </Badge>
-        ),
-        genres:
-            currentSong?.genres &&
-            currentSong?.genres
-                .slice(0, 2)
-                .map((genre) => <Badge key={genre.id}>{genre.name}</Badge>),
-        release_date: currentSong?.releaseDate && (
-            <Badge>{formatPartialIsoDateUTC(currentSong?.releaseDate)}</Badge>
-        ),
-        release_type: currentSong?.tags?.releasetype && (
-            <Badge>{currentSong?.tags?.releasetype[0]}</Badge>
-        ),
-        release_year: currentSong?.releaseYear && <Badge>{currentSong?.releaseYear}</Badge>,
-        sample_rate: currentSong?.sampleRate && <Badge>{currentSong?.sampleRate / 1000} kHz</Badge>,
-        track_number: currentSong?.trackNumber && (
-            <Badge>
-                {t('common.trackNumber')} {currentSong?.trackNumber}
-            </Badge>
-        ),
-        year: currentSong?.year && <Badge>{currentSong?.year}</Badge>,
-    };
-
     return (
         <Flex
             align="center"
             className={clsx(styles.playerContainer, 'full-screen-player-image-container')}
             direction="column"
-            justify="flex-start"
+            h="100%"
+            justify="center"
             p="1rem"
+            w="100%"
         >
-            <div className={styles.imageContainer} ref={mainImageRef}>
+            <div
+                className={styles.imageContainer}
+                ref={mainImageRef}
+                style={{
+                    marginBottom: showMetadata ? '2rem' : undefined,
+                    maxHeight: `${coverArtSize}%`,
+                }}
+            >
                 <AnimatePresence initial={false} mode="sync">
                     {!isPlayingRadio && imageState.current === 0 && (
                         <ImageWithPlaceholder
@@ -268,63 +315,7 @@ export const FullScreenPlayerImage = () => {
                     )}
                 </AnimatePresence>
             </div>
-            <Stack className={styles.metadataContainer} gap="md" maw="100%">
-                <Text fw={900} lh="1.2" overflow="hidden" size="4xl" w="100%">
-                    {isPlayingRadio
-                        ? radioMetadata?.title || stationName || 'Radio'
-                        : currentSong?.name}
-                </Text>
-                <Text key="fs-artists" size="xl">
-                    {isPlayingRadio
-                        ? radioMetadata?.artist || stationName || 'Radio'
-                        : currentSong?.artists?.map((artist, index) => (
-                              <Fragment key={`fs-artist-${artist.id}`}>
-                                  {index > 0 && (
-                                      <Text
-                                          style={{
-                                              display: 'inline-block',
-                                              padding: '0 0.5rem',
-                                          }}
-                                      >
-                                          •
-                                      </Text>
-                                  )}
-                                  <Text
-                                      component={Link}
-                                      isLink
-                                      to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, {
-                                          albumArtistId: artist.id,
-                                      })}
-                                  >
-                                      {artist.name}
-                                  </Text>
-                              </Fragment>
-                          ))}
-                </Text>
-                {isPlayingRadio ? (
-                    <Text overflow="hidden" size="xl" w="100%">
-                        {stationName || 'Radio'}
-                    </Text>
-                ) : (
-                    <Text
-                        component={Link}
-                        isLink
-                        overflow="hidden"
-                        size="xl"
-                        to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
-                            albumId: currentSong?.albumId || '',
-                        })}
-                        w="100%"
-                    >
-                        {currentSong?.album}
-                    </Text>
-                )}
-                {!isPlayingRadio && (
-                    <Group justify="center" mt="sm">
-                        {playerItems.map((i) => !i.disabled && builtDataItems[i.id])}
-                    </Group>
-                )}
-            </Stack>
+            <SharedFullscreenPlayerMetadata imageContainerWidth={imageContainerWidth} />
         </Flex>
     );
 };
