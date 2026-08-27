@@ -1334,8 +1334,8 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     const reset = options?.reset !== false;
                     set((state) => {
                         state.player.status = PlayerStatus.STOPPED;
-                        setTimestampStore(0);
                         if (reset) {
+                            setTimestampStore(0);
                             state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
                         }
                     });

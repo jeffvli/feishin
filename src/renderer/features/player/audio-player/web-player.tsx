@@ -127,16 +127,16 @@ export function WebPlayer() {
                 return;
             }
 
+            if (usePlayerStoreBase.getState().player.status !== PlayerStatus.PLAYING) {
+                return;
+            }
+
             if (num === 1) {
                 setTimestamp(e.playedSeconds);
             }
 
             if (repeat === PlayerRepeat.ONE) {
                 handleRepeatOne(1, e.playedSeconds, getDuration(playerRef.current.player1().ref));
-                return;
-            }
-
-            if (usePlayerStoreBase.getState().player.status !== PlayerStatus.PLAYING) {
                 return;
             }
 
@@ -190,16 +190,16 @@ export function WebPlayer() {
                 return;
             }
 
+            if (usePlayerStoreBase.getState().player.status !== PlayerStatus.PLAYING) {
+                return;
+            }
+
             if (num === 2) {
                 setTimestamp(e.playedSeconds);
             }
 
             if (repeat === PlayerRepeat.ONE) {
                 handleRepeatOne(2, e.playedSeconds, getDuration(playerRef.current.player2().ref));
-                return;
-            }
-
-            if (usePlayerStoreBase.getState().player.status !== PlayerStatus.PLAYING) {
                 return;
             }
 
