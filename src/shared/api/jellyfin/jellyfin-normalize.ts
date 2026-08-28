@@ -224,6 +224,9 @@ const normalizeSong = (
         playlistItemId: item.PlaylistItemId,
         releaseDate,
         releaseYear,
+        resumePositionMs: item.UserData
+            ? item.UserData.PlaybackPositionTicks / TICKS_PER_MS
+            : undefined,
         sampleRate,
         size,
         sortName: item.SortName || item.Name,

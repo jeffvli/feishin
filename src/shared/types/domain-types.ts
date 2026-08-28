@@ -442,6 +442,7 @@ export type Song = {
     playlistItemId?: string;
     releaseDate: null | PartialIsoDateString;
     releaseYear: null | number;
+    resumePositionMs?: number;
     sampleRate: null | number;
     size: number;
     sortName: string;
