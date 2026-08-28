@@ -28,6 +28,7 @@ import {
     Played,
     playlistListSortMap,
     ReplaceApiClientProps,
+    ServerListItem,
     ServerType,
     Song,
     SongListSort,
@@ -214,6 +215,16 @@ const VERSION_INFO: VersionInfo = [
         },
     ],
 ];
+
+const isAudioItemType = (server: null | ServerListItem, type: string) =>
+    type === 'Audio' || (server?.enableAudiobooks === true && type === 'AudioBook');
+
+const isSupportedCollection = (server: null | ServerListItem, collectionType: string) =>
+    collectionType === jfType._enum.collection.MUSIC ||
+    (server?.enableAudiobooks === true && collectionType === jfType._enum.collection.BOOKS);
+
+const getSongItemTypes = (server: null | ServerListItem) =>
+    server?.enableAudiobooks === true ? 'Audio,AudioBook' : 'Audio';
 
 const JF_FIELDS = {
     ALBUM_ARTIST_DETAIL: ['Genres', 'Overview', 'SortName', 'ProviderIds'],
@@ -611,7 +622,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             query: {
                 EnableUserData: true,
                 Fields: JF_FIELDS.SONG,
-                IncludeItemTypes: 'Audio',
+                IncludeItemTypes: getSongItemTypes(apiClientProps.server),
                 ParentId: query.id,
                 Recursive: true,
                 SortBy: 'ParentIndexNumber,IndexNumber,SortName',
@@ -801,7 +812,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             query: {
                 ArtistIds: query.artistId,
                 Fields: JF_FIELDS.SONG,
-                IncludeItemTypes: 'Audio',
+                IncludeItemTypes: getSongItemTypes(apiClientProps.server),
                 IsFavorite: true,
                 Limit: query.limit,
                 Recursive: true,
@@ -848,7 +859,9 @@ export const JellyfinController: InternalControllerEndpoint = {
                     throw new Error('Failed to get music folder list');
                 }
 
-                let items = musicFolderRes.body.Items.filter((item) => item.Type !== 'Audio');
+                let items = musicFolderRes.body.Items.filter(
+                    (item) => !isAudioItemType(apiClientProps.server, item.Type),
+                );
 
                 if (query.searchTerm) {
                     items = filter(items, (item) => {
@@ -857,7 +870,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                 }
 
                 const folders = items
-                    .filter((item) => item.Type !== 'Audio')
+                    .filter((item) => !isAudioItemType(apiClientProps.server, item.Type))
                     .map((item) => jfNormalize.folder(item, apiClientProps.server));
 
                 const sortedFolders = orderBy(folders, [(v) => v.name.toLowerCase()], [sortOrder]);
@@ -886,7 +899,9 @@ export const JellyfinController: InternalControllerEndpoint = {
                     throw new Error('Failed to get music folder list');
                 }
 
-                let items = musicFolderRes.body.Items.filter((item) => item.Type !== 'Audio');
+                let items = musicFolderRes.body.Items.filter(
+                    (item) => !isAudioItemType(apiClientProps.server, item.Type),
+                );
 
                 if (query.searchTerm) {
                     items = filter(items, (item) => {
@@ -895,7 +910,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                 }
 
                 const folders = items
-                    .filter((item) => item.Type !== 'Audio')
+                    .filter((item) => !isAudioItemType(apiClientProps.server, item.Type))
                     .map((item) =>
                         jfNormalize.folder(
                             item as unknown as z.infer<typeof jfType._response.folder>,
@@ -974,12 +989,12 @@ export const JellyfinController: InternalControllerEndpoint = {
         const items = folderDetailRes.body.Items || [];
 
         let filteredFolders = items
-            .filter((item) => item.Type !== 'Audio')
+            .filter((item) => !isAudioItemType(apiClientProps.server, item.Type))
             .map((item) => jfNormalize.folder(item, apiClientProps.server));
         let filteredSongs = items
             .filter(
                 (item) =>
-                    item.Type === 'Audio' &&
+                    isAudioItemType(apiClientProps.server, item.Type) &&
                     (item as unknown as z.infer<typeof jfType._response.song>).MediaSources,
             )
             .map((item) =>
@@ -1121,8 +1136,8 @@ export const JellyfinController: InternalControllerEndpoint = {
             throw new Error('Failed to get genre list');
         }
 
-        const musicFolders = res.body.Items.filter(
-            (folder) => folder.CollectionType === jfType._enum.collection.MUSIC,
+        const musicFolders = res.body.Items.filter((folder) =>
+            isSupportedCollection(apiClientProps.server, folder.CollectionType),
         );
 
         return {
@@ -1208,7 +1223,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             query: {
                 // XXX: No fields are required for only IDs, which saves processing time between
                 // the Jellyfin server query, network (MBs vs KBs), and in-app parsing.
-                IncludeItemTypes: 'Audio',
+                IncludeItemTypes: getSongItemTypes(apiClientProps.server),
                 UserId: apiClientProps.server?.userId,
             },
         });
@@ -1236,7 +1251,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             },
             query: {
                 Fields: JF_FIELDS.PLAYLIST_DETAIL,
-                IncludeItemTypes: 'Audio',
+                IncludeItemTypes: getSongItemTypes(apiClientProps.server),
                 UserId: apiClientProps.server?.userId,
             },
         });
@@ -1277,7 +1292,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             query: {
                 Fields: JF_FIELDS.SONG,
                 GenreIds: query.genre ? query.genre : undefined,
-                IncludeItemTypes: 'Audio',
+                IncludeItemTypes: getSongItemTypes(apiClientProps.server),
                 IsPlayed:
                     query.played === Played.Never
                         ? false
@@ -1455,6 +1470,8 @@ export const JellyfinController: InternalControllerEndpoint = {
         let totalRecordCount = 0;
         const batchSize = 50;
 
+        const includeItemTypes = getSongItemTypes(apiClientProps.server);
+
         // Handle albumIds fetches in batches to prevent HTTP 414 errors
         if (query.albumIds && query.albumIds.length > batchSize) {
             const albumIdBatches = chunk(query.albumIds, batchSize);
@@ -1471,7 +1488,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                         ArtistIds: artistIdsFilter,
                         Fields: JF_FIELDS.SONG,
                         GenreIds: query.genreIds?.join(','),
-                        IncludeItemTypes: 'Audio',
+                        IncludeItemTypes: includeItemTypes,
                         IsFavorite: query.favorite,
                         Limit: query.limit === -1 ? undefined : query.limit,
                         ParentId: getLibraryId(query.musicFolderId),
@@ -1506,7 +1523,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                     ArtistIds: artistIdsFilter,
                     Fields: JF_FIELDS.SONG,
                     GenreIds: query.genreIds?.join(','),
-                    IncludeItemTypes: 'Audio',
+                    IncludeItemTypes: includeItemTypes,
                     IsFavorite: query.favorite,
                     Limit: query.limit === -1 ? undefined : query.limit,
                     ParentId: getLibraryId(query.musicFolderId),
@@ -1654,9 +1671,14 @@ export const JellyfinController: InternalControllerEndpoint = {
             return { boolTags: undefined, enumTags: undefined, excluded: { album: [], song: [] } };
         }
 
+        const includeItemTypes =
+            query.type === LibraryItem.SONG
+                ? getSongItemTypes(apiClientProps.server)
+                : 'MusicAlbum';
+
         const res = await jfApiClient(apiClientProps).getFilterList({
             query: {
-                IncludeItemTypes: query.type === LibraryItem.SONG ? 'Audio' : 'MusicAlbum',
+                IncludeItemTypes: includeItemTypes,
                 ParentId: query.folder,
                 UserId: apiClientProps.server?.userId ?? '',
             },
@@ -1669,7 +1691,7 @@ export const JellyfinController: InternalControllerEndpoint = {
         const studioRes = await jfApiClient(apiClientProps).getStudioList({
             query: {
                 EnableTotalRecordCount: true,
-                IncludeItemTypes: query.type === LibraryItem.SONG ? 'Audio' : 'MusicAlbum',
+                IncludeItemTypes: includeItemTypes,
                 ParentId: query.folder,
             },
         });
@@ -1718,7 +1740,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             query: {
                 ArtistIds: query.artistId,
                 Fields: JF_FIELDS.SONG,
-                IncludeItemTypes: 'Audio',
+                IncludeItemTypes: getSongItemTypes(apiClientProps.server),
                 Limit: query.limit,
                 Recursive: true,
                 SortBy:
@@ -1841,7 +1863,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             },
             query: {
                 Fields: JF_FIELDS.SONG,
-                IncludeItemTypes: 'Audio',
+                IncludeItemTypes: getSongItemTypes(apiClientProps.server),
                 UserId: apiClientProps.server?.userId,
             },
         });
@@ -2084,7 +2106,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                 query: {
                     EnableTotalRecordCount: true,
                     Fields: JF_FIELDS.SONG,
-                    IncludeItemTypes: 'Audio',
+                    IncludeItemTypes: getSongItemTypes(apiClientProps.server),
                     Limit: query.songLimit,
                     Recursive: true,
                     SearchTerm: query.query,
@@ -2148,8 +2170,8 @@ export const JellyfinController: InternalControllerEndpoint = {
                 throw new Error('Failed to get music folders');
             }
 
-            musicFolderIds = res.body.Items.filter(
-                (folder) => folder.CollectionType === jfType._enum.collection.MUSIC,
+            musicFolderIds = res.body.Items.filter((folder) =>
+                isSupportedCollection(apiClientProps.server, folder.CollectionType),
             ).map((folder) => folder.Id);
         }
 

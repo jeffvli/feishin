@@ -112,6 +112,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
     const form = useForm({
         initialValues: {
+            enableAudiobooks: undefined,
             legacyAuth: isLegacyAuth(),
             name:
                 (localSettings ? localSettings.env.SERVER_NAME : window.SERVER_NAME) || 'My Server',
@@ -165,6 +166,10 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
             if (form.values.preferInstantMix !== undefined) {
                 serverItem.preferInstantMix = form.values.preferInstantMix;
+            }
+
+            if (form.values.enableAudiobooks !== undefined) {
+                serverItem.enableAudiobooks = form.values.enableAudiobooks;
             }
 
             addServer(serverItem);
@@ -229,6 +234,10 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
             if (values.preferInstantMix !== undefined) {
                 serverItem.preferInstantMix = values.preferInstantMix;
+            }
+
+            if (values.enableAudiobooks !== undefined) {
+                serverItem.enableAudiobooks = values.enableAudiobooks;
             }
 
             if (values.savePassword !== undefined) {
@@ -405,17 +414,30 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                         />
                     )}
                     {form.values.type === ServerType.JELLYFIN && (
-                        <Checkbox
-                            description={t('form.addServer.input', {
-                                context: 'preferInstantMixDescription',
-                            })}
-                            label={t('form.addServer.input', {
-                                context: 'preferInstantMix',
-                            })}
-                            {...form.getInputProps('preferInstantMix', {
-                                type: 'checkbox',
-                            })}
-                        />
+                        <>
+                            <Checkbox
+                                description={t('form.addServer.input', {
+                                    context: 'preferInstantMixDescription',
+                                })}
+                                label={t('form.addServer.input', {
+                                    context: 'preferInstantMix',
+                                })}
+                                {...form.getInputProps('preferInstantMix', {
+                                    type: 'checkbox',
+                                })}
+                            />
+                            <Checkbox
+                                description={t('form.addServer.input', {
+                                    context: 'enableAudiobooksDescription',
+                                })}
+                                label={t('form.addServer.input', {
+                                    context: 'enableAudiobooks',
+                                })}
+                                {...form.getInputProps('enableAudiobooks', {
+                                    type: 'checkbox',
+                                })}
+                            />
+                        </>
                     )}
                     {showQuickConnect && (
                         <JellyfinQuickConnectButton
