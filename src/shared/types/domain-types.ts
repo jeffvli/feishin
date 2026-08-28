@@ -85,6 +85,7 @@ export interface SavedCollection {
 }
 
 export type ServerListItem = {
+    enableAudiobooks?: boolean;
     features?: ServerFeatures;
     id: string;
     isAdmin?: boolean;
