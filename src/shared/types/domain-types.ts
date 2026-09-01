@@ -422,6 +422,7 @@ export type Song = {
     id: string;
     imageId: null | string;
     imageUrl: null | string;
+    isResumable?: boolean;
     lastPlayedAt: null | string;
     libraryId: null | number;
     libraryName: null | string;
@@ -1463,7 +1464,7 @@ export type ScrobbleArgs = BaseEndpointArgs & {
 
 export type ScrobbleQuery = {
     albumId?: string;
-    event?: 'pause' | 'start' | 'stop' | 'unpause';
+    event?: 'pause' | 'start' | 'stop' | 'timeupdate' | 'unpause';
     id: string;
     mediaType: 'podcast' | 'song';
     playbackRate: number;
