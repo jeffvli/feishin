@@ -2008,8 +2008,9 @@ export const JellyfinController: InternalControllerEndpoint = {
 
         jfApiClient(apiClientProps).scrobbleProgress({
             body: {
+                EventName: query.event,
                 ItemId: query.id,
-                NowPlayingQueue: nowPlayingQueue,
+                NowPlayingQueue: query.event === 'timeupdate' ? undefined : nowPlayingQueue,
                 PositionTicks: position,
             },
         });

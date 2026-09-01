@@ -62,14 +62,14 @@ of the track (position before SCROBBLE_TRACK_BEGIN_SEC), e.g. seek-to-start or
 restart-from-near-zero. Song change and repeat still reset for a new play-through.
 
 Jellyfin progress APIs still use playback position (ticks), not listen time:
-  - Periodic timeupdate while playing
+  - Periodic timeupdate while playing resumable media
   - timeupdate on seek
   - pause / unpause
 
 Other events:
-  - When the song changes: sends 'stop' for the previous non-Jellyfin track;
-    sends 'start' when the new track is playing; clears submission flag and
-    listen accumulator for the new track.
+  - When the song changes: sends 'stop' for the previous track (not on Jellyfin
+    unless the song is resumable); sends 'start' when the new track is playing;
+    clears submission flag and listen accumulator for the new track.
 
   - When the song is restarted (near 0 after 10s+): clears submission flag
     and listen accumulator.
@@ -251,6 +251,8 @@ export const useScrobble = () => {
             const currentSong = usePlayerStore.getState().getCurrentSong();
             const mediaType = currentSong?._itemType.includes('song') ? 'song' : 'podcast';
             const useTicks = currentSong?._serverType === ServerType.JELLYFIN;
+            const hasPlaybackReport =
+                currentSong?._serverType === ServerType.JELLYFIN && currentSong.isResumable;
             const currentStatus = usePlayerStore.getState().player.status;
             const currentTime = properties.timestamp;
             const previousTime = prev.timestamp;
@@ -305,36 +307,34 @@ export const useScrobble = () => {
                 }
             }
 
-            // Send progress events every 10 seconds
-            // if (hasPlaybackReport) {
-            //     const timeSinceLastProgress = currentTime - lastProgressEventRef.current;
-            //     if (timeSinceLastProgress >= 10) {
-            //         sendScrobble.mutate(
-            //             {
-            //                 apiClientProps: { serverId: serverId || '' },
-            //                 query: {
-            //                     albumId: currentSong.albumId,
-            //                     event: 'timeupdate',
-            //                     id: currentSong.id,
-            //                     mediaType: mediaType,
-            //                     playbackRate,
-            //                     position: getPositionValue(currentTime, useTicks),
-            //                     submission: false,
-            //                 },
-            //             },
-            //             {
-            //                 onSuccess: () => {
-            //                     logFn.debug("Scrobbled a timeupdate event", {
-            //                         meta: {
-            //                             id: currentSong.id,
-            //                         },
-            //                     });
-            //                 },
-            //             },
-            //         );
-            //         lastProgressEventRef.current = currentTime;
-            //     }
-            // }
+            // Send progress events every 10 seconds for resumable media
+            if (hasPlaybackReport) {
+                const timeSinceLastProgress = currentTime - lastProgressEventRef.current;
+                if (timeSinceLastProgress >= 10) {
+                    sendScrobble.mutate(
+                        {
+                            apiClientProps: { serverId: currentSong._serverId || '' },
+                            query: {
+                                albumId: currentSong.albumId,
+                                event: 'timeupdate',
+                                id: currentSong.id,
+                                mediaType: mediaType,
+                                playbackRate,
+                                position: getPositionValue(currentTime, useTicks),
+                                submission: false,
+                            },
+                        },
+                        {
+                            onSuccess: () => {
+                                logger.debug('Scrobbled a timeupdate event', {
+                                    id: currentSong.id,
+                                });
+                            },
+                        },
+                    );
+                    lastProgressEventRef.current = currentTime;
+                }
+            }
 
             // Check if we should submit scrobble based on listened time
             if (!isCurrentSongScrobbledRef.current) {
@@ -443,34 +443,12 @@ export const useScrobble = () => {
             songChangeTimeoutRef.current = setTimeout(() => {
                 const currentStatus = usePlayerStore.getState().player.status;
 
-                // Send start scrobble when song changes and the new song is playing
-                if (currentStatus === PlayerStatus.PLAYING && currentSong?.id) {
-                    sendScrobble.mutate(
-                        {
-                            apiClientProps: { serverId: currentSong._serverId || '' },
-                            query: {
-                                albumId: currentSong.albumId,
-                                event: 'start',
-                                id: currentSong.id,
-                                mediaType: mediaType,
-                                playbackRate: playbackRate,
-                                position: 0,
-                                submission: false,
-                            },
-                        },
-                        {
-                            onSuccess: () => {
-                                logger.info('Scrobbled a start event', {
-                                    id: currentSong.id,
-                                });
-                            },
-                        },
-                    );
-                }
+                // Jellyfin does not need a stop event when advancing to another song,
+                // except for resumable media where the position is stored server-side.
+                const skipStopScrobble =
+                    previousSong?._serverType === ServerType.JELLYFIN && !previousSong.isResumable;
 
-                // Jellyfin does not need a stop event when advancing to another song.
-                const skipStopScrobble = previousSong?._serverType === ServerType.JELLYFIN;
-
+                // Send stop first to avoid Jellyfin clearing the now-playing report for the new song
                 if (previousSong?.id && !skipStopScrobble) {
                     sendScrobble.mutate(
                         {
@@ -492,6 +470,31 @@ export const useScrobble = () => {
                             onSuccess: () => {
                                 logger.info('Scrobbled a stop event', {
                                     id: previousSong.id,
+                                });
+                            },
+                        },
+                    );
+                }
+
+                // Send start scrobble when song changes and the new song is playing
+                if (currentStatus === PlayerStatus.PLAYING && currentSong?.id) {
+                    sendScrobble.mutate(
+                        {
+                            apiClientProps: { serverId: currentSong._serverId || '' },
+                            query: {
+                                albumId: currentSong.albumId,
+                                event: 'start',
+                                id: currentSong.id,
+                                mediaType: mediaType,
+                                playbackRate: playbackRate,
+                                position: 0,
+                                submission: false,
+                            },
+                        },
+                        {
+                            onSuccess: () => {
+                                logger.info('Scrobbled a start event', {
+                                    id: currentSong.id,
                                 });
                             },
                         },
