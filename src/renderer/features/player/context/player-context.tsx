@@ -56,7 +56,6 @@ export interface PlayerContext {
         itemType: LibraryItem,
         type: AddToQueueType,
         options?: AddToQueueOptions,
-        additionalFilter?: (song: Song) => boolean,
     ) => void;
     addToQueueByListQuery: (
         serverId: string,
