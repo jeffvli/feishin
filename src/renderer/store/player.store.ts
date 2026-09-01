@@ -167,6 +167,11 @@ export function mapShuffledToQueueIndex(shuffledIndex: number, shuffled: number[
     return shuffledIndex;
 }
 
+// We need to use a unique id so that the equalityFn can work if attempting to set the same timestamp
+export function uniqueSeekToTimestamp(timestamp: number) {
+    return `${timestamp}-${nanoid()}`;
+}
+
 // Helper function to add new indexes to shuffled array after current position
 function addIndexesToShuffled(
     shuffled: number[],
@@ -525,7 +530,6 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 state.player.status = PlayerStatus.PLAYING;
                                 state.player.playerNum = 1;
                                 setTimestampStore(0);
-                                state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
                                 state.queue.default = newUniqueIds;
 
                                 if (state.player.shuffle === PlayerShuffle.TRACK) {
@@ -585,7 +589,6 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 state.player.status = PlayerStatus.PLAYING;
                                 state.player.playerNum = 1;
                                 setTimestampStore(0);
-                                state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
                                 state.queue.default = shuffledIds;
 
                                 // Always maintain shuffled array when using Play.SHUFFLE
@@ -709,7 +712,6 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 }
                                 state.player.status = PlayerStatus.PLAYING;
                                 setTimestampStore(0);
-                                state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
                             }
                         });
 
@@ -1069,7 +1071,6 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             state.player.index = nextIndex;
                             state.player.playerNum = 1;
                             setTimestampStore(0);
-                            state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
 
                             if (isStopped) {
                                 state.player.status = PlayerStatus.PLAYING;
@@ -1123,7 +1124,6 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         state.player.index = nextIndex;
                         state.player.playerNum = 1;
                         setTimestampStore(0);
-                        state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
 
                         if (isStopped) {
                             state.player.status = PlayerStatus.PLAYING;
@@ -1178,7 +1178,6 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                     playIndex = queueIndex;
                                 }
                                 setTimestampStore(0);
-                                state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
                             }
                         }
 
@@ -1226,7 +1225,6 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             state.player.index = index;
                         }
                         setTimestampStore(0);
-                        state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
 
                         state.player.status = PlayerStatus.PLAYING;
                     });
@@ -1279,7 +1277,6 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         state.player.index = previousIndex;
                         state.player.playerNum = 1;
                         setTimestampStore(0);
-                        state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
                         if (resumeFromStopped) {
                             state.player.status = PlayerStatus.PLAYING;
                         }
@@ -2380,9 +2377,4 @@ function toQueueSong(item: Song): QueueSong {
         ...item,
         _uniqueId: nanoid(),
     };
-}
-
-// We need to use a unique id so that the equalityFn can work if attempting to set the same timestamp
-function uniqueSeekToTimestamp(timestamp: number) {
-    return `${timestamp}-${nanoid()}`;
 }
