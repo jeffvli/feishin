@@ -1837,6 +1837,10 @@ export type AddToQueueByUniqueId = {
     uniqueId: string;
 };
 
+export type AddToQueueOptions = {
+    filter?: (song: Song) => boolean;
+};
+
 export type AddToQueueType = AddToQueueByPlayType | AddToQueueByUniqueId;
 
 export async function addToQueueByData(type: AddToQueueType, data: Song[]) {

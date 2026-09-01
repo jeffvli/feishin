@@ -171,21 +171,20 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
                 const albumIds = flatSortedAlbums.map((album) => album.id);
                 if (albumIds.length === 0) return;
 
-                const isSongByArtist =
-                    (artistId?: string) =>
-                    (song: Song): boolean => {
-                        return (
-                            song.albumArtists.some((artist) => artist.id === artistId) ||
-                            song.artists.some((artist) => artist.id === artistId)
-                        );
-                    };
+                const filter = (song: Song) => {
+                    if (song.albumArtists.some((artist) => artist.id === albumArtistId)) {
+                        return true;
+                    }
+
+                    return song.artists.some((artist) => artist.id === albumArtistId);
+                };
 
                 addToQueueByFetch(
                     server.id,
                     albumIds,
                     LibraryItem.ALBUM,
                     type || playButtonBehavior,
-                    isSongByArtist(albumArtistId),
+                    { filter },
                 );
             },
             [

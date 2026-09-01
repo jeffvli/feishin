@@ -18,6 +18,7 @@ import {
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import {
+    AddToQueueOptions,
     AddToQueueType,
     usePlayerActions,
     useSettingsStore,
@@ -54,6 +55,7 @@ export interface PlayerContext {
         id: string[],
         itemType: LibraryItem,
         type: AddToQueueType,
+        options?: AddToQueueOptions,
         additionalFilter?: (song: Song) => boolean,
     ) => void;
     addToQueueByListQuery: (
@@ -318,7 +320,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
             id: string[],
             itemType: LibraryItem,
             type: AddToQueueType,
-            additionalFilter?: (song: Song) => boolean,
+            options?: AddToQueueOptions,
         ) => {
             let toastId: null | string = null;
             const fetchId = nanoid();
@@ -378,8 +380,8 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 const filters = useSettingsStore.getState().playback.filters;
                 let filteredSongs = filterSongsByPlayerFilters(sortedSongs, filters);
 
-                if (additionalFilter) {
-                    filteredSongs = filteredSongs.filter(additionalFilter);
+                if (options?.filter) {
+                    filteredSongs = filteredSongs.filter(options.filter);
                 }
 
                 // Songs from multiple playlists are merged together, so there is no single
