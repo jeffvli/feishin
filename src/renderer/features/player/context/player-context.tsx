@@ -54,6 +54,7 @@ export interface PlayerContext {
         id: string[],
         itemType: LibraryItem,
         type: AddToQueueType,
+        additionalFilter?: (song: Song) => boolean,
     ) => void;
     addToQueueByListQuery: (
         serverId: string,
@@ -312,7 +313,13 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     const addToQueueByFetch = useCallback(
-        async (serverId: string, id: string[], itemType: LibraryItem, type: AddToQueueType) => {
+        async (
+            serverId: string,
+            id: string[],
+            itemType: LibraryItem,
+            type: AddToQueueType,
+            additionalFilter?: (song: Song) => boolean,
+        ) => {
             let toastId: null | string = null;
             const fetchId = nanoid();
 
@@ -370,6 +377,10 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
                 const filters = useSettingsStore.getState().playback.filters;
                 let filteredSongs = filterSongsByPlayerFilters(sortedSongs, filters);
+
+                if (additionalFilter) {
+                    filteredSongs = filteredSongs.filter(additionalFilter);
+                }
 
                 // Songs from multiple playlists are merged together, so there is no single
                 // playlist to attribute them to: skip tagging (and URL inference) entirely.

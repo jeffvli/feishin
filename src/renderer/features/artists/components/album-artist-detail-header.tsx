@@ -1,21 +1,17 @@
-import { useQueryClient, useSuspenseQuery, UseSuspenseQueryResult } from '@tanstack/react-query';
+import { useSuspenseQuery, UseSuspenseQueryResult } from '@tanstack/react-query';
 import { forwardRef, Fragment, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
 
 import styles from './album-artist-detail-header.module.css';
 
-import { queryKeys } from '/@/renderer/api/query-keys';
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { getArtistAlbumsGrouped } from '/@/renderer/features/artists/hooks/use-artist-albums-grouped';
 import { useDeleteArtistImage } from '/@/renderer/features/artists/mutations/delete-artist-image-mutation';
 import { useUploadArtistImage } from '/@/renderer/features/artists/mutations/upload-artist-image-mutation';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
-import {
-    fetchSongsByItemType,
-    usePlayer,
-} from '/@/renderer/features/player/context/player-context';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     LibraryHeader,
     LibraryHeaderMenu,
@@ -37,6 +33,7 @@ import {
     AlbumListResponse,
     LibraryItem,
     ServerType,
+    Song,
 } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
 import { Play } from '/@/shared/types/types';
@@ -110,7 +107,6 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
         const server = useCurrentServer();
         const showRatings = useShowRatings();
         const showFavorites = useShowFavorites();
-        const queryClient = useQueryClient();
         const { t } = useTranslation();
         const detailQuery = useSuspenseQuery(
             artistsQueries.albumArtistDetail({
@@ -145,7 +141,7 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
             },
         ];
 
-        const { addToQueueByData } = usePlayer();
+        const { addToQueueByFetch } = usePlayer();
         const playButtonBehavior = usePlayButtonBehavior();
         const setFavorite = useSetFavorite();
         const setRating = useSetRating();
@@ -158,7 +154,7 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
         const artistReleaseTypeItems = useArtistReleaseTypeItems();
 
         const handlePlay = useCallback(
-            async (type?: Play) => {
+            (type?: Play) => {
                 if (!server?.id || !routeId) return;
 
                 const albums = albumsQuery.data?.items || [];
@@ -175,28 +171,25 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
                 const albumIds = flatSortedAlbums.map((album) => album.id);
                 if (albumIds.length === 0) return;
 
-                const songs = await queryClient.fetchQuery({
-                    gcTime: 0,
-                    queryFn: () => {
-                        return fetchSongsByItemType(queryClient, server.id, {
-                            id: albumIds,
-                            itemType: LibraryItem.ALBUM,
-                        });
-                    },
-                    queryKey: queryKeys.player.fetch(),
-                    staleTime: 0,
-                });
+                const isSongByArtist =
+                    (artistId?: string) =>
+                    (song: Song): boolean => {
+                        return (
+                            song.albumArtists.some((artist) => artist.id === artistId) ||
+                            song.artists.some((artist) => artist.id === artistId)
+                        );
+                    };
 
-                const filteredArtistSongs = songs.filter((song) => {
-                    if (song.albumArtists.some((artist) => artist.id === albumArtistId))
-                        return true;
-
-                    return song.artists.some((artist) => artist.id === albumArtistId);
-                });
-
-                addToQueueByData(filteredArtistSongs, type || playButtonBehavior);
+                addToQueueByFetch(
+                    server.id,
+                    albumIds,
+                    LibraryItem.ALBUM,
+                    type || playButtonBehavior,
+                    isSongByArtist(albumArtistId),
+                );
             },
             [
+                addToQueueByFetch,
                 playButtonBehavior,
                 routeId,
                 server.id,
@@ -206,8 +199,6 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
                 groupingType,
                 artistReleaseTypeItems,
                 t,
-                queryClient,
-                addToQueueByData,
                 albumArtistId,
             ],
         );
