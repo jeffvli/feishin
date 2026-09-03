@@ -1005,10 +1005,13 @@ export const SubsonicController: InternalControllerEndpoint = {
         }
 
         // else if user selects 'favorites'
+        // Use getStarred (via favorite:true) instead of album-scraping so starred
+        // tracks missing from getArtist album lists are not omitted (#2415).
         const res = await SubsonicController.getSongList({
             apiClientProps,
             query: {
                 artistIds: [query.artistId],
+                favorite: true,
                 sortBy: SongListSort.FAVORITED,
                 sortOrder: SortOrder.DESC,
                 startIndex: 0,
