@@ -1,4 +1,10 @@
-import { BrowserWindow, Menu, MenuItemConstructorOptions, shell } from 'electron';
+import {
+    BrowserWindow,
+    Menu,
+    MenuItemConstructorOptions,
+    shell,
+    systemPreferences,
+} from 'electron';
 
 import packageJson from '../../package.json';
 
@@ -81,6 +87,21 @@ export default class MenuBuilder {
 
     constructor(mainWindow: BrowserWindow) {
         this.mainWindow = mainWindow;
+
+        if (process.platform === 'darwin') {
+            const subscription = systemPreferences.subscribeWorkspaceNotification(
+                'NSWorkspaceScreensDidWakeNotification',
+                () => {
+                    if (this.applicationMenu) {
+                        Menu.setApplicationMenu(this.applicationMenu);
+                    }
+                },
+            );
+
+            this.mainWindow.once('closed', () => {
+                systemPreferences.unsubscribeWorkspaceNotification(subscription);
+            });
+        }
     }
 
     buildDarwinTemplate({
