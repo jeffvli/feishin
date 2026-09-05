@@ -343,6 +343,13 @@ function createGithubUpdaterInstance(
 
 protocol.registerSchemesAsPrivileged([
     { privileges: { bypassCSP: true, corsEnabled: true }, scheme: 'feishin' },
+    // `stream: true` is what makes a `<video>` on this scheme issue byte-range requests instead
+    // of asking for whole files, which is what seeking needs. Handled in the music-video feature
+    // module, which owns the cache directory it reads from.
+    {
+        privileges: { bypassCSP: true, corsEnabled: true, stream: true, supportFetchAPI: true },
+        scheme: 'feishin-video',
+    },
 ]);
 
 process.on('uncaughtException', (error: any) => {

@@ -546,6 +546,14 @@ export const GeneralSettingsSchema = z.object({
     listenBrainz: z.boolean(),
     microtonalPitchControls: z.boolean(),
     musicBrainz: z.boolean(),
+    /** Megabytes of downloaded music videos to keep before the least recently watched are evicted. */
+    musicVideoCacheLimitMb: z.number(),
+    /** Shows a synced YouTube music video, muted, alongside the app's own audio playback. */
+    musicVideoEnabled: z.boolean(),
+    /** What the music video panel shows for a track with no confident match. */
+    musicVideoFallback: z.enum(['cover', 'visualizer']),
+    /** Tallest video rendition downloaded, in pixels. Only H.264 renditions are considered. */
+    musicVideoMaxHeight: z.number(),
     nativeAspectRatio: z.boolean(),
     nativeSpotify: z.boolean(),
     passwordStore: z.string().optional(),
@@ -1356,6 +1364,10 @@ const initialState: SettingsState = {
         listenBrainz: true,
         microtonalPitchControls: false,
         musicBrainz: true,
+        musicVideoCacheLimitMb: 2048,
+        musicVideoEnabled: false,
+        musicVideoFallback: 'cover',
+        musicVideoMaxHeight: 480,
         nativeAspectRatio: false,
         nativeSpotify: false,
         passwordStore: undefined,
@@ -2901,10 +2913,17 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     }
                 }
 
+                if (version < 34) {
+                    state.general.musicVideoCacheLimitMb ??= 2048;
+                    state.general.musicVideoEnabled ??= false;
+                    state.general.musicVideoFallback ??= 'cover';
+                    state.general.musicVideoMaxHeight ??= 480;
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 33,
+            version: 34,
         },
     ),
 );

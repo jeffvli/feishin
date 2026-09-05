@@ -24,6 +24,7 @@ import {
     useAutoDJSettings,
     useCurrentServer,
     useFullScreenPlayerStore,
+    useGeneralSettings,
     useHotkeySettings,
     usePlaybackSettings,
     usePlaybackType,
@@ -97,6 +98,7 @@ export const RightControls = () => {
                 <SleepTimerButton />
                 <PlayerConfig />
                 <LyricsButton />
+                <MusicVideoButton />
                 {showFavorites && <FavoriteButton />}
                 <QueueButton />
                 <VolumeButton />
@@ -428,6 +430,42 @@ const LyricsButton = () => {
             size="sm"
             tooltip={{
                 label: t('player.lyrics'),
+                openDelay: 0,
+            }}
+            variant="subtle"
+        />
+    );
+};
+
+/**
+ * Opens the music video panel, which is its own full-screen surface rather than a tab inside the
+ * full-screen player - so unlike `LyricsButton` this has no collapsed state to reason about, and
+ * the full-screen player is left exactly as it was found.
+ */
+const MusicVideoButton = () => {
+    const { musicVideoEnabled } = useGeneralSettings();
+    const videoExpanded = useFullScreenPlayerStore((state) => state.videoExpanded);
+    const { setStore } = useFullScreenPlayerStoreActions();
+
+    if (!musicVideoEnabled) {
+        return null;
+    }
+
+    return (
+        <ActionIcon
+            icon="video"
+            iconProps={{
+                color: videoExpanded ? 'primary' : undefined,
+                size: 'lg',
+            }}
+            onClick={(e) => {
+                e.stopPropagation();
+                setStore({ videoExpanded: !videoExpanded });
+            }}
+            role="button"
+            size="sm"
+            tooltip={{
+                label: t('page.fullscreenPlayer.video'),
                 openDelay: 0,
             }}
             variant="subtle"

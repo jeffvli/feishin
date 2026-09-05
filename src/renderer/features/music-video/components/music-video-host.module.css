@@ -1,0 +1,98 @@
+/*
+ * The panel is mounted for as long as the feature is enabled, whether or not it is on screen, and
+ * opens by sliding within this clip box. That is deliberate: Chromium ties a picture-in-picture
+ * window to the exact `<video>` element it was opened on, and mounting a second copy of the panel
+ * to show it full screen meant two elements decoding the same file at once and the window closing
+ * under the one being torn down. This layer is inert - `pointer-events` are handed to the panel
+ * only while it is open.
+ */
+.host {
+    position: absolute;
+    inset: 0;
+
+    /*
+     * Above the full-screen player and the expanded visualizer, which both sit at 200. The panel
+     * covers whichever of them is open rather than replacing it, so closing the panel puts the
+     * user back exactly where they were instead of somewhere they have to navigate back from.
+     */
+    z-index: 210;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.panel {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: var(--theme-colors-background);
+}
+
+.panel-open {
+    pointer-events: auto;
+}
+
+.stage {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.stage:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    background: var(--theme-colors-background);
+}
+
+/*
+ * Absolutely positioned because the element stays laid out even when there is no video to show:
+ * hiding it outright would close any picture-in-picture window bound to it. In normal flow it
+ * would take the full height and push the loading and fallback states out of view; here they
+ * simply sit over it.
+ */
+.video-layer {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/*
+ * A fixed 16:9 box centred in the stage, with the picture letterboxed inside it by `object-fit`.
+ * Sizing the element to the stage instead let every candidate's own dimensions decide the layout,
+ * so the picture changed shape between tracks.
+ */
+.video {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+}
+
+.fallback {
+    position: absolute;
+    inset: 0;
+}
+
+/* Out of the way of the picture until the pointer asks for it. */
+.chrome {
+    position: absolute;
+    top: var(--theme-spacing-sm);
+    right: var(--theme-spacing-sm);
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 160ms ease;
+}
+
+.stage:hover .chrome,
+.chrome:focus-within {
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .chrome {
+        transition: none;
+    }
+}

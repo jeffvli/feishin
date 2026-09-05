@@ -27,6 +27,7 @@ interface FullScreenPlayerState {
     titleDisplayType: FullScreenPlayerTitleDisplayType;
     titleLineCount: number;
     useImageAspectRatio: boolean;
+    videoExpanded: boolean;
     visualizerExpanded: boolean;
     visualizerReturnToPlayer: boolean;
 }
@@ -51,6 +52,7 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
                 titleDisplayType: 'scroll',
                 titleLineCount: 1,
                 useImageAspectRatio: false,
+                videoExpanded: false,
                 visualizerExpanded: false,
                 visualizerReturnToPlayer: false,
             })),
@@ -63,6 +65,17 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
             migrate: (persistedState, version) => {
                 if (version <= 2) {
                     return {} as FullScreenPlayerState;
+                }
+
+                if (version <= 5) {
+                    // The music video moved out of the full-screen player's tab strip and onto
+                    // its own playerbar button, so a session that was left on that tab would
+                    // otherwise reopen showing an empty panel with no way to tell why.
+                    const state = persistedState as { activeTab?: string };
+
+                    if (state.activeTab === 'video') {
+                        state.activeTab = '';
+                    }
                 }
 
                 if (version <= 4) {
@@ -81,11 +94,11 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
                 return persistedState;
             },
             name: 'store_full_screen_player',
-            // `visualizerReturnToPlayer` is transient navigation intent used only to route
-            // the "shrink visualizer" action back to the full-screen player; it isn't
-            // meaningful across app restarts, so it's excluded from persistence.
+            // `visualizerReturnToPlayer` is transient navigation intent used only to route the
+            // "shrink visualizer" action back to the full-screen player, and is not meaningful
+            // across app restarts.
             partialize: (state) => omit(state, ['visualizerReturnToPlayer']),
-            version: 5,
+            version: 6,
         },
     ),
 );

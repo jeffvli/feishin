@@ -5,6 +5,7 @@ import { ApplicationSettings } from '/@/renderer/features/settings/components/ge
 import { ControlSettings } from '/@/renderer/features/settings/components/general/control-settings';
 import { ExternalLinksSettings } from '/@/renderer/features/settings/components/general/external-links-settings';
 import { LyricSettings } from '/@/renderer/features/settings/components/general/lyric-settings';
+import { MusicVideoSettings } from '/@/renderer/features/settings/components/general/music-video-settings';
 import { QueryBuilderSettings } from '/@/renderer/features/settings/components/general/query-builder-settings';
 import { ScrobbleSettings } from '/@/renderer/features/settings/components/general/scrobble-settings';
 import { SidebarSettings } from '/@/renderer/features/settings/components/general/sidebar-settings';
@@ -28,6 +29,7 @@ export const GeneralTab = memo(() => {
             { component: SidebarSettings, key: 'sidebar' },
             { component: ScrobbleSettings, key: 'scrobble' },
             { component: LyricSettings, key: 'lyrics' },
+            { component: MusicVideoSettings, key: 'musicVideo' },
         ];
 
         if (supportsSmartPlaylists) {

@@ -10,6 +10,9 @@ import { useFullScreenPlayerStore } from '/@/renderer/store/full-screen-player.s
  */
 export const VISUALIZER_FULLSCREEN_TARGET_ID = 'visualizer-fullscreen-target';
 
+/** Same F11-targeting trick as `VISUALIZER_FULLSCREEN_TARGET_ID`, for the music video panel. */
+export const VIDEO_FULLSCREEN_TARGET_ID = 'video-fullscreen-target';
+
 export const useFullscreenToggle = () => {
     useEffect(() => {
         const toggleFullscreen = () => {
@@ -19,15 +22,18 @@ export const useFullscreenToggle = () => {
                 return;
             }
 
-            const { visualizerExpanded } = useFullScreenPlayerStore.getState();
+            const { videoExpanded, visualizerExpanded } = useFullScreenPlayerStore.getState();
 
             const visualizerTarget = visualizerExpanded
                 ? document.getElementById(VISUALIZER_FULLSCREEN_TARGET_ID)
                 : null;
+            const videoTarget = videoExpanded
+                ? document.getElementById(VIDEO_FULLSCREEN_TARGET_ID)
+                : null;
 
-            // Expanded visualizer -> fullscreen just the visualizer.
+            // Expanded visualizer/video -> fullscreen just that container.
             // Anything else -> normal whole-window fullscreen.
-            const target = visualizerTarget ?? document.documentElement;
+            const target = visualizerTarget ?? videoTarget ?? document.documentElement;
 
             target.requestFullscreen().catch(() => {});
         };

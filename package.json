@@ -112,6 +112,8 @@
         "electron-store": "^8.2.0",
         "electron-updater": "^6.8.9",
         "fast-average-color": "9.5.0",
+        "ffbinaries": "^1.1.6",
+        "fft.js": "^4.0.4",
         "fast-xml-parser": "^5.8.0",
         "format-duration": "^3.0.2",
         "fuse.js": "^7.4.2",
