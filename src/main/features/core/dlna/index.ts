@@ -63,6 +63,8 @@ let lastCommandedUri = '';
 let lastQueuedNextUri = '';
 let lastFinishedUri = '';
 let lastAppSeekAt = 0;
+let lastStopCommandAt = 0;
+let pollInFlight = false;
 let lastPlayCommandAt = 0;
 let lastPauseCommandAt = 0;
 let lastClearNextAt = 0;
@@ -968,11 +970,28 @@ function startPositionPolling() {
         if (Date.now() - trackLoadedAt < 50) return;
         // Started polling much sooner, most of the failed DLNA commands I've seen occurred earlier than this, and position info
         // early in the song is good. I tested with a few configurations, this works well, I believe.
+        // Renderers such as upmpdcli block their control port for seconds while seeking;
+        // without this guard polls pile up and answer late, out of order.
+        if (pollInFlight) return;
+        pollInFlight = true;
+        const issuedAt = Date.now();
         try {
             const [posInfo, transportState] = await Promise.all([
                 getPositionInfo(connectedDevice),
                 getTransportInfo(connectedDevice),
             ]);
+            // An answer to a request issued before the latest app command (seek, stop,
+            // play, pause, track load) describes the pre-command state; applying it would
+            // overwrite the app's position, or mirror a stale STOPPED back as a pause.
+            if (
+                lastAppSeekAt > issuedAt ||
+                lastStopCommandAt > issuedAt ||
+                lastPlayCommandAt > issuedAt ||
+                lastPauseCommandAt > issuedAt ||
+                trackLoadedAt > issuedAt
+            ) {
+                return;
+            }
             let realPosition = posInfo.position;
             const proxyState = getActiveProxyState(lastCommandedUri);
             if (proxyState) {
@@ -1204,6 +1223,8 @@ function startPositionPolling() {
             }
         } catch {
             // Polling errors are expected during track transitions
+        } finally {
+            pollInFlight = false;
         }
     }, 500);
     // IMPORTANT: This used to be 1000, but I believe that was not tested explicitly and arbitrary, and we get
@@ -1664,6 +1685,7 @@ ipcMain.on(
             await setAVTransportURI(device, lanUrl, metadata);
             await new Promise((r) => setTimeout(r, 1000));
             if (data.metadata.autoPlay !== false) {
+                lastPlayCommandAt = Date.now();
                 await play(device).catch((err) => dlnaLog('Initial play failed', err));
                 dlnaLog(`Playing: ${data.metadata.title}`);
                 if (shouldMuteTrick) {
@@ -1695,6 +1717,7 @@ ipcMain.on(
             } else {
                 dlnaLog(`Queued (Paused): ${data.metadata.title}`);
                 if (shouldMuteTrick) {
+                    lastPlayCommandAt = Date.now();
                     await play(device).catch(() => {});
                     await waitForTransportState(device, ['PLAYING'], 4000);
                     await new Promise((r) => setTimeout(r, 1200));
@@ -1817,6 +1840,7 @@ ipcMain.on('dlna-stop', async () => {
     if (!connectedDevice) return;
     try {
         isPausedIntentionally = true;
+        lastStopCommandAt = Date.now();
         lastCommandedUri = '';
         lastQueuedNextUri = '';
         await stop(connectedDevice);

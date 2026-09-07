@@ -507,6 +507,9 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
     useEffect(() => {
         if (!dlnaPlayerListener) return;
         const handleCurrentTime = (_event: any, time: number) => {
+            // After the app stopped, the store timestamp is already 0; a late device
+            // position must not resurrect the pre-stop value.
+            if (usePlayerStore.getState().player.status === PlayerStatus.STOPPED) return;
             if (
                 !wasNearEndRef.current &&
                 currentSongDurationRef.current > 0 &&
