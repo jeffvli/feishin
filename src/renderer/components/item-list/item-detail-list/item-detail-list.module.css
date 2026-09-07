@@ -491,26 +491,18 @@
     border-top-color: var(--theme-colors-border);
 }
 
-.track-row.track-row-hover-highlight-enabled {
-    position: relative;
-}
-
-.track-row.track-row-hover-highlight-enabled .track-cell {
-    position: relative;
-    z-index: 2;
-}
-
-.track-row.track-row-hover-highlight-enabled:hover::before {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 1;
-    pointer-events: none;
-    content: '';
+.track-row.track-row-hover-highlight-enabled:hover:not(.track-row-selected) {
     background-color: var(--theme-colors-surface);
-    opacity: 0.7;
+}
+
+.track-row.track-row-selected.track-row-horizontal-border-visible,
+.track-row.track-row-hover-highlight-enabled:hover.track-row-horizontal-border-visible {
+    border-top-color: transparent;
+}
+
+.track-row.track-row-selected .track-cell-vertical-border-visible,
+.track-row.track-row-hover-highlight-enabled:hover .track-cell-vertical-border-visible {
+    border-right-color: transparent;
 }
 
 .skeleton-image-container {

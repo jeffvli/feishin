@@ -1,6 +1,7 @@
 import type { DateTimePickerProps as MantineDateTimePickerProps } from '@mantine/dates';
 
 import { DateTimePicker as MantineDateTimePicker } from '@mantine/dates';
+import clsx from 'clsx';
 
 import styles from './date-time-picker.module.css';
 
@@ -11,6 +12,7 @@ interface DateTimePickerProps extends MantineDateTimePickerProps {
 
 export const DateTimePicker = ({
     classNames,
+    clearable = false,
     maxWidth,
     popoverProps,
     size = 'sm',
@@ -22,12 +24,18 @@ export const DateTimePicker = ({
         <MantineDateTimePicker
             classNames={{
                 description: styles.description,
-                input: styles.input,
+                input: clsx(styles.input, {
+                    [styles.clearable]: clearable,
+                }),
                 label: styles.label,
                 required: styles.required,
                 root: styles.root,
                 section: styles.section,
                 ...classNames,
+            }}
+            clearable={clearable}
+            clearButtonProps={{
+                className: styles.clearButton,
             }}
             popoverProps={{ withinPortal: true, ...popoverProps }}
             size={size}

@@ -6,7 +6,6 @@
     min-height: 0;
     overflow: hidden auto;
     word-break: break-all;
-    transform: translateY(-2rem);
 }
 
 .preview {

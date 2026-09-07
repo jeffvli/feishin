@@ -4,6 +4,7 @@ import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { controller } from '/@/renderer/api/controller';
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
@@ -11,11 +12,13 @@ import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.p
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
 import { ServerList } from '/@/renderer/features/servers/components/server-list';
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
+import { startScanWatch, useScanStatus } from '/@/renderer/features/shared/hooks/use-scan-status';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAuthStoreActions, useCurrentServer, useServerList } from '/@/renderer/store';
 import { hasFeature } from '/@/shared/api/utils';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Icon } from '/@/shared/components/icon/icon';
+import { toast } from '/@/shared/components/toast/toast';
 import {
     ServerListItem,
     ServerListItemWithCredential,
@@ -31,6 +34,7 @@ export const ServerSelectorItems = () => {
     const currentServer = useCurrentServer();
     const serverList = useServerList();
     const { logout, setCurrentServer, setMusicFolderId } = useAuthStoreActions();
+    const { isScanning, isWatching } = useScanStatus();
 
     const { data: musicFolders } = useQuery(
         currentServer
@@ -137,6 +141,23 @@ export const ServerSelectorItems = () => {
         }, 0);
     };
 
+    const handleRescanLibrary = async () => {
+        if (!currentServer || isWatching || isScanning) {
+            return;
+        }
+
+        try {
+            await controller.startLibraryScan({
+                apiClientProps: { serverId: currentServer.id },
+            });
+            startScanWatch();
+        } catch (err) {
+            toast.error({
+                message: err instanceof Error ? err.message : String(err),
+            });
+        }
+    };
+
     return (
         <>
             <DropdownMenu.Label>{t('page.appMenu.selectServer')}</DropdownMenu.Label>
@@ -183,6 +204,12 @@ export const ServerSelectorItems = () => {
                         onClick={handleManageServersModal}
                     >
                         {t('page.appMenu.manageServers')}
+                    </DropdownMenu.Item>
+                    <DropdownMenu.Item
+                        leftSection={<Icon icon="refresh" />}
+                        onClick={handleRescanLibrary}
+                    >
+                        {t('page.appMenu.rescanLibrary')}
                     </DropdownMenu.Item>
                     <DropdownMenu.Item
                         leftSection={<Icon color="error" icon="signOut" />}

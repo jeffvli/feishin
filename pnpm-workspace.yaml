@@ -1,6 +1,6 @@
 allowBuilds:
     abstract-socket: true
-    electron: true
+    electron: false
     electron-winstaller: true
     esbuild: true
 minimumReleaseAge: 1440
@@ -8,4 +8,3 @@ minimumReleaseAgeExclude:
     - 'taglib-wasm@1.5.1'
 overrides:
     'xml2js': '0.5.0'
-    'react-router': '7.14.0'

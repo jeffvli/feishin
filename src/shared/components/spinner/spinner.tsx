@@ -1,28 +1,36 @@
 import { Center } from '@mantine/core';
 import { memo } from 'react';
 import { IconBaseProps } from 'react-icons';
-import { CgSpinnerTwo } from 'react-icons/cg';
+import { LuLoader } from 'react-icons/lu';
 
 import styles from './spinner.module.css';
 
+import { Icon, IconColor } from '/@/shared/components/icon/icon';
+
 interface SpinnerProps extends IconBaseProps {
-    color?: string;
+    color?: IconColor | string;
     container?: boolean;
-    size?: number;
 }
 
-export const SpinnerIcon = CgSpinnerTwo;
+export const SpinnerIcon = LuLoader;
 
-const _Spinner = ({ ...props }: SpinnerProps) => {
+const _Spinner = ({ size = 'xl', ...props }: SpinnerProps) => {
     if (props.container) {
         return (
             <Center className={styles.container}>
-                <SpinnerIcon className={styles.icon} color={props.color} size={props.size} />
+                <Icon
+                    className={styles.icon}
+                    color={props.color as IconColor}
+                    icon="spinner"
+                    size={size}
+                />
             </Center>
         );
     }
 
-    return <SpinnerIcon className={styles.icon} color={props.color} size={props.size} />;
+    return (
+        <Icon className={styles.icon} color={props.color as IconColor} icon="spinner" size={size} />
+    );
 };
 
 _Spinner.displayName = 'Spinner';

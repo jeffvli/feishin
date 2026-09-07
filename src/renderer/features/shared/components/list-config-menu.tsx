@@ -17,6 +17,7 @@ import { SegmentedControl } from '/@/shared/components/segmented-control/segment
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
 import { Table } from '/@/shared/components/table/table';
+import { Text } from '/@/shared/components/text/text';
 import { useDisclosure } from '/@/shared/hooks/use-disclosure';
 import { ItemListKey, ListDisplayType } from '/@/shared/types/types';
 
@@ -27,7 +28,7 @@ export const SONG_DISPLAY_TYPES: ListConfigMenuDisplayTypeConfig[] = [
 const DISPLAY_TYPES = [
     {
         label: (
-            <Group align="center" justify="center" p="sm">
+            <Group align="center" gap="sm" justify="center" p="sm" wrap="nowrap">
                 <Icon icon="layoutTable" size="lg" />
                 {i18n.t('table.config.view.table') as string}
             </Group>
@@ -36,7 +37,7 @@ const DISPLAY_TYPES = [
     },
     {
         label: (
-            <Group align="center" justify="center" p="sm">
+            <Group align="center" gap="sm" justify="center" p="sm" wrap="nowrap">
                 <Icon icon="layoutGrid" size="lg" />
                 {i18n.t('table.config.view.grid') as string}
             </Group>
@@ -45,7 +46,7 @@ const DISPLAY_TYPES = [
     },
     {
         label: (
-            <Group align="center" justify="center" p="sm">
+            <Group align="center" gap="sm" justify="center" p="sm" wrap="nowrap">
                 <Icon icon="layoutDetail" size="lg" />
                 {i18n.t('table.config.view.detail') as string}
             </Group>
@@ -232,6 +233,7 @@ export const ListConfigTable = ({
 }: {
     options: {
         component: ReactNode;
+        description?: ReactNode | string;
         id: string;
         isDivider?: boolean;
         isHidden?: boolean;
@@ -269,7 +271,20 @@ export const ListConfigTable = ({
 
                     return (
                         <Table.Tr key={option.id}>
-                            <Table.Th>{option.label}</Table.Th>
+                            <Table.Th>
+                                {option.description !== undefined ? (
+                                    <Stack gap="xs">
+                                        <Text isNoSelect size="sm">
+                                            {option.label}
+                                        </Text>
+                                        <Text isMuted isNoSelect size="xs">
+                                            {option.description}
+                                        </Text>
+                                    </Stack>
+                                ) : (
+                                    option.label
+                                )}
+                            </Table.Th>
                             <Table.Td>
                                 <div className={styles.control}>{option.component}</div>
                             </Table.Td>

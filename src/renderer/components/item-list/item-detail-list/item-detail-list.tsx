@@ -67,7 +67,7 @@ import { useIsMutatingDeleteFavorite } from '/@/renderer/features/shared/mutatio
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useSettingsStore, useShowRatings } from '/@/renderer/store';
+import { useSettingsStore, useShowFavorites, useShowRatings } from '/@/renderer/store';
 import { formatDurationString, formatPartialIsoDateUTC } from '/@/renderer/utils';
 import { SEPARATOR_STRING } from '/@/shared/api/utils';
 import { ExplicitIndicator } from '/@/shared/components/explicit-indicator/explicit-indicator';
@@ -426,6 +426,7 @@ const MetadataSection = memo(
     ({ controls, internalState, item }: MetadataSectionProps) => {
         const { t } = useTranslation();
         const showRatings = useShowRatings();
+        const showFavorites = useShowFavorites();
         const [isImageHovered, setIsImageHovered] = useState(false);
         const [isMetadataHovered, setIsMetadataHovered] = useState(false);
 
@@ -570,7 +571,7 @@ const MetadataSection = memo(
                             serverId={item._serverId}
                             type="itemCard"
                         />
-                        {isFavorite && <div className={styles.favoriteBadge} />}
+                        {showFavorites && isFavorite && <div className={styles.favoriteBadge} />}
                         {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}
                         <AnimatePresence>
                             {controls && isImageHovered && (
@@ -580,6 +581,7 @@ const MetadataSection = memo(
                                     internalState={internalState}
                                     item={item}
                                     itemType={item._itemType}
+                                    showFavorite={showFavorites}
                                     showRating={true}
                                     type="compact"
                                 />

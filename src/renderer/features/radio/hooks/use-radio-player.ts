@@ -5,6 +5,7 @@ import { createWithEqualityFn } from 'zustand/traditional';
 
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { usePlaybackType, usePlayerStoreBase, useSettingsStore } from '/@/renderer/store';
+import { logger } from '/@/renderer/utils/logger';
 import { PlayerStatus, PlayerType } from '/@/shared/types/types';
 
 export type RadioCurrentStationArt = {
@@ -21,6 +22,7 @@ export interface RadioMetadata {
 
 interface RadioStore {
     actions: {
+        clear: () => void;
         pause: () => void;
         play: (
             streamUrl?: string,
@@ -40,9 +42,22 @@ interface RadioStore {
     stationName: null | string;
 }
 
+const CLEARED_RADIO_STATE = {
+    currentStationArt: null,
+    currentStreamUrl: null,
+    isPlaying: false,
+    metadata: null,
+    stationName: null,
+} as const;
+
 export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
     actions: {
+        clear: () => {
+            logger.debug('Cleared radio state');
+            set({ ...CLEARED_RADIO_STATE });
+        },
         pause: () => {
+            logger.debug('Paused radio playback');
             set({ isPlaying: false });
             usePlayerStoreBase.getState().mediaPause();
         },
@@ -68,6 +83,10 @@ export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
                     nextStationArt = stationArt ?? null;
                 }
 
+                logger.debug('Started radio playback', {
+                    hasStationArt: Boolean(nextStationArt),
+                    stationName: newStationName,
+                });
                 usePlayerStoreBase.getState().mediaPlay();
 
                 return {
@@ -86,19 +105,15 @@ export const useRadioStore = createWithEqualityFn<RadioStore>((set) => ({
         stop: () => {
             const playbackType = useSettingsStore.getState().playback.type;
 
-            set({
-                currentStationArt: null,
-                currentStreamUrl: null,
-                isPlaying: false,
-                metadata: null,
-                stationName: null,
-            });
+            set({ ...CLEARED_RADIO_STATE });
 
             // When stopping radio with mpv, just pause instead of calling mediaStop
             // This prevents mpv from quitting
             if (playbackType === PlayerType.LOCAL && mpvPlayer) {
+                logger.debug('Paused radio playback via mpv');
                 mpvPlayer.pause();
             } else {
+                logger.debug('Stopped radio playback');
                 usePlayerStoreBase.getState().mediaStop();
             }
         },
@@ -141,15 +156,11 @@ export const useRadioControls = () => {
 };
 
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
-const mpvPlayerListener = isElectron() ? window.api.mpvPlayerListener : null;
-const ipc = isElectron() ? window.api.ipc : null;
 
 export const useRadioAudioInstance = () => {
     const { actions } = useRadioStore();
-    const { setCurrentStreamUrl, setIsPlaying, setStationName } = actions;
     const currentStreamUrl = useRadioStore((state) => state.currentStreamUrl);
     const isPlaying = useRadioStore((state) => state.isPlaying);
-    const isRadioActive = useIsRadioActive();
     const playbackType = usePlaybackType();
     const isUsingMpv = playbackType === PlayerType.LOCAL && mpvPlayer;
 
@@ -164,48 +175,18 @@ export const useRadioAudioInstance = () => {
         } else {
             mpvPlayer.pause();
         }
-    }, [
-        currentStreamUrl,
-        isPlaying,
-        isUsingMpv,
-        setIsPlaying,
-        setCurrentStreamUrl,
-        setStationName,
-    ]);
-
-    useEffect(() => {
-        if (!isUsingMpv || !mpvPlayerListener || !ipc || !isRadioActive) {
-            return;
-        }
-
-        const handleMpvPlay = () => {
-            setIsPlaying(true);
-        };
-
-        const handleMpvPause = () => {
-            setIsPlaying(false);
-        };
-
-        const handleMpvStop = () => {
-            setIsPlaying(false);
-            setCurrentStreamUrl(null);
-            setStationName(null);
-            useRadioStore.setState({ currentStationArt: null, metadata: null });
-        };
-
-        mpvPlayerListener.rendererPlay(handleMpvPlay);
-        mpvPlayerListener.rendererPause(handleMpvPause);
-        mpvPlayerListener.rendererStop(handleMpvStop);
-
-        return () => {
-            ipc.removeAllListeners('renderer-player-play');
-            ipc.removeAllListeners('renderer-player-pause');
-            ipc.removeAllListeners('renderer-player-stop');
-        };
-    }, [isUsingMpv, isRadioActive, setIsPlaying, setCurrentStreamUrl, setStationName]);
+    }, [currentStreamUrl, isPlaying, isUsingMpv]);
 
     usePlayerEvents(
         {
+            onPlayerPlay: () => {
+                const radioState = useRadioStore.getState();
+                if (!radioState.currentStreamUrl) {
+                    return;
+                }
+
+                actions.clear();
+            },
             onPlayerStatus: (properties, prev) => {
                 const radioState = useRadioStore.getState();
                 if (!radioState.currentStreamUrl) {

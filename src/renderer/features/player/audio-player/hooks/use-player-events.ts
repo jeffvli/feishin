@@ -15,7 +15,13 @@ import {
     subscribePlayerVolume,
     subscribeQueueCleared,
 } from '/@/renderer/store';
-import { LibraryItem, QueueData, QueueSong, Song } from '/@/shared/types/domain-types';
+import {
+    FullLyricsMetadata,
+    LibraryItem,
+    QueueData,
+    QueueSong,
+    Song,
+} from '/@/shared/types/domain-types';
 import { PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/shared/types/types';
 
 interface PlayerEvents {
@@ -30,6 +36,11 @@ interface PlayerEventsCallbacks {
     onMediaNext?: (properties: { currentIndex: number; nextIndex: number }) => void;
     onMediaPrev?: (properties: { currentIndex: number; prevIndex: number }) => void;
     onNextSongInsertion?: (song: QueueSong | undefined) => void;
+    onPlayerLyricsFetched?: (properties: {
+        lyrics: FullLyricsMetadata;
+        offsetMs: number;
+        synced: boolean;
+    }) => void;
     onPlayerMute?: (properties: { muted: boolean }, prev: { muted: boolean }) => void;
     onPlayerPlay?: (properties: { id: string; index: number }) => void;
     onPlayerProgress?: (properties: { timestamp: number }, prev: { timestamp: number }) => void;

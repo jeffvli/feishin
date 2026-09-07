@@ -176,7 +176,7 @@
         "hotkey_playbackNext": "Další skladba",
         "useSystemTheme_description": "Následovat systémovou předvolbu světlého nebo tmavého motivu",
         "playButtonBehavior_optionAddNext": "$t(player.addNext)",
-        "lyricFetch_description": "Načtení textů z různých internetových zdrojů",
+        "lyricFetch_description": "Načtení textů od zvolených poskytovatelů",
         "lyricFetchProvider_description": "Vyberte poskytovatele textů",
         "globalMediaHotkeys_description": "Zapnout nebo vypnout použití vašich systémových zkratek médií pro ovládání přehrávače",
         "customFontPath": "Vlastní cesta k písmům",
@@ -258,11 +258,11 @@
         "trayEnabled": "Zobrazit v oznamovací oblasti",
         "trayEnabled_description": "Zobrazit/skrýt ikonu/nabídku v oznamovací oblasti. pokud je zakázáno, vypne také minimalizaci/ukončení do oznamovací oblasti",
         "translationApiProvider": "Poskytovatel api překladů",
-        "translationApiProvider_description": "Poskytovatel API pro překlady",
+        "translationApiProvider_description": "Zvolí poskytovatele API použitého pro překlady",
         "translationApiKey": "Klíč API překladů",
         "translationApiKey_description": "Klíč API pro překlady (pouze koncový bod globální služby)",
         "translationTargetLanguage": "Cílový jazyk překladu",
-        "translationTargetLanguage_description": "Cílový jazyk pro překlad",
+        "translationTargetLanguage_description": "Nastaví cílový jazyk použitý pro automatický překlad",
         "lastfmApiKey": "Klíč API {{lastfm}}",
         "lastfmApiKey_description": "Klíč API pro {{lastfm}}. Vyžadováno pro obaly alb",
         "discordServeImage": "Načítat obrázky {{discord}} ze serveru",
@@ -284,10 +284,10 @@
         "discordDisplayType_songname": "Název skladby",
         "discordDisplayType_artistname": "Jména umělců",
         "hotkey_navigateHome": "Přejít domů",
-        "preventSleepOnPlayback": "Zabránit uspání při přehrávání",
-        "preventSleepOnPlayback_description": "Zabránit uspání displeje během přehrávání hudby",
+        "preventSleepOnPlayback": "Zabránit uspání displeje při přehrávání",
+        "preventSleepOnPlayback_description": "Zabránit vypnutí displeje během přehrávání hudby",
         "discordLinkType": "Odkazy ve stavu na {{discord}}u",
-        "discordLinkType_description": "Přidá externí odkazy na {{lastfm}} nebo {{musicbrainz}} do polí skladby a umělce ve stavu na službě {{discord}}. {{musicbrainz}} je nejpřesnější, ale vyžaduje značky a neposkytuje odkazy na umělce, zatímco {{lastfm}} by mělo vždy poskytnout odkaz. neprovádí žádné další síťové požadavky",
+        "discordLinkType_description": "Přidá odkazy na {{lastfm}} nebo {{musicbrainz}} do stavu na službě {{discord}}. {{musicbrainz}} je nejpřesnější, ale vyžaduje značky a neposkytuje odkazy na umělce, zatímco {{lastfm}} by mělo vždy poskytnout odkaz. Neprovádí žádné další síťové požadavky",
         "discordLinkType_none": "$t(common.none)",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}} se zálohou na {{lastfm}}",
         "artistBackground": "Obrázek umělce na pozadí",
@@ -429,8 +429,8 @@
         "waveformLoadingDelay_description": "Zpoždění v sekundách před načtením vlnové křivky. zvyšte, pokud jste během používání webového přehrávače zaznamenali záseky.",
         "playerbarWaveformStretch": "Natáhnutí vlnové křivky",
         "playerbarWaveformStretch_description": "Natáhně vlnovou křivku tak, aby vyplnila dostupný prostor",
-        "preventSuspendOnPlayback_description": "Zabránit aplikaci v uspání během přehrávání hudby",
-        "preventSuspendOnPlayback": "Zabránit uspání při přehrávání",
+        "preventSuspendOnPlayback_description": "Zabránit systému v uspání během přehrávání hudby",
+        "preventSuspendOnPlayback": "Zabránit uspání systému při přehrávání",
         "hotkey_listShowPlayingSong": "Zobrazit přehrávanou skladbu v seznamu",
         "sidebarPlaylistFolders_description": "Vytvořit zobrazení složky pro seznamy skadeb, které zahrnují nastavený oddělovač v názvu",
         "sidebarPlaylistFolders": "Povolit složky",
@@ -458,7 +458,7 @@
         "autoDJ_songStrategy": "Režim výběru skladeb",
         "autoDJ_strategy_option_library_random": "Náhodně",
         "autoDJ_strategy_option_similar": "Podobné",
-        "enableFurigana_description": "Zobrazit návody na výslovnost (furigana) u japonských kandži textů.",
+        "enableFurigana_description": "Zobrazit návody na výslovnost (furigana) u japonských kandži textů",
         "enableFurigana": "Povolit generování furigana",
         "equalizer_descriptionMpv": "Parametrický ekvalizér skrze FFmpeg lavfi (MPV)",
         "equalizer_descriptionWebAudio": "Parametrický ekvalizér skrze Web Audio API",
@@ -494,7 +494,7 @@
         "compressorSavePreset_description": "Uložit aktuální nastavení kompresoru jako pojmenovanou předvolbu",
         "compressorThreshold_description": "Úroveň signálu, nad kterou začne komprese.",
         "compressorThreshold": "Hranice",
-        "enableRomaji_description": "Zobrazit rómadži výslovnost pod japonskými texty.",
+        "enableRomaji_description": "Zobrazit rómadži výslovnost pod japonskými texty",
         "enableRomaji": "Povolit generování rómadži",
         "windowBarTrackinfo_description": "Zobrazit v titulku okna umělce a název aktuální skladby, její pozici ve frontě a stav Přehrává se/Pozastaveno.",
         "windowBarTrackinfo": "Informace o skladbě v titulku okna",
@@ -511,7 +511,25 @@
         "showQueueInSidebar": "Zobrazit frontu přehrávání v postranním panelu přehrávače",
         "showQueueInSidebar_description": "Do postranního panelu přehrávače bude přidán panel zobrazující frontu přehrávání",
         "autoDJ_allowDuplicates_description": "Povolit automatickému DJ přidávat znovu skladby nebo alba, která již jsou ve frontě přehrávání",
-        "autoDJ_onlySimilar_description": "Přidávat pouze položky, které jsou podobné ke spuštěné skladbě. Počet položek je maximální počet položek k přidání, namísto vyplnění limitu jinými zdroji"
+        "autoDJ_onlySimilar_description": "Přidávat pouze položky, které jsou podobné ke spuštěné skladbě. Počet položek je maximální počet položek k přidání, namísto vyplnění limitu jinými zdroji",
+        "showFavorites": "Zobrazit oblíbené",
+        "showFavorites_description": "Ovládá, zda se tlačítko oblíbení (srdíčko) zobrazí v rozhraní",
+        "customThemeErrors_description": "Nepodařilo se načíst tyto soubory motivu.",
+        "customThemeErrors": "Chyby",
+        "customThemeWarnings_description": "Následující motivy byly načteny, ale některé hodnoty byly neplatné a byly ignorovány.",
+        "customThemeWarnings": "Varování",
+        "customThemes_description": "Přesuňte soubory motivu .json pro přidání vlastních motivů. Budou načteny automaticky kdykoli přidáte, upravíte nebo odstraníte soubor.",
+        "customThemes": "Vlastní motivy",
+        "confirmQueueChanges": "Potvrdit změny ve frontě",
+        "confirmQueueChanges_description": "Zeptat se na potvrzení před vymazáním aktuální fronty",
+        "shareExpiration_description": "Jak daleko do budoucnosti ve výchozím nastavení vyprší nové odkazy ke sdílení. Vymažte datum v dialogu sdílení pro použití výchozí hodnoty serveru",
+        "shareExpiration": "Výchozí vypršení sdílení",
+        "shareExpirationUseServerDefault": "Použít výchozí dobu vypršení serveru",
+        "shareExpirationUseServerDefault_description": "Při vytváření sdílených složek vynechte nastavení doby platnosti, aby server mohl použít nakonfigurovanou výchozí hodnotu (např. Navidrome DefaultShareExpiration)",
+        "fullscreenAutoOpenTimeout_description": "Automaticky otevře přehrávač na celou obrazovku po tomto počtu minut neaktivity během přehrávání skladby. Nastavte na 0 pro zakázání",
+        "fullscreenAutoOpenTimeout": "Čas do automatického otevření přehrávače na celou obrazovku (minuty)",
+        "sidebarImageEnabled": "Tlačítko rozbalení obalu alba",
+        "sidebarImageEnabled_description": "Zobrazit tlačítko na obalu alba na liště přehrávače pro jeho rozbalení do postranní lišty. Zakázáním také skryjete tlačítko a sbalíte obal alba, pokud je aktuálně rozbalen"
     },
     "action": {
         "editPlaylist": "Upravit $t(entity.playlist, {\"count\": 1})",
@@ -778,7 +796,9 @@
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "Skladatel",
                 "titleArtist": "$t(common.title) (umělec)",
-                "albumGroup": "Skupina alb"
+                "albumGroup": "Skupina alb",
+                "date": "Datum",
+                "releaseYear": "Rok vydání"
             }
         },
         "column": {
@@ -788,7 +808,7 @@
             "favorite": "Oblíbené",
             "playCount": "Přehrání",
             "albumCount": "Alba",
-            "releaseYear": "Rok",
+            "releaseYear": "Rok vydání",
             "lastPlayed": "Naposledy přehráno",
             "biography": "Biografie",
             "releaseDate": "Datum vydání",
@@ -808,7 +828,9 @@
             "codec": "Kodek",
             "owner": "Majitel",
             "bitDepth": "Bitová hloubka",
-            "sampleRate": "Vzorkovací frekvence"
+            "sampleRate": "Vzorkovací frekvence",
+            "date": "Datum",
+            "year": "Rok"
         }
     },
     "error": {
@@ -891,7 +913,9 @@
         "explicitStatus": "$t(common.explicitStatus)",
         "sortName": "Název v řazení",
         "matchAnd": "A",
-        "matchOr": "Nebo"
+        "matchOr": "Nebo",
+        "date": "Datum",
+        "year": "Rok"
     },
     "page": {
         "sidebar": {
@@ -933,7 +957,27 @@
                 "lyricFollowScrollAlignment": "Zarovnání sledování textů",
                 "lyricLineLeadTime": "Doba vedení řádku (ms)",
                 "lyricPaddingLeft": "Odsazení textů zleva (%)",
-                "lyricPaddingRight": "Odsazení textů zprava (%)"
+                "lyricPaddingRight": "Odsazení textů zprava (%)",
+                "followCurrentLyric_description": "Automaticky posouvat pro udržení aktivního řádku textu v zobrazení",
+                "lyricFollowScrollAlignment_description": "Vertikální umístění aktivního řádku při následování",
+                "lyricAlignment_description": "Horizontální zarovnání textu",
+                "lyricGapSynchronized_description": "Vertikální rozestup mezi synchronizovanými řádky textu písně",
+                "lyricGapUnsynchronized_description": "Vertikální rozestup mezi nesynchronizovanými řádky textu písně",
+                "lyricLineLeadTime_description": "Posunout aktivní řádek o tento počet milisekund před jeho časové razítko",
+                "lyricPaddingLeft_description": "Vzdálenost od levého okraje jako procento plochy pro text písně",
+                "lyricPaddingRight_description": "Vzdálenost od pravého okraje jako procento plochy pro text písně",
+                "lyricSizeSynchronized_description": "Velikost písma pro synchronizované (časované) texty písní",
+                "lyricSizeUnsynchronized_description": "Velikost písma pro nesynchronizované (obyčejné) texty písní",
+                "lyricOpacityNonActive_description": "Neprůhlednost řákdů textu, které nejsou právě aktivní",
+                "lyricScaleNonActive_description": "Rozsah řádků textu, které nejsou v současné době aktivní",
+                "showLyricMatch_description": "Zobrazit název skladby a interpreta u odpovídajících textů",
+                "showLyricProvider_description": "Zobrazit poskytovatele aktuálních textů",
+                "coverArtSize": "Velikost obalu",
+                "playerItemAlignment": "Zarovnání položky přehrávače",
+                "titleDisplayType": "Styl zobrazení názvu",
+                "titleDisplayType_optionMultiLine": "Několik řádků",
+                "titleDisplayType_optionScroll": "Posouvání",
+                "titleLineCount": "Počet řádků názvu"
             },
             "upNext": "Další",
             "lyrics": "Texty",
@@ -962,7 +1006,8 @@
             "noMusicFolder": "Není vybrána žádná složka s hudbou",
             "multipleMusicFolders": "Vybráno {{count}} složek s hudbou",
             "commandPalette": "Otevřít paletu příkazů",
-            "logout": "Odhlásit se"
+            "logout": "Odhlásit se",
+            "rescanLibrary": "Skenovat knihovnu"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -1030,7 +1075,9 @@
             "discord": "Discord",
             "playerFilters": "Filtry přehrávače",
             "logger": "Protokol",
-            "lyricsDisplay": "Zobrazení textů"
+            "lyricsDisplay": "Zobrazení textů",
+            "lyricsTranslation": "Překlad textů",
+            "sharing": "Sdílení"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
@@ -1210,7 +1257,9 @@
             "setExpiration": "Nastavit vypršení",
             "createFailed": "Nepodařilo se vytvořit sdílení (je sdílení povoleno?)",
             "copyToClipboard": "Zkopírovat do schránky: Ctrl+C, enter",
-            "successMustClick": "Sdílení úspěšně vytvořeno. klikněte sem pro otevření"
+            "successMustClick": "Sdílení úspěšně vytvořeno. klikněte sem pro otevření",
+            "setExpiration_description": "Ponechte prázdné pro použití výchozího vypršení serveru",
+            "setExpiration_serverDefault": "Podle serveru"
         },
         "privateMode": {
             "enabled": "Soukromý režim povolen, stav přehrávání je nyní skryt před externími integracemi",
@@ -1257,6 +1306,10 @@
         },
         "createPrefilledPlaylist": {
             "title": "Vytvořit $t(entity.playlist, {\"count\": 1}) z vybraných skladeb"
+        },
+        "queueChangeConfirmation": {
+            "title": "Vymazat aktuální frontu?",
+            "description": "Toto odstraní všechny položky z aktuální fronty."
         }
     },
     "entity": {
@@ -1275,15 +1328,15 @@
         "folderWithCount_one": "{{count}} složka",
         "folderWithCount_few": "{{count}} složky",
         "folderWithCount_other": "{{count}} složek",
-        "albumArtist_one": "Umělec alba",
-        "albumArtist_few": "Umělci alb",
-        "albumArtist_other": "Umělci alb",
+        "albumArtist_one": "Interpret alba",
+        "albumArtist_few": "Interpreti alb",
+        "albumArtist_other": "Interpreti alb",
         "track_one": "Skladba",
         "track_few": "Skladby",
         "track_other": "Skladby",
-        "albumArtistCount_one": "{{count}} umělec alba",
-        "albumArtistCount_few": "{{count}} umělci alba",
-        "albumArtistCount_other": "{{count}} umělců alba",
+        "albumArtistCount_one": "{{count}} interpret alba",
+        "albumArtistCount_few": "{{count}} interpreti alba",
+        "albumArtistCount_other": "{{count}} interpretů alba",
         "albumWithCount_one": "{{count}} album",
         "albumWithCount_few": "{{count}} alba",
         "albumWithCount_other": "{{count}} alb",
@@ -1378,7 +1431,14 @@
         "minuteShort": "min.",
         "secondShort": "s",
         "hourShort": "h.",
-        "dayShort": "d."
+        "dayShort": "d.",
+        "secondLong": "Sekunda",
+        "minuteLong": "Minuta",
+        "hourLong": "Hodina",
+        "dayLong": "Den",
+        "weekLong": "Týden",
+        "monthLong": "Měsíc",
+        "yearLong": "Rok"
     },
     "visualizer": {
         "visualizerType": "Typ vizualizéru",

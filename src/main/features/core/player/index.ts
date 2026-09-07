@@ -10,7 +10,6 @@ import log from '../../../logger';
 import { store } from '../settings';
 
 import { isMacOS, isWindows } from '/@/main/env';
-import { MPV_VOLUME_MAX_CEILING } from '/@/shared/constants/volume';
 import { PlayerData } from '/@/shared/types/domain-types';
 
 declare module 'node-mpv';
@@ -24,8 +23,27 @@ declare module 'node-mpv';
 // }
 
 let mpvInstance: MpvAPI | null = null;
+// Set while a create is in flight. `mpvInstance` is null across that await, so callers that
+// only check it would otherwise conclude mpv is absent and spawn a throwaway instance
+// alongside the one being started.
+let mpvCreatePromise: null | Promise<MpvAPI> = null;
 let currentPlayerData: null | PlayerData = null;
 const socketPath = isWindows() ? `\\\\.\\pipe\\mpvserver-${pid}` : `/tmp/node-mpv-${pid}.sock`;
+
+// While quitting/restarting mpv, playlist-pos goes to -1 and node-mpv emits stopped/paused/
+// resumed. Those look identical to a real track end and must not reach the renderer — otherwise
+// handleTrackEnded runs mediaAutoNext while status is STOPPED and flips the UI back to Playing
+// on the next queue item (e.g. MPV reload after mediaStop).
+let suppressRendererPlaybackEvents = false;
+// Bumped on quit so late events from a dying instance are ignored after a new one starts.
+let playbackEventGeneration = 0;
+
+const sendRendererPlaybackEvent = (channel: string, ...args: unknown[]) => {
+    if (suppressRendererPlaybackEvents) {
+        return;
+    }
+    getMainWindow()?.webContents.send(channel, ...args);
+};
 
 const NodeMpvErrorCode = {
     0: 'Unable to load file or stream',
@@ -168,6 +186,16 @@ const createMpv = async (data: {
     }
 
     let previousPlaylistPos: number | undefined;
+    const eventGeneration = playbackEventGeneration;
+
+    suppressRendererPlaybackEvents = false;
+
+    const sendIfCurrent = (channel: string, ...args: unknown[]) => {
+        if (eventGeneration !== playbackEventGeneration) {
+            return;
+        }
+        sendRendererPlaybackEvent(channel, ...args);
+    };
 
     mpv.on('status', (status) => {
         if (status.property === 'playlist-pos') {
@@ -176,7 +204,7 @@ const createMpv = async (data: {
             // mpv uses playlist-pos = -1 when nothing is playing (ended, cleared, load failure, etc).
             if (currentPos === -1) {
                 if (previousPlaylistPos === 0) {
-                    getMainWindow()?.webContents.send('renderer-player-track-ended');
+                    sendIfCurrent('renderer-player-track-ended');
                 }
                 mpv?.pause();
                 previousPlaylistPos = currentPos;
@@ -186,7 +214,7 @@ const createMpv = async (data: {
             // In our 2-item queue model, playlist-pos should normally be 0.
             // When mpv auto-advances to the next track it becomes > 0 (typically 1).
             if (typeof currentPos === 'number' && currentPos > 0) {
-                getMainWindow()?.webContents.send('renderer-player-auto-next');
+                sendIfCurrent('renderer-player-auto-next');
             }
 
             previousPlaylistPos = currentPos;
@@ -195,21 +223,24 @@ const createMpv = async (data: {
 
     // Automatically updates the play button when the player is playing
     mpv.on('resumed', () => {
-        getMainWindow()?.webContents.send('renderer-player-play');
+        sendIfCurrent('renderer-player-play');
     });
 
     // Automatically updates the play button when the player is stopped
     mpv.on('stopped', () => {
-        getMainWindow()?.webContents.send('renderer-player-stop');
+        sendIfCurrent('renderer-player-stop');
     });
 
     // Automatically updates the play button when the player is paused
     mpv.on('paused', () => {
-        getMainWindow()?.webContents.send('renderer-player-pause');
+        sendIfCurrent('renderer-player-pause');
     });
 
     // Event output every interval set by time_update, used to update the current time
     mpv.on('timeposition', (time: number) => {
+        if (eventGeneration !== playbackEventGeneration) {
+            return;
+        }
         getMainWindow()?.webContents.send('renderer-player-current-time', time);
     });
 
@@ -236,6 +267,8 @@ const killMpvProcess = (mpv: MpvAPI) => {
 const quit = async (instance?: MpvAPI | null) => {
     const mpv = instance || getMpvInstance();
     if (mpv) {
+        suppressRendererPlaybackEvents = true;
+        playbackEventGeneration += 1;
         try {
             // mpv.quit() resolves only when mpv replies over IPC. If mpv's command queue
             // is wedged (e.g. blocked on a dead network stream after the system resumes
@@ -303,6 +336,8 @@ ipcMain.handle(
             });
 
             // Clean up previous mpv instance
+            suppressRendererPlaybackEvents = true;
+            playbackEventGeneration += 1;
             getMpvInstance()?.stop();
             getMpvInstance()
                 ?.quit()
@@ -311,7 +346,12 @@ ipcMain.handle(
                 });
             mpvInstance = null;
 
-            mpvInstance = await createMpv(data);
+            mpvCreatePromise = createMpv(data);
+            try {
+                mpvInstance = await mpvCreatePromise;
+            } finally {
+                mpvCreatePromise = null;
+            }
             mpvLog({ action: 'Restarted mpv', toast: 'success' });
             setAudioPlayerFallback(false);
         } catch (err: any | NodeMpvError) {
@@ -329,7 +369,12 @@ ipcMain.handle(
                 action: `Attempting to initialize mpv with parameters: ${JSON.stringify(data)}`,
                 level: 'debug',
             });
-            mpvInstance = await createMpv(data);
+            mpvCreatePromise = createMpv(data);
+            try {
+                mpvInstance = await mpvCreatePromise;
+            } finally {
+                mpvCreatePromise = null;
+            }
             setAudioPlayerFallback(false);
         } catch (err: any | NodeMpvError) {
             mpvLog({ action: 'Failed to initialize mpv, falling back to web player' }, err);
@@ -339,6 +384,9 @@ ipcMain.handle(
 );
 
 ipcMain.on('player-quit', async () => {
+    // stop() also drives playlist-pos to -1; suppress before that so reload does not look like a track end.
+    suppressRendererPlaybackEvents = true;
+    playbackEventGeneration += 1;
     try {
         await getMpvInstance()?.stop();
         await quit();
@@ -441,6 +489,13 @@ ipcMain.on('player-set-queue', async (_event, current?: string, next?: string, p
         }
     }
 
+    // When pause is requested (e.g. preload after reload while UI is STOPPED/PAUSED), mpv still
+    // briefly resumes on load. Suppress those events so they do not overwrite renderer status.
+    const shouldSuppressLoadEvents = pause === true;
+    if (shouldSuppressLoadEvents) {
+        suppressRendererPlaybackEvents = true;
+    }
+
     try {
         if (current) {
             try {
@@ -463,6 +518,10 @@ ipcMain.on('player-set-queue', async (_event, current?: string, next?: string, p
         }
     } catch (err: any | NodeMpvError) {
         mpvLog({ action: `Failed to set play queue` }, err);
+    } finally {
+        if (shouldSuppressLoadEvents) {
+            suppressRendererPlaybackEvents = false;
+        }
     }
 });
 
@@ -504,12 +563,10 @@ ipcMain.on('player-auto-next', async (_event, url?: string) => {
     }
 });
 
-// Sets the volume to the given value. mpv clamps to its effective --volume-max,
-// so the upper bound here is just a sanity guard; mpv itself is the final
-// authority on how loud it will actually go.
+// Sets the volume to the given value (0-100)
 ipcMain.on('player-volume', async (_event, value: number) => {
     try {
-        if (value == null || Number.isNaN(value) || value < 0 || value > MPV_VOLUME_MAX_CEILING) {
+        if (!value || value < 0 || value > 100) {
             return;
         }
 
@@ -638,6 +695,15 @@ ipcMain.handle(
     'player-get-audio-devices',
     async (): Promise<{ label: string; value: string }[]> => {
         try {
+            // Wait out an in-flight startup so the real instance is reused instead of racing it.
+            if (mpvCreatePromise) {
+                try {
+                    await mpvCreatePromise;
+                } catch {
+                    // Startup failed; fall through to the temporary-instance path below.
+                }
+            }
+
             const instance = getMpvInstance();
             let tempInstance: MpvAPI | null = null;
             let mpvToUse: MpvAPI | null = null;
@@ -734,10 +800,8 @@ const cleanupMpv = async (force = false) => {
 // the renderer to reload mpv so it reconnects with a fresh stream instead of staying
 // stuck on the old, now-dead connection until the app is manually restarted.
 powerMonitor.on('resume', () => {
-    if (getMpvInstance()) {
-        mpvLog({ action: 'System resumed from sleep, reloading mpv' });
-        getMainWindow()?.webContents.send('renderer-mpv-reconnect');
-    }
+    mpvLog({ action: 'System resumed from sleep, notifying renderer to reconnect mpv' });
+    getMainWindow()?.webContents.send('renderer-mpv-reconnect');
 });
 
 app.on('before-quit', async (event) => {

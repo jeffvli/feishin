@@ -1,0 +1,14 @@
+/* Touch-app hardening for the remote control web view — not scoped to a CSS
+   module since it needs broad, unscoped selectors (shared/text.module.css's
+   Text component defaults to `user-select: auto`, which the specificity of
+   plain CSS-module classes can't reliably out-cascade). */
+
+html,
+body {
+    touch-action: manipulation;
+}
+
+#root :not(input, textarea) {
+    -webkit-touch-callout: none;
+    user-select: none;
+}

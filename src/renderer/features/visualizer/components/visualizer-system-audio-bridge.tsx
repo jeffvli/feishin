@@ -133,22 +133,16 @@ function VisualizerSystemAudioBridge() {
         setSessionAllowCapture(false);
     }, [persistConsent]);
 
-    const handleCaptureDenied = useCallback(() => {
-        persistConsent(false);
-        setPromptState({ consent: false });
-        setSessionAllowCapture(false);
-        closeLocalVisualizerSurfaces();
-    }, [persistConsent]);
-
     useVisualizerSystemAudio({
-        onSystemAudioCaptureDenied: handleCaptureDenied,
         onSystemAudioCaptureSuccess: handleCaptureSuccess,
         shouldAttemptConnection,
     });
 
     const handleAllow = useCallback(() => {
+        persistConsent(true);
+        setPromptState({ consent: true });
         setSessionAllowCapture(true);
-    }, []);
+    }, [persistConsent]);
 
     const handleDecline = useCallback(() => {
         persistConsent(false);

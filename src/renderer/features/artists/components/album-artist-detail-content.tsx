@@ -52,6 +52,8 @@ import {
     useCurrentServer,
     useCurrentServerId,
     usePlayerSong,
+    useShowFavorites,
+    useShowRatings,
 } from '/@/renderer/store';
 import {
     useArtistItems,
@@ -605,6 +607,12 @@ const AlbumArtistMetadataFavoriteSongs = ({
     const { t } = useTranslation();
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 300);
+    const [favoriteSongsQueryType, setFavoriteSongsQueryType] = useLocalStorage<
+        'favorite' | 'rating'
+    >({
+        defaultValue: 'favorite',
+        key: 'album-artist-favorite-songs-query-type',
+    });
     const albumArtistDetailFavoriteSongsSort = useAppStore(
         (state) => state.albumArtistDetailFavoriteSongsSort,
     );
@@ -617,11 +625,24 @@ const AlbumArtistMetadataFavoriteSongs = ({
     const currentSong = usePlayerSong();
     const player = usePlayer();
     const serverId = useCurrentServerId();
+    const server = useCurrentServer();
+    const showRatings = useShowRatings();
+    const showFavorites = useShowFavorites();
+    const showFavoriteAndRatingSegmentControl =
+        server?.type !== ServerType.JELLYFIN && showFavorites && showRatings;
+
+    let favoriteSongsQueryTypeFilter = favoriteSongsQueryType;
+    if (showRatings && !showFavorites) {
+        favoriteSongsQueryTypeFilter = 'rating';
+    } else if (!showRatings && showFavorites) {
+        favoriteSongsQueryTypeFilter = 'favorite';
+    }
 
     const favoriteSongsQuery = useQuery({
         ...artistsQueries.favoriteSongs({
             query: {
                 artistId: routeId,
+                type: favoriteSongsQueryTypeFilter,
             },
             serverId: serverId,
         }),
@@ -795,6 +816,27 @@ const AlbumArtistMetadataFavoriteSongs = ({
                                     }}
                                     value={searchTerm}
                                 />
+                                {showFavoriteAndRatingSegmentControl && (
+                                    <SegmentedControl
+                                        data={[
+                                            {
+                                                label: t('common.favorite'),
+                                                value: 'favorite',
+                                            },
+                                            {
+                                                label: t('common.rating'),
+                                                value: 'rating',
+                                            },
+                                        ]}
+                                        onChange={(value) =>
+                                            setFavoriteSongsQueryType(
+                                                value as 'favorite' | 'rating',
+                                            )
+                                        }
+                                        size="xs"
+                                        value={favoriteSongsQueryType}
+                                    />
+                                )}
                                 <ListSortByDropdownControlled
                                     filters={CLIENT_SIDE_SONG_FILTERS}
                                     itemType={LibraryItem.SONG}

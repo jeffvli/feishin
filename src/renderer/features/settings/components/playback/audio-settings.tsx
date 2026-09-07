@@ -3,14 +3,22 @@ import isElectron from 'is-electron';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { eventEmitter } from '/@/renderer/events/event-emitter';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { useCurrentServer, usePlaybackType, usePlayerStatus } from '/@/renderer/store';
-import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+import { useCurrentServer, useMpvInitialized, usePlayerStatus } from '/@/renderer/store';
+import {
+    usePlaybackSettings,
+    usePlaybackType,
+    useSettingsStoreActions,
+} from '/@/renderer/store/settings.store';
 import { logger } from '/@/renderer/utils/logger';
 import { hasFeature } from '/@/shared/api/utils';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Group } from '/@/shared/components/group/group';
 import { Select } from '/@/shared/components/select/select';
 import { Switch } from '/@/shared/components/switch/switch';
 import { toast } from '/@/shared/components/toast/toast';
@@ -50,6 +58,7 @@ export const getDefaultAudioDevice = (
 
 export const useAudioDevices = (playbackType: PlayerType) => {
     const [audioDevices, setAudioDevices] = useState<AudioDeviceOption[]>([]);
+    const mpvInitialized = useMpvInitialized();
 
     useEffect(() => {
         const fetchAudioDevices = async () => {
@@ -73,7 +82,7 @@ export const useAudioDevices = (playbackType: PlayerType) => {
                             message: t('error.audioDeviceFetchError'),
                         }),
                     );
-            } else if (playbackType === PlayerType.LOCAL && mpvPlayer) {
+            } else if (playbackType === PlayerType.LOCAL && mpvPlayer && mpvInitialized) {
                 try {
                     const devices = await getMpvAudioDevices();
                     const uniqueDevices = devices.filter(
@@ -89,7 +98,7 @@ export const useAudioDevices = (playbackType: PlayerType) => {
         };
 
         fetchAudioDevices();
-    }, [playbackType]);
+    }, [mpvInitialized, playbackType]);
 
     return audioDevices;
 };
@@ -100,10 +109,12 @@ export const AudioSettings = memo(() => {
     const { setSettings } = useSettingsStoreActions();
     const status = usePlayerStatus();
     const playbackType = usePlaybackType();
+    const { mediaStop } = usePlayer();
 
     // Cleaned up server feature logic via requested hooks/utilities
     const currentServer = useCurrentServer();
     const isJukeboxSupported = hasFeature(currentServer, ServerFeature.JUKEBOX);
+    const showRefreshButton = settings.type === PlayerType.LOCAL;
 
     const audioDevices = useAudioDevices(playbackType);
     const audioDeviceId =
@@ -124,28 +135,36 @@ export const AudioSettings = memo(() => {
         selectData.push({ label: 'Jukebox', value: PlayerType.JUKEBOX });
     }
 
+    if (isCasting) {
+        selectData.push({ disabled: true, label: 'DLNA', value: PlayerType.DLNA });
+    }
+
     const audioOptions: SettingOption[] = [
         {
             control: (
-                <Select
-                    data={[
-                        {
-                            disabled: !isElectron(),
-                            label: 'MPV',
-                            value: PlayerType.LOCAL,
-                        },
-                        { label: 'Web', value: PlayerType.WEB },
-                        ...(isCasting
-                            ? [{ disabled: true, label: 'DLNA', value: PlayerType.DLNA }]
-                            : []),
-                    ]}
-                    defaultValue={settings.type}
-                    disabled={status === PlayerStatus.PLAYING || isCasting}
-                    onChange={(e) => {
-                        setSettings({ playback: { type: e as PlayerType } });
-                        ipc?.send('settings-set', { property: 'playbackType', value: e });
-                    }}
-                />
+                <Group gap="xs" wrap="nowrap">
+                    <Select
+                        data={selectData}
+                        defaultValue={settings.type}
+                        disabled={status === PlayerStatus.PLAYING || isCasting}
+                        onChange={(e) => {
+                            setSettings({ playback: { type: e as PlayerType } });
+                            ipc?.send('settings-set', { property: 'playbackType', value: e });
+                        }}
+                    />
+                    {showRefreshButton && (
+                        <ActionIcon
+                            icon="refresh"
+                            iconProps={{ size: 'md' }}
+                            onClick={() => {
+                                mediaStop();
+                                eventEmitter.emit('MPV_RELOAD', {});
+                            }}
+                            tooltip={{ label: t('common.reload') }}
+                            variant="transparent"
+                        />
+                    )}
+                </Group>
             ),
             description: t('setting.audioPlayer', { context: 'description' }),
             isHidden: !isElectron() && !isJukeboxSupported,

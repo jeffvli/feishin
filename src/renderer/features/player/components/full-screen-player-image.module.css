@@ -3,7 +3,7 @@
     max-width: 100%;
     height: 100%;
     border-radius: 5px;
-    filter: drop-shadow(0 0 5px rgb(0 0 0 / 40%)) drop-shadow(0 0 5px rgb(0 0 0 / 40%));
+    filter: drop-shadow(rgb(0 0 0 / 35%) 0 5px 15px);
 }
 
 .censored.image {
@@ -16,15 +16,16 @@
     align-items: flex-end;
     justify-content: center;
     max-width: 100%;
-    height: 65%;
+    height: 100%;
     aspect-ratio: 1/1;
-    margin-bottom: 1rem;
 }
 
 .metadata-container {
     display: flex;
     justify-content: center;
-    padding: 1rem;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 0.5rem;
     text-align: center;
     cursor: default;
     border-radius: 5px;
@@ -42,11 +43,6 @@
     @media screen and (height < 640px) {
         .full-screen-player-image-metadata {
             display: none;
-            height: 100%;
-            margin-bottom: 0;
-        }
-
-        .image-container {
             height: 100%;
             margin-bottom: 0;
         }

@@ -2,13 +2,13 @@ import isElectron from 'is-electron';
 import React, { useEffect, useMemo } from 'react';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { lyricsMetadataToLrc } from '/@/renderer/features/lyrics/components/lyrics-export-form';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
-import { clampVolume } from '/@/renderer/features/player/audio-player/utils/volume';
 import {
     useIsRadioActive,
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
-import { usePlayerSong, usePlayerStore, useSettingsStore } from '/@/renderer/store';
+import { usePlayerSong, usePlayerStore } from '/@/renderer/store';
 import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
 import { PlayerShuffle, ServerType } from '/@/shared/types/types';
 
@@ -20,7 +20,7 @@ export const useMPRIS = () => {
     const player = usePlayerStore();
     const currentSong = usePlayerSong();
     const isRadioActive = useIsRadioActive();
-    const { isPlaying: isRadioPlaying, metadata: radioMetadata, stationName } = useRadioPlayer();
+    const { metadata: radioMetadata, stationName } = useRadioPlayer();
 
     const imageUrl = useItemImageUrl({
         id: currentSong?.imageId || undefined,
@@ -30,7 +30,7 @@ export const useMPRIS = () => {
     });
 
     const radioSong = useMemo((): QueueSong | undefined => {
-        if (!isRadioActive || !isRadioPlaying) {
+        if (!isRadioActive) {
             return undefined;
         }
 
@@ -81,6 +81,7 @@ export const useMPRIS = () => {
             compilation: null,
             container: null,
             createdAt: '',
+            date: null,
             discNumber: 0,
             discSubtitle: null,
             duration: 0,
@@ -92,6 +93,7 @@ export const useMPRIS = () => {
             imageUrl: null,
             lastPlayedAt: null,
             lyrics: null,
+            mbzAlbumId: null,
             mbzRecordingId: null,
             mbzTrackId: null,
             name: title,
@@ -110,8 +112,9 @@ export const useMPRIS = () => {
             updatedAt: new Date().toISOString(),
             userFavorite: false,
             userRating: null,
+            year: null,
         };
-    }, [isRadioActive, isRadioPlaying, radioMetadata, stationName]);
+    }, [isRadioActive, radioMetadata, stationName]);
 
     useEffect(() => {
         if (!mpris) {
@@ -135,8 +138,7 @@ export const useMPRIS = () => {
         });
 
         mpris?.requestVolume((data: { volume: number }) => {
-            const { mpvExtraParameters, type } = useSettingsStore.getState().playback;
-            player.setVolume(clampVolume(data.volume, type, mpvExtraParameters));
+            player.setVolume(data.volume);
         });
 
         return () => {
@@ -154,17 +156,30 @@ export const useMPRIS = () => {
             return;
         }
 
-        // Use radio song if radio is active and playing, otherwise use current song
-        const songToUpdate = isRadioActive && isRadioPlaying ? radioSong : currentSong;
-        const imageUrlToUpdate = isRadioActive && isRadioPlaying ? null : imageUrl;
+        // Use radio song while a station is loaded (playing or paused)
+        const songToUpdate = isRadioActive ? radioSong : currentSong;
+        const imageUrlToUpdate = isRadioActive ? null : imageUrl;
 
         mpris?.updateSong(songToUpdate, imageUrlToUpdate);
-    }, [currentSong, imageUrl, isRadioActive, isRadioPlaying, radioSong]);
+    }, [currentSong, imageUrl, isRadioActive, radioSong]);
 
     usePlayerEvents(
         {
             onCurrentSongChange: () => {
                 // The effect above will handle the update when currentSong changes
+            },
+            onPlayerLyricsFetched: (properties) => {
+                if (!mpris) {
+                    return;
+                }
+
+                const formattedLyrics = lyricsMetadataToLrc(
+                    properties.lyrics,
+                    properties.offsetMs,
+                    properties.synced,
+                );
+
+                mpris?.updateLyrics(formattedLyrics);
             },
             onPlayerProgress: (properties) => {
                 if (!mpris) {

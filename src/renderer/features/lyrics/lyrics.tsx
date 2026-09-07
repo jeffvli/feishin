@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import styles from './lyrics.module.css';
 
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { eventEmitter } from '/@/renderer/events/event-emitter';
+import { PlayerLyricsFetchedEventPayload } from '/@/renderer/events/events';
 import { translateLyrics } from '/@/renderer/features/lyrics/api/lyric-translate';
 import {
     computeSelectedFromResult,
@@ -128,6 +130,24 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
             currentSong,
         ),
     );
+
+    useEffect(() => {
+        const handlePlayerLyricsFetched = (payload: PlayerLyricsFetchedEventPayload) => {
+            eventEmitter.emit('PLAYER_LYRICS_FETCHED', payload);
+        };
+
+        if (data && data.selected) {
+            handlePlayerLyricsFetched({
+                lyrics: data.selected,
+                offsetMs: data.selectedOffsetMs,
+                synced: data.selectedSynced,
+            });
+        }
+
+        return () => {
+            eventEmitter.off('PLAYER_LYRICS_FETCHED', handlePlayerLyricsFetched);
+        };
+    }, [data]);
 
     const indexToUse = data?.selectedStructuredIndex ?? index;
     useEffect(() => {

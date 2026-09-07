@@ -158,6 +158,16 @@ const subsonicReleaseFields = (item: {
 
     return { releaseDate: null, releaseYear: null };
 };
+const subsonicTrackYearField = (item: {
+    year?: number;
+}): { date: null | string; year: null | number } => {
+    const y = coerceYear(item.year);
+    if (y > 0) {
+        return { date: String(y), year: y };
+    }
+
+    return { date: null, year: null };
+};
 
 const normalizeSong = (
     item: z.infer<typeof ssType._response.song>,
@@ -173,6 +183,7 @@ const normalizeSong = (
             : item.artist || '';
 
     const { releaseDate, releaseYear } = subsonicReleaseFields(item);
+    const { date, year } = subsonicTrackYearField(item);
 
     return {
         _itemType: LibraryItem.SONG,
@@ -192,6 +203,7 @@ const normalizeSong = (
         compilation: null,
         container: item.contentType.startsWith('audio/') ? item.contentType.split('/')[1] : null,
         createdAt: item.created,
+        date,
         discNumber: item.discNumber || 1,
         discSubtitle: discTitleMap?.get(item.discNumber ?? 1) ?? null,
         duration: item.duration ? item.duration * 1000 : 0,
@@ -214,6 +226,7 @@ const normalizeSong = (
         imageUrl: null,
         lastPlayedAt: null,
         lyrics: null,
+        mbzAlbumId: null,
         mbzRecordingId: item.musicBrainzId || null,
         mbzTrackId: null,
         name: item.title,
@@ -239,20 +252,21 @@ const normalizeSong = (
         updatedAt: '',
         userFavorite: Boolean(item.starred) || false,
         userRating: item.userRating || null,
+        year,
     };
 };
 
 const normalizeAlbumArtist = (
     item:
         | (z.infer<typeof ssType._response.albumArtist> & {
-              similarArtists?: z.infer<
-                  typeof ssType._response.artistInfo
-              >['artistInfo']['similarArtist'];
+              similarArtists?: NonNullable<
+                  z.infer<typeof ssType._response.artistInfo2>['artistInfo2']
+              >['similarArtist'];
           })
         | (z.infer<typeof ssType._response.artistListEntry> & {
-              similarArtists?: z.infer<
-                  typeof ssType._response.artistInfo
-              >['artistInfo']['similarArtist'];
+              similarArtists?: NonNullable<
+                  z.infer<typeof ssType._response.artistInfo2>['artistInfo2']
+              >['similarArtist'];
           }),
     server?: null | ServerListItemWithCredential,
 ): AlbumArtist => {
@@ -273,8 +287,8 @@ const normalizeAlbumArtist = (
         playCount: null,
         similarArtists:
             item.similarArtists?.map((artist) => ({
-                id: artist.id,
-                imageId: artist.coverArt ?? artist.id,
+                id: String(artist.id),
+                imageId: artist.coverArt ?? String(artist.id),
                 imageUrl: null,
                 name: artist.name,
                 userFavorite: Boolean(artist.starred) || false,
@@ -353,6 +367,7 @@ const normalizeAlbum = (
             ) || [],
         sortName: item.title,
         tags: null,
+        trackYearRange: null,
         updatedAt: item.created,
         userFavorite: Boolean(item.starred) || false,
         userRating: item.userRating || null,
@@ -366,6 +381,8 @@ const normalizePlaylist = (
         | z.infer<typeof ssType._response.playlistListEntry>,
     server?: null | ServerListItemWithCredential,
 ): Playlist => {
+    const coverArt = item.coverArt?.toString() || null;
+
     return {
         _itemType: LibraryItem.PLAYLIST,
         _serverId: server?.id || 'unknown',
@@ -374,7 +391,9 @@ const normalizePlaylist = (
         duration: item.duration * 1000,
         genres: [],
         id: item.id.toString(),
-        imageId: item.coverArt?.toString() || null,
+        // Bust the browser image cache when the playlist changes, since the
+        // server may regenerate its auto-generated cover.
+        imageId: coverArt && item.changed ? `${coverArt}&_=${item.changed}` : coverArt,
         imageUrl: null,
         name: item.name,
         owner: item.owner,

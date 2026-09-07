@@ -226,7 +226,8 @@
             "noMusicFolder": "未選取任何媒體庫",
             "multipleMusicFolders": "已選取 {{count}} 個媒體庫",
             "commandPalette": "開啟命令面板",
-            "logout": "登出"
+            "logout": "登出",
+            "rescanLibrary": "重新掃描媒體庫"
         },
         "fullscreenPlayer": {
             "config": {
@@ -249,7 +250,27 @@
                 "lyricFollowScrollAlignment": "歌詞跟隨滾動對齊",
                 "lyricLineLeadTime": "歌詞提前顯示時間 (ms)",
                 "lyricPaddingLeft": "歌詞左側邊距 (%)",
-                "lyricPaddingRight": "歌詞右側邊距 (%)"
+                "lyricPaddingRight": "歌詞右側邊距 (%)",
+                "followCurrentLyric_description": "自動捲動以保持目前歌詞於畫面中",
+                "lyricFollowScrollAlignment_description": "跟隨歌詞時，目前歌詞的垂直顯示位置",
+                "lyricAlignment_description": "歌詞文字的水平對齊方式",
+                "lyricGapSynchronized_description": "動態歌詞的行距",
+                "lyricGapUnsynchronized_description": "靜態歌詞的行距",
+                "lyricLineLeadTime_description": "提前指定毫秒數顯示目前歌詞",
+                "lyricPaddingLeft_description": "歌詞區域的左側留白比例",
+                "lyricPaddingRight_description": "歌詞區域的右側留白比例",
+                "lyricSizeSynchronized_description": "動態歌詞的字型大小",
+                "lyricSizeUnsynchronized_description": "靜態歌詞的字型大小",
+                "lyricOpacityNonActive_description": "非目前歌詞的透明度",
+                "lyricScaleNonActive_description": "非目前歌詞的縮放比例",
+                "showLyricMatch_description": "顯示匹配歌詞的歌曲名稱與藝人",
+                "showLyricProvider_description": "顯示哪個提供者提供了目前的歌詞",
+                "coverArtSize": "封面圖尺寸",
+                "titleDisplayType": "標題顯示樣式",
+                "titleDisplayType_optionMultiLine": "多行",
+                "titleDisplayType_optionScroll": "捲動",
+                "titleLineCount": "標題行數",
+                "playerItemAlignment": "播放器項目對齊方式"
             },
             "lyrics": "歌詞",
             "related": "相關歌曲",
@@ -287,7 +308,9 @@
             "queryBuilder": "查詢建構器",
             "playerFilters": "播放篩選器",
             "logger": "日誌記錄器",
-            "lyricsDisplay": "歌詞顯示"
+            "lyricsDisplay": "歌詞顯示",
+            "lyricsTranslation": "歌詞翻譯",
+            "sharing": "分享"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
@@ -534,7 +557,7 @@
         "hotkey_zoomOut": "縮小",
         "language_description": "設定應用程式的語言（$t(common.restartRequired)）",
         "lyricFetch": "從網路取得歌詞",
-        "lyricFetch_description": "從多個網路來源取得歌詞",
+        "lyricFetch_description": "從多個選擇的來源取得歌詞",
         "lyricFetchProvider": "歌詞來源",
         "lyricOffset": "歌詞偏移（毫秒）",
         "lyricOffset_description": "將歌詞偏移指定的毫秒數",
@@ -673,11 +696,11 @@
         "transcodeFormat": "轉碼的格式",
         "transcodeFormat_description": "選擇要轉碼的格式。留空來讓伺服器決定",
         "translationApiProvider": "翻譯API提供者",
-        "translationApiProvider_description": "翻譯API的提供者",
+        "translationApiProvider_description": "選擇用來翻譯的 API 提供者",
         "translationApiKey": "翻譯API金鑰",
         "translationApiKey_description": "翻譯的API金鑰（僅限全域伺服端點）",
         "translationTargetLanguage": "目標翻譯語言",
-        "translationTargetLanguage_description": "翻譯的目標語言",
+        "translationTargetLanguage_description": "設定用來自動翻譯的目標語言",
         "trayEnabled": "顯示系統匣",
         "trayEnabled_description": "顯示/隱藏系統匣圖示/選單。如果停用，將同時停用最小化/退出到系統匣",
         "volumeWidth": "音量條寬度",
@@ -698,12 +721,12 @@
         "discordDisplayType_songname": "歌曲名稱",
         "discordDisplayType_artistname": "藝人名稱",
         "discordLinkType": "{{discord}} presence 連結",
-        "discordLinkType_description": "在 {{discord}} Rich Presence 中，為歌曲和藝人欄位新增 {{lastfm}} 或 {{musicbrainz}} 的外部連結。{{musicbrainz}} 的準確度最高，但需要標籤且不提供藝人連結；而 {{lastfm}} 通常都能提供連結。此功能不會產生額外的網路請求",
+        "discordLinkType_description": "在 {{discord}} Rich Presence 中新增 {{lastfm}} 或 {{musicbrainz}} 連結。{{musicbrainz}} 的準確度最高，但需要標籤且不提供藝人連結；而 {{lastfm}} 通常都能提供連結。此功能不會產生額外的網路請求",
         "discordLinkType_none": "$t(common.none)",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}} 並以 {{lastfm}} 備用",
         "hotkey_navigateHome": "導航至首頁",
-        "preventSleepOnPlayback": "防止播放時進入睡眠狀態",
-        "preventSleepOnPlayback_description": "在音樂播放時防止螢幕進入睡眠狀態",
+        "preventSleepOnPlayback": "在播放時防止螢幕睡眠",
+        "preventSleepOnPlayback_description": "在音樂播放時防止螢幕關閉",
         "mediaSession": "啟用 Media Session",
         "mediaSession_description": "啟用 Media Session 整合功能，在系統音量疊加層和鎖定畫面上顯示媒體控制項與中繼資料。此功能需要使用網頁播放器。",
         "releaseChannel": "發佈通道",
@@ -836,8 +859,8 @@
         "waveformLoadingDelay_description": "載入波形前的延遲（以秒為單位）。如果您在使用網頁播放器時遇到卡頓，請增加此值。",
         "playerbarWaveformStretch": "波形拉伸",
         "playerbarWaveformStretch_description": "拉伸波形來填補可用空間",
-        "preventSuspendOnPlayback_description": "音樂播放時防止應用程式進入休眠",
-        "preventSuspendOnPlayback": "在播放時防止應用程式暫停",
+        "preventSuspendOnPlayback_description": "在音樂播放時防止系統進入休眠",
+        "preventSuspendOnPlayback": "在播放時防止系統睡眠",
         "hotkey_listShowPlayingSong": "在清單中顯示正在播放的歌曲",
         "sidebarPlaylistFolders_description": "為名稱中包含配置分隔符的播放清單建立資料夾檢視",
         "sidebarPlaylistFolders": "啟用資料夾",
@@ -865,7 +888,7 @@
         "autoDJ_songStrategy": "歌曲選擇模式",
         "autoDJ_strategy_option_library_random": "隨機",
         "autoDJ_strategy_option_similar": "相似",
-        "enableFurigana_description": "在日文歌詞漢字上方顯示發音標記（振假名）。",
+        "enableFurigana_description": "在日文歌詞漢字上方顯示發音標記（振假名）",
         "enableFurigana": "啟用振假名顯示",
         "equalizer_descriptionMpv": "透過 FFmpeg lavfi (MPV) 使用參數等化器",
         "equalizer_descriptionWebAudio": "透過 Web Audio API 使用參數等化器",
@@ -901,7 +924,7 @@
         "compressorSavePreset_description": "將目前壓縮器設定儲存為具名預設",
         "compressorThreshold_description": "開始進行壓縮的訊號電平。",
         "compressorThreshold": "閾值",
-        "enableRomaji_description": "在日文歌詞下方顯示羅馬拼音。",
+        "enableRomaji_description": "在日文歌詞下方顯示羅馬拼音",
         "enableRomaji": "啟用羅馬拼音顯示",
         "windowBarTrackinfo": "在視窗標題列顯示曲目資訊",
         "windowBarTrackinfo_description": "在視窗標題列中顯示目前播放曲目的標題與藝人、播放佇列中的位置，以及播放/暫停狀態。",
@@ -918,7 +941,25 @@
         "autoDJ_onlySimilar": "只有相似",
         "autoDJ_onlySimilar_description": "僅新增與觸發歌曲相似的項目。項目數量視為新增項目的上限，而非透過其他來源填滿至上限",
         "showQueueInSidebar_description": "播放器側邊欄將新增一個顯示播放佇列的面板",
-        "showQueueInSidebar": "在播放器側邊欄中顯示播放佇列"
+        "showQueueInSidebar": "在播放器側邊欄中顯示播放佇列",
+        "showFavorites_description": "控制收藏（愛心）按鈕是否顯示於介面中",
+        "showFavorites": "顯示收藏",
+        "customThemeErrors_description": "無法載入這些主題檔案。",
+        "customThemeErrors": "錯誤",
+        "customThemeWarnings_description": "這些主題已載入，但部分值無效，已被忽略。",
+        "customThemeWarnings": "警告",
+        "customThemes_description": "將 .json 主題檔案拖入此資料夾以新增自訂主題。每當您新增、編輯或移除檔案時，都會自動載入它們。",
+        "customThemes": "自訂主題",
+        "confirmQueueChanges": "確認佇列變更",
+        "confirmQueueChanges_description": "在捨棄目前佇列前先詢問確認",
+        "shareExpiration_description": "新分享連結預設的過期時間。在分享對話框中清除日期即可改用伺服器預設值",
+        "shareExpiration": "預設分享過期時間",
+        "shareExpirationUseServerDefault_description": "建立分享時不指定過期時間，以便伺服器套用其設定的預設值 (例如 Navidrome 的 DefaultShareExpiration)",
+        "shareExpirationUseServerDefault": "使用伺服器預設過期時間",
+        "fullscreenAutoOpenTimeout_description": "播放歌曲期間，閒置達指定時間後自動開啟全螢幕播放器。設定至0來停用此功能",
+        "fullscreenAutoOpenTimeout": "全螢幕播放器自動開啟時間 (分鐘)",
+        "sidebarImageEnabled": "展開專輯封面按鈕",
+        "sidebarImageEnabled_description": "在播放器欄的專輯封面上顯示按鈕，可將專輯封面展開至側邊欄。停用此選項會隱藏按鈕，且若專輯封面處於展開狀態會將其收合"
     },
     "table": {
         "config": {
@@ -995,7 +1036,9 @@
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "作曲者",
                 "titleArtist": "$t(common.title) (藝人)",
-                "albumGroup": "專輯分組"
+                "albumGroup": "專輯分組",
+                "date": "日期",
+                "releaseYear": "發行年份"
             },
             "view": {
                 "table": "表格",
@@ -1021,7 +1064,7 @@
             "playCount": "播放次數",
             "rating": "評分",
             "releaseDate": "發行日期",
-            "releaseYear": "年份",
+            "releaseYear": "發行年份",
             "genre": "曲風",
             "bpm": "BPM",
             "songCount": "曲目",
@@ -1031,7 +1074,9 @@
             "codec": "編解碼器",
             "owner": "擁有者",
             "bitDepth": "位元深度",
-            "sampleRate": "取樣率"
+            "sampleRate": "取樣率",
+            "date": "日期",
+            "year": "年"
         }
     },
     "action": {
@@ -1149,7 +1194,9 @@
         "explicitStatus": "$t(common.explicitStatus)",
         "sortName": "排序名稱",
         "matchAnd": "和",
-        "matchOr": "或"
+        "matchOr": "或",
+        "date": "日期",
+        "year": "年"
     },
     "form": {
         "addServer": {
@@ -1224,7 +1271,9 @@
             "expireInvalid": "到期日必須是未來",
             "createFailed": "無法建立分享（分享是否啟用？）",
             "copyToClipboard": "複製到剪貼簿：Ctrl+C, Enter",
-            "successMustClick": "分享建立成功，點擊此處開啟"
+            "successMustClick": "分享建立成功，點擊此處開啟",
+            "setExpiration_description": "留空以使用伺服器預設過期時間",
+            "setExpiration_serverDefault": "伺服器預設"
         },
         "privateMode": {
             "enabled": "已啟用私人模式，播放狀態現在將對外部整合功能隱藏",
@@ -1271,6 +1320,10 @@
         },
         "createPrefilledPlaylist": {
             "title": "從選取的歌曲建立$t(entity.playlist, {\"count\": 1})"
+        },
+        "queueChangeConfirmation": {
+            "title": "捨棄目前佇列？",
+            "description": "這將從目前佇列中刪除所有項目。"
         }
     },
     "releaseType": {
@@ -1332,7 +1385,14 @@
         "minuteShort": "分",
         "secondShort": "秒",
         "hourShort": "小時",
-        "dayShort": "天"
+        "dayShort": "天",
+        "secondLong": "秒",
+        "minuteLong": "分",
+        "hourLong": "小時",
+        "dayLong": "天",
+        "weekLong": "週",
+        "monthLong": "月",
+        "yearLong": "年"
     },
     "visualizer": {
         "visualizerType": "視覺化效果類型",

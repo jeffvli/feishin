@@ -1,0 +1,21 @@
+.bar {
+    display: flex;
+    flex-shrink: 0;
+    gap: var(--theme-spacing-sm);
+    align-items: center;
+    padding: 8px 16px;
+    cursor: pointer;
+    background: var(--theme-colors-surface);
+    border-top: 1px solid var(--theme-colors-border);
+    transition: opacity 100ms ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.bar:active {
+    opacity: 0.85;
+}
+
+.info {
+    flex: 1;
+    min-width: 0;
+}

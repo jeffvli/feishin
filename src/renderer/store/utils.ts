@@ -4,6 +4,8 @@ import type { PersistStorage, StateStorage } from 'zustand/middleware';
 import { del, get, set } from 'idb-keyval';
 import mergeWith from 'lodash/mergeWith';
 
+import { logger } from '/@/renderer/utils/logger';
+
 type PlayerStorePersistedSlice = {
     player?: unknown;
     queue?: QueueData;
@@ -78,7 +80,8 @@ export const playerStoreStorage: PersistStorage<unknown> = {
         let parsed: { state?: { player?: unknown; queue?: QueueData }; version?: number };
         try {
             parsed = JSON.parse(mainRaw as string);
-        } catch {
+        } catch (error) {
+            logger.warn('Failed to parse player store', { error: String(error) });
             return null;
         }
 
@@ -89,7 +92,8 @@ export const playerStoreStorage: PersistStorage<unknown> = {
         if (queueRaw) {
             try {
                 queue = JSON.parse(queueRaw as string) as QueueData;
-            } catch {
+            } catch (error) {
+                logger.warn('Failed to parse player queue', { error: String(error) });
                 queue = undefined;
             }
         } else if (parsed.state?.queue) {
@@ -234,7 +238,9 @@ export const splitSettingsStorage: StateStorage = {
                 }
             } catch (e) {
                 // If parsing fails, continue with reading from split keys
-                console.warn('Failed to migrate old settings format:', e);
+                logger.warn('Failed to migrate old settings format', {
+                    error: String(e),
+                });
             }
         }
 
@@ -250,7 +256,10 @@ export const splitSettingsStorage: StateStorage = {
                     mergedState[keyName] = JSON.parse(value);
                     hasData = true;
                 } catch (e) {
-                    console.warn(`Failed to parse ${key}:`, e);
+                    logger.warn('Failed to parse settings key', {
+                        error: String(e),
+                        key,
+                    });
                 }
             }
         });
@@ -311,7 +320,7 @@ export const splitSettingsStorage: StateStorage = {
                 localStorage.setItem('store_settings_version', data.version.toString());
             }
         } catch (e) {
-            console.error('Failed to split settings storage:', e);
+            logger.error('Failed to split settings storage', { error: String(e) });
             localStorage.setItem(name, value);
         }
     },

@@ -155,7 +155,7 @@ export const AddToPlaylistContextModal = ({
 
         setIsLoading(true);
         const allSongIds: string[] = [];
-        let totalUniquesAdded = 0;
+        let totalTracksAdded = 0;
 
         try {
             if (albumId && albumId.length > 0) {
@@ -204,6 +204,18 @@ export const AddToPlaylistContextModal = ({
 
             const playlistIds = [...values.selectedPlaylistIds];
 
+            if (allSongIds.length === 0) {
+                setIsLoading(false);
+                toast.info({
+                    message: t('form.addToPlaylist.noneAdded', {
+                        playlist: t('entity.playlistWithCount', {
+                            count: playlistIds.length + values.newPlaylists.length,
+                        }),
+                    }),
+                });
+                return;
+            }
+
             if (values.newPlaylists) {
                 for (const playlist of values.newPlaylists) {
                     try {
@@ -216,7 +228,7 @@ export const AddToPlaylistContextModal = ({
                         });
 
                         if (response?.id) {
-                            playlistIds.push(response?.id);
+                            playlistIds.push(response.id);
                         }
                     } catch (error: any) {
                         toast.error({
@@ -228,7 +240,7 @@ export const AddToPlaylistContextModal = ({
             }
 
             for (const playlistId of playlistIds) {
-                const uniqueSongIds: string[] = [];
+                let songsToAdd = allSongIds;
 
                 if (values.skipDuplicates) {
                     const queryKey = queryKeys.playlists.songListIds(serverId, playlistId);
@@ -249,48 +261,59 @@ export const AddToPlaylistContextModal = ({
                     });
 
                     const playlistSongIds = playlistSongsRes?.items;
+                    const uniqueSongIds: string[] = [];
 
                     for (const songId of allSongIds) {
                         if (!playlistSongIds?.includes(songId)) {
                             uniqueSongIds.push(songId);
                         }
                     }
-                    totalUniquesAdded += uniqueSongIds.length;
+
+                    songsToAdd = uniqueSongIds;
                 }
 
-                if (values.skipDuplicates ? uniqueSongIds.length > 0 : allSongIds.length > 0) {
-                    addToPlaylistMutation.mutate(
-                        {
-                            apiClientProps: { serverId },
-                            body: { songId: values.skipDuplicates ? uniqueSongIds : allSongIds },
-                            query: { id: playlistId },
-                        },
-                        {
-                            onError: (err) => {
-                                toast.error({
-                                    message: `[${
-                                        playlistSelect.find(
-                                            (playlist) => playlist.value === playlistId,
-                                        )?.label
-                                    }] ${err.message}`,
-                                    title: t('error.genericError'),
-                                });
-                            },
-                        },
-                    );
+                if (songsToAdd.length === 0) {
+                    continue;
                 }
+
+                totalTracksAdded += songsToAdd.length;
+
+                addToPlaylistMutation.mutate(
+                    {
+                        apiClientProps: { serverId },
+                        body: { songId: songsToAdd },
+                        query: { id: playlistId },
+                    },
+                    {
+                        onError: (err) => {
+                            toast.error({
+                                message: `[${
+                                    playlistSelect.find((playlist) => playlist.value === playlistId)
+                                        ?.label
+                                }] ${err.message}`,
+                                title: t('error.genericError'),
+                            });
+                        },
+                    },
+                );
             }
 
-            const addMessage =
-                values.skipDuplicates &&
-                allSongIds.length * playlistIds.length !== totalUniquesAdded
-                    ? Math.floor(totalUniquesAdded / playlistIds.length)
-                    : allSongIds.length;
-
             setIsLoading(false);
+
+            if (totalTracksAdded === 0) {
+                toast.info({
+                    message: t('form.addToPlaylist.noneAdded', {
+                        playlist: t('entity.playlistWithCount', {
+                            count: playlistIds.length,
+                        }),
+                    }),
+                });
+                return;
+            }
+
             toast.success({
                 message: t('form.addToPlaylist.success', {
-                    message: addMessage,
+                    message: totalTracksAdded,
                     numOfPlaylists: playlistIds.length,
                 }),
             });

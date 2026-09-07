@@ -1,6 +1,5 @@
 import { ipcMain } from 'electron';
 
-import { getMpvInstance } from '../player';
 import { store } from '../settings';
 
 import { PlayerType } from '/@/shared/types/types';
@@ -18,11 +17,7 @@ export const canHandleVisualizerDisplayMedia = (): boolean => {
         return false;
     }
 
-    if (!isLocalVisualizerSurfaceVisible) {
-        return false;
-    }
-
-    return Boolean(getMpvInstance()?.isRunning());
+    return isLocalVisualizerSurfaceVisible;
 };
 
 ipcMain.on('visualizer-set-local-surface-visible', (_event, visible: boolean) => {

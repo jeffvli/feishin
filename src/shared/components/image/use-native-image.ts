@@ -25,7 +25,6 @@ export function useNativeImage({
     const abortControllerRef = useRef<AbortController | null>(null);
     const loadedRequestSignatureRef = useRef<null | string>(null);
     const objectUrlRef = useRef<null | string>(null);
-    const retiredObjectUrlsRef = useRef<string[]>([]);
     const onFetchErrorRef = useRef(onFetchError);
     const [state, setState] = useState<NativeImageState>({ status: 'idle' });
 
@@ -83,10 +82,8 @@ export function useNativeImage({
         }
 
         abortCurrentRequest();
-        setState((currentState) => ({
-            displaySrc: currentState.displaySrc,
-            status: 'loading',
-        }));
+        revokeObjectUrl();
+        setState({ status: 'loading' });
 
         const abortController = new AbortController();
         abortControllerRef.current = abortController;
@@ -116,9 +113,6 @@ export function useNativeImage({
                 }
 
                 const objectUrl = URL.createObjectURL(blob);
-                if (objectUrlRef.current) {
-                    retiredObjectUrlsRef.current.push(objectUrlRef.current);
-                }
                 objectUrlRef.current = objectUrl;
                 loadedRequestSignatureRef.current = requestSignature;
                 setState({ displaySrc: objectUrl, status: 'loaded' });
@@ -147,19 +141,12 @@ export function useNativeImage({
     }, [enabled, fetchPriority, request, requestSignature]);
 
     useEffect(() => {
-        retiredObjectUrlsRef.current.forEach((objectUrl) => URL.revokeObjectURL(objectUrl));
-        retiredObjectUrlsRef.current = [];
-    }, [state.displaySrc]);
-
-    useEffect(() => {
         return () => {
             abortControllerRef.current?.abort();
 
             if (objectUrlRef.current) {
                 URL.revokeObjectURL(objectUrlRef.current);
             }
-
-            retiredObjectUrlsRef.current.forEach((objectUrl) => URL.revokeObjectURL(objectUrl));
         };
     }, []);
 

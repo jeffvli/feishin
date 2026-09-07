@@ -129,8 +129,10 @@ const CustomThemesManager = memo(() => {
                         </Button>
                     </Group>
                 }
-                description="Drop .json theme files into this folder to add custom themes. They're picked up automatically whenever you add, edit, or remove a file."
-                title="Custom Themes"
+                description={t('setting.customThemes', {
+                    context: 'description',
+                })}
+                title={t('setting.customThemes')}
             />
             {erroredThemes.length > 0 && (
                 <SettingsOptions
@@ -148,9 +150,11 @@ const CustomThemesManager = memo(() => {
                             ))}
                         </Stack>
                     }
-                    description="These theme files could not be loaded."
+                    description={t('setting.customThemeErrors', {
+                        context: 'description',
+                    })}
                     indent
-                    title="Errors"
+                    title={t('setting.customThemeErrors')}
                 />
             )}
             {warnedThemes.length > 0 && (
@@ -173,9 +177,11 @@ const CustomThemesManager = memo(() => {
                             ))}
                         </Stack>
                     }
-                    description="These themes loaded, but some values were invalid and were ignored."
+                    description={t('setting.customThemeWarnings', {
+                        context: 'description',
+                    })}
                     indent
-                    title="Warnings"
+                    title={t('setting.customThemeWarnings')}
                 />
             )}
         </>

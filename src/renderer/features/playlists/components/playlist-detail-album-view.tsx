@@ -1,3 +1,4 @@
+import shuffle from 'lodash/shuffle';
 import { useEffect, useMemo } from 'react';
 
 import { useGridRows } from '/@/renderer/components/item-list/helpers/use-grid-rows';
@@ -17,6 +18,7 @@ import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { usePlaylistSongListFilters } from '/@/renderer/features/playlists/hooks/use-playlist-song-list-filters';
 import { applyClientSideSongFilters } from '/@/renderer/features/playlists/hooks/use-playlist-track-list';
 import { type PlaylistAlbumRow, playlistSongsToAlbums } from '/@/renderer/features/playlists/utils';
+import { useListRefreshTick } from '/@/renderer/features/shared/hooks/use-list-refresh-tick';
 import { useSearchTermFilter } from '/@/renderer/features/shared/hooks/use-search-term-filter';
 import { searchLibraryItems } from '/@/renderer/features/shared/utils';
 import { useGeneralSettings, useListSettings } from '/@/renderer/store';
@@ -46,6 +48,9 @@ export const PlaylistDetailAlbumView = ({ data }: { data: PlaylistSongListRespon
     const { currentPage, onChange: onPageChange } = useItemListPagination();
     const { searchTerm } = useSearchTermFilter();
     const { query } = usePlaylistSongListFilters();
+    const refreshTick = useListRefreshTick(ItemListKey.PLAYLIST_ALBUM);
+
+    const isRandomSort = (query.sortBy as SongListSort) === SongListSort.RANDOM;
 
     const filteredAndSortedSongs = useMemo(() => {
         const raw = data?.items ?? [];
@@ -59,17 +64,17 @@ export const PlaylistDetailAlbumView = ({ data }: { data: PlaylistSongListRespon
             return searched;
         }
 
-        return sortSongList(
-            searched,
-            (query.sortBy as SongListSort) ?? SongListSort.ID,
-            (query.sortOrder as SortOrder) ?? SortOrder.ASC,
-        );
-    }, [data?.items, query, searchTerm]);
+        const sortBy = isRandomSort
+            ? SongListSort.ALBUM
+            : ((query.sortBy as SongListSort) ?? SongListSort.ID);
+        return sortSongList(searched, sortBy, (query.sortOrder as SortOrder) ?? SortOrder.ASC);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- refreshTick intentionally re-shuffles random sort on list refresh
+    }, [data?.items, query, searchTerm, isRandomSort, refreshTick]);
 
-    const sortedAlbums = useMemo(
-        () => playlistSongsToAlbums(filteredAndSortedSongs),
-        [filteredAndSortedSongs],
-    );
+    const sortedAlbums = useMemo(() => {
+        const rows = playlistSongsToAlbums(filteredAndSortedSongs);
+        return isRandomSort ? shuffle(rows) : rows;
+    }, [filteredAndSortedSongs, isRandomSort]);
 
     const isPaginated = pagination === ListPaginationType.PAGINATED;
     const totalAlbumCount = sortedAlbums.length;

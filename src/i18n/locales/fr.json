@@ -319,7 +319,9 @@
         "explicitStatus": "$t(common.explicitStatus)",
         "sortName": "Tri par nom",
         "matchAnd": "Et",
-        "matchOr": "Ou"
+        "matchOr": "Ou",
+        "date": "Date",
+        "year": "Année"
     },
     "page": {
         "sidebar": {
@@ -361,7 +363,21 @@
                 "lyricFollowScrollAlignment": "Les paroles suivent l'alignement",
                 "lyricLineLeadTime": "Temps d'avance de la ligne de paroles (ms)",
                 "lyricPaddingLeft": "Marge de gauche des paroles (%)",
-                "lyricPaddingRight": "Marge de droite des paroles (%)"
+                "lyricPaddingRight": "Marge de droite des paroles (%)",
+                "followCurrentLyric_description": "Défilement automatique pour garder la ligne de paroles active visible",
+                "lyricFollowScrollAlignment_description": "Position verticale de la ligne active lors du suivi",
+                "lyricAlignment_description": "Alignement horizontal des paroles",
+                "lyricGapSynchronized_description": "Espacement vertical entre les lignes de paroles synchronisées",
+                "lyricGapUnsynchronized_description": "Espacement vertical entre les lignes de paroles non synchronisées",
+                "lyricLineLeadTime_description": "Avancez la ligne active de ce nombre de millisecondes avant son horodatage.",
+                "lyricPaddingLeft_description": "Marge intérieure gauche en pourcentage de la zone des paroles",
+                "lyricPaddingRight_description": "Marge intérieure droite en pourcentage de la zone des paroles",
+                "lyricSizeSynchronized_description": "Taille de la police pour les paroles synchronisées (chronométré)",
+                "lyricSizeUnsynchronized_description": "Taille de la police pour les paroles non synchronisées (simples)",
+                "lyricOpacityNonActive_description": "Opacité des lignes de paroles qui ne sont pas actuellement actives",
+                "lyricScaleNonActive_description": "Échelle des lignes de paroles qui ne sont pas actuellement actives",
+                "showLyricMatch_description": "Afficher le nom du titre et l'artiste dont les paroles correspondent",
+                "showLyricProvider_description": "Afficher le fournisseur des paroles actuelles"
             },
             "upNext": "À suivre",
             "lyrics": "Paroles",
@@ -390,7 +406,8 @@
             "selectMusicFolder": "Sélectionner le dossier musique",
             "noMusicFolder": "Aucun dossier musique de sélectionner",
             "multipleMusicFolders": "{{count}} dossiers musique sélectionnés",
-            "logout": "Déconnexion"
+            "logout": "Déconnexion",
+            "rescanLibrary": "Re-analyser la bibliothèque"
         },
         "home": {
             "mostPlayed": "Les plus joués",
@@ -429,7 +446,9 @@
             "discord": "Discord",
             "logger": "Journaliseur",
             "playerFilters": "Filtres du lecteur",
-            "lyricsDisplay": "Affichage des paroles"
+            "lyricsDisplay": "Affichage des paroles",
+            "sharing": "Partage",
+            "lyricsTranslation": "Traduction des paroles"
         },
         "globalSearch": {
             "commands": {
@@ -655,7 +674,7 @@
         "fontType": "Type de police",
         "remotePort": "Port du serveur de contrôle à distance",
         "hotkey_playbackNext": "Piste suivante",
-        "lyricFetch_description": "Récupère les paroles depuis diverses sources d'internet",
+        "lyricFetch_description": "Récupérer les paroles auprès des fournisseurs sélectionnés",
         "lyricFetchProvider_description": "Sélectionnez les fournisseurs auprès desquels récupérer les paroles",
         "globalMediaHotkeys_description": "Active ou désactive l'utilisation des touches multimédias de votre système pour contrôler la lecture",
         "followLyric": "Suivre les paroles en cours",
@@ -768,10 +787,10 @@
         "translationApiKey_description": "Clé API pour la traduction (point de terminaison global uniquement)",
         "translationTargetLanguage": "Langue cible de traduction",
         "trayEnabled": "Afficher la barre d’état système",
-        "translationApiProvider_description": "Fournisseur d'API pour la traduction",
+        "translationApiProvider_description": "Sélectionne le fournisseur d'API utilisé pour la traduction",
         "customCss_description": "Contenu CSS personnalisé. Remarque : les propriétés 'content' et les URL distantes ne sont pas autorisées. Un aperçu de votre contenu est affiché ci-dessous. Des champs supplémentaires que vous n'avez pas définis sont présents en raison d'assainissement. Application de Bureau uniquement: feishin lit et écrit le fichier custom.css dans le répertoire de configuration de l'application et le recharge lorsque celui-ci est modifié",
         "translationApiKey": "Clé API de traduction",
-        "translationTargetLanguage_description": "Langue cible pour la traduction",
+        "translationTargetLanguage_description": "Définis la langue cible utilisée pour la traduction automatique",
         "trayEnabled_description": "Afficher/masquer l’icône/le menu dans la barre d’état système. si désactivé, désactive également la réduction/fermeture vers la barre d’état système",
         "albumBackgroundBlur": "Intensité du flou de l'image d'arrière-plan de l'album",
         "lastfmApiKey": "Clé API {{lastfm}}",
@@ -810,7 +829,7 @@
         "releaseChannel": "Canal de diffusion",
         "releaseChannel_description": "Choisissez entre les versions stable, bêta ou alpha (nocturne) pour les mises à jour automatiques",
         "mediaSession": "Activer media session",
-        "mediaSession_description": "Active l'intégration de Media Session, affichant les contrôles multimédias et les métadonnées dans la superposition du volume du système et sur l'écran de verrouillage",
+        "mediaSession_description": "Active l'intégration de Media Session, affichant les contrôles multimédias et les métadonnées dans la superposition du volume du système et sur l'écran de verrouillage.",
         "enableAutoTranslation_description": "Activer la traduction automatiquement lorsque les paroles sont chargées",
         "enableAutoTranslation": "Activer la traduction automatique",
         "exportImportSettings_control_description": "Exporter et importer les paramètres en JSON",
@@ -852,7 +871,7 @@
         "queryBuilderCustomFields_inputTag": "Tag",
         "queryBuilderCustomFields": "Champs personnalisé",
         "queryBuilderCustomFields_description": "Ajouter des champs personnalisés à utiliser dans les constructeurs de requêtes",
-        "autoDJ": "DJ auto",
+        "autoDJ": "DJ Auto",
         "autoDJ_itemCount": "Nombre d'entrée",
         "autoDJ_itemCount_description": "Le nombre d'entrées tentées d'être ajoutées à la file d'attente",
         "autoDJ_timing": "Timing",
@@ -959,14 +978,14 @@
         "autoDJ_mode_albums": "Albums",
         "autoDJ_mode_description": "Choisissez d'ajouter des titres ou des albums entiers à la file d'attente",
         "autoDJ_mode_songs": "Titres",
-        "autoDJ_enabled": "Activer le DJ auto",
+        "autoDJ_enabled": "Activer le DJ Auto",
         "autoDJ_albumStrategy": "Mode de sélection d'album",
         "autoDJ_songStrategy": "Mode de sélection de titre",
         "autoDJ_strategy_option_library_random": "Aléatoire",
         "autoDJ_strategy_option_similar": "Similaire",
-        "enableFurigana_description": "Afficher les indications de prononciation (furigana) au-dessus des paroles en kanji Japonais.",
+        "enableFurigana_description": "Afficher les indications de prononciation (furigana) au-dessus des paroles en kanji Japonais",
         "enableFurigana": "Active la génération des furigana",
-        "enableRomaji_description": "Afficher une ligne de prononciation en romaji sous les paroles Japonaises.",
+        "enableRomaji_description": "Afficher une ligne de prononciation en romaji sous les paroles Japonaises",
         "enableRomaji": "Active la génération des romaji",
         "equalizer_descriptionMpv": "Égaliseur paramétrique via FFmpeg lavfi (MPV)",
         "equalizer_descriptionWebAudio": "Égaliseur paramétrique via Web Audio API",
@@ -1000,7 +1019,30 @@
         "compressorReset_description": "Rétablir les valeurs par défaut de tous les paramètres du compresseur",
         "compressorSavePreset_description": "Enregistrer les paramètres actuels du compresseur comme préréglage nommé",
         "compressorThreshold": "Seuil",
-        "sidebarPlaylistFolderTreeIndent_description": "Nombre de pixels d'indentation par niveau de l'arborescence"
+        "sidebarPlaylistFolderTreeIndent_description": "Nombre de pixels d'indentation par niveau de l'arborescence",
+        "confirmQueueChanges_description": "Demandez confirmation avant de supprimer la file d'attente actuelle",
+        "autoDJ_allowDuplicates": "Autoriser les doublons",
+        "autoDJ_allowDuplicates_description": "Autoriser les titres ou albums déjà dans la file d'attente d'être ajoutés à nouveau par le DJ Auto",
+        "autoDJ_onlySimilar": "Seulement similaire",
+        "autoDJ_onlySimilar_description": "N'ajoutez que des éléments similaires au titre déclencheur. Le nombre d'éléments indiqué correspond à une limite maximale, et non à une limite atteinte par d'autres sources",
+        "logLevel_optionDebugDescription": "Inclut les informations info, debug et des réponses API expurgées.",
+        "logLevel_optionInfoDescription": "Inclut info, avertissements et erreurs",
+        "exportDiagnostics": "Exporter les diagnostiques",
+        "confirmQueueChanges": "Confirmer les modifications de la file d'attente",
+        "showFavorites": "Afficher les favoris",
+        "showFavorites_description": "Contrôle l'affichage des boutons favoris (cœur) dans l'interface",
+        "showQueueInSidebar_description": "Un panneau affichant la file d'attente sera ajouté à la barre latérale du lecteur",
+        "showQueueInSidebar": "Afficher la file d'attente dans la barre latérale du lecteur",
+        "shareExpiration_description": "Durée de validité par défaut des nouveaux liens de partage. Effacez la date dans la boîte de dialogue de partage pour utiliser la valeur par défaut du serveur",
+        "shareExpiration": "Expiration par défaut des partages",
+        "shareExpirationUseServerDefault_description": "Omettez de spécifier une date d'expiration lors de la création de partages afin que le serveur puisse appliquer sa valeur par défaut configurée (ex. Navidrome DefaultShareExpiration)",
+        "shareExpirationUseServerDefault": "Utiliser l'expiration par défaut du serveur",
+        "customThemeErrors_description": "Ces fichiers de thème n'ont pas pu être chargés.",
+        "customThemeErrors": "Erreurs",
+        "customThemeWarnings_description": "Ces thèmes ont été chargés, mais quelques valeurs invalides ont été ignorées.",
+        "customThemeWarnings": "Avertissements",
+        "customThemes_description": "Déposez vos fichiers de thème .json dans ce dossier pour ajouter des thèmes personnalisés. Ils seront automatiquement pris en compte lors de l'ajout, de la modification ou de la suppression d'un fichier.",
+        "customThemes": "Thèmes Personnalisé"
     },
     "form": {
         "deletePlaylist": {
@@ -1075,7 +1117,9 @@
             "expireInvalid": "L'expiration doit être définie à une date ultérieure",
             "createFailed": "Échec de la création du lien de partage (le partage est-il activé ?)",
             "copyToClipboard": "Copier vers le presse-papiers : Ctrl+C, entrer",
-            "successMustClick": "Partage créé avec succès. cliquez ici pour ouvrir"
+            "successMustClick": "Partage créé avec succès. cliquez ici pour ouvrir",
+            "setExpiration_description": "Laisser vide pour utiliser l'expiration par défaut du serveur",
+            "setExpiration_serverDefault": "Par défaut du serveur"
         },
         "privateMode": {
             "enabled": "Le mode privé est activé, le statut de lecture est maintenant caché des intégrations externes",
@@ -1122,6 +1166,10 @@
         },
         "createPrefilledPlaylist": {
             "title": "Créer $t(entity.playlist, {\"count\": 1}) à partir des titres sélectionnées"
+        },
+        "queueChangeConfirmation": {
+            "title": "Supprimer la file d'attente actuelle ?",
+            "description": "Cette opération supprimera tous les éléments de la file d'attente actuelle."
         }
     },
     "entity": {
@@ -1265,7 +1313,9 @@
                 "sampleRate": "$t(common.sampleRate)",
                 "composer": "Compositeur",
                 "titleArtist": "$t(common.title) (artiste)",
-                "albumGroup": "Groupe d'album"
+                "albumGroup": "Groupe d'album",
+                "date": "Date",
+                "releaseYear": "Année de sortie"
             }
         },
         "column": {
@@ -1274,7 +1324,7 @@
             "rating": "Note",
             "favorite": "Favori",
             "playCount": "Lectures",
-            "releaseYear": "Année",
+            "releaseYear": "Année de sortie",
             "biography": "Biographie",
             "releaseDate": "Date de sortie",
             "bitrate": "Débit binaire",
@@ -1285,17 +1335,18 @@
             "albumArtist": "Artiste de l'album",
             "path": "Chemin",
             "discNumber": "Disque",
-            "albumCount": "$t(entity.album, {\"count\": 2})",
+            "albumCount": "Albums",
             "lastPlayed": "Écouté récemment",
-            "artist": "$t(entity.artist, {\"count\": 1})",
-            "genre": "$t(entity.genre, {\"count\": 1})",
-            "songCount": "$t(entity.track, {\"count\": 2})",
-            "channels": "$t(common.channel, {\"count\": 2})",
-            "size": "$t(common.size)",
-            "codec": "$t(common.codec)",
+            "artist": "Artist",
+            "genre": "Genre",
+            "songCount": "Pistes",
+            "channels": "Canaux",
+            "size": "Taille",
+            "codec": "Codec",
             "owner": "Propriétaire",
-            "bitDepth": "$t(common.bitDepth)",
-            "sampleRate": "$t(common.sampleRate)"
+            "sampleRate": "Taux d'échantillonnage",
+            "date": "Date",
+            "year": "Année"
         }
     },
     "dragDropZone": {
@@ -1357,7 +1408,14 @@
         "minuteShort": "M",
         "secondShort": "S",
         "hourShort": "H",
-        "dayShort": "J"
+        "dayShort": "J",
+        "secondLong": "Seconde",
+        "minuteLong": "Minute",
+        "hourLong": "Heure",
+        "dayLong": "Jour",
+        "weekLong": "Semaine",
+        "monthLong": "Mois",
+        "yearLong": "Année"
     },
     "visualizer": {
         "visualizerType": "Type de visualisateur",

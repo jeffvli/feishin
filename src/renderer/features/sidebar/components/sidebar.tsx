@@ -31,6 +31,7 @@ import {
 } from '/@/renderer/store';
 import {
     SidebarItemType,
+    useSidebarImageEnabled,
     useSidebarItems,
     useSidebarPlaylistList,
     useWindowSettings,
@@ -85,8 +86,9 @@ export const Sidebar = () => {
 
     const sidebarItems = useSidebarItems();
     const { windowBarStyle } = useWindowSettings();
-    const sidebarImageEnabled = useAppStore((state) => state.sidebar.image);
-    const showImage = sidebarImageEnabled;
+    const sidebarImageEnabled = useSidebarImageEnabled();
+    const sidebarImageShown = useAppStore((state) => state.sidebar.image);
+    const showImage = sidebarImageEnabled && sidebarImageShown;
 
     const sidebarItemsWithRoute: SidebarItemType[] = useMemo(() => {
         if (!sidebarItems) return [];

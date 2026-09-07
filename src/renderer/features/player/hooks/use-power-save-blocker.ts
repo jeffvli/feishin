@@ -2,6 +2,7 @@ import isElectron from 'is-electron';
 import React, { useCallback, useEffect } from 'react';
 
 import { usePlayerStatus, useSettingsStore, useWindowSettings } from '/@/renderer/store';
+import { logger } from '/@/renderer/utils/logger';
 import { PlayerStatus } from '/@/shared/types/types';
 
 const utils = isElectron() ? window.api.utils : null;
@@ -16,7 +17,7 @@ export const usePowerSaveBlocker = () => {
         try {
             await utils.startPowerSaveBlocker(preventSleepOnPlayback);
         } catch (error) {
-            console.error('Failed to start power save blocker:', error);
+            logger.error('Failed to start power save blocker:', error);
         }
     }, [preventSleepOnPlayback]);
 
@@ -26,16 +27,18 @@ export const usePowerSaveBlocker = () => {
         try {
             await utils.stopPowerSaveBlocker();
         } catch (error) {
-            console.error('Failed to stop power save blocker:', error);
+            logger.error('Failed to stop power save blocker:', error);
         }
     }, []);
 
     useEffect(() => {
-        if (!preventSleepOnPlayback || !preventSuspendOnPlayback) return;
+        if (!preventSleepOnPlayback && !preventSuspendOnPlayback) return;
 
         if (status === PlayerStatus.PLAYING) {
+            logger.info('Playback started - starting power save blocker');
             startPowerSaveBlocker();
         } else {
+            logger.info('Playback stopped - stopping power save blocker');
             stopPowerSaveBlocker();
         }
     }, [
@@ -65,7 +68,7 @@ export const PowerSaveBlockerHook = () => {
         (state) => state.window.preventSuspendOnPlayback,
     );
 
-    if (!isElectronEnv || !preventSleepOnPlayback || !preventSuspendOnPlayback) {
+    if (!isElectronEnv || (!preventSleepOnPlayback && !preventSuspendOnPlayback)) {
         return null;
     }
 

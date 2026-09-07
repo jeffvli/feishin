@@ -26,7 +26,6 @@ import {
     useAutoDJSettings,
     useCurrentServer,
     useFullScreenPlayerStore,
-    useGeneralSettings,
     useHotkeySettings,
     usePlaybackSettings,
     usePlaybackType,
@@ -36,9 +35,10 @@ import {
     usePlayerVolume,
     useSetFullScreenPlayerStore,
     useSettingsStoreActions,
+    useShowFavorites,
+    useShowRatings,
     useSidebarRightExpanded,
     useSideQueueType,
-    useVolumeMax,
     useVolumeWheelStep,
     useVolumeWidth,
 } from '/@/renderer/store';
@@ -56,7 +56,6 @@ import { SegmentedControl } from '/@/shared/components/segmented-control/segment
 import { Select } from '/@/shared/components/select/select';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
-import { Text } from '/@/shared/components/text/text';
 import { useMediaQuery } from '/@/shared/hooks/use-media-query';
 import { useThrottledCallback } from '/@/shared/hooks/use-throttled-callback';
 import { useThrottledValue } from '/@/shared/hooks/use-throttled-value';
@@ -84,11 +83,11 @@ interface SpeakerProperties {
 
 const isSonosMember = (device: { id: string }) => device.id.toUpperCase().includes('RINCON');
 
-const calculateVolumeUp = (volume: number, volumeWheelStep: number, volumeMax: number) => {
+const calculateVolumeUp = (volume: number, volumeWheelStep: number) => {
     let volumeToSet: number;
-    const newVolumeGreaterThanMax = volume + volumeWheelStep > volumeMax;
-    if (newVolumeGreaterThanMax) {
-        volumeToSet = volumeMax;
+    const newVolumeGreaterThanHundred = volume + volumeWheelStep > 100;
+    if (newVolumeGreaterThanHundred) {
+        volumeToSet = 100;
     } else {
         volumeToSet = volume + volumeWheelStep;
     }
@@ -379,7 +378,6 @@ const GroupMemberVolumeRow = ({
     muted,
     onLongPress,
     onMuteToggle,
-    volumeMax,
     volumeWheelStep,
     volumeWidth,
 }: {
@@ -390,7 +388,6 @@ const GroupMemberVolumeRow = ({
     muted: boolean;
     onLongPress: (deviceId: string, rect: DOMRect) => void;
     onMuteToggle: (deviceId: string, muted: boolean) => void;
-    volumeMax: number;
     volumeWheelStep: number;
     volumeWidth: number | string;
 }) => {
@@ -406,19 +403,11 @@ const GroupMemberVolumeRow = ({
             const volumeToSet =
                 e.deltaY > 0 || e.deltaX > 0
                     ? calculateVolumeDown(member.volume, volumeWheelStep)
-                    : calculateVolumeUp(member.volume, volumeWheelStep, volumeMax);
+                    : calculateVolumeUp(member.volume, volumeWheelStep);
             handleMemberVolume(member.device.id, volumeToSet);
             if (muted && volumeToSet > 0) onMuteToggle(member.device.id, false);
         },
-        [
-            handleMemberVolume,
-            member.device.id,
-            member.volume,
-            volumeWheelStep,
-            volumeMax,
-            muted,
-            onMuteToggle,
-        ],
+        [handleMemberVolume, member.device.id, member.volume, volumeWheelStep, muted, onMuteToggle],
     );
 
     const startLongPress = useCallback(
@@ -515,7 +504,8 @@ const GroupMemberVolumeRow = ({
 };
 
 export const RightControls = () => {
-    const { showRatings } = useGeneralSettings();
+    const showRatings = useShowRatings();
+    const showFavorites = useShowFavorites();
     return (
         <Flex align="flex-end" direction="column" h="100%" px="1rem" py="0.5rem">
             <Group h="calc(100% / 3)">
@@ -527,7 +517,7 @@ export const RightControls = () => {
                 <SleepTimerButton />
                 <PlayerConfig />
                 <LyricsButton />
-                <FavoriteButton />
+                {showFavorites && <FavoriteButton />}
                 <QueueButton />
                 <VolumeButton />
             </Group>
@@ -630,17 +620,9 @@ const AutoDJButton = () => {
                         w="96px"
                     />
                 ),
+                description: t('setting.autoDJ_itemCount_description'),
                 id: 'itemCount',
-                label: (
-                    <Stack gap="xs">
-                        <Text isNoSelect size="sm">
-                            {t('setting.autoDJ_itemCount')}
-                        </Text>
-                        <Text isMuted isNoSelect size="xs">
-                            {t('setting.autoDJ_itemCount_description')}
-                        </Text>
-                    </Stack>
-                ),
+                label: t('setting.autoDJ_itemCount'),
             },
             {
                 component: (
@@ -668,17 +650,9 @@ const AutoDJButton = () => {
                         w="144px"
                     />
                 ),
+                description: t('setting.autoDJ_timing_description'),
                 id: 'timing',
-                label: (
-                    <Stack gap="xs">
-                        <Text isNoSelect size="sm">
-                            {t('setting.autoDJ_timing')}
-                        </Text>
-                        <Text isMuted isNoSelect size="xs">
-                            {t('setting.autoDJ_timing_description')}
-                        </Text>
-                    </Stack>
-                ),
+                label: t('setting.autoDJ_timing'),
             },
         ],
         [
@@ -708,17 +682,9 @@ const AutoDJButton = () => {
                         value={settings.allowDuplicates}
                     />
                 ),
+                description: t('setting.autoDJ_allowDuplicates_description'),
                 id: 'allowDuplicates',
-                label: (
-                    <Stack gap="xs">
-                        <Text isNoSelect size="sm">
-                            {t('setting.autoDJ_allowDuplicates')}
-                        </Text>
-                        <Text isMuted isNoSelect size="xs">
-                            {t('setting.autoDJ_allowDuplicates_description')}
-                        </Text>
-                    </Stack>
-                ),
+                label: t('setting.autoDJ_allowDuplicates'),
             },
             {
                 component: (
@@ -733,17 +699,9 @@ const AutoDJButton = () => {
                         value={settings.onlySimilar}
                     />
                 ),
+                description: t('setting.autoDJ_onlySimilar_description'),
                 id: 'onlySimilar',
-                label: (
-                    <Stack gap="xs">
-                        <Text isNoSelect size="sm">
-                            {t('setting.autoDJ_onlySimilar')}
-                        </Text>
-                        <Text isMuted isNoSelect size="xs">
-                            {t('setting.autoDJ_onlySimilar_description')}
-                        </Text>
-                    </Stack>
-                ),
+                label: t('setting.autoDJ_onlySimilar'),
             },
         ],
         [setSettings, settings.allowDuplicates, settings.onlySimilar, t],
@@ -848,6 +806,7 @@ const LyricsButton = () => {
     const activeTab = useFullScreenPlayerStore((state) => state.activeTab);
     const { setStore } = useFullScreenPlayerStoreActions();
     const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
+
     return (
         <ActionIcon
             icon="microphone"
@@ -857,8 +816,12 @@ const LyricsButton = () => {
             }}
             onClick={(e) => {
                 e.stopPropagation();
-                if (!isFullScreenPlayerExpanded) setStore({ activeTab: 'lyrics' });
-                setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
+                if (!isFullScreenPlayerExpanded) {
+                    setStore({ activeTab: 'lyrics' });
+                    setFullScreenPlayerStore({ expanded: true });
+                } else {
+                    setStore({ activeTab: activeTab === 'lyrics' ? '' : 'lyrics' });
+                }
             }}
             role="button"
             size="sm"
@@ -999,7 +962,6 @@ const VolumeButton = () => {
     const muted = usePlayerMuted();
     const volumeWheelStep = useVolumeWheelStep();
     const volumeWidth = useVolumeWidth();
-    const volumeMax = useVolumeMax();
     const { decreaseVolume, increaseVolume, mediaToggleMute, setVolume } = usePlayer();
     const isMinWidth = useMediaQuery('(max-width: 480px)');
     const { t } = useTranslation();
@@ -1161,18 +1123,11 @@ const VolumeButton = () => {
             const v =
                 e.deltaY > 0 || e.deltaX > 0
                     ? calculateVolumeDown(sliderValue, volumeWheelStep)
-                    : calculateVolumeUp(sliderValue, volumeWheelStep, volumeMax);
+                    : calculateVolumeUp(sliderValue, volumeWheelStep);
             if (showGroupVolumePanel && !isShiftDown) applyVolumeToGroup(v);
             setSliderValue(v);
         },
-        [
-            sliderValue,
-            volumeWheelStep,
-            volumeMax,
-            showGroupVolumePanel,
-            isShiftDown,
-            applyVolumeToGroup,
-        ],
+        [applyVolumeToGroup, isShiftDown, showGroupVolumePanel, sliderValue, volumeWheelStep],
     );
 
     const handleVolumeDownThrottled = useThrottledCallback(handleVolumeDown, 100);
@@ -1279,7 +1234,6 @@ const VolumeButton = () => {
                             muted={memberMutes[m.device.id] ?? false}
                             onLongPress={handleLongPress}
                             onMuteToggle={handleMuteToggle}
-                            volumeMax={volumeMax}
                             volumeWheelStep={volumeWheelStep}
                             volumeWidth={volumeWidth}
                         />
@@ -1387,7 +1341,7 @@ const VolumeButton = () => {
                 </ContextMenu>
                 {!isMinWidth ? (
                     <CustomPlayerbarSlider
-                        max={volumeMax}
+                        max={100}
                         min={0}
                         onChange={handleVolumeSlider}
                         onClick={(e) => e.stopPropagation()}

@@ -366,6 +366,24 @@ export const ApplicationSettings = memo(() => {
         {
             control: (
                 <Switch
+                    aria-label={t('setting.confirmQueueChanges')}
+                    checked={settings.confirmQueueChanges}
+                    onChange={(event) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                confirmQueueChanges: event.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.confirmQueueChanges', { context: 'description' }),
+            title: t('setting.confirmQueueChanges'),
+        },
+        {
+            control: (
+                <Switch
                     aria-label={t('setting.homeFeature')}
                     defaultChecked={settings.homeFeature}
                     onChange={(e) =>
@@ -565,6 +583,26 @@ export const ApplicationSettings = memo(() => {
         {
             control: (
                 <Switch
+                    defaultChecked={settings.showFavorites}
+                    onChange={(e) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                showFavorites: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.showFavorites', {
+                context: 'description',
+            }),
+            isHidden: false,
+            title: t('setting.showFavorites'),
+        },
+        {
+            control: (
+                <Switch
                     defaultChecked={settings.showRatings}
                     onChange={(e) => {
                         setSettings({
@@ -644,6 +682,33 @@ export const ApplicationSettings = memo(() => {
             }),
             isHidden: false,
             title: t('setting.playerbarOpenDrawer'),
+        },
+        {
+            control: (
+                <NumberInput
+                    max={120}
+                    min={0}
+                    onBlur={(e) => {
+                        const rawValue = e.currentTarget.value;
+
+                        const newVal = Math.min(Math.max(Number(rawValue), 0), 120);
+
+                        setSettings({
+                            general: {
+                                ...settings,
+                                fullscreenAutoOpenTimeout: newVal,
+                            },
+                        });
+                    }}
+                    placeholder={t('common.none')}
+                    value={settings.fullscreenAutoOpenTimeout}
+                />
+            ),
+            description: t('setting.fullscreenAutoOpenTimeout', {
+                context: 'description',
+            }),
+            isHidden: false,
+            title: t('setting.fullscreenAutoOpenTimeout'),
         },
         {
             control: (

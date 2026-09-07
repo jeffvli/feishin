@@ -43,7 +43,8 @@
         "openApplicationDirectory": "Buka direktori aplikasi",
         "goToCurrent": "Pergi ke item saat ini",
         "collapseAllFolders": "Ciutkan semua folder",
-        "expandAllFolders": "Bentangkan semua folder"
+        "expandAllFolders": "Bentangkan semua folder",
+        "createPlaylistFromQueue": "Buat $t(entity.playlist, {\"count\": 1}) dari antrean"
     },
     "common": {
         "clear": "Bersihkan",
@@ -165,7 +166,14 @@
         "back": "Kembali",
         "grouping": "Pengelompokan",
         "numberOfResults": "{{numberOfResults}} hasil",
-        "newVersionAvailable": "Versi baru tersedia"
+        "newVersionAvailable": "Versi baru tersedia",
+        "openFolder": "Buka folder",
+        "saveAndClose": "Simpan dan tutup",
+        "undo": "Batalkan",
+        "lastScan": "Pemindaian terakhir {{date}}",
+        "scanFolderCount": "{{count}} folder",
+        "scanItemCount": "{{count}} item",
+        "scanningLibrary": "Memindai pustaka…"
     },
     "entity": {
         "album_other": "Album",
@@ -269,7 +277,9 @@
         "sortName": "Nama pengurutan",
         "explicitStatus": "$t(common.explicitStatus)",
         "matchAnd": "Dan",
-        "matchOr": "Atau"
+        "matchOr": "Atau",
+        "date": "Tanggal",
+        "year": "Tahun"
     },
     "form": {
         "addServer": {
@@ -288,7 +298,8 @@
             "input_preferInstantMixDescription": "Hanya gunakan mix instan untuk mendapatkan lagu serupa. berguna jika Anda memiliki plugin yang memodifikasi perilaku ini",
             "input_preferRemoteUrl": "Utamakan URL publik",
             "input_remoteUrl": "Url publik",
-            "input_remoteUrlPlaceholder": "Opsional: URL publik untuk fitur eksternal"
+            "input_remoteUrlPlaceholder": "Opsional: URL publik untuk fitur eksternal",
+            "input_passwordNoSSO": "Autentikasi proxy terbalik (SSO) tidak didukung. Hanya autentikasi nama pengguna/kata sandi dan autentikasi Subsonic yang didukung"
         },
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
@@ -339,7 +350,9 @@
             "expireInvalid": "Masa berlaku harus di waktu mendatang",
             "createFailed": "Gagal membuat bagikanan (apakah fitur berbagi diaktifkan?)",
             "copyToClipboard": "Salin ke clipboard: Ctrl+C, enter",
-            "successMustClick": "Berbagi berhasil dibuat. klik di sini untuk membuka"
+            "successMustClick": "Berbagi berhasil dibuat. klik di sini untuk membuka",
+            "setExpiration_description": "Kosongkan untuk menggunakan masa kedaluwarsa default server",
+            "setExpiration_serverDefault": "Default server"
         },
         "updateServer": {
             "success": "Server berhasil diperbarui",
@@ -373,7 +386,12 @@
             "input_played": "Filter pemutaran",
             "input_played_optionAll": "Semua trek",
             "input_played_optionUnplayed": "Hanya trek yang belum diputar",
-            "input_played_optionPlayed": "Hanya trek yang sudah diputar"
+            "input_played_optionPlayed": "Hanya trek yang sudah diputar",
+            "input_kind_albums": "Album",
+            "input_kind_songs": "Lagu",
+            "input_kind": "Pilihan acak",
+            "input_limit_albums": "Berapa banyak album?",
+            "input_limit_songs": "Berapa banyak lagu?"
         },
         "privateMode": {
             "enabled": "Mode pribadi diaktifkan, status pemutaran kini disembunyikan dari integrasi eksternal",
@@ -382,6 +400,13 @@
         },
         "editRadioStation": {
             "success": "Stasiun radio berhasil diperbarui"
+        },
+        "queueChangeConfirmation": {
+            "title": "Buang antrean saat ini?",
+            "description": "Ini akan menghapus semua item dari antrean saat ini."
+        },
+        "createPrefilledPlaylist": {
+            "title": "Buat $t(entity.playlist, {\"count\": 1}) dari lagu yang dipilih"
         }
     },
     "page": {
@@ -431,7 +456,9 @@
             "privateModeOn": "Nyalakan mode pribadi",
             "selectMusicFolder": "Pilih folder musik",
             "noMusicFolder": "Tidak ada folder musik yang dipilih",
-            "multipleMusicFolders": "{{count}} folder musik dipilih"
+            "multipleMusicFolders": "{{count}} folder musik dipilih",
+            "rescanLibrary": "Pindai ulang pustaka",
+            "logout": "Keluar"
         },
         "manageServers": {
             "title": "Kelola server",
@@ -467,7 +494,8 @@
             "moveItems": "$t(action.moveItems)",
             "goTo": "Buka ke",
             "goToAlbum": "Buka ke $t(entity.album, {\"count\": 1})",
-            "goToAlbumArtist": "Buka ke $t(entity.albumArtist, {\"count\": 1})"
+            "goToAlbumArtist": "Buka ke $t(entity.albumArtist, {\"count\": 1})",
+            "editMetadata": "Edit Metadata"
         },
         "fullscreenPlayer": {
             "config": {
@@ -486,13 +514,35 @@
                 "lyricOffset": "Offset lirik (ms)",
                 "lyricGap": "Jarak lirik",
                 "lyricOpacityNonActive": "Opasitas lirik nonaktif",
-                "lyricScaleNonActive": "Skala lirik nonaktif"
+                "lyricScaleNonActive": "Skala lirik nonaktif",
+                "followCurrentLyric_description": "Gulir secara otomatis untuk menjaga baris lirik aktif tetap terlihat",
+                "lyricFollowScrollAlignment": "Penyelarasan ikuti lirik",
+                "lyricFollowScrollAlignment_description": "Posisi vertikal baris aktif saat mengikuti",
+                "lyricAlignment_description": "Penyelarasan horizontal teks lirik",
+                "lyricGapSynchronized_description": "Jarak vertikal antar baris lirik tersinkronisasi",
+                "lyricGapUnsynchronized_description": "Jarak vertikal antar baris lirik tak tersinkronisasi",
+                "lyricLineLeadTime": "Waktu tuntun baris (ms)",
+                "lyricLineLeadTime_description": "Majukan baris aktif sebanyak milidetik ini sebelum timestamp-nya",
+                "lyricPaddingLeft": "Padding kiri lirik (%)",
+                "lyricPaddingLeft_description": "Padding kiri sebagai persentase dari area lirik",
+                "lyricPaddingRight": "Padding kanan lirik (%)",
+                "lyricPaddingRight_description": "Padding kanan sebagai persentase dari area lirik",
+                "lyricSizeSynchronized_description": "Ukuran font untuk lirik tersinkronisasi (berwaktu)",
+                "lyricSizeUnsynchronized_description": "Ukuran font untuk lirik tak tersinkronisasi (biasa)",
+                "lyricOpacityNonActive_description": "Opasitas baris lirik yang sedang tidak aktif",
+                "lyricScaleNonActive_description": "Skala baris lirik yang sedang tidak aktif",
+                "showLyricMatch_description": "Tampilkan nama lagu dan artis dari lirik yang cocok",
+                "showLyricProvider_description": "Tampilkan penyedia yang menyediakan lirik saat ini"
             },
             "lyrics": "Lirik",
             "related": "Terkait",
             "upNext": "Berikutnya",
             "noLyrics": "Tanpa lirik",
-            "visualizer": "Visualisasi"
+            "visualizer": "Visualisasi",
+            "lyricLayers": "Lapisan lirik",
+            "lyricLanguage": "Bahasa",
+            "showPronunciation": "Pelafalan",
+            "showTranslation": "Terjemahan"
         },
         "genreList": {
             "showAlbums": "Tampilkan $t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2})",
@@ -519,7 +569,27 @@
         "itemDetail": {
             "copyPath": "Salin jalur ke papan klip",
             "copiedPath": "Jalur berhasil disalin",
-            "openFile": "Tampilkan trek di pengelola file"
+            "openFile": "Tampilkan trek di pengelola file",
+            "tagConfiguration": "Konfigurasi tag",
+            "addTagConfig": "Tambahkan tag…",
+            "multiValueToggle": "Multi-nilai",
+            "autocompleteSource": "Sumber autolengkap",
+            "customValues": "Nilai khusus",
+            "addCustomValue": "Tambahkan nilai khusus…",
+            "serverSuggestions": "Server",
+            "fileNotWritable": "File tidak dapat diakses atau tidak dapat ditulis",
+            "triggerRescan": "Picu pemindaian ulang pustaka setelah menyimpan",
+            "addField": "Tambahkan bidang…",
+            "emptyFields": "Bidang tidak boleh kosong",
+            "tagsTab": "Tag",
+            "artworkTab": "Artwork",
+            "removeArtwork": "Hapus Artwork",
+            "noArtwork": "Tanpa Artwork",
+            "multipleValues": "(Beberapa Nilai)",
+            "multipleArtworks": "Beberapa Artwork",
+            "noLocalSongs": "Tidak ditemukan lagu dengan jalur file lokal",
+            "readPartialFailure": "Gagal membaca metadata dari {{count}} dari {{total}} file",
+            "writePartialFailure": "Gagal menyimpan {{count}} file"
         },
         "playlist": {
             "reorder": "Pengurutan ulang hanya diaktifkan saat mengurutkan berdasarkan ID"
@@ -550,7 +620,9 @@
             "transcoding": "Transcoding",
             "discord": "Discord",
             "logger": "Logger",
-            "playerFilters": "Filter pemutar"
+            "playerFilters": "Filter pemutar",
+            "sharing": "Berbagi",
+            "lyricsTranslation": "Terjemahan Lirik"
         },
         "sidebar": {
             "albumArtists": "Artis Album",
@@ -648,7 +720,10 @@
         "sleepTimer_timeRemaining": "{{time}} tersisa",
         "sleepTimer_setCustom": "Atur pengatur waktu",
         "sleepTimer_cancel": "Batalkan pengatur waktu",
-        "scrobbleForceSubmit": "Paksa scrobble"
+        "scrobbleForceSubmit": "Paksa scrobble",
+        "nextAlbum": "Alt+klik untuk album berikutnya",
+        "previousAlbum": "Alt+klik untuk album sebelumnya",
+        "sleepTimer_endOfAlbum": "Akhir album saat ini"
     },
     "setting": {
         "accentColor": "Warna sorotan",
@@ -687,7 +762,7 @@
         "customCssEnable_description": "Izinkan penulisan CSS kustom",
         "customCssNotice": "Peringatan: meskipun ada beberapa sanitasi (melarang URL() dan content:), menggunakan CSS kustom tetap dapat menimbulkan risiko dengan mengubah antarmuka",
         "customCss": "Css kustom",
-        "customCss_description": "Konten CSS kustom. Catatan: properti content dan URL jarak jauh tidak diizinkan. Pratinjau konten anda ditampilkan di bawah. Kolom tambahan yang tidak anda atur ada karena sanitasi",
+        "customCss_description": "Konten CSS khusus. Catatan: properti content dan remote urls tidak diizinkan. Pratinjau konten Anda ditampilkan di bawah. Bidang tambahan yang tidak Anda atur tetap ada karena sanitasi. Desktop: feishin membaca dan menulis custom.css di direktori konfigurasi aplikasi dan memuat ulangnya saat file berubah",
         "customFontPath": "Jalur font kustom",
         "customFontPath_description": "Tentukan jalur font kustom yang akan digunakan aplikasi",
         "discordApplicationId": "ID aplikasi {{discord}}",
@@ -762,7 +837,7 @@
         "lastfmApiKey": "Kunci API untuk {{lastfm}}",
         "lastfmApiKey_description": "Kunci API untuk {{lastfm}}. Diperlukan untuk sampul",
         "lyricFetch": "Cari lirik di internet",
-        "lyricFetch_description": "Mencari lirik dari berbagai sumber di Internet",
+        "lyricFetch_description": "Ambil lirik dari penyedia yang dipilih",
         "lyricFetchProvider": "Penyedia untuk mencari lirik",
         "lyricFetchProvider_description": "Pilih penyedia untuk mengambil lirik dari",
         "lyricOffset": "Geser lirik (ms)",
@@ -841,11 +916,11 @@
         "transcodeFormat": "Format untuk ditranskode",
         "transcodeFormat_description": "Pilih format untuk ditranskode. biarkan kosong agar server yang memutuskan",
         "translationApiProvider": "Penyedia API terjemahan",
-        "translationApiProvider_description": "Penyedia API untuk terjemahan",
+        "translationApiProvider_description": "Memilih penyedia API yang digunakan untuk terjemahan",
         "translationApiKey": "Kunci API terjemahan",
         "translationApiKey_description": "Kunci API untuk terjemahan (hanya endpoint layanan global)",
         "translationTargetLanguage": "Bahasa tujuan penerjemahan",
-        "translationTargetLanguage_description": "Bahasa tujuan untuk penerjemahan",
+        "translationTargetLanguage_description": "Menetapkan bahasa target yang digunakan untuk terjemahan otomatis",
         "trayEnabled": "Tampilkan baki",
         "trayEnabled_description": "Tampilkan/sembunyikan ikon/menu di area pemberitahuan. Jika dinonaktifkan, juga menonaktifkan meminimalkan/keluar ke baki",
         "useSystemTheme": "Gunakan tema sistem",
@@ -863,7 +938,7 @@
         "savePlayQueue": "Simpan antrean pemutaran",
         "autoDJ": "DJ Otomatis",
         "autoDJ_itemCount": "Jumlah item",
-        "autoDJ_itemCount_description": "Jumlah item yang dicoba ditambahkan ke antrean saat DJ otomatis diaktifkan",
+        "autoDJ_itemCount_description": "Jumlah item yang berusaha ditambahkan ke antrean",
         "autoDJ_timing": "Waktu",
         "autoDJ_timing_description": "Jumlah lagu yang tersisa dalam antrean sebelum DJ otomatis dipicu",
         "useThemeAccentColor": "Gunakan warna aksen tema",
@@ -922,7 +997,7 @@
         "lastfm_description": "Tampilkan tautan ke Last.fm pada halaman artis/album",
         "lastfm": "Tampilkan tautan last.fm",
         "logLevel": "Tingkat log",
-        "logLevel_description": "Menetapkan tingkat log minimum untuk ditampilkan. debug menampilkan semua log, error hanya menampilkan error",
+        "logLevel_description": "Menetapkan tingkat log minimum yang akan ditampilkan",
         "logLevel_optionDebug": "Debug",
         "logLevel_optionInfo": "Info",
         "mpvExtraParameters": "Parameter tambahan mpv",
@@ -979,7 +1054,7 @@
         "preventSleepOnPlayback": "Cegah tidur saat pemutaran",
         "sidebarPlaylistSorting_description": "Memungkinkan pengurutan playlist secara manual di bilah samping dengan drag dan drop alih-alih urutan default server",
         "sidebarPlaylistSorting": "Pengurutan playlist bilah samping",
-        "mediaSession_description": "Mengaktifkan integrasi Media Session, menampilkan kontrol media dan metadata pada overlay volume sistem dan layar kunci",
+        "mediaSession_description": "Mengaktifkan integrasi sesi media, menampilkan kontrol media dan metadata di overlay volume sistem dan layar kunci. Memerlukan Pemutar Audio Web.",
         "mediaSession": "Aktifkan media session",
         "transcode": "Aktifkan transcoding",
         "queryBuilder": "Pembuat kueri",
@@ -1044,7 +1119,84 @@
         "sidePlayQueueLayout_optionHorizontal": "Horizontal",
         "sidePlayQueueLayout_optionVertical": "Vertikal",
         "waveformLoadingDelay": "Penundaan pemuatan bentuk gelombang",
-        "waveformLoadingDelay_description": "Penundaan dalam detik sebelum memuat bentuk gelombang. Tingkatkan nilai ini jika Anda mengalami tersendat saat menggunakan pemutar web."
+        "waveformLoadingDelay_description": "Penundaan dalam detik sebelum memuat bentuk gelombang. Tingkatkan nilai ini jika Anda mengalami tersendat saat menggunakan pemutar web.",
+        "autoDJ_mode": "Mode",
+        "autoDJ_mode_albums": "Album",
+        "autoDJ_mode_description": "Pilih untuk menambahkan lagu atau seluruh album ke antrean",
+        "autoDJ_mode_songs": "Lagu",
+        "autoDJ_enabled": "Aktifkan Auto DJ",
+        "autoDJ_albumStrategy": "Mode pemilihan album",
+        "autoDJ_songStrategy": "Mode pemilihan lagu",
+        "autoDJ_strategy_option_library_random": "Acak",
+        "autoDJ_strategy_option_similar": "Serupa",
+        "autoDJ_allowDuplicates": "Izinkan duplikat",
+        "autoDJ_allowDuplicates_description": "Izinkan lagu atau album yang sudah ada di antrean ditambahkan lagi oleh Auto DJ",
+        "autoDJ_onlySimilar": "Hanya yang serupa",
+        "autoDJ_onlySimilar_description": "Hanya tambahkan item yang serupa dengan lagu pemicu. Jumlah item dianggap sebagai jumlah maksimum item yang akan ditambahkan, bukan diisi hingga batas oleh sumber lain",
+        "audioDeviceDefault": "Default sistem",
+        "enableFurigana_description": "Tampilkan panduan pelafalan (furigana) di atas lirik kanji Jepang",
+        "enableFurigana": "Aktifkan pembuatan furigana",
+        "enableRomaji_description": "Tampilkan baris pelafalan romaji di bawah lirik Jepang",
+        "enableRomaji": "Aktifkan pembuatan romaji",
+        "equalizer_descriptionMpv": "Equalizer parametrik melalui FFmpeg lavfi (MPV)",
+        "equalizer_descriptionWebAudio": "Equalizer parametrik melalui Web Audio API",
+        "equalizer": "Equalizer",
+        "equalizerBands_description": "Gain per-bands. Seret ke atas/bawah atau ketik nilai. Rentang: -12 hingga +12 dB.",
+        "equalizerBands": "Bands",
+        "equalizerPreamp_description": "Gain input sebelum bands EQ. Atur negatif saat meningkatkan bands untuk mencegah clipping (MPV).",
+        "equalizerPreamp": "Preamp",
+        "equalizerPreset_description": "Terapkan kurva EQ bawaan atau khusus yang tersimpan",
+        "equalizerPreset": "Preset",
+        "equalizerPresetDeletePlaceholder": "Hapus custom...",
+        "equalizerPresetGroupBuiltIn": "Bawaan",
+        "equalizerPresetGroupCustom": "Khusus",
+        "equalizerPresetNamePlaceholder": "Nama preset...",
+        "equalizerPresetSelectPlaceholder": "Pilih preset",
+        "equalizerSavePreset_description": "Simpan pengaturan EQ saat ini sebagai preset bernama",
+        "equalizerSavePreset": "Simpan preset",
+        "hotkey_playbackNextAlbum": "Album berikutnya",
+        "hotkey_playbackPreviousAlbum": "Album sebelumnya",
+        "logLevel_optionDebugDescription": "Termasuk info, plus informasi debug lengkap, dan respons API yang disamarkan",
+        "logLevel_optionInfoDescription": "Termasuk info, peringatan, dan kesalahan",
+        "exportDiagnostics": "Ekspor diagnostik",
+        "confirmQueueChanges": "Konfirmasi perubahan antrean",
+        "confirmQueueChanges_description": "Minta konfirmasi sebelum membuang antrean saat ini",
+        "showFavorites": "Tampilkan favorit",
+        "showFavorites_description": "Mengontrol apakah tombol favorit (hati) muncul di antarmuka",
+        "showQueueInSidebar_description": "Panel akan ditambahkan ke bilah sisi pemutar yang menampilkan antrean putar",
+        "showQueueInSidebar": "Tampilkan antrean putar di bilah sisi pemutar",
+        "compressor_descriptionMpv": "Kompresor rentang dinamis melalui FFmpeg acompressor (MPV)",
+        "compressor_descriptionWebAudio": "Kompresor rentang dinamis melalui Web Audio API",
+        "compressor": "Kompresor",
+        "compressorAttack_description": "Seberapa cepat kompresor aktif setelah sinyal melebihi ambang.",
+        "compressorAttack": "Attack",
+        "compressorKnee_description": "Lebar soft-knee. Nilai lebih tinggi membuat transisi ke kompresi lebih bertahap.",
+        "compressorKnee": "Knee",
+        "compressorMakeupGain_description": "Gain output yang diterapkan setelah kompresi untuk mengembalikan kenyaringan.",
+        "compressorMakeupGain": "Makeup Gain",
+        "compressorPreset_description": "Terapkan pengaturan kompresor bawaan atau khusus yang tersimpan",
+        "compressorRatio_description": "Rasio kompresi, mis. 4 = 4:1.",
+        "compressorRatio": "Ratio",
+        "compressorRelease_description": "Seberapa cepat kompresor melepas setelah sinyal turun di bawah ambang.",
+        "compressorRelease": "Release",
+        "compressorReset_description": "Kembalikan semua parameter kompresor ke nilai default",
+        "compressorSavePreset_description": "Simpan pengaturan kompresor saat ini sebagai preset bernama",
+        "compressorThreshold_description": "Tingkat sinyal di mana kompresi dimulai.",
+        "compressorThreshold": "Threshold",
+        "shareExpiration_description": "Berapa lama ke depan tautan berbagi baru akan kedaluwarsa secara default. Kosongkan tanggal di dialog berbagi untuk menggunakan default server",
+        "shareExpiration": "Kedaluwarsa berbagi default",
+        "shareExpirationUseServerDefault_description": "Jangan sertakan kedaluwarsa saat membuat berbagi sehingga server dapat menerapkan default yang dikonfigurasi (mis. Navidrome DefaultShareExpiration)",
+        "shareExpirationUseServerDefault": "Gunakan kedaluwarsa default server",
+        "customThemeErrors_description": "File tema ini tidak dapat dimuat.",
+        "customThemeErrors": "Kesalahan",
+        "customThemeWarnings_description": "Tema ini dimuat, tetapi beberapa nilai tidak valid dan diabaikan.",
+        "customThemeWarnings": "Peringatan",
+        "customThemes_description": "Letakkan file tema .json ke folder ini untuk menambahkan tema khusus. File-file ini diambil secara otomatis setiap kali Anda menambahkan, mengedit, atau menghapus file.",
+        "customThemes": "Tema Khusus",
+        "windowBarTrackinfo": "Info trek di Judul Jendela",
+        "windowBarTrackinfo_description": "Tampilkan judul dan artis trek saat ini, posisi antrean, dan status Memutar/Jeda di Judul Jendela.",
+        "microtonalPitchControls": "Kontrol pitch mikrotonal",
+        "microtonalPitchControls_description": "Tambahkan lebih banyak kontrol pitch untuk berpindah di antara semi-ton"
     },
     "table": {
         "column": {
@@ -1067,14 +1219,16 @@
             "playCount": "Putaran",
             "rating": "Penilaian",
             "releaseDate": "Tanggal rilis",
-            "releaseYear": "Tahun",
+            "releaseYear": "Tahun rilis",
             "size": "Ukuran",
             "songCount": "Trek",
             "title": "Judul",
             "trackNumber": "Pista",
             "bitDepth": "Kedalaman Bit",
             "sampleRate": "Laju Sampel",
-            "owner": "Pemilik"
+            "owner": "Pemilik",
+            "date": "Tanggal",
+            "year": "Tahun"
         },
         "config": {
             "general": {
@@ -1107,7 +1261,12 @@
                 "horizontalBorders": "Batas baris",
                 "rowHoverHighlight": "Sorotan hover baris",
                 "showHeader": "Tampilkan header",
-                "verticalBorders": "Batas kolom"
+                "verticalBorders": "Batas kolom",
+                "albumGroupConfig": "Konfigurasi Grup Album",
+                "albumGroupMetadata": "Bidang metadata",
+                "albumGroupShowFavoriteRating": "Tampilkan favorit dan peringkat",
+                "albumGroupVerticalLayout": "Tata letak vertikal",
+                "albumImageSize": "Ukuran gambar album"
             },
             "label": {
                 "actions": "$t(common.action, {\"count\": 2})",
@@ -1145,7 +1304,9 @@
                 "image": "Gambar",
                 "sampleRate": "$t(common.sampleRate)",
                 "titleArtist": "$t(common.title) (artis)",
-                "albumGroup": "Grup album"
+                "albumGroup": "Grup album",
+                "date": "Tanggal",
+                "releaseYear": "Tahun Rilis"
             },
             "view": {
                 "table": "Tabel",
@@ -1159,7 +1320,14 @@
         "minuteShort": "M",
         "secondShort": "S",
         "hourShort": "H",
-        "dayShort": "D"
+        "dayShort": "D",
+        "secondLong": "Detik",
+        "minuteLong": "Menit",
+        "hourLong": "Jam",
+        "dayLong": "Hari",
+        "weekLong": "Minggu",
+        "monthLong": "Bulan",
+        "yearLong": "Tahun"
     },
     "filterOperator": {
         "after": "Setelah",
@@ -1180,7 +1348,9 @@
         "notContains": "Tidak berisi",
         "notInPlaylist": "Tidak berada di",
         "notInTheLast": "Tidak dalam kurun terakhir",
-        "startsWith": "Diawali dengan"
+        "startsWith": "Diawali dengan",
+        "isMissing": "Tidak ada",
+        "isPresent": "Ada"
     },
     "queryBuilder": {
         "standardTags": "Tag standar",

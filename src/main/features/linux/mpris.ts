@@ -1,9 +1,8 @@
 import { ipcMain } from 'electron';
 import Player from 'mpris-service';
 
-import { getMainWindow } from '/@/main/index';
+import { getMainWindow, showMainWindow } from '/@/main/index';
 import log from '/@/main/logger';
-import { MPV_VOLUME_MAX_CEILING } from '/@/shared/constants/volume';
 import { QueueSong } from '/@/shared/types/domain-types';
 import { PlayerRepeat, PlayerStatus } from '/@/shared/types/types';
 
@@ -23,7 +22,7 @@ mprisPlayer.on('quit', () => {
 });
 
 const hasData = (): boolean => {
-    return mprisPlayer.metadata && !!mprisPlayer.metadata['mpris:length'];
+    return mprisPlayer.metadata && !!mprisPlayer.metadata['mpris:trackid'];
 };
 
 mprisPlayer.on('stop', () => {
@@ -71,11 +70,14 @@ mprisPlayer.on('previous', () => {
     }
 });
 
-// The renderer clamps to the active backend's maximum (mpv's --volume-max when
-// mpv is selected), since that range is derived from settings the renderer owns.
-// Only a sanity range is enforced here.
 mprisPlayer.on('volume', (vol: number) => {
-    const volume = Math.min(MPV_VOLUME_MAX_CEILING, Math.max(0, Math.round(vol * 100)));
+    let volume = Math.round(vol * 100);
+
+    if (volume > 100) {
+        volume = 100;
+    } else if (volume < 0) {
+        volume = 0;
+    }
 
     getMainWindow()?.webContents.send('request-volume', {
         volume,
@@ -107,7 +109,7 @@ mprisPlayer.on('seek', (event: number) => {
 });
 
 mprisPlayer.on('raise', () => {
-    getMainWindow()?.show();
+    showMainWindow();
 });
 
 ipcMain.on('update-position', (_event, arg: number) => {
@@ -143,6 +145,10 @@ ipcMain.on('update-repeat', (_event, arg: PlayerRepeat) => {
 
 ipcMain.on('update-shuffle', (_event, shuffle: boolean) => {
     mprisPlayer.shuffle = shuffle;
+});
+
+ipcMain.on('update-lyrics', (_event, lyrics: string) => {
+    mprisPlayer.metadata['xesam:asText'] = lyrics;
 });
 
 ipcMain.on(
