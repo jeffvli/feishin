@@ -627,7 +627,9 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 speakerSidePauseRef.current = true;
                 mediaPause?.();
             } else if (state === 'STOPPED') {
-                mediaPause?.();
+                if (usePlayerStore.getState().player.status !== PlayerStatus.STOPPED) {
+                    mediaPause?.();
+                }
             }
         };
         dlnaPlayerListener.rendererDlnaTransportState(handler);
@@ -803,7 +805,22 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                     suppressDeviceSeekRef.current = false;
                     return;
                 }
+                // mediaStop resets the timestamp to 0 in the same store update that sets
+                // STOPPED; forwarding that as a seek would restart the track on the renderer.
+                if (usePlayerStore.getState().player.status === PlayerStatus.STOPPED) {
+                    return;
+                }
                 dlnaPlayer?.seek(properties.timestamp);
+            },
+            onPlayerStop: () => {
+                devicePassiveModeRef.current = false;
+                dlnaPlayer?.stop();
+                // Force the next play to re-send the track: renderers may drop the URI on Stop.
+                hasPlayedRef.current = false;
+                lastSentUrlRef.current = '';
+                lastSentRawUrlRef.current = '';
+                sameUriLoopQueuedRef.current = false;
+                wasNearEndRef.current = false;
             },
             onQueueCleared: () => {
                 devicePassiveModeRef.current = false;
