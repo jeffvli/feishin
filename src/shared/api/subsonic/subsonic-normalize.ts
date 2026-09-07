@@ -285,6 +285,7 @@ const normalizeAlbumArtist = (
         mbz: null,
         name: item.name,
         playCount: null,
+        roles: null,
         similarArtists:
             item.similarArtists?.map((artist) => ({
                 id: String(artist.id),

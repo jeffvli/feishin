@@ -229,6 +229,7 @@ export type AlbumArtist = {
     mbz: null | string;
     name: string;
     playCount: null | number;
+    roles: null | string[];
     similarArtists: null | RelatedArtist[];
     songCount: null | number;
     uploadedImage?: string;
@@ -521,6 +522,7 @@ export interface AlbumListQuery extends AlbumListNavidromeQuery, BaseQuery<Album
     maxYear?: number;
     minYear?: number;
     musicFolderId?: string | string[];
+    role?: string;
     searchTerm?: string;
     startIndex: number;
 }

@@ -1,5 +1,5 @@
-import { useSuspenseQueries } from '@tanstack/react-query';
-import { Suspense, useRef } from 'react';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { Suspense, useRef, useState } from 'react';
 import { useParams } from 'react-router';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
@@ -37,22 +37,24 @@ const AlbumArtistDetailRouteContent = () => {
     };
 
     const routeId = (artistId || albumArtistId) as string;
+    const [role, setRole] = useState<null | string>(null);
 
-    const [detailQuery, albumsQuery] = useSuspenseQueries({
-        queries: [
-            artistsQueries.albumArtistDetail({ query: { id: routeId }, serverId: server?.id }),
-            albumQueries.list({
-                query: {
-                    artistIds: [routeId],
-                    limit: -1,
-                    sortBy: AlbumListSort.RELEASE_DATE,
-                    sortOrder: SortOrder.DESC,
-                    startIndex: 0,
-                },
-                serverId,
-            }),
-        ],
-    });
+    const detailQuery = useSuspenseQuery(
+        artistsQueries.albumArtistDetail({ query: { id: routeId }, serverId: server?.id }),
+    );
+    const albumsQuery = useQuery(
+        albumQueries.list({
+            query: {
+                artistIds: [routeId],
+                limit: -1,
+                role: role || undefined,
+                sortBy: AlbumListSort.RELEASE_DATE,
+                sortOrder: SortOrder.DESC,
+                startIndex: 0,
+            },
+            serverId,
+        }),
+    );
 
     const imageUrl = useItemImageUrl({
         id: detailQuery.data?.imageId || undefined,
@@ -120,7 +122,12 @@ const AlbumArtistDetailRouteContent = () => {
                         albumsQuery={albumsQuery}
                         ref={headerRef as React.Ref<HTMLDivElement>}
                     />
-                    <AlbumArtistDetailContent albumsQuery={albumsQuery} detailQuery={detailQuery} />
+                    <AlbumArtistDetailContent
+                        albumsQuery={albumsQuery}
+                        detailQuery={detailQuery}
+                        role={role}
+                        setRole={setRole}
+                    />
                 </LibraryContainer>
             </NativeScrollArea>
         </AnimatedPage>

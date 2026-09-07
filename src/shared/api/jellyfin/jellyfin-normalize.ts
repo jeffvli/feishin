@@ -334,6 +334,7 @@ const normalizeAlbumArtist = (
         mbz: item.ProviderIds?.MusicBrainzArtist || null,
         name: item.Name,
         playCount: item.UserData?.PlayCount || 0,
+        roles: null,
         similarArtists,
         songCount: item.SongCount ?? null,
         uploadedImage: item.ImageTags?.Primary ?? undefined,

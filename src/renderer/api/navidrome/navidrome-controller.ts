@@ -425,16 +425,18 @@ export const NavidromeController: InternalControllerEndpoint = {
             ? query.artistIds
             : query.artistIds?.[0];
 
+        const key = query.role ? `role_${query.role}_id` : 'artist_id';
+
         const res = await ndApiClient(apiClientProps).getAlbumList({
             query: {
                 _end: query.startIndex + (query.limit || 0),
                 _order: sortOrderMap.navidrome[query.sortOrder],
                 _sort: albumListSortMap.navidrome[query.sortBy],
                 _start: query.startIndex,
-                artist_id: artistIds,
                 compilation: query.compilation,
                 genre_id: genres,
                 has_rating: query.hasRating,
+                [key]: artistIds,
                 library_id: getLibraryId(query.musicFolderId),
                 name: query.searchTerm,
                 recently_played: query.isRecentlyPlayed,

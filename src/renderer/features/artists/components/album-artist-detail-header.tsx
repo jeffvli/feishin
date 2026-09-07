@@ -1,4 +1,4 @@
-import { useSuspenseQuery, UseSuspenseQueryResult } from '@tanstack/react-query';
+import { UseQueryResult, useSuspenseQuery } from '@tanstack/react-query';
 import { forwardRef, Fragment, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
@@ -39,7 +39,7 @@ import { ServerFeature } from '/@/shared/types/features-types';
 import { Play } from '/@/shared/types/types';
 
 interface AlbumArtistDetailHeaderProps {
-    albumsQuery: UseSuspenseQueryResult<AlbumListResponse, Error>;
+    albumsQuery: UseQueryResult<AlbumListResponse, Error>;
 }
 
 function ArtistImageUploadOverlay({

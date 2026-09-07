@@ -414,10 +414,12 @@ const normalizeAlbumArtist = (
 
     if (item.stats) {
         albumCount = Math.max(
+            item.stats.maincredit?.albumCount ?? 0,
             item.stats.albumartist?.albumCount ?? 0,
             item.stats.artist?.albumCount ?? 0,
         );
         songCount = Math.max(
+            item.stats.maincredit?.songCount ?? 0,
             item.stats.albumartist?.songCount ?? 0,
             item.stats.artist?.songCount ?? 0,
         );
@@ -457,6 +459,8 @@ const normalizeAlbumArtist = (
         mbz: item.mbzArtistId || null,
         name: item.name,
         playCount: item.playCount || 0,
+        // filter out specifically maincredit. This is not filterable properly
+        roles: item.stats ? Object.keys(item.stats).filter((key) => key !== 'maincredit') : null,
         similarArtists:
             item.similarArtists?.map((artist) => ({
                 id: String(artist.id),
