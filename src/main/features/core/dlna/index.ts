@@ -78,6 +78,30 @@ let lastCommandedUri = '';
 // Seconds the current stream starts at (a transcode re-sent with a start offset). Added to
 // every polled position so the app sees track time, not stream time.
 let positionOffsetSeconds = 0;
+// A Yamaha HTR-6067 given SetNextAVTransportURI within ~300 ms of Play switches to the
+// queued URI instead of the one just loaded. The app re-arms the queued next about a second
+// after issuing a load, which on that receiver lands on top of Play. Next-URI changes wait
+// until no Play is in flight and the last Play is at least a second old.
+let playInFlight = false; // a load (SetAVTransportURI through Play) or a Play is in progress
+let nextUriInFlight = false; // a SetNext/ClearNext call is in progress
+const NEXT_URI_SETTLE_MS = 1000;
+async function settleAfterPlay(): Promise<void> {
+    while (playInFlight) await new Promise((r) => setTimeout(r, 100));
+    const wait = NEXT_URI_SETTLE_MS - (Date.now() - lastPlayCommandAt);
+    if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+}
+// The converse: Play must not be issued while a next-URI call is still being answered.
+async function waitForNextUriIdle(): Promise<void> {
+    while (nextUriInFlight) await new Promise((r) => setTimeout(r, 50));
+}
+async function withNextUriInFlight<T>(fn: () => Promise<T>): Promise<T> {
+    nextUriInFlight = true;
+    try {
+        return await fn();
+    } finally {
+        nextUriInFlight = false;
+    }
+}
 // Mirrors the engine's isChunkedTranscodeUrl: Jellyfin transcode routes that cannot be seeked.
 const isChunkedTranscodeUri = (uri: string) =>
     /[?&]static=false(?:&|$)/.test(uri) || /\/universal\?/.test(uri);
@@ -1733,6 +1757,7 @@ ipcMain.on(
     ) => {
         if (!connectedDevice) return;
         const device = connectedDevice;
+        playInFlight = true;
         try {
             hasStartedPlaying = false;
             lastKnownPosition = 0;
@@ -1779,6 +1804,7 @@ ipcMain.on(
             await setAVTransportURI(device, lanUrl, metadata);
             await new Promise((r) => setTimeout(r, 1000));
             if (data.metadata.autoPlay !== false) {
+                await waitForNextUriIdle();
                 lastPlayCommandAt = Date.now();
                 await play(device).catch((err) => dlnaLog('Initial play failed', err));
                 dlnaLog(`Playing: ${data.metadata.title}`);
@@ -1811,6 +1837,7 @@ ipcMain.on(
             } else {
                 dlnaLog(`Queued (Paused): ${data.metadata.title}`);
                 if (shouldMuteTrick) {
+                    await waitForNextUriIdle();
                     lastPlayCommandAt = Date.now();
                     await play(device).catch(() => {});
                     await waitForTransportState(device, ['PLAYING'], 4000);
@@ -1846,6 +1873,8 @@ ipcMain.on(
                     groupMembers.map((m) => setMute(m, !!data.isMuted).catch(() => {})),
                 );
             }
+        } finally {
+            playInFlight = false;
         }
     },
 );
@@ -1853,11 +1882,14 @@ ipcMain.on(
 // Set the next track for gapless playback
 ipcMain.on('dlna-set-next-url', async (_event, data: { metadata: TrackMetadata; url: string }) => {
     if (!connectedDevice) return;
+    await settleAfterPlay();
+    if (!connectedDevice) return;
+    const device = connectedDevice;
     try {
         if (!data.url) {
             lastQueuedNextUri = '';
             try {
-                await clearNextAVTransportURI(connectedDevice);
+                await withNextUriInFlight(() => clearNextAVTransportURI(device));
             } catch {
                 // Pass
             }
@@ -1869,10 +1901,12 @@ ipcMain.on('dlna-set-next-url', async (_event, data: { metadata: TrackMetadata; 
         const lanArtUrl = data.metadata?.albumArtUrl
             ? rewriteUrlForLan(data.metadata.albumArtUrl)
             : undefined;
-        await setNextAVTransportURI(connectedDevice, lanUrl, {
-            ...data.metadata,
-            albumArtUrl: lanArtUrl,
-        });
+        await withNextUriInFlight(() =>
+            setNextAVTransportURI(device, lanUrl, {
+                ...data.metadata,
+                albumArtUrl: lanArtUrl,
+            }),
+        );
         dlnaLog(`Set next track: ${data.metadata.title}`);
     } catch (err) {
         dlnaLog(`Failed to set next track ${data?.metadata?.title || ''}`, err);
@@ -1888,7 +1922,13 @@ ipcMain.on('dlna-play', async () => {
         lastPlayCommandAt = Date.now();
         lastPauseCommandAt = 0;
         lastKnownTransportState = 'PLAYING';
-        await play(connectedDevice);
+        await waitForNextUriIdle();
+        playInFlight = true;
+        try {
+            await play(connectedDevice);
+        } finally {
+            playInFlight = false;
+        }
     } catch (err) {
         dlnaLog('Failed to resume playback', err);
     }
@@ -1920,10 +1960,13 @@ ipcMain.on('dlna-pause', async () => {
 
 ipcMain.on('dlna-clear-next', async () => {
     if (!connectedDevice) return;
+    await settleAfterPlay();
+    if (!connectedDevice) return;
+    const device = connectedDevice;
     lastQueuedNextUri = '';
     lastClearNextAt = Date.now();
     try {
-        await clearNextAVTransportURI(connectedDevice);
+        await withNextUriInFlight(() => clearNextAVTransportURI(device));
         dlnaLog('Cleared next track');
     } catch (err) {
         dlnaLog('Failed to clear next track', err);
