@@ -1472,6 +1472,12 @@ export const JellyfinController: InternalControllerEndpoint = {
             query: { ...query, limit: 1, startIndex: 0 },
         }).then((result) => result!.totalRecordCount!),
     getStreamUrl: async ({ apiClientProps: { server }, query }) => {
+        // Lossy encoders top out at 48 kHz (libmp3lame, libopus, aac); asking Jellyfin
+        // for more makes ffmpeg fail and the stream never starts.
+        const clampSampleRate = (rate: number | undefined, codec: string) =>
+            rate && ['aac', 'mp3', 'ogg', 'opus', 'vorbis'].includes(codec)
+                ? Math.min(rate, 48000)
+                : rate;
         const {
             bitrate,
             container,
@@ -1501,8 +1507,9 @@ export const JellyfinController: InternalControllerEndpoint = {
                 if (bitrate !== undefined) {
                     url += `&audioBitRate=${bitrate * 1000}`;
                 }
-                if (maxSampleRate && sampleRate && sampleRate > maxSampleRate) {
-                    url += `&audioSampleRate=${maxSampleRate}`;
+                const cappedRate = clampSampleRate(maxSampleRate, realFormat);
+                if (cappedRate && sampleRate && sampleRate > cappedRate) {
+                    url += `&audioSampleRate=${cappedRate}`;
                 }
             }
         } else if (transcode) {
@@ -1530,8 +1537,9 @@ export const JellyfinController: InternalControllerEndpoint = {
             if (bitrate !== undefined) {
                 url += `&maxStreamingBitrate=${bitrate * 1000}`;
             }
-            if (maxSampleRate) {
-                url += `&maxAudioSampleRate=${maxSampleRate}`;
+            const cappedRate = clampSampleRate(maxSampleRate, realFormat.toLowerCase());
+            if (cappedRate) {
+                url += `&maxAudioSampleRate=${cappedRate}`;
             }
         }
 
