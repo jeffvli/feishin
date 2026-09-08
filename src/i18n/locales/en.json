@@ -1262,6 +1262,7 @@
         "transcodeBitrate": "Bitrate to transcode",
         "transcodeFormat_description": "Selects the format to transcode. Leave empty to let the server decide",
         "transcodeFormat": "Format to transcode",
+        "transcodeNote": "Transcoding is done by the server and applies from the next track",
         "transcodeSampleRate_description": "Maximum sample rate in Hz for transcoded audio, e.g. 192000. Leave empty to keep the source rate. Jellyfin only",
         "transcodeSampleRate": "Max sample rate to transcode",
         "translationApiKey_description": "API key for translation (global service endpoint only)",
