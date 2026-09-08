@@ -157,14 +157,16 @@ function getMimeType(url: string, contentType?: null | string, suffix?: null | s
         const mime = FORMAT_MIME_MAP[fmt];
         if (mime) return mime;
     }
+    // A transcode URL names its container in the path (stream.mp3); that describes the
+    // bytes the renderer will get, where the source's type and suffix describe the file.
+    const path = url.split('?')[0].toLowerCase();
+    for (const [ext, mime] of Object.entries(SUFFIX_MIME_MAP)) {
+        if (path.endsWith(`.${ext}`)) return mime;
+    }
     if (contentType?.startsWith('audio/')) return contentType;
     if (suffix) {
         const mapped = SUFFIX_MIME_MAP[suffix.toLowerCase()];
         if (mapped) return mapped;
-    }
-    const path = url.split('?')[0].toLowerCase();
-    for (const [ext, mime] of Object.entries(SUFFIX_MIME_MAP)) {
-        if (path.endsWith(`.${ext}`)) return mime;
     }
     return 'audio/mpeg';
 }
