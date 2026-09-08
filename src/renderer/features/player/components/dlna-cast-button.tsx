@@ -26,7 +26,6 @@ import { toast } from '/@/shared/components/toast/toast';
 import { PlayerType } from '/@/shared/types/types';
 
 const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
-const ipc = isElectron() ? window.api.ipc : null;
 const dlnaPlayerListener = isElectron() ? window.api.dlnaPlayerListener : null;
 
 type Screen = 'connected' | 'connecting' | 'expand-group' | 'group' | 'group-build' | 'idle';
@@ -82,15 +81,11 @@ export const DlnaCastButton = () => {
                 toast.info?.({ message: payload.message });
             }
         };
-        dlnaPlayerListener.rendererDlnaToast(handler);
-        return () => {
-            ipc?.removeAllListeners('renderer-dlna-toast');
-        };
+        return dlnaPlayerListener.rendererDlnaToast(handler);
     }, []);
 
     useEffect(() => {
         if (!dlnaPlayerListener) return;
-        if (!ipc) return;
         const handleGroupState = (_: unknown, state: GroupMember[]) => {
             setGroupMemberList(state);
             if (state.length > 1) {
@@ -110,10 +105,7 @@ export const DlnaCastButton = () => {
                 }
             }
         };
-        dlnaPlayerListener.rendererDlnaGroupState(handleGroupState);
-        return () => {
-            ipc?.removeAllListeners('renderer-dlna-group-state');
-        };
+        return dlnaPlayerListener.rendererDlnaGroupState(handleGroupState);
     }, [t]);
     useEffect(() => {
         if (!dlnaPlayerListener) return;
@@ -125,10 +117,7 @@ export const DlnaCastButton = () => {
                 return updated;
             });
         };
-        dlnaPlayerListener.rendererDlnaDiscoveryUpdate(handleDiscoveryUpdate);
-        return () => {
-            ipc?.removeAllListeners('renderer-dlna-discovery-update');
-        };
+        return dlnaPlayerListener.rendererDlnaDiscoveryUpdate(handleDiscoveryUpdate);
     }, [screen]);
 
     const handleDiscover = useCallback(async () => {

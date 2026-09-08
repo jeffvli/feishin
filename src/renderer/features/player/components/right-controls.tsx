@@ -1047,11 +1047,12 @@ const VolumeButton = () => {
                 return next;
             });
         };
-        dlnaPlayerListener.rendererDlnaGroupState(handleGroupState);
-        dlnaPlayerListener.rendererDlnaGroupMemberVolume(handleMemberVolume);
+        const unsubscribeGroupState = dlnaPlayerListener.rendererDlnaGroupState(handleGroupState);
+        const unsubscribeMemberVolume =
+            dlnaPlayerListener.rendererDlnaGroupMemberVolume(handleMemberVolume);
         return () => {
-            ipc?.removeAllListeners('renderer-dlna-group-state');
-            ipc?.removeAllListeners('renderer-dlna-group-member-volume');
+            unsubscribeGroupState();
+            unsubscribeMemberVolume();
         };
     }, []);
 

@@ -129,6 +129,7 @@ let speedProxyProcess: ChildProcess | null = null;
 let isPausedIntentionally = false;
 let currentFfmpegProcess: ChildProcess | null = null;
 let currentTranscodeFile = '';
+const servedTempFiles = new Set<string>();
 let lastKnownDuration = 0;
 let nearEndStallCount = 0;
 let resumeKickCount = 0;
@@ -140,6 +141,7 @@ let pendingTopologyRefreshTimeout: NodeJS.Timeout | null = null;
 cleanupTempFiles();
 
 function cleanupTempFiles() {
+    servedTempFiles.clear();
     try {
         const tmpDir = os.tmpdir();
         const files = readdirSync(tmpDir);
@@ -207,6 +209,7 @@ function stopCurrentTranscode() {
         currentFfmpegProcess = null;
     }
     if (currentTranscodeFile) {
+        servedTempFiles.delete(path.resolve(currentTranscodeFile));
         try {
             if (existsSync(currentTranscodeFile)) {
                 unlinkSync(currentTranscodeFile);
@@ -421,27 +424,37 @@ async function ensureEventServer(): Promise<void> {
             try {
                 const qs = new URLSearchParams(req.url.split('?')[1] ?? '');
                 const filePath = qs.get('path');
-                if (!filePath || !filePath.startsWith(os.tmpdir())) {
+                const resolvedPath = filePath ? path.resolve(filePath) : '';
+                if (!resolvedPath || !servedTempFiles.has(resolvedPath)) {
                     res.writeHead(403);
                     return res.end();
                 }
-                const stat = statSync(filePath);
+                const stat = statSync(resolvedPath);
                 const fileSize = stat.size;
                 const range = req.headers.range;
+                const isGrowing =
+                    resolvedPath === path.resolve(currentTranscodeFile) &&
+                    currentFfmpegProcess !== null;
                 if (req.method === 'HEAD') {
                     res.writeHead(200, {
-                        'Accept-Ranges': 'bytes',
-                        'Content-Length': fileSize,
+                        'Accept-Ranges': isGrowing ? 'none' : 'bytes',
+                        ...(isGrowing ? {} : { 'Content-Length': fileSize }),
                         'Content-Type': 'audio/mpeg',
                     });
                     return res.end();
                 }
-                if (range) {
+                if (isGrowing) {
+                    res.writeHead(200, {
+                        'Accept-Ranges': 'none',
+                        'Content-Type': 'audio/mpeg',
+                    });
+                    void streamGrowingFile(resolvedPath, res);
+                } else if (range) {
                     const parts = range.replace(/bytes=/, '').split('-');
                     const start = parseInt(parts[0], 10);
                     const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
                     const chunksize = end - start + 1;
-                    const file = createReadStream(filePath, { end, start });
+                    const file = createReadStream(resolvedPath, { end, start });
                     res.writeHead(206, {
                         'Accept-Ranges': 'bytes',
                         'Content-Length': chunksize,
@@ -455,7 +468,7 @@ async function ensureEventServer(): Promise<void> {
                         'Content-Length': fileSize,
                         'Content-Type': 'audio/mpeg',
                     });
-                    createReadStream(filePath).pipe(res);
+                    createReadStream(resolvedPath).pipe(res);
                 }
             } catch (err) {
                 dlnaLog('Static file serve error', err);
@@ -1472,6 +1485,32 @@ async function stopTopologySubscription(device: DlnaDevice): Promise<void> {
     topologySubscriptionSid = null;
 }
 
+async function streamGrowingFile(filePath: string, res: http.ServerResponse): Promise<void> {
+    let offset = 0;
+    while (!res.destroyed) {
+        try {
+            const size = statSync(filePath).size;
+            if (size > offset) {
+                await new Promise<void>((resolve) => {
+                    const stream = createReadStream(filePath, { end: size - 1, start: offset });
+                    stream.on('end', resolve);
+                    stream.on('error', resolve);
+                    stream.pipe(res, { end: false });
+                });
+                offset = size;
+                continue;
+            }
+        } catch {
+            break;
+        }
+        const isGrowing =
+            path.resolve(currentTranscodeFile) === filePath && currentFfmpegProcess !== null;
+        if (!isGrowing) break;
+        await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    if (!res.destroyed) res.end();
+}
+
 async function waitForTransportState(
     device: DlnaDevice,
     states: string[],
@@ -2138,66 +2177,62 @@ ipcMain.handle(
         const fileName = `dlna-speed-${safeUrlId}-s${data.speed}-p${pp}.mp3`;
         const filePath = path.join(os.tmpdir(), fileName);
         currentTranscodeFile = filePath;
-        return new Promise<null | string>((resolve) => {
-            try {
-                let audioFilter = '';
-                if (data.speed !== 1) {
-                    if (!data.preservePitch) {
-                        const targetRate = Math.round(44100 * data.speed);
-                        audioFilter = `aresample=44100,asetrate=${targetRate},aresample=44100`;
-                    } else {
-                        const parts: string[] = [];
-                        let remaining = data.speed;
-                        while (remaining > 2) {
-                            parts.push('atempo=2.0');
-                            remaining /= 2;
-                        }
-                        while (remaining < 0.5) {
-                            parts.push('atempo=0.5');
-                            remaining /= 0.5;
-                        }
-                        parts.push(`atempo=${remaining.toFixed(6)}`);
-                        audioFilter = parts.join(',');
+        try {
+            let audioFilter = '';
+            if (data.speed !== 1) {
+                if (!data.preservePitch) {
+                    const targetRate = Math.round(44100 * data.speed);
+                    audioFilter = `aresample=44100,asetrate=${targetRate},aresample=44100`;
+                } else {
+                    const parts: string[] = [];
+                    let remaining = data.speed;
+                    while (remaining > 2) {
+                        parts.push('atempo=2.0');
+                        remaining /= 2;
                     }
+                    while (remaining < 0.5) {
+                        parts.push('atempo=0.5');
+                        remaining /= 0.5;
+                    }
+                    parts.push(`atempo=${remaining.toFixed(6)}`);
+                    audioFilter = parts.join(',');
                 }
-                dlnaLog(`Transcode started for speed: ${data.speed}`);
-                const ffmpeg = spawn('ffmpeg', [
-                    '-loglevel',
-                    'error',
-                    '-i',
-                    data.url,
-                    '-vn',
-                    '-af',
-                    audioFilter || 'anull',
-                    '-map_metadata',
-                    '0',
-                    '-f',
-                    'mp3',
-                    currentTranscodeFile,
-                ]);
-                currentFfmpegProcess = ffmpeg;
-                ffmpeg.on('error', (err) => {
-                    dlnaLog('FFmpeg spawn error', err);
-                    currentFfmpegProcess = null;
-                    resolve(null);
-                });
-                ffmpeg.on('close', (code) => {
-                    currentFfmpegProcess = null;
-                    if (code === 0) {
-                        dlnaLog('Transcode finished successfully');
-                        resolve(
-                            `http://${lanIp}:${eventServerPort}/serve-temp?path=${encodeURIComponent(currentTranscodeFile)}`,
-                        );
-                    } else {
-                        dlnaLog(`FFmpeg exited with code ${code}`);
-                        resolve(null);
-                    }
-                });
-            } catch (err) {
-                dlnaLog('Transcode setup failed', err);
-                resolve(null);
             }
-        });
+            dlnaLog(`Transcode started for speed: ${data.speed}`);
+            const ffmpeg = spawn('ffmpeg', [
+                '-loglevel',
+                'error',
+                '-i',
+                data.url,
+                '-vn',
+                '-af',
+                audioFilter || 'anull',
+                '-map_metadata',
+                '0',
+                '-f',
+                'mp3',
+                filePath,
+            ]);
+            currentFfmpegProcess = ffmpeg;
+            ffmpeg.on('error', (err) => {
+                dlnaLog('FFmpeg spawn error', err);
+                if (currentFfmpegProcess === ffmpeg) currentFfmpegProcess = null;
+            });
+            ffmpeg.on('close', (code) => {
+                if (currentFfmpegProcess === ffmpeg) currentFfmpegProcess = null;
+                if (code === 0) {
+                    servedTempFiles.add(path.resolve(filePath));
+                    dlnaLog('Transcode finished successfully');
+                } else {
+                    servedTempFiles.delete(path.resolve(filePath));
+                    dlnaLog(`FFmpeg exited with code ${code}`);
+                }
+            });
+            return true;
+        } catch (err) {
+            dlnaLog('Transcode setup failed', err);
+            return null;
+        }
     },
 );
 
@@ -2218,6 +2253,11 @@ ipcMain.handle(
         const filePath = path.join(os.tmpdir(), fileName);
         try {
             await fsPromises.access(filePath);
+            if (currentTranscodeFile === filePath && currentFfmpegProcess) {
+                const stat = await fsPromises.stat(filePath);
+                if (stat.size < 64 * 1024) return null;
+            }
+            servedTempFiles.add(path.resolve(filePath));
             return `http://${lanIp}:${eventServerPort}/serve-temp?path=${encodeURIComponent(filePath)}`;
         } catch {
             return null;

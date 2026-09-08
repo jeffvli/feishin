@@ -38,7 +38,6 @@ type SongWithAudioMeta = {
 
 const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
 const dlnaPlayerListener = isElectron() ? window.api.dlnaPlayerListener : null;
-const ipc = isElectron() ? window.api.ipc : null;
 const SUFFIX_MIME_MAP: Record<string, string> = {
     aac: 'audio/aac',
     flac: 'audio/flac',
@@ -584,14 +583,10 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             }
             setTimestamp(Math.floor(time));
         };
-        dlnaPlayerListener.rendererCurrentTime(handleCurrentTime);
-        return () => {
-            ipc?.removeAllListeners('renderer-dlna-current-time');
-        };
+        return dlnaPlayerListener.rendererCurrentTime(handleCurrentTime);
     }, [setTimestamp]);
     useEffect(() => {
         if (!dlnaPlayerListener) return;
-        if (!ipc) return;
         const handler = async (
             _event: any,
             info: {
@@ -661,10 +656,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 sendCurrentTrackToDlna();
             }
         };
-        dlnaPlayerListener.rendererDlnaConnectPlayback(handler);
-        return () => {
-            ipc?.removeAllListeners('renderer-dlna-connect-playback');
-        };
+        return dlnaPlayerListener.rendererDlnaConnectPlayback(handler);
     }, [
         transcode,
         setTimestamp,
@@ -701,14 +693,10 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 }
             }
         };
-        dlnaPlayerListener.rendererDlnaTransportState(handler);
-        return () => {
-            ipc?.removeAllListeners('renderer-dlna-transport-state');
-        };
+        return dlnaPlayerListener.rendererDlnaTransportState(handler);
     }, [mediaPlay, mediaPause]);
     useEffect(() => {
         if (!dlnaPlayerListener) return;
-        if (!ipc) return;
         const handler = () => {
             const timeSinceTrackEnded = Date.now() - recentTrackEndedAtRef.current;
             if (timeSinceTrackEnded < TRACK_ENDED_PREV_SUPPRESSION_MS) {
@@ -729,25 +717,18 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             sameUriLoopQueuedRef.current = false;
             mediaPrevious(false);
         };
-        dlnaPlayerListener.rendererDlnaPrevTrack(handler);
-        return () => {
-            ipc?.removeAllListeners('renderer-dlna-prev-track');
-        };
+        return dlnaPlayerListener.rendererDlnaPrevTrack(handler);
     }, [mediaPrevious, onEnded, sendNextTrackToDlna]);
     useEffect(() => {
         if (!dlnaPlayerListener) return;
         const handler = (_event: any, vol: number) => {
             setVolume?.(vol);
         };
-        dlnaPlayerListener.rendererDlnaVolume(handler);
-        return () => {
-            ipc?.removeAllListeners('renderer-dlna-volume');
-        };
+        return dlnaPlayerListener.rendererDlnaVolume(handler);
     }, [setVolume]);
     // Listen for track ended events
     useEffect(() => {
         if (!dlnaPlayerListener) return;
-        if (!ipc) return;
         const handleTrackEnded = (_event: unknown, payload?: { gapless?: boolean }) => {
             if (!hasPlayedRef.current) return;
             // gapless: true means the renderer already switched to the queued next URI on its
@@ -781,10 +762,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 setTimeout(() => sendNextTrackToDlna(), 500);
             }
         };
-        dlnaPlayerListener.rendererDlnaTrackEnded(handleTrackEnded);
-        return () => {
-            ipc?.removeAllListeners('renderer-dlna-track-ended');
-        };
+        return dlnaPlayerListener.rendererDlnaTrackEnded(handleTrackEnded);
     }, [onEnded, sendCurrentTrackToDlna, sendNextTrackToDlna]);
     // Handle play/pause
     const isInitialMount = useRef(true);

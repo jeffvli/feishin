@@ -66,9 +66,9 @@ const setGroupMemberVolume = (deviceId: string, vol: number) =>
 const setGroupMemberMute = (deviceId: string, muted: boolean) =>
     ipcRenderer.send('dlna-group-member-mute', { deviceId, muted });
 const getGroupState = (): Promise<GroupMember[]> => ipcRenderer.invoke('dlna-group-get-state');
-function singleOn<T extends (...args: any[]) => void>(channel: string, cb: T): void {
-    ipcRenderer.removeAllListeners(channel);
+function singleOn<T extends (...args: any[]) => void>(channel: string, cb: T): () => void {
     ipcRenderer.on(channel, cb);
+    return () => ipcRenderer.removeListener(channel, cb);
 }
 
 const rendererCurrentTime = (cb: (event: IpcRendererEvent, time: number) => void) =>

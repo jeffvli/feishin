@@ -56,7 +56,14 @@ function createSocketForInterface(
         const send = () => {
             socket.send(message, 0, message.length, SSDP_PORT, SSDP_ADDRESS, () => {});
         };
-        socket.on('error', () => {});
+        socket.once('error', () => {
+            try {
+                socket.close();
+            } catch {
+                // Socket may not have finished binding
+            }
+            resolve(socket);
+        });
         socket.on('message', (msg) => {
             const loc = msg.toString().match(/LOCATION:\s*(.+)\r?\n/i);
             if (loc) locations.add(loc[1].trim());

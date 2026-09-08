@@ -5,7 +5,6 @@ import { useRadioPlayer, useRadioStore } from '/@/renderer/features/radio/hooks/
 import { usePlayerActions, usePlayerMuted, usePlayerVolume } from '/@/renderer/store';
 
 const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
-const ipc = isElectron() ? window.api.ipc : null;
 const dlnaPlayerListener = isElectron() ? window.api.dlnaPlayerListener : null;
 
 export function RadioDlnaPlayer() {
@@ -25,10 +24,7 @@ export function RadioDlnaPlayer() {
     useEffect(() => {
         if (!dlnaPlayerListener) return;
         const handler = (_event: any, vol: number) => setVolume(vol);
-        dlnaPlayerListener.rendererDlnaVolume(handler);
-        return () => {
-            ipc?.removeAllListeners('renderer-dlna-volume');
-        };
+        return dlnaPlayerListener.rendererDlnaVolume(handler);
     }, [setVolume]);
     useEffect(() => {
         if (!dlnaPlayerListener) return;
@@ -37,10 +33,7 @@ export function RadioDlnaPlayer() {
                 useRadioStore.getState().actions.stop();
             }
         };
-        dlnaPlayerListener.rendererDlnaTransportState(handler);
-        return () => {
-            ipc?.removeAllListeners('renderer-dlna-transport-state');
-        };
+        return dlnaPlayerListener.rendererDlnaTransportState(handler);
     }, []);
     const { isPlaying } = useRadioPlayer();
     const isInitialMountRef = useRef(true);
