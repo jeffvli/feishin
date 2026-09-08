@@ -147,6 +147,7 @@ export async function getPositionInfo(
         AVT,
         'GetPositionInfo',
         '<InstanceID>0</InstanceID>',
+        POLL_TIMEOUT_MS,
     );
     const parseTime = (timeStr: string): number => {
         if (!timeStr || timeStr === 'NOT_IMPLEMENTED' || timeStr === '0') return 0;
@@ -191,6 +192,7 @@ export async function getTransportInfo(device: DlnaDevice): Promise<string> {
         AVT,
         'GetTransportInfo',
         '<InstanceID>0</InstanceID>',
+        POLL_TIMEOUT_MS,
     );
     const match = xml.match(/<CurrentTransportState>(.*?)<\/CurrentTransportState>/);
     return match ? match[1] : 'STOPPED';
@@ -439,11 +441,19 @@ function parseInt2(xml: string, tag: string): number {
     return m ? parseInt(m[1], 10) : 0;
 }
 
+// Renderers stall: a Yamaha HTR-6067 has taken 7 s to answer SetAVTransportURI and has
+// left position queries unanswered. Without a limit one such call parks the poller (it
+// polls one request at a time) and any flow awaiting the command. Polls use a short
+// limit, commands a long one.
+const COMMAND_TIMEOUT_MS = 15000;
+const POLL_TIMEOUT_MS = 4000;
+
 async function soapRequest(
     url: string,
     service: string,
     action: string,
     body: string,
+    timeoutMs: number = COMMAND_TIMEOUT_MS,
 ): Promise<string> {
     const soapBody = `<?xml version="1.0" encoding="utf-8"?>
 <s:Envelope s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
@@ -458,6 +468,10 @@ async function soapRequest(
             method: 'POST',
             url: url,
         });
+        const timer = setTimeout(() => {
+            request.abort();
+            reject(new Error(`SOAP ${action} timed out after ${timeoutMs} ms`));
+        }, timeoutMs);
         request.setHeader('Content-Type', 'text/xml; charset="utf-8"');
         request.setHeader('SOAPAction', `"${service}#${action}"`);
         request.on('response', (response) => {
@@ -466,6 +480,7 @@ async function soapRequest(
                 data += chunk.toString();
             });
             response.on('end', () => {
+                clearTimeout(timer);
                 if (response.statusCode === 200) {
                     resolve(data);
                 } else {
@@ -477,7 +492,10 @@ async function soapRequest(
                 }
             });
         });
-        request.on('error', reject);
+        request.on('error', (err) => {
+            clearTimeout(timer);
+            reject(err);
+        });
         request.write(soapBody);
         request.end();
     });

@@ -999,10 +999,14 @@ function startPositionPolling() {
         pollInFlight = true;
         const issuedAt = Date.now();
         try {
-            const [posInfo, transportState] = await Promise.all([
+            const [posInfo, rawTransportState] = await Promise.all([
                 getPositionInfo(connectedDevice),
                 getTransportInfo(connectedDevice),
             ]);
+            // A Yamaha HTR-6067 reports NO_MEDIA_PRESENT, not STOPPED, once it has dropped or
+            // finished a stream; for everything below that is a stop.
+            const transportState =
+                rawTransportState === 'NO_MEDIA_PRESENT' ? 'STOPPED' : rawTransportState;
             if (positionOffsetSeconds > 0 && posInfo.position >= 0) {
                 posInfo.position += positionOffsetSeconds;
             }
@@ -1834,7 +1838,8 @@ ipcMain.on(
                     );
                 }
             }
-        } catch {
+        } catch (err) {
+            dlnaLog(`Failed to load ${data.metadata.title}`, err);
             if (data.seekTo !== undefined) {
                 await setMute(device, !!data.isMuted).catch(() => {});
                 await Promise.all(
