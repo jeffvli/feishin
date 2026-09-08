@@ -746,8 +746,13 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
     useEffect(() => {
         if (!dlnaPlayerListener) return;
         if (!ipc) return;
-        const handleTrackEnded = () => {
+        const handleTrackEnded = (_event: unknown, payload?: { gapless?: boolean }) => {
             if (!hasPlayedRef.current) return;
+            // gapless: true means the renderer already switched to the queued next URI on its
+            // own; false (stuck at the end, or dropped to STOPPED) means it did not, so the
+            // new current track has to be sent. Renderers that accept SetNextAVTransportURI
+            // but never act on it would otherwise sit at the end while the app walks the queue.
+            const deviceAdvanced = payload?.gapless !== false;
             const state = usePlayerStore.getState();
             const playerData = state.getPlayerData();
             const isAtEnd = !playerData.nextSong;
@@ -764,9 +769,9 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             wasNearEndRef.current = false;
             const currentSpeed = usePlayerStore.getState().player.speed || 1;
             isAutoAdvancingRef.current = true;
-            skipNextSendRef.current = currentSpeed === 1;
+            skipNextSendRef.current = deviceAdvanced && currentSpeed === 1;
             onEnded();
-            if (currentSpeed !== 1) {
+            if (!deviceAdvanced || currentSpeed !== 1) {
                 setTimeout(() => {
                     sendCurrentTrackToDlna();
                 }, 200);

@@ -73,8 +73,9 @@ function singleOn<T extends (...args: any[]) => void>(channel: string, cb: T): v
 
 const rendererCurrentTime = (cb: (event: IpcRendererEvent, time: number) => void) =>
     singleOn('renderer-dlna-current-time', cb);
-const rendererDlnaTrackEnded = (cb: (event: IpcRendererEvent) => void) =>
-    singleOn('renderer-dlna-track-ended', cb);
+const rendererDlnaTrackEnded = (
+    cb: (event: IpcRendererEvent, payload?: { gapless?: boolean }) => void,
+) => singleOn('renderer-dlna-track-ended', cb);
 const rendererTrackEnded = rendererDlnaTrackEnded;
 const rendererDlnaConnectPlayback = (
     cb: (
