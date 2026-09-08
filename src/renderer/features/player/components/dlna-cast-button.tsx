@@ -55,7 +55,7 @@ export const DlnaCastButton = () => {
         settings.type === PlayerType.DLNA ? PlayerType.WEB : settings.type,
     );
 
-    const isConnected = screen === 'connected' || screen === 'group';
+    const isConnected = settings.type === PlayerType.DLNA;
     const hasSonosDevices = devices.some(isSonosDevice);
     useEffect(() => {
         if (!showPopover) return;
