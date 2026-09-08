@@ -59,6 +59,21 @@ let hasStartedPlaying = false;
 let trackLoadedAt = 0;
 let lastKnownTransportState = '';
 let lastKnownDeviceVolume = -1;
+// Volume the app last asked for, and when. Some renderers (HEOS on a transcoded
+// stream, for one) report 0 and ignore SetVolume; their reports must not win.
+let lastAppVolume = -1;
+let lastAppVolumeAt = 0;
+let deviceVolumeMismatches = 0;
+let deviceVolumeUntrusted = false;
+// A changed device volume must hold across consecutive polls before it is acted on;
+// a reading of exactly 0 must hold much longer, since that is what misbehaving
+// renderers report transiently while switching tracks.
+let pendingDeviceVolume = -1;
+let pendingDeviceVolumePolls = 0;
+const DEVICE_VOLUME_SETTLE_MS = 5000;
+const DEVICE_VOLUME_MISMATCH_LIMIT = 6;
+const DEVICE_VOLUME_STABLE_POLLS = 3;
+const DEVICE_VOLUME_ZERO_STABLE_POLLS = 10;
 let lastCommandedUri = '';
 let lastQueuedNextUri = '';
 let lastFinishedUri = '';
@@ -1189,6 +1204,54 @@ function startPositionPolling() {
 
             try {
                 const deviceVolume = await getVolume(connectedDevice);
+                if (deviceVolume === lastKnownDeviceVolume) {
+                    pendingDeviceVolume = -1;
+                    pendingDeviceVolumePolls = 0;
+                    throw new Error('volume unchanged');
+                }
+                if (deviceVolume !== pendingDeviceVolume) {
+                    pendingDeviceVolume = deviceVolume;
+                    pendingDeviceVolumePolls = 1;
+                    throw new Error('volume unstable');
+                }
+                pendingDeviceVolumePolls += 1;
+                const stablePollsNeeded =
+                    deviceVolume === 0
+                        ? DEVICE_VOLUME_ZERO_STABLE_POLLS
+                        : DEVICE_VOLUME_STABLE_POLLS;
+                if (pendingDeviceVolumePolls < stablePollsNeeded) {
+                    throw new Error('volume unstable');
+                }
+                if (lastAppVolume >= 0 && deviceVolume !== lastAppVolume) {
+                    // The device does not reflect what the app set. Give it time to settle;
+                    // if it never does, stop letting its reports overwrite the app volume.
+                    if (Date.now() - lastAppVolumeAt < DEVICE_VOLUME_SETTLE_MS) {
+                        throw new Error('volume not settled');
+                    }
+                    deviceVolumeMismatches += 1;
+                    if (deviceVolumeMismatches >= DEVICE_VOLUME_MISMATCH_LIMIT) {
+                        if (!deviceVolumeUntrusted) {
+                            dlnaLog(
+                                `Device reports volume ${deviceVolume} after app set ${lastAppVolume}; ignoring its volume reports`,
+                            );
+                        }
+                        deviceVolumeUntrusted = true;
+                        throw new Error('volume untrusted');
+                    }
+                    // A non-zero contradiction is most likely the user turning the device's
+                    // own knob and is passed on. A zero contradicting a non-zero app volume
+                    // is what misreporting renderers send; never let it win, or the app
+                    // pushes 0 back and the device "agrees" from then on.
+                    if (deviceVolume === 0 && lastAppVolume > 0) {
+                        throw new Error('volume zero contradicts app');
+                    }
+                } else if (lastAppVolume >= 0) {
+                    deviceVolumeMismatches = 0;
+                    deviceVolumeUntrusted = false;
+                }
+                if (deviceVolumeUntrusted) {
+                    throw new Error('volume untrusted');
+                }
                 if (deviceVolume !== lastKnownDeviceVolume) {
                     lastKnownDeviceVolume = deviceVolume;
                     if (groupMembers.length > 0) {
@@ -1423,6 +1486,12 @@ ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
         trackLoadedAt = Date.now();
         lastKnownTransportState = '';
         lastKnownDeviceVolume = -1;
+        lastAppVolume = -1;
+        lastAppVolumeAt = 0;
+        deviceVolumeMismatches = 0;
+        deviceVolumeUntrusted = false;
+        pendingDeviceVolume = -1;
+        pendingDeviceVolumePolls = 0;
         lastCommandedUri = '';
         lastQueuedNextUri = '';
         startPositionPolling();
@@ -1869,6 +1938,8 @@ ipcMain.on('dlna-seek', async (_event, seconds: number) => {
 ipcMain.on('dlna-volume', async (_event, value: number) => {
     if (!connectedDevice) return;
     try {
+        lastAppVolume = value;
+        lastAppVolumeAt = Date.now();
         await setVolume(connectedDevice, value);
         lastKnownDeviceVolume = value;
         if (groupMembers.length > 0) groupMemberVolumes[connectedDevice.id] = value;
