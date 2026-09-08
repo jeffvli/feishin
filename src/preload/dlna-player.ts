@@ -44,7 +44,7 @@ const disconnectPassive = (): Promise<boolean> => ipcRenderer.invoke('dlna-disco
 const playUrl = (
     url: string,
     metadata: TrackMetadata,
-    options?: { isMuted?: boolean; seekTo?: number },
+    options?: { isMuted?: boolean; positionOffset?: number; seekTo?: number },
 ) => ipcRenderer.send('dlna-play-url', { metadata, url, ...options });
 const setNextUrl = (url: string, metadata: TrackMetadata) =>
     ipcRenderer.send('dlna-set-next-url', { metadata, url });

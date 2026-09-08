@@ -75,6 +75,12 @@ const DEVICE_VOLUME_MISMATCH_LIMIT = 6;
 const DEVICE_VOLUME_STABLE_POLLS = 3;
 const DEVICE_VOLUME_ZERO_STABLE_POLLS = 10;
 let lastCommandedUri = '';
+// Seconds the current stream starts at (a transcode re-sent with a start offset). Added to
+// every polled position so the app sees track time, not stream time.
+let positionOffsetSeconds = 0;
+// Mirrors the engine's isChunkedTranscodeUrl: Jellyfin transcode routes that cannot be seeked.
+const isChunkedTranscodeUri = (uri: string) =>
+    /[?&]static=false(?:&|$)/.test(uri) || /\/universal\?/.test(uri);
 let lastQueuedNextUri = '';
 let lastFinishedUri = '';
 let lastAppSeekAt = 0;
@@ -633,6 +639,7 @@ function handleEventNotify(body: string): void {
         ) {
             dlnaLog('Gapless transition detected (event)');
             lastCommandedUri = newUri;
+            positionOffsetSeconds = 0;
             lastQueuedNextUri = '';
             hasStartedPlaying = true;
             trackLoadedAt = Date.now();
@@ -645,6 +652,7 @@ function handleEventNotify(body: string): void {
     if (lastQueuedNextUri && newUri === lastQueuedNextUri) {
         dlnaLog('Event: advanced to next track');
         lastCommandedUri = newUri;
+        positionOffsetSeconds = 0;
         lastQueuedNextUri = '';
         hasStartedPlaying = true;
         trackLoadedAt = Date.now();
@@ -995,6 +1003,9 @@ function startPositionPolling() {
                 getPositionInfo(connectedDevice),
                 getTransportInfo(connectedDevice),
             ]);
+            if (positionOffsetSeconds > 0 && posInfo.position >= 0) {
+                posInfo.position += positionOffsetSeconds;
+            }
             // An answer to a request issued before the latest app command (seek, stop,
             // play, pause, track load) describes the pre-command state; applying it would
             // overwrite the app's position, or mirror a stale STOPPED back as a pause.
@@ -1043,6 +1054,7 @@ function startPositionPolling() {
                 ) {
                     dlnaLog(`Polling: advanced to next track`);
                     lastCommandedUri = posInfo.trackUri;
+                    positionOffsetSeconds = 0;
                     lastQueuedNextUri = '';
                     trackLoadedAt = Date.now();
                     lastKnownPosition = 0;
@@ -1485,6 +1497,7 @@ ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
         hasStartedPlaying = false;
         trackLoadedAt = Date.now();
         lastKnownTransportState = '';
+        positionOffsetSeconds = 0;
         lastKnownDeviceVolume = -1;
         lastAppVolume = -1;
         lastAppVolumeAt = 0;
@@ -1532,6 +1545,7 @@ ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
                 currentPosition = posInfo.position;
                 currentDuration = posInfo.duration;
                 lastCommandedUri = currentUri;
+                positionOffsetSeconds = 0;
                 nextUri = mediaInfo.nextUri || '';
                 if (nextUri) lastQueuedNextUri = nextUri;
                 dlnaLog(`Device already playing: ${currentUri} at ${currentPosition}s (${tState})`);
@@ -1705,7 +1719,13 @@ ipcMain.on(
     'dlna-play-url',
     async (
         _event,
-        data: { isMuted?: boolean; metadata: TrackMetadata; seekTo?: number; url: string },
+        data: {
+            isMuted?: boolean;
+            metadata: TrackMetadata;
+            positionOffset?: number;
+            seekTo?: number;
+            url: string;
+        },
     ) => {
         if (!connectedDevice) return;
         const device = connectedDevice;
@@ -1718,7 +1738,7 @@ ipcMain.on(
             nearEndStallCount = 0;
             const lanUrl = rewriteUrlForLan(data.url);
             lastPlayCommandAt = Date.now();
-            if (lanUrl === lastCommandedUri && !data.seekTo) {
+            if (lanUrl === lastCommandedUri && !data.seekTo && !isChunkedTranscodeUri(lanUrl)) {
                 dlnaLog(
                     `dlna-play-url: URI already loaded (${data.metadata.title}), seeking to 0 and playing`,
                 );
@@ -1737,6 +1757,7 @@ ipcMain.on(
             lastPlayUrlSentAt = Date.now();
             lastLoadedFromUri = lastCommandedUri;
             lastCommandedUri = lanUrl;
+            positionOffsetSeconds = data.positionOffset ?? 0;
             lastQueuedNextUri = '';
             const lanArtUrl = data.metadata.albumArtUrl
                 ? rewriteUrlForLan(data.metadata.albumArtUrl)
@@ -1921,6 +1942,13 @@ ipcMain.on('dlna-stop', async () => {
 // Seek to position
 ipcMain.on('dlna-seek', async (_event, seconds: number) => {
     if (!connectedDevice) return;
+    // A chunked transcode cannot be seeked (see the engine's isChunkedTranscodeUrl); a HEOS
+    // receiver given a Seek on one hangs in TRANSITIONING. The engine re-sends with an offset
+    // instead, so anything that still arrives here for such a stream is dropped.
+    if (isChunkedTranscodeUri(lastCommandedUri)) {
+        dlnaLog(`Ignoring Seek to ${seconds} on a chunked transcode`);
+        return;
+    }
     try {
         lastAppSeekAt = Date.now();
         let targetSeconds = seconds;
@@ -1964,7 +1992,8 @@ ipcMain.handle('dlna-get-position', async () => {
     try {
         const info = await getPositionInfo(connectedDevice);
         const proxyState = getActiveProxyState(lastCommandedUri);
-        return proxyState ? info.position * proxyState.speed : info.position;
+        const position = proxyState ? info.position * proxyState.speed : info.position;
+        return position + positionOffsetSeconds;
     } catch {
         return lastKnownPosition;
     }

@@ -68,6 +68,7 @@ export const getSongUrl = async (
     transcode: Partial<TranscodingConfig>,
     skipAutoTranscode?: boolean,
     forRenderer?: boolean,
+    startTime?: number,
 ) => {
     const url = await api.controller.getStreamUrl({
         apiClientProps: { serverId: song._serverId },
@@ -80,6 +81,7 @@ export const getSongUrl = async (
             maxSampleRate: transcode.maxSampleRate,
             sampleRate: song.sampleRate,
             skipAutoTranscode,
+            startTime,
             transcode: transcode.enabled ?? false,
         },
     });

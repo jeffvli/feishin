@@ -108,6 +108,7 @@ async function findQueueMatchForUris(
 async function getDlnaUrl(
     song: QueueSong,
     transcode: TranscodingConfig,
+    startTime?: number,
 ): Promise<string | undefined> {
     const { contentType, suffix } = song as unknown as SongWithAudioMeta;
     if (isOpusByMetadata({ contentType, suffix })) {
@@ -116,6 +117,7 @@ async function getDlnaUrl(
             { ...transcode, enabled: true, format: 'mp3' },
             undefined,
             true,
+            startTime,
         );
         return mp3Url;
     }
@@ -129,6 +131,7 @@ async function getDlnaUrl(
                 { ...transcode, enabled: true, format: 'mp3' },
                 undefined,
                 true,
+                startTime,
             );
             return mp3Url ?? probeUrl;
         }
@@ -138,11 +141,12 @@ async function getDlnaUrl(
                 { ...transcode, enabled: true, format: 'mp3' },
                 undefined,
                 true,
+                startTime,
             );
             return mp3Url ?? probeUrl;
         }
     }
-    const playbackUrl = await getSongUrl(song, transcode, undefined, true);
+    const playbackUrl = await getSongUrl(song, transcode, undefined, true, startTime);
     return playbackUrl;
 }
 
@@ -163,6 +167,13 @@ function getMimeType(url: string, contentType?: null | string, suffix?: null | s
         if (path.endsWith(`.${ext}`)) return mime;
     }
     return 'audio/mpeg';
+}
+
+// Jellyfin's transcode routes send chunked responses without a length; renderers cannot
+// range into them, and at least HEOS receivers accept a Seek on such a stream and then
+// hang in TRANSITIONING. Seeks on these streams are re-sends with a start offset instead.
+function isChunkedTranscodeUrl(url: string): boolean {
+    return /[?&]static=false(?:&|$)/.test(url) || /\/universal\?/.test(url);
 }
 
 function isOggByMetadata(song: SongWithAudioMeta): boolean {
@@ -284,6 +295,9 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
     const speakerSidePauseRef = useRef(false);
     const mountHandoffInProgressRef = useRef(false);
     const sendCurrentTrackGenRef = useRef(0);
+    // Set by a seek on a chunked transcode: the current track is re-sent starting here.
+    const offsetSeekRef = useRef<number | undefined>(undefined);
+    const lastSentSongIdRef = useRef<string>('');
     const justLoadedTrackRef = useRef(false);
     const suppressDeviceSeekRef = useRef(false);
     useEffect(() => {
@@ -304,8 +318,30 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         const song = playerData.currentSong;
         if (!song) return;
         const currentSpeed = usePlayerStore.getState().player.speed || 1;
-        const rawUrl = await getDlnaUrl(song, transcode);
+        const offsetSeek = offsetSeekRef.current;
+        offsetSeekRef.current = undefined;
+        // The offset the track should start at: an explicit seek, or a pending handoff /
+        // resume position (read here, consumed below as before).
+        let requestedSeek = offsetSeek ?? 0;
+        if (requestedSeek <= 0 && playerHandoff.pendingDlnaSeek >= 0) {
+            requestedSeek = playerHandoff.pendingDlnaSeek;
+        } else if (requestedSeek <= 0 && pendingInitialSeek.value >= 0) {
+            requestedSeek = pendingInitialSeek.value;
+        }
+        const wantsOffsetStream = requestedSeek > 0 && currentSpeed === 1;
+        const rawUrl = await getDlnaUrl(
+            song,
+            transcode,
+            wantsOffsetStream ? requestedSeek : undefined,
+        );
         if (!rawUrl) return;
+        const streamStartsAtOffset = wantsOffsetStream && rawUrl.includes('startTimeTicks=');
+        if (offsetSeek !== undefined && !streamStartsAtOffset && !isChunkedTranscodeUrl(rawUrl)) {
+            // Seek on a stream the server cannot offset: plain UPnP Seek as before. (A chunked
+            // stream with no offset falls through and is re-sent from its start.)
+            dlnaPlayer.seek(offsetSeek);
+            return;
+        }
         let urlToPlay = rawUrl;
         let isProxy = false;
         if (currentSpeed !== 1) {
@@ -339,6 +375,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             skipNextSendRef.current = false;
             lastSentUrlRef.current = urlToPlay;
             lastSentRawUrlRef.current = rawUrl;
+            lastSentSongIdRef.current = song.id;
             lastSentAtRef.current = Date.now();
             return;
         }
@@ -348,6 +385,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         }
         lastSentUrlRef.current = urlToPlay;
         lastSentRawUrlRef.current = rawUrl;
+        lastSentSongIdRef.current = song.id;
         lastSentAtRef.current = now;
         wasNearEndRef.current = false;
         const durationSeconds = song.duration ? song.duration / 1000 : 0;
@@ -379,14 +417,24 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
         if (!shouldAutoPlay && !hasPlayedRef.current) {
             return;
         }
-        let targetSeek = 0;
+        let targetSeek = offsetSeek ?? 0;
         if (playerHandoff.pendingDlnaSeek >= 0) {
-            targetSeek = playerHandoff.pendingDlnaSeek;
+            if (targetSeek <= 0) targetSeek = playerHandoff.pendingDlnaSeek;
             playerHandoff.pendingDlnaSeek = -1;
         } else if (pendingInitialSeek.value >= 0) {
-            targetSeek = pendingInitialSeek.value;
+            if (targetSeek <= 0) targetSeek = pendingInitialSeek.value;
             pendingInitialSeek.value = -1;
         }
+        // When the stream itself starts at the offset the renderer must not be asked to seek;
+        // the main process adds the offset to the positions it reports instead.
+        const positionOffset = streamStartsAtOffset ? targetSeek : 0;
+        if (streamStartsAtOffset) targetSeek = 0;
+        // A forward skip triggers this twice (song-change subscription and MEDIA_NEXT); the
+        // 500 ms same-URL check above collapses the pair, so a send must not drop itself just
+        // because a newer one started. It only stands down when the song moved on while it
+        // awaited URL and MIME resolution (a rapid double skip).
+        const stillCurrent = usePlayerStore.getState().getPlayerData().currentSong;
+        if (stillCurrent?._uniqueId !== song._uniqueId) return;
         justLoadedTrackRef.current = true;
         dlnaPlayer.playUrl(
             urlToPlay,
@@ -399,7 +447,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 mimeType,
                 title: song.name,
             },
-            { isMuted: props.isMuted, seekTo: targetSeek },
+            { isMuted: props.isMuted, positionOffset, seekTo: targetSeek },
         );
         hasPlayedRef.current = true;
         isAutoAdvancingRef.current = false;
@@ -604,6 +652,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
             }
             await new Promise<void>((resolve) => setTimeout(resolve, 50));
             lastSentRawUrlRef.current = '';
+            lastSentSongIdRef.current = '';
             lastSentUrlRef.current = '';
             mountHandoffInProgressRef.current = false;
             if (playerStatus === PlayerStatus.PLAYING) {
@@ -828,6 +877,19 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 if (usePlayerStore.getState().player.status === PlayerStatus.STOPPED) {
                     return;
                 }
+                if (
+                    lastSentRawUrlRef.current &&
+                    isChunkedTranscodeUrl(lastSentRawUrlRef.current) &&
+                    (usePlayerStore.getState().player.speed || 1) === 1
+                ) {
+                    // A track change resets the timestamp in the same store update that swaps
+                    // the song; that is not a seek, and the new track's send follows on its own.
+                    const currentId = usePlayerStore.getState().getPlayerData().currentSong?.id;
+                    if (currentId !== lastSentSongIdRef.current) return;
+                    offsetSeekRef.current = properties.timestamp;
+                    void sendCurrentTrackToDlna();
+                    return;
+                }
                 dlnaPlayer?.seek(properties.timestamp);
             },
             onPlayerStop: () => {
@@ -837,6 +899,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 hasPlayedRef.current = false;
                 lastSentUrlRef.current = '';
                 lastSentRawUrlRef.current = '';
+                lastSentSongIdRef.current = '';
                 sameUriLoopQueuedRef.current = false;
                 wasNearEndRef.current = false;
             },
@@ -846,6 +909,7 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 hasPlayedRef.current = false;
                 lastSentUrlRef.current = '';
                 lastSentRawUrlRef.current = '';
+                lastSentSongIdRef.current = '';
                 sameUriLoopQueuedRef.current = false;
                 wasNearEndRef.current = false;
             },

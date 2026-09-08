@@ -1956,6 +1956,8 @@ export type StreamQuery = {
     offset?: number;
     sampleRate?: null | number;
     skipAutoTranscode?: boolean;
+    /** Start offset in seconds for a server-side transcode (Jellyfin `startTimeTicks`). */
+    startTime?: number;
     transcode: boolean;
 };
 
