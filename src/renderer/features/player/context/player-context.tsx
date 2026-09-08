@@ -17,7 +17,13 @@ import {
 } from '/@/renderer/features/player/utils';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
-import { AddToQueueType, usePlayerActions, useSettingsStore } from '/@/renderer/store';
+import {
+    AddToQueueOptions,
+    AddToQueueType,
+    usePlayerActions,
+    useSettingsStore,
+    useSettingsStoreActions,
+} from '/@/renderer/store';
 import { logger } from '/@/renderer/utils/logger';
 import { shuffle as shuffleArray } from '/@/renderer/utils/shuffle';
 import { sortSongsByFetchedOrder } from '/@/shared/api/utils';
@@ -43,12 +49,18 @@ export interface PlayerContext {
         type: AddToQueueType,
         playSongId?: string,
         contextPlaylistId?: null | string,
+        // Bypasses confirmQueueChange entirely — for callers (the remote
+        // control bridge) that already obtained confirmation themselves
+        // before calling this, where the confirm modal this would otherwise
+        // open has no way to reach whoever actually needs to answer it.
+        skipConfirmation?: boolean,
     ) => void;
     addToQueueByFetch: (
         serverId: string,
         id: string[],
         itemType: LibraryItem,
         type: AddToQueueType,
+        options?: AddToQueueOptions,
     ) => void;
     addToQueueByListQuery: (
         serverId: string,
@@ -56,7 +68,7 @@ export interface PlayerContext {
         itemType: LibraryItem,
         type: AddToQueueType,
     ) => Promise<void>;
-    clearQueue: () => void;
+    clearQueue: (skipConfirmation?: boolean) => void;
     clearSelected: (items: QueueSong[]) => void;
     decreaseVolume: (amount: number) => void;
     getQueue: () => QueueSong[];
@@ -90,7 +102,7 @@ export interface PlayerContext {
 
 export const PlayerContext = createContext<PlayerContext>({
     addToQueueByData: () => {},
-    addToQueueByFetch: () => {},
+    addToQueueByFetch: async () => {},
     addToQueueByListQuery: async () => {},
     clearQueue: () => {},
     clearSelected: () => {},
@@ -164,12 +176,55 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     const { t } = useTranslation();
     const queryClient = useQueryClient();
     const storeActions = usePlayerActions();
+    const settingsActions = useSettingsStoreActions();
     const timeoutIds = useRef<null | Record<string, ReturnType<typeof setTimeout>>>({});
 
     const [doNotShowAgain, setDoNotShowAgain] = useLocalStorage({
         defaultValue: false,
         key: 'large_fetch_confirmation',
     });
+
+    const confirmQueueChange = useCallback(
+        (onConfirm: () => void) => {
+            const shouldConfirm = useSettingsStore.getState().general.confirmQueueChanges;
+
+            if (!shouldConfirm || storeActions.getQueue().items.length === 0) {
+                onConfirm();
+                return;
+            }
+
+            openModal({
+                children: (
+                    <ConfirmModal
+                        labels={{
+                            cancel: t('common.cancel'),
+                            confirm: t('common.confirm'),
+                        }}
+                        onConfirm={() => {
+                            closeAllModals();
+                            onConfirm();
+                        }}
+                    >
+                        <Stack>
+                            <Text>{t('form.queueChangeConfirmation.description')}</Text>
+                            <Checkbox
+                                label={t('common.doNotShowAgain')}
+                                onChange={(event) => {
+                                    settingsActions.setSettings({
+                                        general: {
+                                            confirmQueueChanges: !event.currentTarget.checked,
+                                        },
+                                    });
+                                }}
+                            />
+                        </Stack>
+                    </ConfirmModal>
+                ),
+                title: t('form.queueChangeConfirmation.title'),
+            });
+        },
+        [settingsActions, storeActions, t],
+    );
 
     const confirmLargeFetch = useCallback((): Promise<boolean> => {
         if (doNotShowAgain) {
@@ -215,6 +270,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
             type: AddToQueueType,
             playSongId?: string,
             contextPlaylistId?: null | string,
+            skipConfirmation?: boolean,
         ) => {
             const filters = useSettingsStore.getState().playback.filters;
             let filteredData = filterSongsByPlayerFilters(data, filters);
@@ -225,33 +281,52 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 filteredData = tagPlaylistContext(filteredData, resolvedContextId);
             }
 
-            if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
-                const edge = type.edge === 'top' ? 'top' : 'bottom';
+            const addToQueue = () => {
+                if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
+                    const edge = type.edge === 'top' ? 'top' : 'bottom';
 
-                logger.debug('Added to queue by data', {
-                    data: data.length,
-                    edge,
-                    filtered: filteredData.length,
-                    type,
-                    uniqueId: type.uniqueId,
-                });
+                    logger.debug('Added to queue by data', {
+                        data: data.length,
+                        edge,
+                        filtered: filteredData.length,
+                        type,
+                        uniqueId: type.uniqueId,
+                    });
 
-                storeActions.addToQueueByUniqueId(filteredData, type.uniqueId, edge, playSongId);
+                    storeActions.addToQueueByUniqueId(
+                        filteredData,
+                        type.uniqueId,
+                        edge,
+                        playSongId,
+                    );
+                } else {
+                    logger.debug('Added to queue by type', {
+                        data: data.length,
+                        filtered: filteredData.length,
+                        type,
+                    });
+
+                    storeActions.addToQueueByType(filteredData, type as Play, playSongId);
+                }
+            };
+
+            if (!skipConfirmation && isReplaceQueueType(type)) {
+                confirmQueueChange(addToQueue);
             } else {
-                logger.debug('Added to queue by type', {
-                    data: data.length,
-                    filtered: filteredData.length,
-                    type,
-                });
-
-                storeActions.addToQueueByType(filteredData, type as Play, playSongId);
+                addToQueue();
             }
         },
-        [storeActions],
+        [confirmQueueChange, storeActions],
     );
 
     const addToQueueByFetch = useCallback(
-        async (serverId: string, id: string[], itemType: LibraryItem, type: AddToQueueType) => {
+        async (
+            serverId: string,
+            id: string[],
+            itemType: LibraryItem,
+            type: AddToQueueType,
+            options?: AddToQueueOptions,
+        ) => {
             let toastId: null | string = null;
             const fetchId = nanoid();
 
@@ -310,6 +385,10 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 const filters = useSettingsStore.getState().playback.filters;
                 let filteredSongs = filterSongsByPlayerFilters(sortedSongs, filters);
 
+                if (options?.filter) {
+                    filteredSongs = filteredSongs.filter(options.filter);
+                }
+
                 // Songs from multiple playlists are merged together, so there is no single
                 // playlist to attribute them to: skip tagging (and URL inference) entirely.
                 const isMultiPlaylist = itemType === LibraryItem.PLAYLIST && id.length > 1;
@@ -324,11 +403,19 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                     filteredSongs = tagPlaylistContext(filteredSongs, resolvedContextId);
                 }
 
-                if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
-                    const edge = type.edge === 'top' ? 'top' : 'bottom';
-                    storeActions.addToQueueByUniqueId(filteredSongs, type.uniqueId, edge);
+                const addToQueue = () => {
+                    if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
+                        const edge = type.edge === 'top' ? 'top' : 'bottom';
+                        storeActions.addToQueueByUniqueId(filteredSongs, type.uniqueId, edge);
+                    } else {
+                        storeActions.addToQueueByType(filteredSongs, type as Play);
+                    }
+                };
+
+                if (!options?.skipConfirmation && isReplaceQueueType(type)) {
+                    confirmQueueChange(addToQueue);
                 } else {
-                    storeActions.addToQueueByType(filteredSongs, type as Play);
+                    addToQueue();
                 }
             } catch (err: any) {
                 if (instanceOfCancellationError(err)) {
@@ -347,7 +434,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 });
             }
         },
-        [queryClient, storeActions, t],
+        [confirmQueueChange, queryClient, storeActions, t],
     );
 
     const addToQueueByListQuery = useCallback(
@@ -525,11 +612,27 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         [queryClient, confirmLargeFetch, t, addToQueueByData, addToQueueByFetch],
     );
 
-    const clearQueue = useCallback(() => {
-        logger.debug('Cleared queue');
+    const clearQueue = useCallback(
+        (skipConfirmation?: boolean) => {
+            const run = () => {
+                logger.debug('Cleared queue');
 
-        storeActions.clearQueue();
-    }, [storeActions]);
+                storeActions.clearQueue();
+            };
+
+            // Same bypass as addToQueueByData's skipConfirmation — the
+            // remote control bridge already obtained confirmation on the
+            // phone itself before calling this, and the modal
+            // confirmQueueChange would otherwise open has no way to reach
+            // whoever actually needs to answer it.
+            if (skipConfirmation) {
+                run();
+            } else {
+                confirmQueueChange(run);
+            }
+        },
+        [confirmQueueChange, storeActions],
+    );
 
     const clearSelected = useCallback(
         (items: QueueSong[]) => {
@@ -550,8 +653,6 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     );
 
     const getQueue = useCallback(() => {
-        logger.debug('Cleared queue');
-
         const queue = storeActions.getQueue();
         return queue.items;
     }, [storeActions]);
@@ -639,15 +740,17 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
 
     const setQueue = useCallback(
         (data: Song[], index?: number, position?: number) => {
-            logger.debug('Set queue', {
-                data: data.length,
-                index,
-                position,
-            });
+            confirmQueueChange(() => {
+                logger.debug('Set queue', {
+                    data: data.length,
+                    index,
+                    position,
+                });
 
-            storeActions.setQueue(data, index, position);
+                storeActions.setQueue(data, index, position);
+            });
         },
-        [storeActions],
+        [confirmQueueChange, storeActions],
     );
 
     const setSpeed = useCallback(

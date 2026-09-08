@@ -59,10 +59,57 @@ let hasStartedPlaying = false;
 let trackLoadedAt = 0;
 let lastKnownTransportState = '';
 let lastKnownDeviceVolume = -1;
+// Volume the app last asked for, and when. Some renderers (HEOS on a transcoded
+// stream, for one) report 0 and ignore SetVolume; their reports must not win.
+let lastAppVolume = -1;
+let lastAppVolumeAt = 0;
+let deviceVolumeMismatches = 0;
+let deviceVolumeUntrusted = false;
+// A changed device volume must hold across consecutive polls before it is acted on;
+// a reading of exactly 0 must hold much longer, since that is what misbehaving
+// renderers report transiently while switching tracks.
+let pendingDeviceVolume = -1;
+let pendingDeviceVolumePolls = 0;
+const DEVICE_VOLUME_SETTLE_MS = 5000;
+const DEVICE_VOLUME_MISMATCH_LIMIT = 6;
+const DEVICE_VOLUME_STABLE_POLLS = 3;
+const DEVICE_VOLUME_ZERO_STABLE_POLLS = 10;
 let lastCommandedUri = '';
+// Seconds the current stream starts at (a transcode re-sent with a start offset). Added to
+// every polled position so the app sees track time, not stream time.
+let positionOffsetSeconds = 0;
+// A Yamaha HTR-6067 given SetNextAVTransportURI within ~300 ms of Play switches to the
+// queued URI instead of the one just loaded. The app re-arms the queued next about a second
+// after issuing a load, which on that receiver lands on top of Play. Next-URI changes wait
+// until no Play is in flight and the last Play is at least a second old.
+let playInFlight = false; // a load (SetAVTransportURI through Play) or a Play is in progress
+let nextUriInFlight = false; // a SetNext/ClearNext call is in progress
+const NEXT_URI_SETTLE_MS = 1000;
+async function settleAfterPlay(): Promise<void> {
+    while (playInFlight) await new Promise((r) => setTimeout(r, 100));
+    const wait = NEXT_URI_SETTLE_MS - (Date.now() - lastPlayCommandAt);
+    if (wait > 0) await new Promise((r) => setTimeout(r, wait));
+}
+// The converse: Play must not be issued while a next-URI call is still being answered.
+async function waitForNextUriIdle(): Promise<void> {
+    while (nextUriInFlight) await new Promise((r) => setTimeout(r, 50));
+}
+async function withNextUriInFlight<T>(fn: () => Promise<T>): Promise<T> {
+    nextUriInFlight = true;
+    try {
+        return await fn();
+    } finally {
+        nextUriInFlight = false;
+    }
+}
+// Mirrors the engine's isChunkedTranscodeUrl: Jellyfin transcode routes that cannot be seeked.
+const isChunkedTranscodeUri = (uri: string) =>
+    /[?&]static=false(?:&|$)/.test(uri) || /\/universal\?/.test(uri);
 let lastQueuedNextUri = '';
 let lastFinishedUri = '';
 let lastAppSeekAt = 0;
+let lastStopCommandAt = 0;
+let pollInFlight = false;
 let lastPlayCommandAt = 0;
 let lastPauseCommandAt = 0;
 let lastClearNextAt = 0;
@@ -616,6 +663,7 @@ function handleEventNotify(body: string): void {
         ) {
             dlnaLog('Gapless transition detected (event)');
             lastCommandedUri = newUri;
+            positionOffsetSeconds = 0;
             lastQueuedNextUri = '';
             hasStartedPlaying = true;
             trackLoadedAt = Date.now();
@@ -628,6 +676,7 @@ function handleEventNotify(body: string): void {
     if (lastQueuedNextUri && newUri === lastQueuedNextUri) {
         dlnaLog('Event: advanced to next track');
         lastCommandedUri = newUri;
+        positionOffsetSeconds = 0;
         lastQueuedNextUri = '';
         hasStartedPlaying = true;
         trackLoadedAt = Date.now();
@@ -968,11 +1017,35 @@ function startPositionPolling() {
         if (Date.now() - trackLoadedAt < 50) return;
         // Started polling much sooner, most of the failed DLNA commands I've seen occurred earlier than this, and position info
         // early in the song is good. I tested with a few configurations, this works well, I believe.
+        // Renderers such as upmpdcli block their control port for seconds while seeking;
+        // without this guard polls pile up and answer late, out of order.
+        if (pollInFlight) return;
+        pollInFlight = true;
+        const issuedAt = Date.now();
         try {
-            const [posInfo, transportState] = await Promise.all([
+            const [posInfo, rawTransportState] = await Promise.all([
                 getPositionInfo(connectedDevice),
                 getTransportInfo(connectedDevice),
             ]);
+            // A Yamaha HTR-6067 reports NO_MEDIA_PRESENT, not STOPPED, once it has dropped or
+            // finished a stream; for everything below that is a stop.
+            const transportState =
+                rawTransportState === 'NO_MEDIA_PRESENT' ? 'STOPPED' : rawTransportState;
+            if (positionOffsetSeconds > 0 && posInfo.position >= 0) {
+                posInfo.position += positionOffsetSeconds;
+            }
+            // An answer to a request issued before the latest app command (seek, stop,
+            // play, pause, track load) describes the pre-command state; applying it would
+            // overwrite the app's position, or mirror a stale STOPPED back as a pause.
+            if (
+                lastAppSeekAt > issuedAt ||
+                lastStopCommandAt > issuedAt ||
+                lastPlayCommandAt > issuedAt ||
+                lastPauseCommandAt > issuedAt ||
+                trackLoadedAt > issuedAt
+            ) {
+                return;
+            }
             let realPosition = posInfo.position;
             const proxyState = getActiveProxyState(lastCommandedUri);
             if (proxyState) {
@@ -1009,6 +1082,7 @@ function startPositionPolling() {
                 ) {
                     dlnaLog(`Polling: advanced to next track`);
                     lastCommandedUri = posInfo.trackUri;
+                    positionOffsetSeconds = 0;
                     lastQueuedNextUri = '';
                     trackLoadedAt = Date.now();
                     lastKnownPosition = 0;
@@ -1170,6 +1244,54 @@ function startPositionPolling() {
 
             try {
                 const deviceVolume = await getVolume(connectedDevice);
+                if (deviceVolume === lastKnownDeviceVolume) {
+                    pendingDeviceVolume = -1;
+                    pendingDeviceVolumePolls = 0;
+                    throw new Error('volume unchanged');
+                }
+                if (deviceVolume !== pendingDeviceVolume) {
+                    pendingDeviceVolume = deviceVolume;
+                    pendingDeviceVolumePolls = 1;
+                    throw new Error('volume unstable');
+                }
+                pendingDeviceVolumePolls += 1;
+                const stablePollsNeeded =
+                    deviceVolume === 0
+                        ? DEVICE_VOLUME_ZERO_STABLE_POLLS
+                        : DEVICE_VOLUME_STABLE_POLLS;
+                if (pendingDeviceVolumePolls < stablePollsNeeded) {
+                    throw new Error('volume unstable');
+                }
+                if (lastAppVolume >= 0 && deviceVolume !== lastAppVolume) {
+                    // The device does not reflect what the app set. Give it time to settle;
+                    // if it never does, stop letting its reports overwrite the app volume.
+                    if (Date.now() - lastAppVolumeAt < DEVICE_VOLUME_SETTLE_MS) {
+                        throw new Error('volume not settled');
+                    }
+                    deviceVolumeMismatches += 1;
+                    if (deviceVolumeMismatches >= DEVICE_VOLUME_MISMATCH_LIMIT) {
+                        if (!deviceVolumeUntrusted) {
+                            dlnaLog(
+                                `Device reports volume ${deviceVolume} after app set ${lastAppVolume}; ignoring its volume reports`,
+                            );
+                        }
+                        deviceVolumeUntrusted = true;
+                        throw new Error('volume untrusted');
+                    }
+                    // A non-zero contradiction is most likely the user turning the device's
+                    // own knob and is passed on. A zero contradicting a non-zero app volume
+                    // is what misreporting renderers send; never let it win, or the app
+                    // pushes 0 back and the device "agrees" from then on.
+                    if (deviceVolume === 0 && lastAppVolume > 0) {
+                        throw new Error('volume zero contradicts app');
+                    }
+                } else if (lastAppVolume >= 0) {
+                    deviceVolumeMismatches = 0;
+                    deviceVolumeUntrusted = false;
+                }
+                if (deviceVolumeUntrusted) {
+                    throw new Error('volume untrusted');
+                }
                 if (deviceVolume !== lastKnownDeviceVolume) {
                     lastKnownDeviceVolume = deviceVolume;
                     if (groupMembers.length > 0) {
@@ -1204,6 +1326,8 @@ function startPositionPolling() {
             }
         } catch {
             // Polling errors are expected during track transitions
+        } finally {
+            pollInFlight = false;
         }
     }, 500);
     // IMPORTANT: This used to be 1000, but I believe that was not tested explicitly and arbitrary, and we get
@@ -1401,7 +1525,14 @@ ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
         hasStartedPlaying = false;
         trackLoadedAt = Date.now();
         lastKnownTransportState = '';
+        positionOffsetSeconds = 0;
         lastKnownDeviceVolume = -1;
+        lastAppVolume = -1;
+        lastAppVolumeAt = 0;
+        deviceVolumeMismatches = 0;
+        deviceVolumeUntrusted = false;
+        pendingDeviceVolume = -1;
+        pendingDeviceVolumePolls = 0;
         lastCommandedUri = '';
         lastQueuedNextUri = '';
         startPositionPolling();
@@ -1442,6 +1573,7 @@ ipcMain.handle('dlna-connect', async (_event, device: DlnaDevice) => {
                 currentPosition = posInfo.position;
                 currentDuration = posInfo.duration;
                 lastCommandedUri = currentUri;
+                positionOffsetSeconds = 0;
                 nextUri = mediaInfo.nextUri || '';
                 if (nextUri) lastQueuedNextUri = nextUri;
                 dlnaLog(`Device already playing: ${currentUri} at ${currentPosition}s (${tState})`);
@@ -1615,10 +1747,17 @@ ipcMain.on(
     'dlna-play-url',
     async (
         _event,
-        data: { isMuted?: boolean; metadata: TrackMetadata; seekTo?: number; url: string },
+        data: {
+            isMuted?: boolean;
+            metadata: TrackMetadata;
+            positionOffset?: number;
+            seekTo?: number;
+            url: string;
+        },
     ) => {
         if (!connectedDevice) return;
         const device = connectedDevice;
+        playInFlight = true;
         try {
             hasStartedPlaying = false;
             lastKnownPosition = 0;
@@ -1628,7 +1767,7 @@ ipcMain.on(
             nearEndStallCount = 0;
             const lanUrl = rewriteUrlForLan(data.url);
             lastPlayCommandAt = Date.now();
-            if (lanUrl === lastCommandedUri && !data.seekTo) {
+            if (lanUrl === lastCommandedUri && !data.seekTo && !isChunkedTranscodeUri(lanUrl)) {
                 dlnaLog(
                     `dlna-play-url: URI already loaded (${data.metadata.title}), seeking to 0 and playing`,
                 );
@@ -1647,6 +1786,7 @@ ipcMain.on(
             lastPlayUrlSentAt = Date.now();
             lastLoadedFromUri = lastCommandedUri;
             lastCommandedUri = lanUrl;
+            positionOffsetSeconds = data.positionOffset ?? 0;
             lastQueuedNextUri = '';
             const lanArtUrl = data.metadata.albumArtUrl
                 ? rewriteUrlForLan(data.metadata.albumArtUrl)
@@ -1664,6 +1804,8 @@ ipcMain.on(
             await setAVTransportURI(device, lanUrl, metadata);
             await new Promise((r) => setTimeout(r, 1000));
             if (data.metadata.autoPlay !== false) {
+                await waitForNextUriIdle();
+                lastPlayCommandAt = Date.now();
                 await play(device).catch((err) => dlnaLog('Initial play failed', err));
                 dlnaLog(`Playing: ${data.metadata.title}`);
                 if (shouldMuteTrick) {
@@ -1695,6 +1837,8 @@ ipcMain.on(
             } else {
                 dlnaLog(`Queued (Paused): ${data.metadata.title}`);
                 if (shouldMuteTrick) {
+                    await waitForNextUriIdle();
+                    lastPlayCommandAt = Date.now();
                     await play(device).catch(() => {});
                     await waitForTransportState(device, ['PLAYING'], 4000);
                     await new Promise((r) => setTimeout(r, 1200));
@@ -1721,13 +1865,16 @@ ipcMain.on(
                     );
                 }
             }
-        } catch {
+        } catch (err) {
+            dlnaLog(`Failed to load ${data.metadata.title}`, err);
             if (data.seekTo !== undefined) {
                 await setMute(device, !!data.isMuted).catch(() => {});
                 await Promise.all(
                     groupMembers.map((m) => setMute(m, !!data.isMuted).catch(() => {})),
                 );
             }
+        } finally {
+            playInFlight = false;
         }
     },
 );
@@ -1735,11 +1882,14 @@ ipcMain.on(
 // Set the next track for gapless playback
 ipcMain.on('dlna-set-next-url', async (_event, data: { metadata: TrackMetadata; url: string }) => {
     if (!connectedDevice) return;
+    await settleAfterPlay();
+    if (!connectedDevice) return;
+    const device = connectedDevice;
     try {
         if (!data.url) {
             lastQueuedNextUri = '';
             try {
-                await clearNextAVTransportURI(connectedDevice);
+                await withNextUriInFlight(() => clearNextAVTransportURI(device));
             } catch {
                 // Pass
             }
@@ -1751,10 +1901,12 @@ ipcMain.on('dlna-set-next-url', async (_event, data: { metadata: TrackMetadata; 
         const lanArtUrl = data.metadata?.albumArtUrl
             ? rewriteUrlForLan(data.metadata.albumArtUrl)
             : undefined;
-        await setNextAVTransportURI(connectedDevice, lanUrl, {
-            ...data.metadata,
-            albumArtUrl: lanArtUrl,
-        });
+        await withNextUriInFlight(() =>
+            setNextAVTransportURI(device, lanUrl, {
+                ...data.metadata,
+                albumArtUrl: lanArtUrl,
+            }),
+        );
         dlnaLog(`Set next track: ${data.metadata.title}`);
     } catch (err) {
         dlnaLog(`Failed to set next track ${data?.metadata?.title || ''}`, err);
@@ -1770,7 +1922,13 @@ ipcMain.on('dlna-play', async () => {
         lastPlayCommandAt = Date.now();
         lastPauseCommandAt = 0;
         lastKnownTransportState = 'PLAYING';
-        await play(connectedDevice);
+        await waitForNextUriIdle();
+        playInFlight = true;
+        try {
+            await play(connectedDevice);
+        } finally {
+            playInFlight = false;
+        }
     } catch (err) {
         dlnaLog('Failed to resume playback', err);
     }
@@ -1802,10 +1960,13 @@ ipcMain.on('dlna-pause', async () => {
 
 ipcMain.on('dlna-clear-next', async () => {
     if (!connectedDevice) return;
+    await settleAfterPlay();
+    if (!connectedDevice) return;
+    const device = connectedDevice;
     lastQueuedNextUri = '';
     lastClearNextAt = Date.now();
     try {
-        await clearNextAVTransportURI(connectedDevice);
+        await withNextUriInFlight(() => clearNextAVTransportURI(device));
         dlnaLog('Cleared next track');
     } catch (err) {
         dlnaLog('Failed to clear next track', err);
@@ -1817,6 +1978,7 @@ ipcMain.on('dlna-stop', async () => {
     if (!connectedDevice) return;
     try {
         isPausedIntentionally = true;
+        lastStopCommandAt = Date.now();
         lastCommandedUri = '';
         lastQueuedNextUri = '';
         await stop(connectedDevice);
@@ -1828,6 +1990,13 @@ ipcMain.on('dlna-stop', async () => {
 // Seek to position
 ipcMain.on('dlna-seek', async (_event, seconds: number) => {
     if (!connectedDevice) return;
+    // A chunked transcode cannot be seeked (see the engine's isChunkedTranscodeUrl); a HEOS
+    // receiver given a Seek on one hangs in TRANSITIONING. The engine re-sends with an offset
+    // instead, so anything that still arrives here for such a stream is dropped.
+    if (isChunkedTranscodeUri(lastCommandedUri)) {
+        dlnaLog(`Ignoring Seek to ${seconds} on a chunked transcode`);
+        return;
+    }
     try {
         lastAppSeekAt = Date.now();
         let targetSeconds = seconds;
@@ -1845,6 +2014,8 @@ ipcMain.on('dlna-seek', async (_event, seconds: number) => {
 ipcMain.on('dlna-volume', async (_event, value: number) => {
     if (!connectedDevice) return;
     try {
+        lastAppVolume = value;
+        lastAppVolumeAt = Date.now();
         await setVolume(connectedDevice, value);
         lastKnownDeviceVolume = value;
         if (groupMembers.length > 0) groupMemberVolumes[connectedDevice.id] = value;
@@ -1869,7 +2040,8 @@ ipcMain.handle('dlna-get-position', async () => {
     try {
         const info = await getPositionInfo(connectedDevice);
         const proxyState = getActiveProxyState(lastCommandedUri);
-        return proxyState ? info.position * proxyState.speed : info.position;
+        const position = proxyState ? info.position * proxyState.speed : info.position;
+        return position + positionOffsetSeconds;
     } catch {
         return lastKnownPosition;
     }

@@ -35,10 +35,11 @@ import {
     useCurrentServer,
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
-    useGeneralSettings,
     usePlayerData,
     usePlayerSong,
     useSetFullScreenPlayerStore,
+    useShowFavorites,
+    useShowRatings,
 } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Text } from '/@/shared/components/text/text';
@@ -216,10 +217,11 @@ const overlayVariants: Variants = {
 interface BackgroundImageOverlayProps {
     dynamicBackground: boolean | undefined;
     dynamicImageBlur: number | undefined;
+    dynamicIsImage: boolean | undefined;
 }
 
 const BackgroundImageOverlay = memo(
-    ({ dynamicBackground, dynamicImageBlur }: BackgroundImageOverlayProps) => {
+    ({ dynamicBackground, dynamicImageBlur, dynamicIsImage }: BackgroundImageOverlayProps) => {
         const currentSong = usePlayerSong();
         const { nextSong } = usePlayerData();
 
@@ -253,7 +255,7 @@ const BackgroundImageOverlay = memo(
             previousSongRef.current = currentSong?._uniqueId;
         }, [currentSong?._uniqueId, nextSong?._uniqueId]);
 
-        if (!dynamicBackground) {
+        if (!dynamicBackground || !dynamicIsImage) {
             return null;
         }
 
@@ -297,14 +299,44 @@ const BackgroundImageOverlay = memo(
 
 BackgroundImageOverlay.displayName = 'BackgroundImageOverlay';
 
+interface BackgroundOverlayProps {
+    dynamicBackground: boolean | undefined;
+    opacity: number;
+}
+
+const BackgroundOverlay = memo(({ dynamicBackground, opacity }: BackgroundOverlayProps) => {
+    if (!dynamicBackground) {
+        return null;
+    }
+
+    const alpha = Math.min(1, Math.max(0, opacity / 120));
+
+    return (
+        <div
+            className={styles.backgroundOverlay}
+            style={{ backgroundColor: `rgba(0, 0, 0, ${alpha})` }}
+        />
+    );
+});
+
+BackgroundOverlay.displayName = 'BackgroundOverlay';
+
 interface MobilePlayerContainerProps {
     children: ReactNode;
     dynamicBackground: boolean | undefined;
+    dynamicImageBlur: number | undefined;
     dynamicIsImage: boolean | undefined;
+    opacity: number;
 }
 
 const MobilePlayerContainer = memo(
-    ({ children, dynamicBackground, dynamicIsImage }: MobilePlayerContainerProps) => {
+    ({
+        children,
+        dynamicBackground,
+        dynamicImageBlur,
+        dynamicIsImage,
+        opacity,
+    }: MobilePlayerContainerProps) => {
         const currentSong = usePlayerSong();
         const imageUrl = useItemImageUrl({
             id: currentSong?.imageId || undefined,
@@ -339,12 +371,21 @@ const MobilePlayerContainer = memo(
                 exit="closed"
                 initial="closed"
                 style={{
-                    backgroundColor,
+                    backgroundColor: dynamicBackground ? 'transparent' : backgroundColor,
                 }}
                 variants={mobileContainerVariants}
             >
+                {dynamicBackground && (
+                    <div className={styles.backgroundColor} style={{ backgroundColor }} />
+                )}
                 <BackgroundImage
                     dynamicBackground={dynamicBackground}
+                    dynamicIsImage={dynamicIsImage}
+                />
+                <BackgroundOverlay dynamicBackground={dynamicBackground} opacity={opacity} />
+                <BackgroundImageOverlay
+                    dynamicBackground={dynamicBackground}
+                    dynamicImageBlur={dynamicImageBlur}
                     dynamicIsImage={dynamicIsImage}
                 />
                 {children}
@@ -376,7 +417,7 @@ export const MobileFullscreenPlayer = () => {
     const { t } = useTranslation();
     const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
-    const { activeTab, dynamicBackground, dynamicImageBlur, dynamicIsImage } =
+    const { activeTab, dynamicBackground, dynamicImageBlur, dynamicIsImage, opacity } =
         useFullScreenPlayerStore();
     const currentSong = usePlayerSong();
     const { currentSong: currentSongData } = usePlayerData();
@@ -386,8 +427,10 @@ export const MobileFullscreenPlayer = () => {
 
     const isPlayingRadio = isRadioActive && isRadioPlaying;
     const effectiveDynamicBackground = dynamicBackground && !isPlayingRadio;
+
     const setFavorite = useSetFavorite();
-    const { showRatings: showRatingsSetting } = useGeneralSettings();
+    const showRatingsSetting = useShowRatings();
+    const showFavorites = useShowFavorites();
     const setRating = useSetRating();
 
     const [isPageHovered, setIsPageHovered] = useState(false);
@@ -453,12 +496,10 @@ export const MobileFullscreenPlayer = () => {
     return (
         <MobilePlayerContainer
             dynamicBackground={effectiveDynamicBackground}
+            dynamicImageBlur={dynamicImageBlur}
             dynamicIsImage={dynamicIsImage}
+            opacity={opacity}
         >
-            <BackgroundImageOverlay
-                dynamicBackground={effectiveDynamicBackground}
-                dynamicImageBlur={dynamicImageBlur}
-            />
             <motion.div
                 animate={{
                     opacity: isPlayerState ? 1 : 0,
@@ -469,19 +510,15 @@ export const MobileFullscreenPlayer = () => {
                 onMouseLeave={() => setIsPageHovered(false)}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
             >
-                <MobileFullscreenPlayerHeader
-                    currentSong={currentSong}
-                    isPageHovered={isPageHovered}
-                    onClose={handleToggleFullScreenPlayer}
-                />
+                <MobileFullscreenPlayerHeader />
                 <MobileFullscreenPlayerAlbumArt />
                 <MobileFullscreenPlayerMetadata
                     currentSong={currentSong}
                     onToggleFavorite={handleToggleFavorite}
                     onUpdateRating={handleUpdateRating}
-                    radioArtist={isPlayingRadio ? (radioMetadata?.artist ?? undefined) : undefined}
                     radioStationName={isPlayingRadio ? (stationName ?? undefined) : undefined}
                     radioTitle={isPlayingRadio ? (radioMetadata?.title ?? undefined) : undefined}
+                    showFavorite={showFavorites}
                     showRating={showRating}
                 />
                 <MobileFullscreenPlayerProgress currentSong={currentSong} />

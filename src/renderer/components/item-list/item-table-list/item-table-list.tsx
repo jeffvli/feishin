@@ -122,7 +122,7 @@ const hasRequiredStateItemProperties = (
 
 export enum TableItemSize {
     COMPACT = 40,
-    DEFAULT = 64,
+    DEFAULT = 66,
     LARGE = 88,
 }
 

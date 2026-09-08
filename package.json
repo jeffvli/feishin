@@ -22,16 +22,18 @@
     "main": "./out/main/index.js",
     "scripts": {
         "build": "pnpm run build:electron && pnpm run build:remote",
-        "build:electron": "electron-vite build",
+        "build:electron": "cross-env NODE_OPTIONS=--max-old-space-size=4096 electron-vite build",
         "build:remote": "vite build --config remote.vite.config.ts",
         "build:web": "vite build --config web.vite.config.ts",
         "dev": "electron-vite dev",
         "dev:remote": "vite dev --config remote.vite.config.ts",
         "dev:watch": "electron-vite dev --watch",
         "i18next": "i18next -c src/i18n/i18next-parser.config.js",
-        "postinstall": "electron-builder install-app-deps",
+        "postinstall": "install-electron && electron-builder install-app-deps",
         "lint": "pnpm run typecheck && pnpm run lint-code && pnpm run lint-styles",
+        "lint:commits": "commitlint",
         "lint:fix": "pnpm run lint-code:fix && pnpm run lint-styles:fix",
+        "lint:staged": "lint-staged",
         "lint-code": "eslint --max-warnings=0 --cache .",
         "lint-code:fix": "eslint --cache --fix .",
         "lint-styles": "stylelint --max-warnings=0 'src/**/*.{css,scss}'",
@@ -67,6 +69,10 @@
         "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
         "version": "pnpm version --no-git-tag-version",
         "postversion": "node ./scripts/update-app-stream.mjs"
+    },
+    "lint-staged": {
+        "*.{ts,tsx}": "eslint --max-warnings=0 --fix",
+        "*.{css,scss}": "stylelint --max-warnings=0 --fix"
     },
     "resolutions": {
         "xml2js": "0.5.0"
@@ -150,6 +156,8 @@
         "zustand": "^5.0.14"
     },
     "devDependencies": {
+        "@commitlint/cli": "^21.2.2",
+        "@commitlint/config-conventional": "^21.2.2",
         "@electron-toolkit/eslint-config-prettier": "^3.0.0",
         "@electron-toolkit/eslint-config-ts": "^3.1.0",
         "@electron-toolkit/tsconfig": "^2.0.0",
@@ -167,10 +175,10 @@
         "babel-plugin-react-compiler": "^1.0.0",
         "concurrently": "^9.2.1",
         "cross-env": "^10.1.0",
-        "electron": "^41.7.1",
-        "electron-builder": "^26.15.5",
+        "electron": "^43.4.1",
+        "electron-builder": "^26.15.7",
         "electron-devtools-installer": "^4.0.0",
-        "electron-vite": "^4.0.1",
+        "electron-vite": "^5.0.0",
         "eslint": "^9.39.4",
         "eslint-plugin-perfectionist": "^4.15.1",
         "eslint-plugin-prettier": "^5.5.6",
@@ -178,6 +186,7 @@
         "eslint-plugin-react-hooks": "^7.1.1",
         "eslint-plugin-react-refresh": "^0.4.26",
         "i18next-parser": "^9.4.0",
+        "lint-staged": "^17.3.0",
         "postcss-preset-mantine": "^1.18.0",
         "postcss-simple-vars": "^7.0.1",
         "prettier": "^3.8.3",

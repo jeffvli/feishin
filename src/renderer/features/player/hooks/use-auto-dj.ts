@@ -64,9 +64,10 @@ export const useAutoDJ = () => {
                     return;
                 }
 
-                logger.info('Auto play triggered', {
+                logger.info('Auto DJ triggered', {
                     remaining: properties.remaining,
                     songId: properties.song?.id,
+                    songName: properties.song?.name,
                 });
 
                 try {
@@ -144,7 +145,7 @@ export const useAutoDJ = () => {
                         });
                     }
                 } catch (error) {
-                    logger.error('Auto play failed', {
+                    logger.error('Auto DJ failed', {
                         error: (error as Error).message,
                         songId: properties.song?.id,
                     });

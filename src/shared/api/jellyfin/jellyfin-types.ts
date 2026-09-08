@@ -722,6 +722,14 @@ const scrobbleParameters = z.object({
     EventName: z.string().optional(),
     IsPaused: z.boolean().optional(),
     ItemId: z.string(),
+    NowPlayingQueue: z
+        .array(
+            z.object({
+                Id: z.string(),
+                PlaylistItemId: z.string().optional(),
+            }),
+        )
+        .optional(),
     PositionTicks: z.number().optional(),
 });
 

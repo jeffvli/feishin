@@ -21,7 +21,7 @@ import { LibraryItem } from '/@/shared/types/domain-types';
 
 enum TableItemSize {
     COMPACT = 40,
-    DEFAULT = 64,
+    DEFAULT = 66,
     LARGE = 88,
 }
 

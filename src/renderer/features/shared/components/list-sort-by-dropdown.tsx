@@ -188,6 +188,11 @@ export const CLIENT_SIDE_SONG_FILTERS = [
     },
     {
         defaultOrder: SortOrder.ASC,
+        name: i18n.t('filter.random'),
+        value: SongListSort.RANDOM,
+    },
+    {
+        defaultOrder: SortOrder.ASC,
         name: i18n.t('filter.sortName'),
         value: SongListSort.SORT_NAME,
     },
@@ -214,6 +219,11 @@ export const CLIENT_SIDE_SONG_FILTERS = [
     {
         defaultOrder: SortOrder.DESC,
         name: i18n.t('filter.releaseYear'),
+        value: SongListSort.RELEASE_YEAR,
+    },
+    {
+        defaultOrder: SortOrder.DESC,
+        name: i18n.t('filter.year'),
         value: SongListSort.YEAR,
     },
 ];
@@ -591,6 +601,11 @@ const SONG_LIST_FILTERS: Partial<
         {
             defaultOrder: SortOrder.DESC,
             name: i18n.t('filter.releaseYear'),
+            value: SongListSort.RELEASE_YEAR,
+        },
+        {
+            defaultOrder: SortOrder.DESC,
+            name: i18n.t('filter.year'),
             value: SongListSort.YEAR,
         },
     ],
@@ -852,7 +867,7 @@ const GENRE_LIST_FILTERS: Partial<
         },
         {
             defaultOrder: SortOrder.ASC,
-            name: i18n.t('filter.albumCount'),
+            name: i18n.t('filter.songCount'),
             value: GenreListSort.SONG_COUNT,
         },
     ],

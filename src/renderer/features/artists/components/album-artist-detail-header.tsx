@@ -19,7 +19,7 @@ import {
 import { useSetFavorite } from '/@/renderer/features/shared/hooks/use-set-favorite';
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useAppStore, useCurrentServer, useShowRatings } from '/@/renderer/store';
+import { useAppStore, useCurrentServer, useShowFavorites, useShowRatings } from '/@/renderer/store';
 import { useArtistReleaseTypeItems, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { formatDurationString } from '/@/renderer/utils';
 import { hasFeature, SEPARATOR_STRING, sortAlbumList } from '/@/shared/api/utils';
@@ -33,6 +33,7 @@ import {
     AlbumListResponse,
     LibraryItem,
     ServerType,
+    Song,
 } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
 import { Play } from '/@/shared/types/types';
@@ -105,6 +106,7 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
         const routeId = (artistId || albumArtistId) as string;
         const server = useCurrentServer();
         const showRatings = useShowRatings();
+        const showFavorites = useShowFavorites();
         const { t } = useTranslation();
         const detailQuery = useSuspenseQuery(
             artistsQueries.albumArtistDetail({
@@ -168,11 +170,21 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
 
                 const albumIds = flatSortedAlbums.map((album) => album.id);
                 if (albumIds.length === 0) return;
+
+                const filter = (song: Song) => {
+                    if (song.albumArtists.some((artist) => artist.id === albumArtistId)) {
+                        return true;
+                    }
+
+                    return song.artists.some((artist) => artist.id === albumArtistId);
+                };
+
                 addToQueueByFetch(
                     server.id,
                     albumIds,
                     LibraryItem.ALBUM,
                     type || playButtonBehavior,
+                    { filter },
                 );
             },
             [
@@ -186,6 +198,7 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
                 groupingType,
                 artistReleaseTypeItems,
                 t,
+                albumArtistId,
             ],
         );
 
@@ -299,7 +312,7 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
                     </Group>
                     <LibraryHeaderMenu
                         favorite={detailQuery.data?.userFavorite}
-                        onFavorite={handleFavorite}
+                        onFavorite={showFavorites ? handleFavorite : undefined}
                         onMore={handleMoreOptions}
                         onPlay={(type) => handlePlay(type)}
                         onRating={showRating ? handleUpdateRating : undefined}

@@ -66,14 +66,18 @@ const BaseNativeScrollArea = forwardRef(
             },
         });
 
+        // Only depend on stable values — inline pageHeaderProps objects change every
+        // render and were re-initializing OverlayScrollbars, wiping restored scroll.
+        const hasPageHeader = Boolean(!noHeader && pageHeaderProps);
+
         useEffect(() => {
             if (containerRef.current) {
                 initialize(containerRef.current as HTMLDivElement);
-                if (!noHeader && pageHeaderProps) {
+                if (hasPageHeader) {
                     containerRef.current.setAttribute('data-scrolled', 'false');
                 }
             }
-        }, [initialize, noHeader, pageHeaderProps]);
+        }, [hasPageHeader, initialize]);
 
         const mergedRef = useMergedRef(ref, containerRef);
 

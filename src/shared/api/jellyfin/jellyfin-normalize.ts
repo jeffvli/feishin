@@ -155,6 +155,7 @@ const normalizeSong = (
         compilation: null,
         container,
         createdAt: item.DateCreated,
+        date: releaseDate || String(releaseYear),
         discNumber: (item.ParentIndexNumber && item.ParentIndexNumber) || 1,
         discSubtitle: null,
         duration: item.RunTimeTicks / TICKS_PER_MS,
@@ -190,6 +191,7 @@ const normalizeSong = (
         imageUrl: null,
         lastPlayedAt: null,
         lyrics: null,
+        mbzAlbumId: item.ProviderIds?.MusicBrainzAlbum || null,
         mbzRecordingId: null,
         mbzTrackId: item.ProviderIds?.MusicBrainzTrack || null,
         name: item.Name,
@@ -209,6 +211,7 @@ const normalizeSong = (
         updatedAt: item.DateCreated,
         userFavorite: (item.UserData && item.UserData.IsFavorite) || false,
         userRating: null,
+        year: releaseYear,
     };
 };
 
@@ -280,6 +283,7 @@ const normalizeAlbum = (
         songs: item.Songs?.map((song) => normalizeSong(song, server)),
         sortName: item.SortName || item.Name,
         tags: getTags(item),
+        trackYearRange: null,
         updatedAt: item?.DateLastMediaAdded || item.DateCreated,
         userFavorite: item.UserData?.IsFavorite || false,
         userRating: null,

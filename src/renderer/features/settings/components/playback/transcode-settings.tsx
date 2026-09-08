@@ -71,7 +71,7 @@ export const TranscodeSettings = memo(() => {
                             format: e.currentTarget.value || undefined,
                         });
                     }}
-                    placeholder="mp3, opus"
+                    placeholder="mp3, opus, flac"
                     width={100}
                 />
             ),
@@ -81,6 +81,31 @@ export const TranscodeSettings = memo(() => {
             isHidden: !transcode.enabled,
             note,
             title: t('setting.transcodeFormat'),
+        },
+        {
+            control: (
+                <NumberInput
+                    aria-label="Transcode max sample rate"
+                    defaultValue={transcode.maxSampleRate}
+                    min={0}
+                    onBlur={(e) => {
+                        setTranscodingConfig({
+                            ...transcode,
+                            maxSampleRate: e.currentTarget.value
+                                ? Number(e.currentTarget.value)
+                                : undefined,
+                        });
+                    }}
+                    placeholder="192000"
+                    w={100}
+                />
+            ),
+            description: t('setting.transcodeSampleRate', {
+                context: 'description',
+            }),
+            isHidden: !transcode.enabled,
+            note,
+            title: t('setting.transcodeSampleRate'),
         },
     ];
 

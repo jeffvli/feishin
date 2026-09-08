@@ -314,7 +314,12 @@ export const contract = c.router({
         method: 'POST',
         path: 'Items/:id/Refresh',
         query: z.object({
+            ImageRefreshMode: z.string().optional(),
             MetadataRefreshMode: z.string().optional(),
+            Recursive: z.boolean().optional(),
+            RegenerateTrickplay: z.boolean().optional(),
+            ReplaceAllImages: z.boolean().optional(),
+            ReplaceAllMetadata: z.boolean().optional(),
         }),
         responses: {
             204: z.null(),

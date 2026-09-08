@@ -5,3 +5,6 @@ out
 .eslintcache
 *.log*
 release
+.idea
+.scratch
+tsconfig.*.tsbuildinfo

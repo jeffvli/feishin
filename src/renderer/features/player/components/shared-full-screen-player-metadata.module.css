@@ -1,0 +1,18 @@
+.metadata-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 0.5rem;
+    text-align: center;
+    cursor: default;
+    border-radius: 5px;
+
+    a {
+        cursor: pointer;
+    }
+
+    h1 {
+        font-size: 3.5vh;
+    }
+}

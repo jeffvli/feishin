@@ -1,0 +1,21 @@
+.scrolling-text-container {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.track {
+    --scroll-gap: 1rem;
+
+    display: flex;
+    align-items: center;
+    width: max-content;
+}
+
+.track div {
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.track div + div {
+    margin-left: var(--scroll-gap);
+}

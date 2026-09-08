@@ -356,8 +356,10 @@ const getSongFieldValue = (song: Song, field: string): boolean | null | number |
             return song.playCount;
         case 'rating':
             return song.userRating || 0;
-        case 'year':
+        case 'releaseYear':
             return song.releaseYear || 0;
+        case 'year':
+            return song.year || 0;
         default:
             return null;
     }
@@ -434,7 +436,7 @@ export const filterSongsByPlayerFilters = (songs: Song[], filters: PlayerFilter[
     });
 
     if (filteredSongs.length > 0) {
-        logger.debug('Player filters applied', {
+        logger.info('Player filters applied', {
             filteredCount: filteredSongs.length,
             filteredSongs: filteredSongs.map(({ filter, song }) => ({
                 artist: song.artistName,

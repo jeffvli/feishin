@@ -18,3 +18,35 @@ jobs:
 
             - name: Lint Files
               run: pnpm run lint
+
+    commitlint:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+
+            - name: Install Node.js and PNPM
+              uses: pnpm/action-setup@v4
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Lint PR commits
+              if: github.event_name == 'pull_request'
+              run: pnpm exec commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+
+            - name: Fetch pre-push tip (unreachable after force-push)
+              if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
+              run: git fetch origin ${{ github.event.before }}
+
+            - name: Lint push commits
+              if: github.event_name == 'push'
+              run: |
+                  if [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+                    pnpm exec commitlint --last --verbose
+                  else
+                    pnpm exec commitlint --from ${{ github.event.before }} --to ${{ github.event.after }} --verbose
+                  fi

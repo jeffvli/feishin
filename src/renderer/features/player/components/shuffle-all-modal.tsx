@@ -149,6 +149,8 @@ export const ShuffleAllContextModal = () => {
         if (playbackKind === 'albums') {
             const { data } = await refetchAlbums();
 
+            closeAllModals();
+
             addToQueueByFetch(
                 server.id,
                 data?.items.map((a) => a.id) ?? [],
@@ -158,10 +160,10 @@ export const ShuffleAllContextModal = () => {
         } else {
             const { data } = await refetchSongs();
 
+            closeAllModals();
+
             addToQueueByData(data?.items || [], playType);
         }
-
-        closeAllModals();
     };
 
     return (

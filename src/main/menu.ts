@@ -2,6 +2,7 @@ import { BrowserWindow, Menu, MenuItemConstructorOptions, shell } from 'electron
 
 import packageJson from '../../package.json';
 
+import { store } from '/@/main/features/core/settings';
 import { PlayerRepeat, PlayerStatus } from '/@/shared/types/types';
 
 export type MenuPlaybackState = {
@@ -173,7 +174,29 @@ export default class MenuBuilder {
                 },
             ],
         };
-        const subMenuWindow: MenuItemConstructorOptions = { role: 'windowMenu' };
+        const subMenuWindow: MenuItemConstructorOptions = {
+            role: 'windowMenu',
+            submenu:
+                store.get('window_exit_to_tray') && !this.mainWindow.isVisible()
+                    ? [
+                          {
+                              type: 'separator',
+                          },
+                          {
+                              accelerator: 'CmdOrCtrl+0',
+                              click: () => {
+                                  if (this.mainWindow.isMinimized()) {
+                                      this.mainWindow.restore();
+                                  }
+                                  this.mainWindow.setSkipTaskbar(false);
+                                  this.mainWindow.show();
+                                  this.mainWindow.focus();
+                              },
+                              label: 'Feishin',
+                          },
+                      ]
+                    : undefined,
+        };
         const subMenuPlayback: MenuItemConstructorOptions = {
             label: 'Playback',
             submenu: [

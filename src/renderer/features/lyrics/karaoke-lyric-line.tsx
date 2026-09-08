@@ -181,6 +181,7 @@ export const KaraokeLyricLine = memo(
         pronunciationText,
         romajiCueLines,
         romajiText,
+        text,
         translatedText,
         translationCueLines,
         ...props
@@ -258,6 +259,7 @@ export const KaraokeLyricLine = memo(
                                         styles.overlayLine,
                                     )}
                                 {translationCueLine &&
+                                    translationCueLine.value !== cueLine.value &&
                                     renderOverlayCueLineRow(
                                         translationCueLine,
                                         lineIndex,
@@ -276,7 +278,7 @@ export const KaraokeLyricLine = memo(
                             }}
                         />
                     )}
-                    {!hasSyncedTranslation && translatedText && (
+                    {!hasSyncedTranslation && translatedText && translatedText !== text && (
                         <span
                             className={styles.translationLine}
                             dangerouslySetInnerHTML={{ __html: sanitize(translatedText) }}

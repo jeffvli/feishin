@@ -1,6 +1,7 @@
 import isElectron from 'is-electron';
 import { create } from 'zustand';
 
+import { logger } from '/@/renderer/utils/logger';
 import { setCustomThemeRegistry } from '/@/shared/themes/app-theme';
 import { AppThemeConfiguration } from '/@/shared/themes/app-theme-types';
 
@@ -73,13 +74,26 @@ const toRegistry = (rawThemes: RawCustomTheme[]): Record<string, AppThemeConfigu
 
 export const useCustomThemesStore = create<CustomThemesActions & CustomThemesState>()((set) => ({
     openThemesFolder: async () => {
-        await customThemesApi?.openFolder();
+        try {
+            await customThemesApi?.openFolder();
+        } catch (error) {
+            logger.warn('Failed to open custom themes folder', { error: String(error) });
+        }
     },
     refresh: async () => {
         if (!customThemesApi) return;
-        const rawThemes = (await customThemesApi.get()) as unknown as RawCustomTheme[];
-        setCustomThemeRegistry(toRegistry(rawThemes));
-        set({ themes: rawThemes.map(toMeta) });
+        try {
+            const rawThemes = (await customThemesApi.get()) as unknown as RawCustomTheme[];
+            setCustomThemeRegistry(toRegistry(rawThemes));
+            set({ themes: rawThemes.map(toMeta) });
+            logger.debug('Refreshed custom themes', {
+                errorCount: rawThemes.filter((t) => t.error).length,
+                themeCount: rawThemes.length,
+                themes: rawThemes.map((t) => t.label),
+            });
+        } catch (error) {
+            logger.warn('Failed to refresh custom themes', { error: String(error) });
+        }
     },
     themes: [],
 }));

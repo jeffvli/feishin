@@ -7,6 +7,7 @@ import {
     DateInput as MantineDateInput,
     DateTimePicker as MantineDateTimeInput,
 } from '@mantine/dates';
+import clsx from 'clsx';
 
 import styles from './date-picker.module.css';
 
@@ -17,6 +18,7 @@ interface DateInputProps extends MantineDateInputProps {
 
 export const DateInput = ({
     classNames,
+    clearable = false,
     maxWidth,
     size = 'sm',
     style,
@@ -27,12 +29,18 @@ export const DateInput = ({
         <MantineDateInput
             classNames={{
                 description: styles.description,
-                input: styles.input,
+                input: clsx(styles.input, {
+                    [styles.clearable]: clearable,
+                }),
                 label: styles.label,
                 required: styles.required,
                 root: styles.root,
                 section: styles.section,
                 ...classNames,
+            }}
+            clearable={clearable}
+            clearButtonProps={{
+                className: styles.clearButton,
             }}
             size={size}
             style={{ maxWidth, width, ...style }}
@@ -48,6 +56,7 @@ interface DateTimeInputProps extends MantineDateTimeInputProps {
 
 export const DateTimeInput = ({
     classNames,
+    clearable = false,
     maxWidth,
     size = 'sm',
     style,
@@ -58,12 +67,18 @@ export const DateTimeInput = ({
         <MantineDateTimeInput
             classNames={{
                 description: styles.description,
-                input: styles.input,
+                input: clsx(styles.input, {
+                    [styles.clearable]: clearable,
+                }),
                 label: styles.label,
                 required: styles.required,
                 root: styles.root,
                 section: styles.section,
                 ...classNames,
+            }}
+            clearable={clearable}
+            clearButtonProps={{
+                className: styles.clearButton,
             }}
             size={size}
             style={{ maxWidth, width, ...style }}

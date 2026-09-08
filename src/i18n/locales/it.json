@@ -695,7 +695,9 @@
         "autoDJ_onlySimilar": "Solo simili",
         "autoDJ_onlySimilar_description": "Aggiunge solo elementi simili al brano che ha attivato Auto DJ. Il numero di elementi viene considerato come il massimo da aggiungere, invece di riempire la coda con altre sorgenti",
         "showQueueInSidebar": "Mostra la coda nella barra laterale player",
-        "showQueueInSidebar_description": "Aggiunge un pannello alla barra laterale del player che mostra la coda di riproduzione"
+        "showQueueInSidebar_description": "Aggiunge un pannello alla barra laterale del player che mostra la coda di riproduzione",
+        "showFavorites": "Mostra i preferiti",
+        "showFavorites_description": "Controlla se la funzione dei preferiti (cuore) viene mostrata nell'interfaccia"
     },
     "error": {
         "remotePortWarning": "Riavvia il server per applicare la nuova porta",

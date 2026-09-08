@@ -1,4 +1,4 @@
-import { useSuspenseQueries } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import { useParams } from 'react-router';
 
@@ -24,6 +24,7 @@ import { useAppStore } from '/@/renderer/store/app.store';
 import { useCurrentServer } from '/@/renderer/store/auth.store';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import { sortSongList } from '/@/shared/api/utils';
+import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { LibraryItem, Song } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
@@ -36,18 +37,27 @@ const AlbumArtistDetailFavoriteSongsListRoute = () => {
     const server = useCurrentServer();
     const pageKey = LibraryItem.SONG;
 
-    const [detailQuery, favoriteSongsQuery] = useSuspenseQueries({
-        queries: [
-            artistsQueries.albumArtistDetail({
-                query: { id: routeId },
-                serverId: server?.id,
-            }),
-            artistsQueries.favoriteSongs({
-                query: { artistId: routeId },
-                serverId: server?.id,
-            }),
-        ],
+    const [favoriteSongsQueryType] = useLocalStorage<'favorite' | 'rating'>({
+        defaultValue: 'favorite',
+        key: 'album-artist-favorite-songs-query-type',
     });
+
+    const detailQuery = useSuspenseQuery(
+        artistsQueries.albumArtistDetail({
+            query: { id: routeId },
+            serverId: server?.id,
+        }),
+    );
+
+    const favoriteSongsQuery = useSuspenseQuery(
+        artistsQueries.favoriteSongs({
+            query: {
+                artistId: routeId,
+                type: favoriteSongsQueryType,
+            },
+            serverId: server?.id,
+        }),
+    );
 
     const songs = useMemo(
         () => favoriteSongsQuery?.data?.items || [],

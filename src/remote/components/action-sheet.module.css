@@ -1,0 +1,137 @@
+.content {
+    /* Mantine's Drawer only supports fixed named sizes (xs..xl) — passing
+       anything else resolves to an undefined CSS var and silently falls
+       back to 100% height. Override the height var directly instead so the
+       sheet shrinks to fit its content. */
+    --drawer-height: auto;
+
+    max-height: 85dvh;
+
+    /* Visual chrome (background/radius/shadow) lives on .sheet, not here —
+       .content itself never moves during the drag-to-dismiss gesture, only
+       its child does, so any background/shadow painted here would stay
+       put while the actual card slides out from under it. Overflow must
+       stay visible for the same reason: .content's height is fixed to the
+       sheet's resting size, so a dragged-down .sheet would otherwise get
+       clipped by Mantine's default `overflow-y: auto` the moment it moves
+       past that boundary. */
+    overflow: visible;
+    background: transparent;
+}
+
+.body {
+    padding: 0;
+}
+
+.sheet {
+    padding: 8px 8px calc(env(safe-area-inset-bottom, 0px) + 12px);
+    background: color-mix(in srgb, var(--theme-colors-surface) 92%, transparent);
+    border-top: 1px solid var(--theme-colors-border);
+    border-top-left-radius: var(--theme-radius-xl);
+    border-top-right-radius: var(--theme-radius-xl);
+    box-shadow: 0 -8px 24px rgb(0 0 0 / 20%);
+    backdrop-filter: blur(16px) saturate(180%);
+}
+
+.handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 24px;
+    touch-action: none;
+    cursor: grab;
+}
+
+.handle-bar {
+    width: 36px;
+    height: 4px;
+    background: var(--theme-colors-border);
+    border-radius: 999px;
+}
+
+.header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 4px 4px 8px;
+}
+
+.header-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.back-button {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: var(--theme-colors-text-secondary);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    border-radius: var(--theme-radius-md);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.header-spacer {
+    flex-shrink: 0;
+    width: 32px;
+}
+
+.item {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+    min-height: 52px;
+    padding: 0 12px;
+    color: var(--theme-colors-foreground);
+    text-align: left;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    border-radius: var(--theme-radius-lg);
+    transition: background-color 100ms ease, opacity 100ms ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.item:active {
+    background-color: var(--theme-colors-background);
+    opacity: 0.7;
+}
+
+.item:disabled {
+    color: var(--theme-colors-text-secondary);
+    cursor: default;
+    opacity: 0.5;
+}
+
+.item-label {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: var(--theme-font-size-md);
+    white-space: nowrap;
+}
+
+.item-right-icon {
+    color: var(--theme-colors-text-secondary);
+}
+
+.divider {
+    height: 1px;
+    margin: 6px 12px;
+    background: var(--theme-colors-border);
+}
+
+.max-height {
+    max-height: 55vh;
+}

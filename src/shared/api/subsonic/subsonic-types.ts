@@ -304,26 +304,33 @@ const artistInfoParameters = z.object({
     includeNotPresent: z.boolean().optional(),
 });
 
-const artistInfo = z.object({
-    artistInfo: z.object({
-        biography: z.string().optional(),
-        largeImageUrl: z.string().optional(),
-        lastFmUrl: z.string().optional(),
-        mediumImageUrl: z.string().optional(),
-        musicBrainzId: z.string().optional(),
-        similarArtist: z.array(
-            z.object({
-                albumCount: z.string(),
-                artistImageUrl: z.string().optional(),
-                coverArt: z.string().optional(),
-                id: z.string(),
-                name: z.string(),
-                starred: z.string().optional(),
-                userRating: z.number().optional(),
-            }),
-        ),
-        smallImageUrl: z.string().optional(),
-    }),
+// Organizes music according to ID3 tags, and must be queried with an ID3 artist id
+// (as returned by getArtists/getArtist). The non-ID3 getArtistInfo resolves the id
+// against the folder browsing namespace, where the same id belongs to an unrelated item.
+const artistInfo2 = z.object({
+    artistInfo2: z
+        .object({
+            biography: z.string().optional(),
+            largeImageUrl: z.string().optional(),
+            lastFmUrl: z.string().optional(),
+            mediumImageUrl: z.string().optional(),
+            musicBrainzId: z.string().optional(),
+            similarArtist: z
+                .array(
+                    z.object({
+                        albumCount: z.number().or(z.string()).optional(),
+                        artistImageUrl: z.string().optional(),
+                        coverArt: z.string().optional(),
+                        id,
+                        name: z.string(),
+                        starred: z.string().optional(),
+                        userRating: z.number().optional(),
+                    }),
+                )
+                .optional(),
+            smallImageUrl: z.string().optional(),
+        })
+        .optional(),
 });
 
 const topSongsListParameters = z.object({
@@ -951,7 +958,7 @@ export const ssType = {
         albumInfo,
         albumList,
         albumListEntry,
-        artistInfo,
+        artistInfo2,
         artistListEntry,
         authenticate,
         baseResponse,

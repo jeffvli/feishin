@@ -44,7 +44,7 @@ const disconnectPassive = (): Promise<boolean> => ipcRenderer.invoke('dlna-disco
 const playUrl = (
     url: string,
     metadata: TrackMetadata,
-    options?: { isMuted?: boolean; seekTo?: number },
+    options?: { isMuted?: boolean; positionOffset?: number; seekTo?: number },
 ) => ipcRenderer.send('dlna-play-url', { metadata, url, ...options });
 const setNextUrl = (url: string, metadata: TrackMetadata) =>
     ipcRenderer.send('dlna-set-next-url', { metadata, url });
@@ -73,8 +73,9 @@ function singleOn<T extends (...args: any[]) => void>(channel: string, cb: T): v
 
 const rendererCurrentTime = (cb: (event: IpcRendererEvent, time: number) => void) =>
     singleOn('renderer-dlna-current-time', cb);
-const rendererDlnaTrackEnded = (cb: (event: IpcRendererEvent) => void) =>
-    singleOn('renderer-dlna-track-ended', cb);
+const rendererDlnaTrackEnded = (
+    cb: (event: IpcRendererEvent, payload?: { gapless?: boolean }) => void,
+) => singleOn('renderer-dlna-track-ended', cb);
 const rendererTrackEnded = rendererDlnaTrackEnded;
 const rendererDlnaConnectPlayback = (
     cb: (

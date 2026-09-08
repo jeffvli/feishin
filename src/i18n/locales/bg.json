@@ -1,0 +1,10 @@
+{
+    "action": {
+        "addToFavorites": "Добави към $t(entity.favorite, {\"count\": 2})",
+        "addToPlaylist": "Добави към $t(entity.playlist, {\"count\": 1})",
+        "addOrRemoveFromSelection": "Добави или премахни от избраните",
+        "selectRangeOfItems": "Изберете набор от елементи",
+        "clearQueue": "Изчисти опашката",
+        "goToCurrent": "Отиди към текущия елемент"
+    }
+}
