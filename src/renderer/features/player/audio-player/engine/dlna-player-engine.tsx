@@ -111,7 +111,12 @@ async function getDlnaUrl(
 ): Promise<string | undefined> {
     const { contentType, suffix } = song as unknown as SongWithAudioMeta;
     if (isOpusByMetadata({ contentType, suffix })) {
-        const mp3Url = await getSongUrl(song, { ...transcode, enabled: true, format: 'mp3' });
+        const mp3Url = await getSongUrl(
+            song,
+            { ...transcode, enabled: true, format: 'mp3' },
+            undefined,
+            true,
+        );
         return mp3Url;
     }
     // Detection falls back to a probe of the actual stream if there isn't a positive from the initial metadata/suffix test
@@ -119,15 +124,25 @@ async function getDlnaUrl(
     if (probeUrl) {
         const isOpus = await probeIsOpusOgg(probeUrl);
         if (isOpus) {
-            const mp3Url = await getSongUrl(song, { ...transcode, enabled: true, format: 'mp3' });
+            const mp3Url = await getSongUrl(
+                song,
+                { ...transcode, enabled: true, format: 'mp3' },
+                undefined,
+                true,
+            );
             return mp3Url ?? probeUrl;
         }
         if (isOggByMetadata({ contentType, suffix })) {
-            const mp3Url = await getSongUrl(song, { ...transcode, enabled: true, format: 'mp3' });
+            const mp3Url = await getSongUrl(
+                song,
+                { ...transcode, enabled: true, format: 'mp3' },
+                undefined,
+                true,
+            );
             return mp3Url ?? probeUrl;
         }
     }
-    const playbackUrl = await getSongUrl(song, transcode);
+    const playbackUrl = await getSongUrl(song, transcode, undefined, true);
     return playbackUrl;
 }
 

@@ -1947,11 +1947,14 @@ export type StreamArgs = BaseEndpointArgs & {
 
 export type StreamQuery = {
     bitrate?: number;
+    container?: null | string;
     format?: string;
+    forRenderer?: boolean;
     id: string;
     maxSampleRate?: number;
     mediaType?: 'podcast' | 'song';
     offset?: number;
+    sampleRate?: null | number;
     skipAutoTranscode?: boolean;
     transcode: boolean;
 };

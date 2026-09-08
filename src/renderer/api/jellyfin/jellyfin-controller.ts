@@ -1472,12 +1472,40 @@ export const JellyfinController: InternalControllerEndpoint = {
             query: { ...query, limit: 1, startIndex: 0 },
         }).then((result) => result!.totalRecordCount!),
     getStreamUrl: async ({ apiClientProps: { server }, query }) => {
-        const { bitrate, format, id, maxSampleRate, transcode } = query;
+        const {
+            bitrate,
+            container,
+            format,
+            forRenderer,
+            id,
+            maxSampleRate,
+            sampleRate,
+            transcode,
+        } = query;
         const deviceId = '';
 
         let url = `${server?.url}/Items/${id}/Download?apiKey=${server?.credential}&playSessionId=${deviceId}`;
 
-        if (transcode) {
+        if (transcode && forRenderer) {
+            // UPnP/DLNA renderers commonly pick a decoder from the URL's file extension and
+            // refuse the extension-less universal route, so build a stream.{format} URL for
+            // them. That route takes an exact sample rate, so only cap when the source is
+            // above the configured maximum, and send the file untouched when it already
+            // matches the requested format.
+            const realFormat = (format || 'mp3').toLowerCase();
+            if (container?.toLowerCase() !== realFormat) {
+                url =
+                    `${server?.url}/Audio/${id}/stream.${realFormat}` +
+                    `?audioCodec=${realFormat}&static=false` +
+                    `&apiKey=${server?.credential}&playSessionId=${deviceId}`;
+                if (bitrate !== undefined) {
+                    url += `&audioBitRate=${bitrate * 1000}`;
+                }
+                if (maxSampleRate && sampleRate && sampleRate > maxSampleRate) {
+                    url += `&audioSampleRate=${maxSampleRate}`;
+                }
+            }
+        } else if (transcode) {
             // Some format appears to be required. Fall back to trusty MP3 if not specified
             // Otherwise, ffmpeg appears to crash
             const realFormat = format || 'mp3';
