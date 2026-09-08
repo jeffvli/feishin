@@ -1949,6 +1949,7 @@ export type StreamQuery = {
     bitrate?: number;
     format?: string;
     id: string;
+    maxSampleRate?: number;
     mediaType?: 'podcast' | 'song';
     offset?: number;
     skipAutoTranscode?: boolean;

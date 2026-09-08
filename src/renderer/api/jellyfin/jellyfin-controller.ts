@@ -1472,7 +1472,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             query: { ...query, limit: 1, startIndex: 0 },
         }).then((result) => result!.totalRecordCount!),
     getStreamUrl: async ({ apiClientProps: { server }, query }) => {
-        const { bitrate, format, id, transcode } = query;
+        const { bitrate, format, id, maxSampleRate, transcode } = query;
         const deviceId = '';
 
         let url = `${server?.url}/Items/${id}/Download?apiKey=${server?.credential}&playSessionId=${deviceId}`;
@@ -1501,6 +1501,9 @@ export const JellyfinController: InternalControllerEndpoint = {
 
             if (bitrate !== undefined) {
                 url += `&maxStreamingBitrate=${bitrate * 1000}`;
+            }
+            if (maxSampleRate) {
+                url += `&maxAudioSampleRate=${maxSampleRate}`;
             }
         }
 

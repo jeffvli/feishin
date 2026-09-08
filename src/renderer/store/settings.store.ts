@@ -277,6 +277,7 @@ const TranscodingConfigSchema = z.object({
     bitrate: z.number().optional(),
     enabled: z.boolean(),
     format: z.string().optional(),
+    maxSampleRate: z.number().optional(),
 });
 
 const MpvSettingsSchema = z.object({
