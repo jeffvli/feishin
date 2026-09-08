@@ -1494,7 +1494,7 @@ async function streamGrowingFile(filePath: string, res: http.ServerResponse): Pr
                 await new Promise<void>((resolve) => {
                     const stream = createReadStream(filePath, { end: size - 1, start: offset });
                     stream.on('end', resolve);
-                    stream.on('error', resolve);
+                    stream.on('error', () => resolve());
                     stream.pipe(res, { end: false });
                 });
                 offset = size;
