@@ -284,6 +284,8 @@ export type SongState = {
     volume?: number;
 };
 
+import type { SoundTouchNode } from '@soundtouchjs/audio-worklet';
+
 export type TitleTheme = 'dark' | 'light' | 'system';
 
 export interface UniqueId {
@@ -295,6 +297,8 @@ export type WebAudio = {
     dsp: null | {
         compressor: DynamicsCompressorNode;
         eqFilters: BiquadFilterNode[];
+        // null when AudioWorklet is unsupported or the module failed to load
+        pitchShifter: null | SoundTouchNode;
         preampGain: GainNode;
     };
     gains: GainNode[];

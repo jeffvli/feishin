@@ -14,7 +14,11 @@ import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { usePlaybackSettings, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+import {
+    usePlaybackSettings,
+    useSettingsStore,
+    useSettingsStoreActions,
+} from '/@/renderer/store/settings.store';
 import { Button } from '/@/shared/components/button/button';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
@@ -285,7 +289,10 @@ export const EqSettings = memo(() => {
         (eq: EqSettingsType, compressor: CompressorSettings) => {
             // ── MPV player ────────────────────────────────────────────────
             if (settings.type === PlayerType.LOCAL) {
-                const filterStr = buildMpvAudioFilters(eq, compressor);
+                // Read pitch directly from the store (not a hook dep) so this
+                // callback never rebuilds the `af` chain with a stale pitch setting.
+                const { pitch } = useSettingsStore.getState().playback;
+                const filterStr = buildMpvAudioFilters(eq, compressor, pitch);
                 mpvPlayer?.setProperties({ af: filterStr });
                 return;
             }

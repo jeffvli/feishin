@@ -132,11 +132,11 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
                 properties,
             });
 
-            // Apply EQ and compressor filters after MPV has initialized
-            const { compressor, equalizer } = useSettingsStore.getState().playback;
+            // Apply EQ, compressor, and pitch filters after MPV has initialized
+            const { compressor, equalizer, pitch } = useSettingsStore.getState().playback;
             const { buildMpvAudioFilters } =
                 await import('/@/renderer/features/settings/components/playback/mpv-audio-filters');
-            const filterStr = buildMpvAudioFilters(equalizer, compressor);
+            const filterStr = buildMpvAudioFilters(equalizer, compressor, pitch);
             if (filterStr) {
                 mpvPlayer?.setProperties({ af: filterStr });
             }

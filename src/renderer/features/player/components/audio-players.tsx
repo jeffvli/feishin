@@ -1,3 +1,5 @@
+import type { SoundTouchNode } from '@soundtouchjs/audio-worklet';
+
 import isElectron from 'is-electron';
 import { useEffect } from 'react';
 
@@ -232,7 +234,7 @@ const AudioPlayersContent = ({
         // Build DSP chain from persisted settings so EQ/compressor
         // are active immediately on first playback, not just after
         // the user opens the settings panel.
-        const { compressor, equalizer } = useSettingsStore.getState().playback;
+        const { compressor, equalizer, pitch } = useSettingsStore.getState().playback;
 
         // Preamp gain — converts dB to linear
         const preampGain = context.createGain();
@@ -266,7 +268,9 @@ const AudioPlayersContent = ({
             compressorNode.knee.value = 0;
         }
 
-        // Wire: each gain → preamp → eq[0] → eq[1] → ... → compressor → destination
+        // Wire: each gain → [pitch shifter] → preamp → eq[0] → eq[1] → ... → compressor → destination
+        // The pitch shifter is inserted asynchronously below, once its AudioWorklet
+        // module has loaded, so gains connect directly to the preamp until then.
         for (const gain of gains) {
             gain.connect(preampGain);
         }
@@ -285,11 +289,60 @@ const AudioPlayersContent = ({
 
         setWebAudio?.({
             context,
-            dsp: { compressor: compressorNode, eqFilters, preampGain },
+            dsp: { compressor: compressorNode, eqFilters, pitchShifter: null, preampGain },
             gains,
         });
 
+        // Pitch shifting (independent of tempo) uses SoundTouchJS's AudioWorklet
+        // node (WSOLA time-stretcher), which sounds far cleaner than a naive
+        // fixed-grain overlap-add shifter. Its processor module must be
+        // registered asynchronously before the node can be constructed.
+        let isCancelled = false;
+        let pitchShifterNode: SoundTouchNode | undefined;
+
+        const loadPitchShifter = async () => {
+            try {
+                const { SoundTouchNode } = await import('@soundtouchjs/audio-worklet');
+                const { default: processorUrl } =
+                    await import('@soundtouchjs/audio-worklet/processor?url');
+                await SoundTouchNode.register(context, processorUrl);
+
+                if (isCancelled) return;
+
+                pitchShifterNode = new SoundTouchNode({ context });
+                // Tempo is never changed by this feature, so the source always
+                // plays at its natural rate - only pitchSemitones is used.
+                pitchShifterNode.playbackRate.value = 1;
+                pitchShifterNode.pitchSemitones.value = pitch.enabled ? pitch.semitones : 0;
+
+                for (const gain of gains) {
+                    gain.disconnect(preampGain);
+                    gain.connect(pitchShifterNode);
+                }
+                pitchShifterNode.connect(preampGain);
+
+                setWebAudio?.({
+                    context,
+                    dsp: {
+                        compressor: compressorNode,
+                        eqFilters,
+                        pitchShifter: pitchShifterNode,
+                        preampGain,
+                    },
+                    gains,
+                });
+            } catch (error) {
+                logger.warn('Pitch shifter AudioWorklet failed to load, pitch shift disabled', {
+                    error: (error as Error).message,
+                });
+            }
+        };
+
+        void loadPitchShifter();
+
         return () => {
+            isCancelled = true;
+            pitchShifterNode?.disconnect();
             void context.close().catch(() => {});
             setWebAudio?.(undefined);
         };

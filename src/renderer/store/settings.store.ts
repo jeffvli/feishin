@@ -300,6 +300,12 @@ const EqSettingsSchema = z.object({
     preamp: z.number(),
 });
 
+const PitchSettingsSchema = z.object({
+    enabled: z.boolean(),
+    // Semitones to shift, positive = higher, negative = lower. Tempo is unaffected.
+    semitones: z.number(),
+});
+
 const CompressorSettingsSchema = z.object({
     attack: z.number(),
     enabled: z.boolean(),
@@ -709,6 +715,7 @@ const PlaybackSettingsSchema = z.object({
     mpvAudioDeviceId: z.string().nullable().optional(),
     mpvExtraParameters: z.array(z.string()),
     mpvProperties: MpvSettingsSchema,
+    pitch: PitchSettingsSchema,
     preservePitch: z.boolean(),
     scrobble: ScrobbleSettingsSchema,
     transcode: TranscodingConfigSchema,
@@ -2096,6 +2103,10 @@ const initialState: SettingsState = {
             replayGainFallbackDB: undefined,
             replayGainMode: 'no',
             replayGainPreampDB: 0,
+        },
+        pitch: {
+            enabled: false,
+            semitones: 0,
         },
         preservePitch: true,
         scrobble: {

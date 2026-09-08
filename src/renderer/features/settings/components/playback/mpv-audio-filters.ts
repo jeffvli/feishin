@@ -22,6 +22,11 @@ export interface EqSettings {
     preamp: number; // dB pre-gain before bands, clamped to [-12, 12]
 }
 
+export interface PitchSettings {
+    enabled: boolean;
+    semitones: number; // e.g. +12 = one octave up, tempo is unaffected
+}
+
 // Octave widths for each band — tuned so 10 bands cover 20Hz–20kHz
 // with no gaps and gentle overlap.
 const BAND_WIDTHS: Record<number, number> = {
@@ -43,7 +48,11 @@ const BAND_WIDTHS: Record<number, number> = {
  * Returns the MPV `af` property value for the given EQ + compressor settings.
  * An empty string clears all filters (pass-through).
  */
-export function buildMpvAudioFilters(eq: EqSettings, compressor: CompressorSettings): string {
+export function buildMpvAudioFilters(
+    eq: EqSettings,
+    compressor: CompressorSettings,
+    pitch?: PitchSettings,
+): string {
     const parts: string[] = [];
 
     if (eq.enabled) {
@@ -76,6 +85,13 @@ export function buildMpvAudioFilters(eq: EqSettings, compressor: CompressorSetti
                 `knee=${compressor.knee}` +
                 `]`,
         );
+    }
+
+    if (pitch?.enabled && pitch.semitones !== 0) {
+        // rubberband pitch-scale shifts pitch without affecting tempo/speed.
+        // Requires FFmpeg built with librubberband (bundled in most mpv distributions).
+        const pitchScale = 2 ** (pitch.semitones / 12);
+        parts.push(`lavfi=[rubberband=pitch-scale=${pitchScale.toFixed(6)}]`);
     }
 
     return parts.join(',');

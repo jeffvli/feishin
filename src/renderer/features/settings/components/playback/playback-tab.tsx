@@ -5,6 +5,7 @@ import { shallow } from 'zustand/shallow';
 import { AudioSettings } from '/@/renderer/features/settings/components/playback/audio-settings';
 import { AutoDJSettings } from '/@/renderer/features/settings/components/playback/auto-dj-settings';
 import { EqSettings } from '/@/renderer/features/settings/components/playback/eq-settings';
+import { PitchSettings } from '/@/renderer/features/settings/components/playback/pitch-settings';
 import { PlayerFilterSettings } from '/@/renderer/features/settings/components/playback/player-filter-settings';
 import { TranscodeSettings } from '/@/renderer/features/settings/components/playback/transcode-settings';
 import { useSettingsStore } from '/@/renderer/store';
@@ -39,6 +40,7 @@ export const PlaybackTab = memo(() => {
             <AudioSettings />
             <Suspense fallback={<></>}>{hasFancyAudio && <MpvSettings />}</Suspense>
             <EqSettings />
+            {hasFancyAudio && <PitchSettings />}
             <Divider />
             <TranscodeSettings />
             <Divider />
