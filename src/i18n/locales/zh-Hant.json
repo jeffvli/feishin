@@ -207,7 +207,8 @@
             "mostPlayed": "最多播放",
             "newlyAdded": "最近新增的發行",
             "recentlyReleased": "最近發行",
-            "genres": "$t(entity.genre, {\"count\": 2})"
+            "genres": "$t(entity.genre, {\"count\": 2})",
+            "playlists": "播放清單"
         },
         "appMenu": {
             "openBrowserDevtools": "開啟瀏覽器開發者工具",

@@ -42,6 +42,7 @@ import {
     useShowRatings,
 } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem, ServerType } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
@@ -564,9 +565,9 @@ export const MobileFullscreenPlayer = () => {
                                 variant={isPageHovered ? 'default' : 'subtle'}
                             />
                         </div>
-                        <div className={styles.queueContent}>
+                        <Stack gap={0} h="100%" w="100%">
                             <PlayQueue listKey={ItemListKey.FULL_SCREEN} searchTerm={undefined} />
-                        </div>
+                        </Stack>
                     </motion.div>
                 )}
             </AnimatePresence>
