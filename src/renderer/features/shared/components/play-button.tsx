@@ -64,7 +64,7 @@ export const PlayTextButton = ({
             {props.children || (
                 <Group gap="sm" wrap="nowrap">
                     <Icon icon="mediaPlay" size="lg" />
-                    {t('player.play')}
+                    <span className={styles.text}>{t('player.play')}</span>
                 </Group>
             )}
         </Button>
@@ -86,7 +86,7 @@ export const PlayNextTextButton = ({ ...props }: TextPlayButtonProps) => {
         <PlayTextButton {...props} showTooltip={false}>
             <Group gap="sm" wrap="nowrap">
                 <Icon className={styles.noFill} icon="mediaPlayNext" size="lg" />
-                {t('player.addNext')}
+                <span className={styles.text}>{t('player.addNext')}</span>
             </Group>
         </PlayTextButton>
     );
@@ -107,7 +107,7 @@ export const PlayLastTextButton = ({ ...props }: TextPlayButtonProps) => {
         <PlayTextButton {...props} showTooltip={false}>
             <Group gap="sm" wrap="nowrap">
                 <Icon className={styles.noFill} icon="mediaPlayLast" size="lg" />
-                {t('player.addLast')}
+                <span className={styles.text}>{t('player.addLast')}</span>
             </Group>
         </PlayTextButton>
     );
@@ -128,7 +128,7 @@ export const WideShuffleButton = ({ ...props }: TextPlayButtonProps) => {
         <PlayTextButton {...props}>
             <Group gap="sm" wrap="nowrap">
                 <Icon fill="default" icon="mediaShuffle" size="lg" />
-                {t('action.shuffle')}
+                <span className={styles.text}>{t('action.shuffle')}</span>
             </Group>
         </PlayTextButton>
     );
