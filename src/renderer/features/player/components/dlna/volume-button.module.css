@@ -14,13 +14,6 @@
     display: inline-flex;
 }
 
-.group-panel,
-.speaker-properties {
-    color: var(--theme-colors-foreground);
-    background: var(--theme-colors-background);
-    border: 1px solid var(--theme-colors-border);
-}
-
 .group-panel {
     position: absolute;
     right: calc(-1 * var(--theme-spacing-sm));
@@ -28,7 +21,10 @@
     left: calc(-1 * var(--theme-spacing-sm));
     z-index: 200;
     padding: 0 var(--theme-spacing-sm) var(--theme-spacing-3xl);
+    color: var(--theme-colors-foreground);
     pointer-events: none;
+    background: var(--theme-colors-background);
+    border: 1px solid var(--theme-colors-border);
     opacity: 0;
     transform: translateY(var(--theme-spacing-xs));
     transition:
@@ -67,43 +63,4 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.speaker-properties {
-    position: fixed;
-    bottom: var(--speaker-properties-bottom);
-    left: clamp(
-        var(--theme-spacing-xl),
-        var(--speaker-properties-left),
-        calc(100vw - var(--theme-spacing-xl))
-    );
-    z-index: 9999;
-    min-width: 17.5rem;
-    padding: var(--theme-spacing-sm) var(--theme-spacing-md);
-    transform: translateX(-50%);
-}
-
-.speaker-name {
-    margin-bottom: var(--theme-spacing-sm);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.properties {
-    display: flex;
-    flex-direction: column;
-    gap: var(--theme-spacing-sm);
-}
-
-.property-slider {
-    display: grid;
-    grid-template-columns: minmax(min-content, 1fr) 2fr min-content;
-    gap: var(--theme-spacing-sm);
-    align-items: center;
-    width: 100%;
-}
-
-.property-toggle label {
-    font-size: var(--theme-font-size-xs);
 }

@@ -9,6 +9,7 @@ import { playerHandoff } from '../audio-player/engine/player-handoff';
 
 import { DeviceList } from '/@/renderer/features/player/components/dlna/device-list';
 import { GroupBuilder } from '/@/renderer/features/player/components/dlna/group-builder';
+import { SpeakerPropertiesButton } from '/@/renderer/features/player/components/dlna/speaker-properties-button';
 import {
     usePlaybackSettings,
     usePlayerActions,
@@ -21,6 +22,7 @@ import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { AppIcon } from '/@/shared/components/icon/icon';
+import { Paper } from '/@/shared/components/paper/paper';
 import { Popover } from '/@/shared/components/popover/popover';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
@@ -400,8 +402,12 @@ export const DlnaCastButton = () => {
                 />
             </Popover.Target>
 
-            <Popover.Dropdown style={{ minWidth: 340 }}>
-                <div onClick={(e) => e.stopPropagation()}>
+            <Popover.Dropdown
+                onClick={(event) => event.stopPropagation()}
+                p="sm"
+                style={{ minWidth: 340 }}
+            >
+                <Paper p="md" radius="md">
                     {screen === 'connecting' && (
                         <Group p="sm">
                             <Loader color="gray" size={12} type="bars" />
@@ -512,9 +518,18 @@ export const DlnaCastButton = () => {
                                 {t('dlna.nowCasting')}
                             </Text>
 
-                            <Text c="dimmed" size="sm">
-                                {connectedDeviceName}
-                            </Text>
+                            <Group justify="space-between">
+                                <Text c="dimmed" size="sm">
+                                    {connectedDeviceName}
+                                </Text>
+                                {coordinatorRef.current &&
+                                    isSonosDevice(coordinatorRef.current) && (
+                                        <SpeakerPropertiesButton
+                                            deviceId={coordinatorRef.current.id}
+                                            deviceName={coordinatorRef.current.name}
+                                        />
+                                    )}
+                            </Group>
                             <Group gap="xs" mt="sm">
                                 {coordinatorRef.current &&
                                     isSonosDevice(coordinatorRef.current) && (
@@ -584,19 +599,27 @@ export const DlnaCastButton = () => {
                                         {member.isCoordinator && <AppIcon.star size={12} />}
                                     </Group>
 
-                                    {!member.isCoordinator && !member.device.isPair && (
-                                        <Button
-                                            color="red"
-                                            onClick={() => handleRemoveMember(member.device.id)}
-                                            size="compact-xs"
-                                            style={{
-                                                color: 'var(--mantine-color-red-4, #ff6b6b)',
-                                            }}
-                                            variant="subtle"
-                                        >
-                                            {t('dlna.group.remove')}
-                                        </Button>
-                                    )}
+                                    <Group gap="xs">
+                                        {!member.isCoordinator && !member.device.isPair && (
+                                            <Button
+                                                color="red"
+                                                onClick={() => handleRemoveMember(member.device.id)}
+                                                size="compact-xs"
+                                                style={{
+                                                    color: 'var(--mantine-color-red-4, #ff6b6b)',
+                                                }}
+                                                variant="subtle"
+                                            >
+                                                {t('dlna.group.remove')}
+                                            </Button>
+                                        )}
+                                        {isSonosDevice(member.device) && (
+                                            <SpeakerPropertiesButton
+                                                deviceId={member.device.id}
+                                                deviceName={member.device.name}
+                                            />
+                                        )}
+                                    </Group>
                                 </Group>
                             ))}
 
@@ -642,7 +665,7 @@ export const DlnaCastButton = () => {
                             </Text>
                         </>
                     )}
-                </div>
+                </Paper>
             </Popover.Dropdown>
         </Popover>
     );
