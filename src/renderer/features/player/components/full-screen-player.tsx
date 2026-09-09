@@ -294,12 +294,10 @@ const PlayerContainer = memo(
     }: PlayerContainerProps) => {
         const currentSong = usePlayerSong();
         const isRadioActive = useIsRadioActive();
-        const { currentStationArt: currentRadioStationArt, isPlaying: isRadioPlaying } =
-            useRadioPlayer();
+        const { currentStationArt: currentRadioStationArt } = useRadioPlayer();
 
-        const isPlayingRadio = isRadioActive && isRadioPlaying;
-        const imageId = isPlayingRadio ? currentRadioStationArt?.imageId : currentSong?.imageId;
-        const currentImageUrl = isPlayingRadio
+        const imageId = isRadioActive ? currentRadioStationArt?.imageId : currentSong?.imageId;
+        const currentImageUrl = isRadioActive
             ? currentRadioStationArt?.imageUrl
             : currentSong?.imageUrl;
 

@@ -93,11 +93,9 @@ export const MobileFullscreenPlayerAlbumArt = () => {
     const { fullScreenPlayer: albumArtRes } = useImageRes();
     const { useImageAspectRatio } = useFullScreenPlayerStore();
     const isRadioActive = useIsRadioActive();
-    const { isPlaying: isRadioPlaying } = useRadioPlayer();
+    const { currentStationArt: currentRadioStationArt } = useRadioPlayer();
     const currentSong = usePlayerSong();
     const { nextSong } = usePlayerData();
-
-    const isPlayingRadio = isRadioActive && isRadioPlaying;
 
     const currentImageUrl = useItemImageUrl({
         id: currentSong?.imageId || undefined,
@@ -110,6 +108,13 @@ export const MobileFullscreenPlayerAlbumArt = () => {
         id: nextSong?.imageId || undefined,
         itemType: LibraryItem.SONG,
         size: mainImageDimensions.idealSize,
+        type: 'fullScreenPlayer',
+    });
+
+    const radioImage = useItemImageUrl({
+        id: currentRadioStationArt?.imageId || undefined,
+        itemType: LibraryItem.RADIO_STATION,
+        serverId: currentRadioStationArt?.serverId,
         type: 'fullScreenPlayer',
     });
 
@@ -167,7 +172,7 @@ export const MobileFullscreenPlayerAlbumArt = () => {
                 })}
             >
                 <AnimatePresence initial={false} mode="sync">
-                    {isPlayingRadio ? (
+                    {isRadioActive ? (
                         <ImageWithPlaceholder
                             animate="open"
                             className={PlaybackSelectors.playerCoverArt}
@@ -179,7 +184,7 @@ export const MobileFullscreenPlayerAlbumArt = () => {
                             loading="eager"
                             placeholder="var(--theme-colors-foreground-muted)"
                             placeholderIcon="radio"
-                            src=""
+                            src={radioImage || ''}
                             useImageAspectRatio={useImageAspectRatio}
                             variants={imageVariants}
                         />

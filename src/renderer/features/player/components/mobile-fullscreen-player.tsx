@@ -338,9 +338,17 @@ const MobilePlayerContainer = memo(
         opacity,
     }: MobilePlayerContainerProps) => {
         const currentSong = usePlayerSong();
+        const isRadioActive = useIsRadioActive();
+        const { currentStationArt: currentRadioStationArt } = useRadioPlayer();
+
+        const imageId = isRadioActive ? currentRadioStationArt?.imageId : currentSong?.imageId;
+        const currentImageUrl = isRadioActive
+            ? currentRadioStationArt?.imageUrl
+            : currentSong?.imageUrl;
+
         const imageUrl = useItemImageUrl({
-            id: currentSong?.imageId || undefined,
-            imageUrl: currentSong?.imageUrl,
+            id: imageId || undefined,
+            imageUrl: currentImageUrl,
             itemType: LibraryItem.SONG,
             type: 'itemCard',
         });
@@ -422,11 +430,10 @@ export const MobileFullscreenPlayer = () => {
     const currentSong = usePlayerSong();
     const { currentSong: currentSongData } = usePlayerData();
     const isRadioActive = useIsRadioActive();
-    const { isPlaying: isRadioPlaying, metadata: radioMetadata, stationName } = useRadioPlayer();
+    const { metadata: radioMetadata, stationName } = useRadioPlayer();
     const server = useCurrentServer();
 
-    const isPlayingRadio = isRadioActive && isRadioPlaying;
-    const effectiveDynamicBackground = dynamicBackground && !isPlayingRadio;
+    const effectiveDynamicBackground = dynamicBackground;
 
     const setFavorite = useSetFavorite();
     const showRatingsSetting = useShowRatings();
@@ -516,8 +523,8 @@ export const MobileFullscreenPlayer = () => {
                     currentSong={currentSong}
                     onToggleFavorite={handleToggleFavorite}
                     onUpdateRating={handleUpdateRating}
-                    radioStationName={isPlayingRadio ? (stationName ?? undefined) : undefined}
-                    radioTitle={isPlayingRadio ? (radioMetadata?.title ?? undefined) : undefined}
+                    radioStationName={isRadioActive ? (stationName ?? undefined) : undefined}
+                    radioTitle={isRadioActive ? (radioMetadata?.title ?? undefined) : undefined}
                     showFavorite={showFavorites}
                     showRating={showRating}
                 />
