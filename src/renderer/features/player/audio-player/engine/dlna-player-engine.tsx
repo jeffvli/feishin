@@ -862,6 +862,11 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 if (usePlayerStore.getState().player.status === PlayerStatus.STOPPED) {
                     return;
                 }
+                const currentId = usePlayerStore.getState().getPlayerData().currentSong?.id;
+                // useUpdateCurrentSong clears a stale local seek by emitting zero when the
+                // song changes. A gapless renderer has already started that song, so do not
+                // restart it with a device seek.
+                if (properties.timestamp === 0 && currentId !== lastSentSongIdRef.current) return;
                 if (
                     lastSentRawUrlRef.current &&
                     isChunkedTranscodeUrl(lastSentRawUrlRef.current) &&
@@ -869,7 +874,6 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                 ) {
                     // A track change resets the timestamp in the same store update that swaps
                     // the song; that is not a seek, and the new track's send follows on its own.
-                    const currentId = usePlayerStore.getState().getPlayerData().currentSong?.id;
                     if (currentId !== lastSentSongIdRef.current) return;
                     offsetSeekRef.current = properties.timestamp;
                     void sendCurrentTrackToDlna();

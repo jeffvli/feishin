@@ -12,6 +12,7 @@ import { GroupBuilder } from '/@/renderer/features/player/components/dlna/group-
 import {
     usePlaybackSettings,
     usePlayerActions,
+    usePlayerStore,
     usePlayerVolume,
     useSettingsStoreActions,
 } from '/@/renderer/store';
@@ -23,7 +24,7 @@ import { AppIcon } from '/@/shared/components/icon/icon';
 import { Popover } from '/@/shared/components/popover/popover';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
-import { PlayerType } from '/@/shared/types/types';
+import { PlayerStatus, PlayerType } from '/@/shared/types/types';
 
 const dlnaPlayer = isElectron() ? window.api.dlnaPlayer : null;
 const dlnaPlayerListener = isElectron() ? window.api.dlnaPlayerListener : null;
@@ -146,9 +147,11 @@ export const DlnaCastButton = () => {
         async (device: DlnaDevice) => {
             if (!dlnaPlayer) return;
             const currentTimestamp = useTimestampStoreBase.getState().timestamp;
-            if (currentTimestamp > 0) {
-                playerHandoff.pendingDlnaSeek = currentTimestamp;
-            }
+            const localWasPlaying =
+                usePlayerStore.getState().player.status === PlayerStatus.PLAYING;
+            playerHandoff.pendingDlnaSeek = localWasPlaying ? currentTimestamp : -1;
+            playerHandoff.deviceAlreadyPlaying = false;
+            playerHandoff.deviceWasPaused = false;
             if (settings.type !== PlayerType.DLNA) {
                 previousPlayerTypeRef.current = settings.type;
             }
@@ -157,7 +160,11 @@ export const DlnaCastButton = () => {
             if (result.success) {
                 coordinatorRef.current = device;
                 setVolume(result.volume);
-                if (result.currentUri && result.currentTransportState !== 'STOPPED') {
+                if (
+                    !localWasPlaying &&
+                    result.currentUri &&
+                    result.currentTransportState !== 'STOPPED'
+                ) {
                     if (result.currentTransportState === 'PAUSED_PLAYBACK') {
                         playerHandoff.deviceAlreadyPlaying = true;
                         playerHandoff.deviceWasPaused = true;
@@ -204,9 +211,11 @@ export const DlnaCastButton = () => {
         async (selected: DlnaDevice[], coordinator: DlnaDevice) => {
             if (!dlnaPlayer || selected.length < 2) return;
             const currentTimestamp = useTimestampStoreBase.getState().timestamp;
-            if (currentTimestamp > 0) {
-                playerHandoff.pendingDlnaSeek = currentTimestamp;
-            }
+            const localWasPlaying =
+                usePlayerStore.getState().player.status === PlayerStatus.PLAYING;
+            playerHandoff.pendingDlnaSeek = localWasPlaying ? currentTimestamp : -1;
+            playerHandoff.deviceAlreadyPlaying = false;
+            playerHandoff.deviceWasPaused = false;
             if (settings.type !== PlayerType.DLNA) {
                 previousPlayerTypeRef.current = settings.type;
             }
@@ -217,7 +226,11 @@ export const DlnaCastButton = () => {
                 setScreen('group-build');
                 return;
             }
-            if (result.currentUri && result.currentTransportState !== 'STOPPED') {
+            if (
+                !localWasPlaying &&
+                result.currentUri &&
+                result.currentTransportState !== 'STOPPED'
+            ) {
                 if (result.currentTransportState === 'PAUSED_PLAYBACK') {
                     playerHandoff.deviceAlreadyPlaying = true;
                     playerHandoff.deviceWasPaused = true;

@@ -134,6 +134,8 @@ let lastKnownDuration = 0;
 let nearEndStallCount = 0;
 let resumeKickCount = 0;
 let lastPlayUrlSentAt = 0;
+let lastAutoAdvancedAt = 0;
+let lastAutoAdvancedUri = '';
 let expectedGroupMemberCount = -1;
 let topologyRefreshAttempt = 0;
 let pendingTopologyRefreshTimeout: NodeJS.Timeout | null = null;
@@ -199,6 +201,7 @@ function rewriteUrlForLan(url: string): string {
 }
 
 function stopCurrentTranscode() {
+    const transcodeWasRunning = currentFfmpegProcess !== null;
     if (currentFfmpegProcess) {
         dlnaLog('Stopping active transcode process');
         try {
@@ -208,7 +211,10 @@ function stopCurrentTranscode() {
         }
         currentFfmpegProcess = null;
     }
-    if (currentTranscodeFile) {
+    // A completed file may still be the stream the renderer is reading. Keep it available
+    // until disconnect cleanup instead of dropping the current playback while its replacement
+    // is being prepared.
+    if (currentTranscodeFile && transcodeWasRunning) {
         servedTempFiles.delete(path.resolve(currentTranscodeFile));
         try {
             if (existsSync(currentTranscodeFile)) {
@@ -585,6 +591,8 @@ async function fullDisconnect(): Promise<void> {
     hasStartedPlaying = false;
     lastCommandedUri = '';
     lastQueuedNextUri = '';
+    lastAutoAdvancedAt = 0;
+    lastAutoAdvancedUri = '';
     lastKnownDuration = 0;
     nearEndStallCount = 0;
     isRadioMode = false;
@@ -676,6 +684,8 @@ function handleEventNotify(body: string): void {
         ) {
             dlnaLog('Gapless transition detected (event)');
             lastCommandedUri = newUri;
+            lastAutoAdvancedAt = Date.now();
+            lastAutoAdvancedUri = newUri;
             positionOffsetSeconds = 0;
             lastQueuedNextUri = '';
             hasStartedPlaying = true;
@@ -689,6 +699,8 @@ function handleEventNotify(body: string): void {
     if (lastQueuedNextUri && newUri === lastQueuedNextUri) {
         dlnaLog('Event: advanced to next track');
         lastCommandedUri = newUri;
+        lastAutoAdvancedAt = Date.now();
+        lastAutoAdvancedUri = newUri;
         positionOffsetSeconds = 0;
         lastQueuedNextUri = '';
         hasStartedPlaying = true;
@@ -820,6 +832,8 @@ async function passiveDisconnect(): Promise<void> {
     hasStartedPlaying = false;
     lastCommandedUri = '';
     lastQueuedNextUri = '';
+    lastAutoAdvancedAt = 0;
+    lastAutoAdvancedUri = '';
     lastKnownDuration = 0;
     nearEndStallCount = 0;
     isRadioMode = false;
@@ -1095,6 +1109,8 @@ function startPositionPolling() {
                 ) {
                     dlnaLog(`Polling: advanced to next track`);
                     lastCommandedUri = posInfo.trackUri;
+                    lastAutoAdvancedAt = Date.now();
+                    lastAutoAdvancedUri = posInfo.trackUri;
                     positionOffsetSeconds = 0;
                     lastQueuedNextUri = '';
                     trackLoadedAt = Date.now();
@@ -1113,6 +1129,8 @@ function startPositionPolling() {
                     !recentAppSeek
                 ) {
                     dlnaLog(`Polling: looped same track (gapless 1-loop)`);
+                    lastAutoAdvancedAt = Date.now();
+                    lastAutoAdvancedUri = posInfo.trackUri;
                     trackLoadedAt = Date.now();
                     lastKnownPosition = 0;
                     pendingPrevTrack = false;
@@ -1800,6 +1818,7 @@ ipcMain.on(
         try {
             hasStartedPlaying = false;
             lastKnownPosition = 0;
+            resumeKickCount = 0;
             isPausedIntentionally = data.metadata.autoPlay === false;
             lastAppSeekAt = Date.now();
             lastKnownDuration = 0;
@@ -1807,6 +1826,9 @@ ipcMain.on(
             const lanUrl = rewriteUrlForLan(data.url);
             lastPlayCommandAt = Date.now();
             if (lanUrl === lastCommandedUri && !data.seekTo && !isChunkedTranscodeUri(lanUrl)) {
+                if (lanUrl === lastAutoAdvancedUri && Date.now() - lastAutoAdvancedAt < 2000) {
+                    return;
+                }
                 dlnaLog(
                     `dlna-play-url: URI already loaded (${data.metadata.title}), seeking to 0 and playing`,
                 );
@@ -1838,6 +1860,10 @@ ipcMain.on(
                     await Promise.all(groupMembers.map((m) => setMute(m, true).catch(() => {})));
                 } catch {
                     // Pass
+                }
+                if (lastLoadedFromUri) {
+                    lastStopCommandAt = Date.now();
+                    await stop(device).catch(() => {});
                 }
             }
             await setAVTransportURI(device, lanUrl, metadata);
@@ -2176,6 +2202,9 @@ ipcMain.handle(
         const pp = data.preservePitch ? '1' : '0';
         const fileName = `dlna-speed-${safeUrlId}-s${data.speed}-p${pp}.mp3`;
         const filePath = path.join(os.tmpdir(), fileName);
+        if (servedTempFiles.has(path.resolve(filePath)) && existsSync(filePath)) {
+            return true;
+        }
         currentTranscodeFile = filePath;
         try {
             let audioFilter = '';
@@ -2253,11 +2282,7 @@ ipcMain.handle(
         const filePath = path.join(os.tmpdir(), fileName);
         try {
             await fsPromises.access(filePath);
-            if (currentTranscodeFile === filePath && currentFfmpegProcess) {
-                const stat = await fsPromises.stat(filePath);
-                if (stat.size < 64 * 1024) return null;
-            }
-            servedTempFiles.add(path.resolve(filePath));
+            if (!servedTempFiles.has(path.resolve(filePath))) return null;
             return `http://${lanIp}:${eventServerPort}/serve-temp?path=${encodeURIComponent(filePath)}`;
         } catch {
             return null;
