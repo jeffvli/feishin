@@ -1,10 +1,15 @@
+import type {
+    DiscordImageProxyConfig,
+    LitterboxImageProxyConfig,
+} from '/@/shared/types/discord-rpc';
 import type { SetActivity } from '@xhayper/discord-rpc';
 
 import isElectron from 'is-electron';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { api } from '/@/renderer/api';
-import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { getItemImageUrl, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import {
     useIsRadioActive,
@@ -13,6 +18,7 @@ import {
 import {
     DiscordDisplayType,
     DiscordLinkType,
+    DiscordServerType,
     useAppStore,
     useDiscordSettings,
     useLastfmApiKey,
@@ -23,6 +29,7 @@ import {
 } from '/@/renderer/store';
 import { sentenceCase } from '/@/renderer/utils';
 import { logger } from '/@/renderer/utils/logger';
+import { toast } from '/@/shared/components/toast/toast';
 import { useDebouncedCallback } from '/@/shared/hooks/use-debounced-callback';
 import { LibraryItem, QueueSong, ServerType } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
@@ -45,6 +52,7 @@ const truncate = (field: string) =>
     field.length <= MAX_FIELD_LENGTH ? field : field.substring(0, MAX_FIELD_LENGTH - 1) + '…';
 
 export const useDiscordRpc = () => {
+    const { t } = useTranslation();
     const discordSettings = useDiscordSettings();
     const lastfmApiKey = useLastfmApiKey();
     const privateMode = useAppStore((state) => state.privateMode);
@@ -263,8 +271,83 @@ export const useDiscordRpc = () => {
                 activity.smallImageText = sentenceCase(current[2]);
             }
 
-            if (discordSettings.showServerImage && song) {
-                if (song._uniqueId === currentSong?._uniqueId && imageUrlRef.current) {
+            if (song && song._uniqueId === currentSong?._uniqueId && imageUrlRef.current) {
+                if (
+                    discordSettings.serverType !== DiscordServerType.NONE &&
+                    discordSettings.serverType !== DiscordServerType.MUSIC_SERVER &&
+                    discordSettings.imageProxyServerLink
+                ) {
+                    if (song._serverType === ServerType.JELLYFIN) {
+                        activity.largeImageKey = imageUrlRef.current;
+                    } else if (
+                        song._serverType === ServerType.NAVIDROME ||
+                        song._serverType === ServerType.SUBSONIC
+                    ) {
+                        try {
+                            const serverImageUrl = getItemImageUrl({
+                                id: song.id,
+                                itemType: LibraryItem.SONG,
+                                type: 'fullScreenPlayer',
+                            });
+
+                            const imageResponse = await fetch(serverImageUrl ?? '');
+                            if (!imageResponse.ok) {
+                                logger.error('Failed fetching image URL from music server', {
+                                    imageUrl: serverImageUrl,
+                                });
+                                throw new Error();
+                            }
+
+                            const imageBlob = await imageResponse.blob();
+
+                            // Convert blob to ArrayBuffer to enable IPC communication
+                            const arrayBuffer = await imageBlob.arrayBuffer();
+
+                            let config: DiscordImageProxyConfig;
+                            switch (discordSettings.serverType) {
+                                case DiscordServerType.LITTERBOX:
+                                    if (
+                                        !['1h', '12h', '24h', '72h'].includes(
+                                            discordSettings.litterboxTime,
+                                        )
+                                    ) {
+                                        config = {};
+                                        break;
+                                    }
+                                    config = {
+                                        time: discordSettings.litterboxTime as LitterboxImageProxyConfig['time'],
+                                    };
+                                    break;
+                                case DiscordServerType.UGUU: {
+                                    config = {};
+                                    break;
+                                }
+                                default: {
+                                    const exhaustive = discordSettings.serverType;
+                                    logger.error(`Unhandled server type: ${exhaustive}`);
+                                    config = {};
+                                    break;
+                                }
+                            }
+                            const globalImageUrl = await discordRpc?.postImageProxyRequest(
+                                discordSettings.imageProxyServerLink,
+                                discordSettings.serverType,
+                                arrayBuffer,
+                                config,
+                            );
+
+                            if (!globalImageUrl) {
+                                toast.error({
+                                    message: t('error.discordImageProxyUploadFailed'),
+                                });
+                            }
+                            activity.largeImageKey = globalImageUrl;
+                        } catch {
+                            /* empty */
+                        }
+                    }
+                }
+                if (discordSettings.serverType == DiscordServerType.MUSIC_SERVER) {
                     if (song._serverType === ServerType.JELLYFIN) {
                         activity.largeImageKey = imageUrlRef.current;
                     } else if (
@@ -341,21 +424,24 @@ export const useDiscordRpc = () => {
             discordRpc?.setActivity(activity);
         },
         [
-            discordSettings.showAsListening,
-            discordSettings.showServerImage,
-            discordSettings.showStateIcon,
-            discordSettings.showPaused,
-            lastfmApiKey,
-            discordSettings.clientId,
-            discordSettings.displayType,
-            discordSettings.linkType,
             lastUniqueId,
-            currentSong?._uniqueId,
             isRadioActive,
             isRadioPlaying,
-            radioMetadata?.artist,
+            discordSettings.showPaused,
+            discordSettings.displayType,
+            discordSettings.showAsListening,
+            discordSettings.linkType,
+            discordSettings.showStateIcon,
+            discordSettings.clientId,
+            discordSettings.serverType,
+            discordSettings.imageProxyServerLink,
+            discordSettings.litterboxTime,
+            currentSong?._uniqueId,
+            lastfmApiKey,
             radioMetadata?.title,
+            radioMetadata?.artist,
             stationName,
+            t,
         ],
     );
 

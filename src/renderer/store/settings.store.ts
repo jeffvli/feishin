@@ -186,6 +186,8 @@ const DiscordDisplayTypeSchema = z.enum(['artist', 'feishin', 'song']);
 
 const DiscordLinkTypeSchema = z.enum(['last_fm', 'musicbrainz', 'musicbrainz_last_fm', 'none']);
 
+const DiscordServerTypeSchema = z.enum(['music_server', 'none', 'uguu', 'litterbox']);
+
 const GenreTargetSchema = z.enum(['album', 'track']);
 
 const PlaylistTargetSchema = z.enum(['album', 'track']);
@@ -322,10 +324,12 @@ const DiscordSettingsSchema = z.object({
     clientId: z.string(),
     displayType: DiscordDisplayTypeSchema,
     enabled: z.boolean(),
+    imageProxyServerLink: z.string(),
     linkType: DiscordLinkTypeSchema,
+    litterboxTime: z.string(),
+    serverType: DiscordServerTypeSchema,
     showAsListening: z.boolean(),
     showPaused: z.boolean(),
-    showServerImage: z.boolean(),
     showStateIcon: z.boolean(),
 });
 
@@ -964,6 +968,13 @@ export enum DiscordLinkType {
     NONE = 'none',
 }
 
+export enum DiscordServerType {
+    LITTERBOX = 'litterbox',
+    MUSIC_SERVER = 'music_server',
+    NONE = 'none',
+    UGUU = 'uguu',
+}
+
 export enum GenreTarget {
     ALBUM = 'album',
     TRACK = 'track',
@@ -1313,10 +1324,12 @@ const initialState: SettingsState = {
         clientId: '1165957668758900787',
         displayType: DiscordDisplayType.FEISHIN,
         enabled: false,
+        imageProxyServerLink: 'https://uguu.se/upload',
         linkType: DiscordLinkType.NONE,
+        litterboxTime: '12h',
+        serverType: DiscordServerType.NONE,
         showAsListening: false,
         showPaused: true,
-        showServerImage: false,
         showStateIcon: true,
     },
     font: {

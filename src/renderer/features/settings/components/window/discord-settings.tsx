@@ -9,6 +9,7 @@ import {
 import {
     DiscordDisplayType,
     DiscordLinkType,
+    DiscordServerType,
     useDiscordSettings,
     useGeneralSettings,
     useSettingsStoreActions,
@@ -22,6 +23,17 @@ export const DiscordSettings = memo(() => {
     const settings = useDiscordSettings();
     const generalSettings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
+
+    const getDefaultImageProxyServerLink = (serverType: DiscordServerType) => {
+        switch (serverType) {
+            case DiscordServerType.LITTERBOX:
+                return 'https://litterbox.catbox.moe/resources/internals/api.php';
+            case DiscordServerType.UGUU:
+                return 'https://uguu.se/upload';
+        }
+        // Default
+        return 'https://uguu.se/upload';
+    };
 
     const discordOptions: SettingOption[] = [
         {
@@ -213,26 +225,103 @@ export const DiscordSettings = memo(() => {
         },
         {
             control: (
-                <Switch
-                    checked={settings.showServerImage}
+                <Select
+                    aria-label={t('setting.discordServerType')}
+                    clearable={false}
+                    data={[
+                        {
+                            label: t('setting.discordServerType_none'),
+                            value: DiscordServerType.NONE,
+                        },
+                        { label: 'Music server', value: DiscordServerType.MUSIC_SERVER },
+                        {
+                            label: t('setting.discordServerType_uguu'),
+                            value: DiscordServerType.UGUU,
+                        },
+                        {
+                            label: t('setting.discordServerType_litterbox'),
+                            value: DiscordServerType.LITTERBOX,
+                        },
+                    ]}
+                    defaultValue={settings.serverType}
                     onChange={(e) => {
+                        if (!e) return;
+
+                        const nextServerType = e as DiscordServerType;
+                        const nextSettings: {
+                            imageProxyServerLink?: string;
+                            serverType: DiscordServerType;
+                        } = {
+                            serverType: nextServerType,
+                        };
+
+                        if (
+                            nextServerType === DiscordServerType.LITTERBOX ||
+                            nextServerType === DiscordServerType.UGUU
+                        ) {
+                            nextSettings.imageProxyServerLink =
+                                getDefaultImageProxyServerLink(nextServerType);
+                        }
+
                         setSettings({
-                            discord: {
-                                showServerImage: e.currentTarget.checked,
-                            },
+                            discord: nextSettings,
                         });
                     }}
                 />
             ),
-            description: t('setting.discordServeImage', {
+            description: t('setting.discordServerType', {
                 context: 'description',
 
                 discord: 'Discord',
             }),
             isHidden: !isElectron(),
-            title: t('setting.discordServeImage', {
+            title: t('setting.discordServerType', {
                 discord: 'Discord',
             }),
+        },
+        {
+            control: (
+                <TextInput
+                    onChange={(e) => {
+                        setSettings({
+                            discord: {
+                                imageProxyServerLink: e.currentTarget.value,
+                            },
+                        });
+                    }}
+                    value={settings.imageProxyServerLink}
+                />
+            ),
+            description: t('setting.discordImageProxyServerLink', {
+                context: 'description',
+                discord: 'Discord',
+            }),
+            isHidden:
+                !isElectron() ||
+                settings.serverType === DiscordServerType.NONE ||
+                settings.serverType === DiscordServerType.MUSIC_SERVER,
+            title: t('setting.discordImageProxyServerLink', {
+                discord: 'Discord',
+            }),
+        },
+        {
+            control: (
+                <TextInput
+                    onChange={(e) => {
+                        setSettings({
+                            discord: {
+                                litterboxTime: e.currentTarget.value,
+                            },
+                        });
+                    }}
+                    value={settings.litterboxTime}
+                />
+            ),
+            description: t('setting.discordLitterboxTimeField', {
+                context: 'description',
+            }),
+            isHidden: !isElectron() || settings.serverType !== DiscordServerType.LITTERBOX,
+            title: t('setting.discordLitterboxTimeField'),
         },
         {
             control: (
