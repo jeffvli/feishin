@@ -78,7 +78,6 @@ export const MobilePlayerbar = () => {
                     <AnimatePresence initial={false} mode="popLayout">
                         {currentSong?.id && (
                             <div className={styles.imageWrapper}>
-                                {/*TODO: Radio image here*/}
                                 <motion.div
                                     animate={{ opacity: 1, scale: 1 }}
                                     className={styles.image}
