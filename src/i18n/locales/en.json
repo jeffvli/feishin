@@ -647,7 +647,8 @@
             "newlyAdded": "Newly added releases",
             "recentlyPlayed": "Recently played",
             "recentlyReleased": "Recently released",
-            "title": "$t(common.home)"
+            "title": "$t(common.home)",
+            "playlists": "Playlists"
         },
         "itemDetail": {
             "tagConfiguration": "Tag configuration",
