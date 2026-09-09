@@ -358,7 +358,9 @@
             "input_url": "URL",
             "input_username": "Username",
             "success": "Server added successfully",
-            "title": "Add Server"
+            "title": "Add Server",
+            "input_customHeaders": "Custom headers",
+            "input_customHeadersDescription": "Optional headers sent with every request to this server, one per line (Name: value). Useful for reverse-proxy auth (e.g. Cloudflare Access service tokens)"
         },
         "largeFetchConfirmation": {
             "title": "Add items to the queue",

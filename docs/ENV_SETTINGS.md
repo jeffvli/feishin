@@ -155,3 +155,11 @@ Applies to the default lyrics display profile (`lyricsDisplay.default`).
 | `font.type` | `builtIn` | `FS_FONT_TYPE` | `builtIn` / `system` / `custom`. |
 | `font.builtIn` | `Inter` | `FS_FONT_BUILT_IN` | Built-in font name. |
 | `font.system` | *(empty)* | `FS_FONT_SYSTEM` | System font name (when type is `system`). |
+
+---
+
+## Server
+
+| Setting | Default | Env variable | Available values / Description |
+|-------------|---------|--------------|--------------------------------|
+| *(server requests)* | *(empty)* | `FS_SERVER_CUSTOM_HEADERS` | Extra HTTP headers sent with every request to the server, one per line (`Name: value`). Useful for reverse-proxy authentication such as Cloudflare Access service tokens (`CF-Access-Client-Id` / `CF-Access-Client-Secret`). Applied instance-wide on the web build; can be overridden per server in the add/edit server form ("Custom headers"). Unlike the other settings here, this is read at request time, not only on first run. |

@@ -85,6 +85,7 @@ export interface SavedCollection {
 }
 
 export type ServerListItem = {
+    customHeaders?: Record<string, string>;
     features?: ServerFeatures;
     id: string;
     isAdmin?: boolean;
@@ -1556,6 +1557,7 @@ export type ControllerEndpoint = {
     authenticate: (
         url: string,
         body: { legacy?: boolean; password: string; username: string },
+        customHeaders?: Record<string, string>,
     ) => Promise<AuthenticationResponse>;
     createFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
     createInternetRadioStation: (
@@ -1693,6 +1695,7 @@ export type InternalControllerEndpoint = {
     authenticate: (
         url: string,
         body: { legacy?: boolean; password: string; username: string },
+        customHeaders?: Record<string, string>,
     ) => Promise<AuthenticationResponse>;
     createFavorite: (args: ReplaceApiClientProps<FavoriteArgs>) => Promise<FavoriteResponse>;
     createInternetRadioStation: (

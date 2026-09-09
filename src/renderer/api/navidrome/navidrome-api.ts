@@ -6,7 +6,7 @@ import omitBy from 'lodash/omitBy';
 import qs from 'qs';
 
 import i18n from '/@/i18n/i18n';
-import { authenticationFailure } from '/@/renderer/api/utils';
+import { authenticationFailure, getCustomRequestHeaders } from '/@/renderer/api/utils';
 import { useAuthStore } from '/@/renderer/store';
 import { logger } from '/@/renderer/utils/logger';
 import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
@@ -472,12 +472,13 @@ axiosClient.interceptors.response.use(
 );
 
 export const ndApiClient = (args: {
+    customHeaders?: Record<string, string>;
     forceRemoteUrl?: boolean;
     server: null | ServerListItemWithCredential;
     signal?: AbortSignal;
     url?: string;
 }) => {
-    const { forceRemoteUrl, server, signal, url } = args;
+    const { customHeaders, forceRemoteUrl, server, signal, url } = args;
 
     return initClient(contract, {
         api: async ({ body, headers, method, path }) => {
@@ -501,6 +502,7 @@ export const ndApiClient = (args: {
                     data: body,
                     headers: {
                         ...headers,
+                        ...getCustomRequestHeaders(server, customHeaders),
                         ...(token && { 'x-nd-authorization': `Bearer ${token}` }),
                     },
                     method: method as Method,

@@ -39,3 +39,43 @@ export const authenticationFailure = (currentServer: null | ServerListItem, mess
         });
     }
 };
+
+export const serializeCustomHeaders = (headers?: Record<string, string>): string => {
+    if (!headers) return '';
+
+    return Object.entries(headers)
+        .map(([name, value]) => `${name}: ${value}`)
+        .join('\n');
+};
+
+export const parseCustomHeaders = (raw?: null | string): Record<string, string> => {
+    if (!raw?.trim()) return {};
+
+    const headers: Record<string, string> = {};
+    for (const line of raw.split(/\r?\n|,/)) {
+        const separator = line.indexOf(':');
+        if (separator <= 0) continue;
+
+        const name = line.slice(0, separator).trim();
+        const value = line.slice(separator + 1).trim();
+        if (name && value) {
+            headers[name] = value;
+        }
+    }
+
+    return headers;
+};
+
+// Resolve the custom headers to send to a server. Precedence (highest last):
+// env default (window.FS_SERVER_CUSTOM_HEADERS, e.g. baked into the web
+// build), then caller-supplied headers, then the per-server setting.
+export const getCustomRequestHeaders = (
+    server?: null | ServerListItem,
+    extra?: Record<string, string>,
+): Record<string, string> => {
+    return {
+        ...parseCustomHeaders(window.FS_SERVER_CUSTOM_HEADERS),
+        ...extra,
+        ...server?.customHeaders,
+    };
+};

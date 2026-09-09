@@ -260,6 +260,7 @@ export type QueryBuilderRule = {
 
 export type ServerListItem = {
     credential: string;
+    customHeaders?: Record<string, string>;
     features?: ServerFeatures;
     id: string;
     name: string;

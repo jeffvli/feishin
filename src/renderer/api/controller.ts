@@ -216,6 +216,7 @@ export interface GeneralController extends Omit<Required<ControllerEndpoint>, 'a
         url: string,
         body: { legacy?: boolean; password: string; username: string },
         type: ServerType,
+        customHeaders?: Record<string, string>,
     ) => Promise<AuthenticationResponse>;
 }
 
@@ -232,8 +233,8 @@ export const controller: GeneralController = {
             server.type,
         )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
     },
-    authenticate(url, body, type) {
-        return apiController('authenticate', type)(url, body);
+    authenticate(url, body, type, customHeaders) {
+        return apiController('authenticate', type)(url, body, customHeaders);
     },
     createFavorite(args) {
         const server = getServerById(args.apiClientProps.serverId);

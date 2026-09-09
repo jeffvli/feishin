@@ -313,7 +313,7 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         return null;
     },
-    authenticate: async (url, body) => {
+    authenticate: async (url, body, customHeaders) => {
         let credential: string;
         let credentialParams: {
             p?: string;
@@ -342,7 +342,11 @@ export const SubsonicController: InternalControllerEndpoint = {
             };
         }
 
-        const resp = await ssApiClient({ server: null, url: cleanServerUrl }).authenticate({
+        const resp = await ssApiClient({
+            customHeaders,
+            server: null,
+            url: cleanServerUrl,
+        }).authenticate({
             query: {
                 c: 'Feishin',
                 f: 'json',

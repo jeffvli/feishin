@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
+import { parseCustomHeaders, serializeCustomHeaders } from '/@/renderer/api/utils';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { getServerById, useAuthStoreActions } from '/@/renderer/store';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
@@ -14,6 +15,7 @@ import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { PasswordInput } from '/@/shared/components/password-input/password-input';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
+import { Textarea } from '/@/shared/components/textarea/textarea';
 import { toast } from '/@/shared/components/toast/toast';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { useFocusTrap } from '/@/shared/hooks/use-focus-trap';
@@ -50,6 +52,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
 
     const form = useForm({
         initialValues: {
+            customHeaders: serializeCustomHeaders(server?.customHeaders),
             isAdmin: server?.isAdmin,
             legacyAuth: false,
             name: server?.name,
@@ -70,6 +73,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
     const handleSubmit = form.onSubmit(async (values) => {
         try {
             setIsLoading(true);
+            const customHeaders = parseCustomHeaders(values.customHeaders);
 
             // Check if we can skip authentication
             const usernameChanged = values.username !== server.username;
@@ -118,6 +122,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                         username: values.username,
                     },
                     values.type,
+                    Object.keys(customHeaders).length > 0 ? customHeaders : undefined,
                 );
 
                 if (!data) {
@@ -136,6 +141,10 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     userId: data.userId,
                     username: data.username,
                 };
+
+                if (Object.keys(customHeaders).length > 0) {
+                    serverItem.customHeaders = customHeaders;
+                }
 
                 if (data.ndCredential !== undefined) {
                     serverItem.ndCredential = data.ndCredential;
@@ -160,6 +169,9 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
             if (values.preferRemoteUrl !== undefined) {
                 serverItem.preferRemoteUrl = values.preferRemoteUrl;
             }
+
+            serverItem.customHeaders =
+                Object.keys(customHeaders).length > 0 ? customHeaders : undefined;
 
             updateServer(server.id, serverItem);
 
@@ -267,6 +279,21 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                         context: 'password',
                     })}
                     {...form.getInputProps('password')}
+                />
+                <Textarea
+                    autosize
+                    description={t('form.addServer.input', {
+                        context: 'customHeadersDescription',
+                    })}
+                    label={t('form.addServer.input', {
+                        context: 'customHeaders',
+                    })}
+                    minRows={2}
+                    placeholder={
+                        'CF-Access-Client-Id: xxx.access' + '\n' + 'CF-Access-Client-Secret: yyy'
+                    }
+                    spellCheck={false}
+                    {...form.getInputProps('customHeaders')}
                 />
                 {localSettings && isNavidrome && (
                     <Checkbox

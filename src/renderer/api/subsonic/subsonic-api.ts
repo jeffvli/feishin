@@ -4,7 +4,7 @@ import qs from 'qs';
 import { z } from 'zod';
 
 import i18n from '/@/i18n/i18n';
-import { authenticationFailure } from '/@/renderer/api/utils';
+import { authenticationFailure, getCustomRequestHeaders } from '/@/renderer/api/utils';
 import { useAuthStore } from '/@/renderer/store';
 import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
 import { ssType } from '/@/shared/api/subsonic/subsonic-types';
@@ -476,13 +476,14 @@ const silentlyTransformResponse = (data: any) => {
 };
 
 export const ssApiClient = (args: {
+    customHeaders?: Record<string, string>;
     forceRemoteUrl?: boolean;
     server: null | ServerListItemWithCredential;
     signal?: AbortSignal;
     silent?: boolean;
     url?: string;
 }) => {
-    const { forceRemoteUrl, server, signal, silent, url } = args;
+    const { customHeaders, forceRemoteUrl, server, signal, silent, url } = args;
 
     return initClient(contract, {
         api: async ({ body, headers, method, path, rawQuery }) => {
@@ -563,10 +564,15 @@ export const ssApiClient = (args: {
             }
 
             try {
-                const result =
-                    await axiosClient.request<z.infer<typeof ssType._response.baseResponse>>(
-                        request,
-                    );
+                const result = await axiosClient.request<
+                    z.infer<typeof ssType._response.baseResponse>
+                >({
+                    ...request,
+                    headers: {
+                        ...request.headers,
+                        ...getCustomRequestHeaders(server, customHeaders),
+                    },
+                });
 
                 return {
                     body: result.data['subsonic-response'],

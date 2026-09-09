@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { api } from '/@/renderer/api';
+import { parseCustomHeaders } from '/@/renderer/api/utils';
 import {
     isLegacyAuth,
     isServerLock,
@@ -24,6 +25,7 @@ import { SegmentedControl } from '/@/shared/components/segmented-control/segment
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
+import { Textarea } from '/@/shared/components/textarea/textarea';
 import { toast } from '/@/shared/components/toast/toast';
 import { useFocusTrap } from '/@/shared/hooks/use-focus-trap';
 import { useForm } from '/@/shared/hooks/use-form';
@@ -105,6 +107,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
     const form = useForm({
         initialValues: {
+            customHeaders: '',
             legacyAuth: isLegacyAuth(),
             name:
                 (localSettings ? localSettings.env.SERVER_NAME : window.SERVER_NAME) || 'My Server',
@@ -154,6 +157,9 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                     username: values.username,
                 },
                 values.type as ServerType,
+                Object.keys(parseCustomHeaders(values.customHeaders)).length > 0
+                    ? parseCustomHeaders(values.customHeaders)
+                    : undefined,
             );
 
             if (!data) {
@@ -172,6 +178,11 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 userId: data.userId,
                 username: data.username,
             };
+
+            const customHeaders = parseCustomHeaders(values.customHeaders);
+            if (Object.keys(customHeaders).length > 0) {
+                serverItem.customHeaders = customHeaders;
+            }
 
             if (values.preferInstantMix !== undefined) {
                 serverItem.preferInstantMix = values.preferInstantMix;
@@ -303,6 +314,24 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             context: 'password',
                         })}
                         {...form.getInputProps('password')}
+                    />
+                    <Textarea
+                        autosize
+                        description={t('form.addServer.input', {
+                            context: 'customHeadersDescription',
+                        })}
+                        disabled={serverLock}
+                        label={t('form.addServer.input', {
+                            context: 'customHeaders',
+                        })}
+                        minRows={2}
+                        placeholder={
+                            'CF-Access-Client-Id: xxx.access' +
+                            '\n' +
+                            'CF-Access-Client-Secret: yyy'
+                        }
+                        spellCheck={false}
+                        {...form.getInputProps('customHeaders')}
                     />
                     {localSettings && form.values.type === ServerType.NAVIDROME && (
                         <Checkbox
