@@ -545,7 +545,7 @@
         "deselectAll": "すべて選択解除",
         "moveToBottom": "一番下へ移動",
         "setRating": "評価を設定",
-        "toggleSmartPlaylistEditor": "$t(entity.smartPlaylist) エディターを切り替え",
+        "toggleSmartPlaylistEditor": "$t(entity.smartPlaylist)エディターを切り替え",
         "removeFromFavorites": "$t(entity.favorite, {\"count\": 2})から削除",
         "openIn": {
             "lastfm": "Last.fm で開く",
@@ -1038,7 +1038,7 @@
             "genres": "$t(entity.genre, {\"count\": 2})"
         },
         "albumDetail": {
-            "moreFromArtist": "$t(entity.artist, {\"count\": 1}) の他の項目",
+            "moreFromArtist": "この$t(entity.artist, {\"count\": 1})の他の作品",
             "moreFromGeneric": "{{item}} の他の作品",
             "released": "リリース"
         },
@@ -1106,7 +1106,7 @@
             "topSongs": "人気曲",
             "topSongsFrom": "{{title}} の人気曲",
             "viewAll": "すべて表示",
-            "viewAllTracks": "$t(entity.track, {\"count\": 2}) をすべて表示",
+            "viewAllTracks": "すべての$t(entity.track, {\"count\": 2})を表示",
             "relatedArtists": "関連の$t(entity.artist, {\"count\": 2})",
             "groupingTypeAll": "すべてのリリースタイプ",
             "groupingTypePrimary": "主なリリースタイプ",

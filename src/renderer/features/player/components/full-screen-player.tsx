@@ -342,7 +342,12 @@ export const FullScreenPlayer = () => {
     const { activeTab, dynamicBackground, dynamicImageBlur, dynamicIsImage, opacity } =
         useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
-    const hasActiveModule = Boolean(activeTab);
+    const hasActiveModule =
+        activeTab === 'queue' ||
+        activeTab === 'related' ||
+        activeTab === 'lyrics' ||
+        activeTab === 'visualizer';
+
     const { windowBarStyle } = useWindowSettings();
     const effectiveDynamicBackground = dynamicBackground;
 

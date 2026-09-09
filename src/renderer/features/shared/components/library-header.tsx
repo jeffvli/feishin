@@ -394,21 +394,19 @@ export const LibraryHeaderMenu = ({
                     <PlayLastTextButton {...handlePlayLast.handlers} {...handlePlayLast.props} />
                 )}
                 {onAlbumRadio && (
-                    <Button
+                    <ActionIcon
                         disabled={isPlayerFetching}
-                        leftSection={
-                            isPlayerFetching ? (
-                                <Spinner color="white" />
-                            ) : (
-                                <Icon icon="radio" size="lg" />
-                            )
-                        }
                         onClick={onAlbumRadio}
-                        size="md"
+                        size="lg"
+                        tooltip={{ label: t('player.albumRadio') }}
                         variant="transparent"
                     >
-                        {t('player.albumRadio')}
-                    </Button>
+                        {isPlayerFetching ? (
+                            <Spinner color="white" size="lg" />
+                        ) : (
+                            <Icon icon="radio" size="lg" />
+                        )}
+                    </ActionIcon>
                 )}
                 {onArtistRadio && (
                     <Button

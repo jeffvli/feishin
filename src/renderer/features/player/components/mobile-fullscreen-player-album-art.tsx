@@ -80,7 +80,6 @@ const ImageWithPlaceholder = ({
             className={clsx(styles.albumImage, className)}
             style={{
                 objectFit: useImageAspectRatio ? 'contain' : 'cover',
-                width: useImageAspectRatio ? 'auto' : '100%',
             }}
             {...props}
         />

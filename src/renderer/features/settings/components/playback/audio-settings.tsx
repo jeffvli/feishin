@@ -9,7 +9,7 @@ import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { useCurrentServer, usePlayerStatus } from '/@/renderer/store';
+import { useCurrentServer, useMpvInitialized, usePlayerStatus } from '/@/renderer/store';
 import {
     usePlaybackSettings,
     usePlaybackType,
@@ -58,6 +58,7 @@ export const getDefaultAudioDevice = (
 
 export const useAudioDevices = (playbackType: PlayerType) => {
     const [audioDevices, setAudioDevices] = useState<AudioDeviceOption[]>([]);
+    const mpvInitialized = useMpvInitialized();
 
     useEffect(() => {
         const fetchAudioDevices = async () => {
@@ -81,7 +82,7 @@ export const useAudioDevices = (playbackType: PlayerType) => {
                             message: t('error.audioDeviceFetchError'),
                         }),
                     );
-            } else if (playbackType === PlayerType.LOCAL && mpvPlayer) {
+            } else if (playbackType === PlayerType.LOCAL && mpvPlayer && mpvInitialized) {
                 try {
                     const devices = await getMpvAudioDevices();
                     const uniqueDevices = devices.filter(
@@ -97,7 +98,7 @@ export const useAudioDevices = (playbackType: PlayerType) => {
         };
 
         fetchAudioDevices();
-    }, [playbackType]);
+    }, [mpvInitialized, playbackType]);
 
     return audioDevices;
 };

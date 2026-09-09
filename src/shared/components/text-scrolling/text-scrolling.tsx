@@ -105,7 +105,7 @@ export const BaseTextScrolling = ({ children, gap, pause, speed, ...rest }: Text
                     },
                 );
 
-                await animation.finished;
+                await animation.finished.catch(() => {});
             }
         };
 

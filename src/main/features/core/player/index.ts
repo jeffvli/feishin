@@ -23,6 +23,10 @@ declare module 'node-mpv';
 // }
 
 let mpvInstance: MpvAPI | null = null;
+// Set while a create is in flight. `mpvInstance` is null across that await, so callers that
+// only check it would otherwise conclude mpv is absent and spawn a throwaway instance
+// alongside the one being started.
+let mpvCreatePromise: null | Promise<MpvAPI> = null;
 let currentPlayerData: null | PlayerData = null;
 const socketPath = isWindows() ? `\\\\.\\pipe\\mpvserver-${pid}` : `/tmp/node-mpv-${pid}.sock`;
 
@@ -342,7 +346,12 @@ ipcMain.handle(
                 });
             mpvInstance = null;
 
-            mpvInstance = await createMpv(data);
+            mpvCreatePromise = createMpv(data);
+            try {
+                mpvInstance = await mpvCreatePromise;
+            } finally {
+                mpvCreatePromise = null;
+            }
             mpvLog({ action: 'Restarted mpv', toast: 'success' });
             setAudioPlayerFallback(false);
         } catch (err: any | NodeMpvError) {
@@ -360,7 +369,12 @@ ipcMain.handle(
                 action: `Attempting to initialize mpv with parameters: ${JSON.stringify(data)}`,
                 level: 'debug',
             });
-            mpvInstance = await createMpv(data);
+            mpvCreatePromise = createMpv(data);
+            try {
+                mpvInstance = await mpvCreatePromise;
+            } finally {
+                mpvCreatePromise = null;
+            }
             setAudioPlayerFallback(false);
         } catch (err: any | NodeMpvError) {
             mpvLog({ action: 'Failed to initialize mpv, falling back to web player' }, err);
@@ -677,6 +691,15 @@ ipcMain.handle(
     'player-get-audio-devices',
     async (): Promise<{ label: string; value: string }[]> => {
         try {
+            // Wait out an in-flight startup so the real instance is reused instead of racing it.
+            if (mpvCreatePromise) {
+                try {
+                    await mpvCreatePromise;
+                } catch {
+                    // Startup failed; fall through to the temporary-instance path below.
+                }
+            }
+
             const instance = getMpvInstance();
             let tempInstance: MpvAPI | null = null;
             let mpvToUse: MpvAPI | null = null;

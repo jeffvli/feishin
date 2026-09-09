@@ -1,0 +1,82 @@
+.container {
+    display: grid;
+
+    /* Fixed label columns, not auto — auto sizes each slider's track to
+       whatever's left over after ITS OWN label content, so two sliders
+       with differently-sized labels (e.g. "3:32" vs a volume icon) end up
+       with visibly different track widths. */
+    grid-template-columns: 3rem minmax(0, 1fr) 3rem;
+    gap: var(--theme-spacing-md);
+    align-items: center;
+    width: 100%;
+}
+
+.label-left {
+    justify-self: end;
+}
+
+.label-right {
+    justify-self: start;
+}
+
+.root {
+    /* Mantine's own root is `display: flex; flex-direction: column` with no
+       `justify-content`, so its track sits flush against the top of this
+       padded box instead of centered in it — pull it back to the middle so
+       it lines up with the (grid-centered) labels beside it. */
+    justify-content: center;
+    width: 100%;
+
+    /* Generous hit area beyond the visible track — this is a touch remote,
+       not a mouse-driven UI, so the draggable region needs to be much
+       taller than the visual bar. */
+    padding: 0.5rem 0;
+
+    /* Mirrors the desktop playerbar slider's own :hover/:focus rule
+       (playerbar-slider.module.css) exactly, plus :active — the desktop
+       resting state is neutral, only turning primary while you're actually
+       engaging it, and :active is the touch equivalent of :hover for that
+       (a touch-and-hold/drag does trigger :active, unlike :hover, which
+       needs a pointing device that can move without touching). */
+    &:active,
+    &:focus,
+    &:hover {
+        .bar {
+            background-color: var(--theme-colors-primary-filled);
+        }
+
+        .thumb {
+            opacity: 1;
+        }
+    }
+}
+
+.bar {
+    background-color: var(--theme-colors-foreground);
+    transition: background-color 0.2s ease-in-out;
+}
+
+.track {
+    height: 1rem;
+}
+
+.thumb {
+    width: var(--thumb-size, 1.3rem);
+    height: var(--thumb-size, 1.3rem);
+    border-color: var(--theme-colors-primary-filled);
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.slider-label {
+    /* Matches the desktop playerbar slider's own .label bubble
+       (playerbar-slider.module.css) — was plain unstyled text here before,
+       with no background/shadow to read as a floating tooltip. */
+    max-width: 200px;
+    padding: var(--theme-spacing-sm) var(--theme-spacing-md);
+    font-size: var(--theme-font-size-md);
+    font-weight: 550;
+    color: var(--theme-colors-surface-foreground);
+    background: var(--theme-colors-surface);
+    box-shadow: 4px 4px 10px 0 rgb(0 0 0 / 20%);
+}

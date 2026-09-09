@@ -2,7 +2,7 @@ import isElectron from 'is-electron';
 import { useEffect, useRef } from 'react';
 
 import { getItemImageUrl } from '/@/renderer/components/item-image/item-image';
-import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
+import { useRemotePush } from '/@/renderer/features/remote/hooks/use-remote-push';
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
@@ -10,7 +10,6 @@ import { usePlayerActions, usePlayerStore, useRemoteSettings } from '/@/renderer
 import { logger } from '/@/renderer/utils/logger';
 import { toast } from '/@/shared/components/toast/toast';
 import { LibraryItem } from '/@/shared/types/domain-types';
-import { PlayerShuffle } from '/@/shared/types/types';
 
 const remote = isElectron() ? window.api.remote : null;
 const ipc = isElectron() ? window.api.ipc : null;
@@ -58,18 +57,18 @@ export const useRemote = () => {
         }
 
         remote.requestPosition((data: { position: number }) => {
-            logger.debug('Request position received', { position: data.position });
+            logger.debug('Remote request position received', { position: data.position });
             const newTime = data.position;
             player.mediaSeekToTimestamp(newTime);
         });
 
         remote.requestSeek((data: { offset: number }) => {
-            logger.debug('Request seek received', { offset: data.offset });
+            logger.debug('Remote request seek received', { offset: data.offset });
             mediaSkipForward(data.offset);
         });
 
         remote.requestRating((data: { id: string; rating: number; serverId: string }) => {
-            logger.debug('Request rating received', {
+            logger.debug('Remote request rating received', {
                 id: data.id,
                 rating: data.rating,
                 serverId: data.serverId,
@@ -78,12 +77,12 @@ export const useRemote = () => {
         });
 
         remote.requestVolume((data: { volume: number }) => {
-            logger.debug('Request volume received', { volume: data.volume });
+            logger.debug('Remote request volume received', { volume: data.volume });
             setVolume(data.volume);
         });
 
         remote.requestFavorite((data: { favorite: boolean; id: string; serverId: string }) => {
-            logger.debug('Request favorite received', {
+            logger.debug('Remote request favorite received', {
                 favorite: data.favorite,
                 id: data.id,
                 serverId: data.serverId,
@@ -127,7 +126,7 @@ export const useRemote = () => {
         const currentSong = player.getCurrentSong();
 
         if (currentSong) {
-            logger.debug('Sending initial song', {
+            logger.debug('Remote sending initial song', {
                 artistName: currentSong.artistName,
                 id: currentSong.id,
                 name: currentSong.name,
@@ -146,111 +145,10 @@ export const useRemote = () => {
             remote.updateSong(currentSong, imageUrl);
         }
     }, [isRemoteEnabled, player]);
-
-    usePlayerEvents(
-        {
-            onCurrentSongChange: (properties) => {
-                if (!isRemoteEnabled || !remote) {
-                    return;
-                }
-
-                logger.debug('Update song sent', {
-                    artistName: properties.song?.artistName,
-                    id: properties.song?.id,
-                    index: properties.index,
-                    name: properties.song?.name,
-                });
-                if (properties.song) {
-                    const song = properties.song;
-                    const imageUrl =
-                        getItemImageUrl({
-                            id: song.id,
-                            imageUrl: song.imageUrl,
-                            itemType: LibraryItem.SONG,
-                            serverId: song._serverId,
-                            type: 'itemCard',
-                            useRemoteUrl: true,
-                        }) || null;
-
-                    remote.updateSong(song, imageUrl);
-                } else {
-                    remote.updateSong(undefined);
-                }
-            },
-            onPlayerProgress: (properties) => {
-                if (!isRemoteEnabled || !remote) {
-                    return;
-                }
-
-                logger.debug('Update position sent', { timestamp: properties.timestamp });
-                remote.updatePosition(properties.timestamp);
-            },
-            onPlayerRepeat: (properties) => {
-                if (!isRemoteEnabled || !remote) {
-                    return;
-                }
-
-                logger.debug('Update repeat sent', { repeat: properties.repeat });
-                remote.updateRepeat(properties.repeat);
-            },
-            onPlayerShuffle: (properties) => {
-                if (!isRemoteEnabled || !remote) {
-                    return;
-                }
-
-                const isShuffleEnabled = properties.shuffle !== PlayerShuffle.NONE;
-                logger.debug('Update shuffle sent', {
-                    isShuffleEnabled,
-                    shuffle: properties.shuffle,
-                });
-                remote.updateShuffle(isShuffleEnabled);
-            },
-            onPlayerStatus: (properties) => {
-                if (!isRemoteEnabled || !remote) {
-                    return;
-                }
-
-                logger.debug('Update playback sent', { status: properties.status });
-                remote.updatePlayback(properties.status);
-            },
-            onPlayerVolume: (properties) => {
-                if (!isRemoteEnabled || !remote) {
-                    return;
-                }
-
-                logger.debug('Update volume sent', { volume: properties.volume });
-                remote.updateVolume(properties.volume);
-            },
-            onUserFavorite: (properties) => {
-                if (!isRemoteEnabled || !remote) {
-                    return;
-                }
-
-                logger.debug('Update favorite sent', {
-                    favorite: properties.favorite,
-                    id: properties.id,
-                    serverId: properties.serverId,
-                });
-                remote.updateFavorite(properties.favorite, properties.serverId, properties.id);
-            },
-            onUserRating: (properties) => {
-                if (!isRemoteEnabled || !remote) {
-                    return;
-                }
-
-                logger.debug('Update rating sent', {
-                    id: properties.id,
-                    rating: properties.rating || 0,
-                    serverId: properties.serverId,
-                });
-                remote.updateRating(properties.rating || 0, properties.serverId, properties.id);
-            },
-        },
-        [],
-    );
 };
 
 export const RemoteHook = () => {
     useRemote();
+    useRemotePush();
     return null;
 };

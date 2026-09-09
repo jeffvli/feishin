@@ -453,7 +453,10 @@ const hideMainWindowToTray = () => {
 };
 
 export const showMainWindow = () => {
-    if (!mainWindow || mainWindow.isDestroyed()) return;
+    if (!mainWindow || mainWindow.isDestroyed()) {
+        void createWindow(false);
+        return;
+    }
 
     if (mainWindow.isMinimized()) {
         mainWindow.restore();
@@ -821,16 +824,6 @@ async function createWindow(first = true): Promise<void> {
         mainWindow = null;
     });
 
-    if (isMacOS()) {
-        mainWindow.on('show', () => {
-            rebuildMainMenu();
-        });
-
-        mainWindow.on('hide', () => {
-            rebuildMainMenu();
-        });
-    }
-
     mainWindow.on('close', (event) => {
         if (mainWindow) {
             const bounds = mainWindow.getNormalBounds();
@@ -867,7 +860,7 @@ async function createWindow(first = true): Promise<void> {
         app.setAppUserModelId('org.jeffvli.feishin');
     }
 
-    menuBuilder = new MenuBuilder(mainWindow);
+    menuBuilder = new MenuBuilder(mainWindow, showMainWindow);
     rebuildMainMenu();
 
     // Open URLs in the user's browser

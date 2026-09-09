@@ -2,6 +2,7 @@ import isElectron from 'is-electron';
 import React, { useEffect, useMemo } from 'react';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { lyricsMetadataToLrc } from '/@/renderer/features/lyrics/components/lyrics-export-form';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import {
     useIsRadioActive,
@@ -166,6 +167,19 @@ export const useMPRIS = () => {
         {
             onCurrentSongChange: () => {
                 // The effect above will handle the update when currentSong changes
+            },
+            onPlayerLyricsFetched: (properties) => {
+                if (!mpris) {
+                    return;
+                }
+
+                const formattedLyrics = lyricsMetadataToLrc(
+                    properties.lyrics,
+                    properties.offsetMs,
+                    properties.synced,
+                );
+
+                mpris?.updateLyrics(formattedLyrics);
             },
             onPlayerProgress: (properties) => {
                 if (!mpris) {

@@ -33,6 +33,7 @@ import {
     AlbumListResponse,
     LibraryItem,
     ServerType,
+    Song,
 } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
 import { Play } from '/@/shared/types/types';
@@ -169,11 +170,21 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
 
                 const albumIds = flatSortedAlbums.map((album) => album.id);
                 if (albumIds.length === 0) return;
+
+                const filter = (song: Song) => {
+                    if (song.albumArtists.some((artist) => artist.id === albumArtistId)) {
+                        return true;
+                    }
+
+                    return song.artists.some((artist) => artist.id === albumArtistId);
+                };
+
                 addToQueueByFetch(
                     server.id,
                     albumIds,
                     LibraryItem.ALBUM,
                     type || playButtonBehavior,
+                    { filter },
                 );
             },
             [
@@ -187,6 +198,7 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
                 groupingType,
                 artistReleaseTypeItems,
                 t,
+                albumArtistId,
             ],
         );
 

@@ -20,6 +20,12 @@
     background-size: cover;
 }
 
+.background-color {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+}
+
 .background-image-overlay {
     position: absolute;
     top: 0;
@@ -29,6 +35,13 @@
     height: 100%;
     background: var(--theme-overlay-header);
     backdrop-filter: blur(var(--image-blur));
+}
+
+.background-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
 }
 
 .player-state,
@@ -98,6 +111,13 @@
     height: auto;
     max-height: 100%;
     aspect-ratio: auto;
+}
+
+.image-native-aspect-ratio .album-image {
+    position: relative;
+    height: auto;
+    max-height: 50dvh;
+    margin: 0 auto;
 }
 
 .album-image {

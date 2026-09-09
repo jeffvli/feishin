@@ -52,6 +52,12 @@
     border-radius: var(--theme-radius-xl);
     transition: background-color 0.2s ease-in-out !important;
 
+    .text {
+        @container (max-width: $mantine-breakpoint-lg) {
+            display: none;
+        }
+    }
+
     &[data-variant='subtle'] {
         transition: background-color 0.2s ease-in-out !important;
 

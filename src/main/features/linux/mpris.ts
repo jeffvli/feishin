@@ -147,6 +147,10 @@ ipcMain.on('update-shuffle', (_event, shuffle: boolean) => {
     mprisPlayer.shuffle = shuffle;
 });
 
+ipcMain.on('update-lyrics', (_event, lyrics: string) => {
+    mprisPlayer.metadata['xesam:asText'] = lyrics;
+});
+
 ipcMain.on(
     'update-song',
     (_event, song: QueueSong | undefined, imageUrl: null | string | undefined) => {

@@ -1,4 +1,4 @@
-import { LibraryItem, Song } from '/@/shared/types/domain-types';
+import { FullLyricsMetadata, LibraryItem, Song } from '/@/shared/types/domain-types';
 
 export type AutoDJQueueAddedEventPayload = {
     songCount: number;
@@ -11,6 +11,7 @@ export type EventMap = {
     MEDIA_NEXT: MediaNextEventPayload;
     MEDIA_PREV: MediaPrevEventPayload;
     MPV_RELOAD: MpvReloadEventPayload;
+    PLAYER_LYRICS_FETCHED: PlayerLyricsFetchedEventPayload;
     PLAYER_PLAY: PlayerPlayEventPayload;
     PLAYER_REPEATED: PlayerRepeatedEventPayload;
     PLAYER_STOP: PlayerStopEventPayload;
@@ -46,6 +47,12 @@ export type MediaPrevEventPayload = {
 };
 
 export type MpvReloadEventPayload = Record<string, never>;
+
+export type PlayerLyricsFetchedEventPayload = {
+    lyrics: FullLyricsMetadata;
+    offsetMs: number;
+    synced: boolean;
+};
 
 export type PlayerPlayEventPayload = {
     id: string;

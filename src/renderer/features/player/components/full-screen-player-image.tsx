@@ -63,6 +63,7 @@ const ImageWithPlaceholder = ({
     placeholderIcon?: 'itemAlbum' | 'radio';
 }) => {
     const nativeAspectRatio = useNativeAspectRatio();
+    const useImageAspectRatio = useFullScreenPlayerStore((state) => state.useImageAspectRatio);
 
     if (!props.src) {
         return (
@@ -85,8 +86,8 @@ const ImageWithPlaceholder = ({
                 [styles.censored]: explicit,
             })}
             style={{
-                objectFit: nativeAspectRatio ? 'contain' : 'cover',
-                width: nativeAspectRatio ? 'auto' : '100%',
+                objectFit: nativeAspectRatio || useImageAspectRatio ? 'contain' : 'cover',
+                width: nativeAspectRatio || useImageAspectRatio ? 'auto' : '100%',
             }}
             {...props}
         />
