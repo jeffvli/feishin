@@ -70,6 +70,7 @@ const deepMergeIntoState = <T extends Record<string, any>>(
 const HomeItemSchema = z.enum([
     'genres',
     'mostPlayed',
+    'playlists',
     'random',
     'recentlyAdded',
     'recentlyPlayed',
@@ -960,6 +961,7 @@ export enum GenreTarget {
 export enum HomeItem {
     GENRES = 'genres',
     MOST_PLAYED = 'mostPlayed',
+    PLAYLISTS = 'playlists',
     RANDOM = 'random',
     RECENTLY_ADDED = 'recentlyAdded',
     RECENTLY_PLAYED = 'recentlyPlayed',
@@ -1233,6 +1235,7 @@ const defaultHomeItemOrder: HomeItem[] = [
     HomeItem.RECENTLY_RELEASED,
     HomeItem.RECENTLY_PLAYED,
     HomeItem.MOST_PLAYED,
+    HomeItem.PLAYLISTS,
 ];
 
 const homeItems = defaultHomeItemOrder.map((id) => ({
@@ -2901,10 +2904,17 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     }
                 }
 
+                if (version < 34) {
+                    state.general.homeItems.push({
+                        disabled: false,
+                        id: HomeItem.PLAYLISTS,
+                    });
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 33,
+            version: 34,
         },
     ),
 );
