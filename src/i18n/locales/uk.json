@@ -725,7 +725,8 @@
             "newlyAdded": "Нещодавно додані релізи",
             "recentlyPlayed": "Нещодавно відтворені",
             "recentlyReleased": "Нещодавні релізи",
-            "title": "$t(common.home)"
+            "title": "$t(common.home)",
+            "playlists": "Плейлисти"
         },
         "itemDetail": {
             "copyPath": "Скопіювати шлях у буфер обміну",
