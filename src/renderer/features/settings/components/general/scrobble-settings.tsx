@@ -8,6 +8,7 @@ import {
 import {
     ScrobbleMinimumMode,
     usePlaybackSettings,
+    useSettingsStore,
     useSettingsStoreActions,
 } from '/@/renderer/store/settings.store';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
@@ -20,6 +21,8 @@ export const ScrobbleSettings = memo(() => {
     const { t } = useTranslation();
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
+
+    const scrobbleMinimumMode = useSettingsStore((state) => state.playback.scrobble.minimumMode);
 
     const scrobbleOptions: SettingOption[] = [
         {
@@ -42,56 +45,6 @@ export const ScrobbleSettings = memo(() => {
                 context: 'description',
             }),
             title: t('setting.scrobble'),
-        },
-        {
-            control: (
-                <Slider
-                    aria-label="Scrobble percentage"
-                    defaultValue={settings.scrobble.scrobbleAtPercentage}
-                    label={`${settings.scrobble.scrobbleAtPercentage}%`}
-                    max={90}
-                    min={25}
-                    onChange={(e) => {
-                        setSettings({
-                            playback: {
-                                scrobble: {
-                                    scrobbleAtPercentage: e,
-                                },
-                            },
-                        });
-                    }}
-                    w={100}
-                />
-            ),
-            description: t('setting.minimumScrobblePercentage', {
-                context: 'description',
-            }),
-            title: t('setting.minimumScrobblePercentage'),
-        },
-        {
-            control: (
-                <NumberInput
-                    aria-label="Scrobble duration in seconds"
-                    defaultValue={settings.scrobble.scrobbleAtDuration}
-                    max={1200}
-                    min={0}
-                    onChange={(e) => {
-                        if (e === '') return;
-                        setSettings({
-                            playback: {
-                                scrobble: {
-                                    scrobbleAtDuration: Number(e),
-                                },
-                            },
-                        });
-                    }}
-                    width={75}
-                />
-            ),
-            description: t('setting.minimumScrobbleSeconds', {
-                context: 'description',
-            }),
-            title: t('setting.minimumScrobbleSeconds'),
         },
         {
             control: (
@@ -132,6 +85,58 @@ export const ScrobbleSettings = memo(() => {
                 context: 'description',
             }),
             title: t('setting.scrobbleMinimumMode'),
+        },
+        {
+            control: (
+                <Slider
+                    aria-label="Scrobble percentage"
+                    defaultValue={settings.scrobble.scrobbleAtPercentage}
+                    label={`${settings.scrobble.scrobbleAtPercentage}%`}
+                    max={90}
+                    min={25}
+                    onChange={(e) => {
+                        setSettings({
+                            playback: {
+                                scrobble: {
+                                    scrobbleAtPercentage: e,
+                                },
+                            },
+                        });
+                    }}
+                    w={100}
+                />
+            ),
+            description: t('setting.minimumScrobblePercentage', {
+                context: 'description',
+            }),
+            isHidden: scrobbleMinimumMode === ScrobbleMinimumMode.SECONDS,
+            title: t('setting.minimumScrobblePercentage'),
+        },
+        {
+            control: (
+                <NumberInput
+                    aria-label="Scrobble duration in seconds"
+                    defaultValue={settings.scrobble.scrobbleAtDuration}
+                    max={1200}
+                    min={0}
+                    onChange={(e) => {
+                        if (e === '') return;
+                        setSettings({
+                            playback: {
+                                scrobble: {
+                                    scrobbleAtDuration: Number(e),
+                                },
+                            },
+                        });
+                    }}
+                    width={75}
+                />
+            ),
+            description: t('setting.minimumScrobbleSeconds', {
+                context: 'description',
+            }),
+            isHidden: scrobbleMinimumMode === ScrobbleMinimumMode.PERCENTAGE,
+            title: t('setting.minimumScrobbleSeconds'),
         },
         {
             control: (
