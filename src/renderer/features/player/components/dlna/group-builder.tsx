@@ -4,7 +4,10 @@ import { useTranslation } from 'react-i18next';
 
 import type { DlnaDevice } from './types';
 
+import styles from './group-builder.module.css';
+
 import { Button } from '/@/shared/components/button/button';
+import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
 import { AppIcon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
@@ -61,54 +64,16 @@ export const GroupBuilder = ({
                 </Group>
             )}
 
-            {devices.map((device) => {
-                const isLocked = lockedCoordinator?.id === device.id;
-                const isChecked = checked.some((d) => d.id === device.id);
-                const isCoord = device.id === coordinator?.id;
-                const isPair = device.isPair ?? false;
-                return (
-                    <div
-                        key={device.id}
-                        onClick={() => toggle(device)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') toggle(device);
-                        }}
-                        role="button"
-                        style={{
-                            alignItems: 'center',
-                            background: isChecked ? 'rgba(108,159,255,0.15)' : 'transparent',
-                            borderRadius: '4px',
-                            cursor: isLocked || isPair ? 'default' : 'pointer',
-                            display: 'flex',
-                            fontSize: '0.8rem',
-                            gap: 8,
-                            opacity: isPair ? 0.45 : 1,
-                            padding: '6px 12px',
-                        }}
-                        tabIndex={isLocked || isPair ? -1 : 0}
-                    >
-                        <span
-                            style={{
-                                background: isChecked ? '#6c9fff' : 'transparent',
-                                border: `2px solid ${isChecked ? '#6c9fff' : '#555'}`,
-                                borderRadius: 3,
-                                display: 'inline-block',
-                                flexShrink: 0,
-                                height: 12,
-                                width: 12,
-                            }}
-                        />
-                        <Text c={isLocked || isPair ? 'dimmed' : undefined} size="sm">
-                            {device.name}
-                        </Text>
-                        {isCoord && (
-                            <Text c="primary" size="xs">
-                                {t('dlna.group.coordinator')}
-                            </Text>
-                        )}
-                    </div>
-                );
-            })}
+            {devices.map((device) => (
+                <GroupDeviceItem
+                    checked={checked.some((item) => item.id === device.id)}
+                    device={device}
+                    disabled={lockedCoordinator?.id === device.id || Boolean(device.isPair)}
+                    isCoordinator={device.id === coordinator?.id}
+                    key={device.id}
+                    onToggle={toggle}
+                />
+            ))}
 
             {!lockedCoordinator && (
                 <Text c="dimmed" px="sm" size="xs">
@@ -141,5 +106,40 @@ export const GroupBuilder = ({
                 </Button>
             </Group>
         </>
+    );
+};
+
+const GroupDeviceItem = ({
+    checked,
+    device,
+    disabled,
+    isCoordinator,
+    onToggle,
+}: {
+    checked: boolean;
+    device: DlnaDevice;
+    disabled: boolean;
+    isCoordinator: boolean;
+    onToggle: (device: DlnaDevice) => void;
+}) => {
+    const { t } = useTranslation();
+
+    return (
+        <Checkbox
+            checked={checked}
+            className={styles.device}
+            disabled={disabled}
+            label={
+                <Group gap="xs">
+                    <Text size="sm">{device.name}</Text>
+                    {isCoordinator && (
+                        <Text c="primary" size="xs">
+                            {t('dlna.group.coordinator')}
+                        </Text>
+                    )}
+                </Group>
+            }
+            onChange={() => onToggle(device)}
+        />
     );
 };

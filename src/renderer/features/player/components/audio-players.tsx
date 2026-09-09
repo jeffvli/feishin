@@ -1,7 +1,7 @@
 import type { ErrorInfo, ReactNode } from 'react';
 
 import isElectron from 'is-electron';
-import { Component, useEffect, useState } from 'react';
+import { Component, useEffect } from 'react';
 
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
@@ -120,17 +120,7 @@ function isSafari() {
 export const AudioPlayers = () => {
     const playbackType = usePlaybackType();
     const serverId = useCurrentServerId();
-    const { resetSampleRate, setSettings } = useSettingsStoreActions();
-    // DLNA requires an active connection — fall back to web on startup
-    const [mountChecked, setMountChecked] = useState(false);
-    useEffect(() => {
-        if (playbackType === PlayerType.DLNA) {
-            setSettings({ playback: { type: PlayerType.WEB } });
-        }
-        setMountChecked(true);
-        // Only run on mount
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    const { resetSampleRate } = useSettingsStoreActions();
     const {
         audioDeviceId,
         mpvProperties: { audioSampleRateHz },
@@ -140,7 +130,6 @@ export const AudioPlayers = () => {
     useEffect(() => {
         detectBrowserProfile();
     }, []);
-    if (!mountChecked) return null;
     return (
         <>
             <SleepTimerHook />

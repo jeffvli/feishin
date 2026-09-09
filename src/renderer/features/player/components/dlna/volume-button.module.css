@@ -1,0 +1,109 @@
+.root {
+    position: relative;
+}
+
+.volume-control {
+    position: relative;
+    z-index: 201;
+    display: flex;
+    gap: var(--theme-spacing-xs);
+    align-items: center;
+}
+
+.icon-target {
+    display: inline-flex;
+}
+
+.group-panel,
+.speaker-properties {
+    color: var(--theme-colors-foreground);
+    background: var(--theme-colors-background);
+    border: 1px solid var(--theme-colors-border);
+}
+
+.group-panel {
+    position: absolute;
+    right: calc(-1 * var(--theme-spacing-sm));
+    bottom: calc(-1 * var(--theme-spacing-sm));
+    left: calc(-1 * var(--theme-spacing-sm));
+    z-index: 200;
+    padding: 0 var(--theme-spacing-sm) var(--theme-spacing-3xl);
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(var(--theme-spacing-xs));
+    transition:
+        opacity 180ms ease,
+        transform 180ms ease;
+}
+
+.root:hover .group-panel,
+.group-panel:focus-within {
+    pointer-events: auto;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.group-mode {
+    padding: var(--theme-spacing-xs) 0;
+}
+
+.divider {
+    margin: 0 calc(-1 * var(--theme-spacing-sm)) var(--theme-spacing-sm);
+    border-bottom: 1px solid var(--theme-colors-border);
+}
+
+.member {
+    margin-bottom: var(--theme-spacing-sm);
+    transition: opacity 0.2s;
+
+    &[data-disabled='true'] {
+        pointer-events: none;
+        opacity: 0.4;
+    }
+}
+
+.member-name {
+    margin-bottom: var(--theme-spacing-xs);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.speaker-properties {
+    position: fixed;
+    bottom: var(--speaker-properties-bottom);
+    left: clamp(
+        var(--theme-spacing-xl),
+        var(--speaker-properties-left),
+        calc(100vw - var(--theme-spacing-xl))
+    );
+    z-index: 9999;
+    min-width: 17.5rem;
+    padding: var(--theme-spacing-sm) var(--theme-spacing-md);
+    transform: translateX(-50%);
+}
+
+.speaker-name {
+    margin-bottom: var(--theme-spacing-sm);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.properties {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-spacing-sm);
+}
+
+.property-slider {
+    display: grid;
+    grid-template-columns: minmax(min-content, 1fr) 2fr min-content;
+    gap: var(--theme-spacing-sm);
+    align-items: center;
+    width: 100%;
+}
+
+.property-toggle label {
+    font-size: var(--theme-font-size-xs);
+}
