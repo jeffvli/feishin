@@ -1,0 +1,9 @@
+<resources>
+    <color name="feishin_bg">#121212</color>
+    <color name="feishin_surface">#1e1e1e</color>
+    <color name="feishin_accent">#FF9800</color>
+    <color name="feishin_accent_variant">#F57C00</color>
+    <color name="feishin_text_primary">#FFFFFF</color>
+    <color name="feishin_text_secondary">#B0B0B0</color>
+    <color name="feishin_divider">#2d2d2d</color>
+</resources>

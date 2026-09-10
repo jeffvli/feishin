@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.Feishin" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:statusBarColor">@color/feishin_bg</item>
+        <item name="android:navigationBarColor">@color/feishin_bg</item>
+        <item name="android:windowBackground">@color/feishin_bg</item>
+        <item name="colorPrimary">@color/feishin_accent</item>
+        <item name="colorSurface">@color/feishin_surface</item>
+    </style>
+</resources>

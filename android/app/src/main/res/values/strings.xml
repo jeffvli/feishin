@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Feishin</string>
+    <string name="default_server_url">https://feishin.srvr.club/</string>
+    <string name="change_server">Change Server URL</string>
+    <string name="reload">Reload</string>
+    <string name="server_error_title">Connection Error</string>
+    <string name="server_error_message">Unable to connect to Feishin server. Please verify network connectivity or check server URL.</string>
+    <string name="retry">Retry</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="server_url_hint">e.g. https://feishin.srvr.club/</string>
+    <string name="playback_channel_name">Feishin Playback</string>
+    <string name="playback_channel_desc">Shows now-playing track and media controls</string>
+</resources>
