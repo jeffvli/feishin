@@ -5,6 +5,7 @@ import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { runAutoDjAlbumIds } from '/@/renderer/features/player/auto-dj/auto-dj-albums';
 import { runAutoDjSongs } from '/@/renderer/features/player/auto-dj/auto-dj-songs';
 import { useIsPlayerFetching, usePlayer } from '/@/renderer/features/player/context/player-context';
+import { usePlayerRepeat } from '/@/renderer/store';
 import {
     AUTO_DJ_STRATEGY,
     isShuffleEnabled,
@@ -21,12 +22,14 @@ import { hasFeature } from '/@/shared/api/utils';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
 import { Play } from '/@/shared/types/types';
+import { PlayerRepeat } from '/@/shared/types/types';
 
 export const useAutoDJ = () => {
     const queryClient = useQueryClient();
     const serverId = useCurrentServerId();
     const server = useCurrentServer();
     const player = usePlayer();
+    const playerRepeat = usePlayerRepeat();
     const settings = useAutoDJSettings();
     const isFetching = useIsPlayerFetching();
 
@@ -61,6 +64,10 @@ export const useAutoDJ = () => {
                 }
 
                 if (properties.remaining >= settings.timing) {
+                    return;
+                }
+
+                if (playerRepeat == PlayerRepeat.ALL) {
                     return;
                 }
 
@@ -174,6 +181,7 @@ export const useAutoDJ = () => {
         settings.onlySimilar,
         settings.songStrategy,
         settings.timing,
+        playerRepeat,
     ]);
 };
 
