@@ -170,7 +170,7 @@ const SidebarImage = () => {
     const { setSideBar } = useAppStoreActions();
     const currentSong = usePlayerSong();
     const isRadioActive = useIsRadioActive();
-    const { currentStationArt, isPlaying: isRadioPlaying } = useRadioPlayer();
+    const { currentStationArt } = useRadioPlayer();
     const { blurExplicitImages } = useGeneralSettings();
 
     const imageUrl = useItemImageUrl({
@@ -188,7 +188,6 @@ const SidebarImage = () => {
         type: 'sidebar',
     });
 
-    const isPlayingRadio = isRadioActive && isRadioPlaying;
     const isSongDefined = Boolean(currentSong?.id);
 
     const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
@@ -201,7 +200,7 @@ const SidebarImage = () => {
         e.preventDefault();
         e.stopPropagation();
 
-        if (!currentSong || isPlayingRadio) {
+        if (!currentSong || isRadioActive) {
             return;
         }
 
