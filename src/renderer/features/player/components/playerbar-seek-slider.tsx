@@ -11,41 +11,35 @@ interface PlayerbarSeekSliderProps {
     min: number;
 }
 
+const SEEK_RESOLVE_MS = 1000;
+
 export const PlayerbarSeekSlider = ({ max, min }: PlayerbarSeekSliderProps) => {
     const [isSeeking, setIsSeeking] = useState(false);
     const [seekValue, setSeekValue] = useState(0);
     const currentTime = usePlayerTimestamp();
-    const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const lastSeekValueRef = useRef<null | number>(null);
-
     const { mediaSeekToTimestamp } = usePlayer();
+    const releasedAtRef = useRef<null | number>(null);
 
-    const handleSeekToTimestamp = (timestamp: number) => {
-        mediaSeekToTimestamp(timestamp);
-    };
-
-    // Sync isSeeking state when currentTime catches up to seek value
+    // Resolve isSeeking once currentTime catches up to the seek target, or after
+    // a timeout - but only once the slider has actually been released
+    // (onChangeEnd), so holding it still mid-drag (without releasing) never gets
+    // interrupted/snapped back to the live position. Both checks ride on the
+    // currentTime poll itself (which fires every ~500ms) rather than a
+    // separately armed setTimeout, so the resolve can't be silently cancelled
+    // and left stuck once it is eligible to run.
     useEffect(() => {
-        if (isSeeking && lastSeekValueRef.current !== null) {
-            const timeDiff = Math.abs(currentTime - lastSeekValueRef.current);
-            if (timeDiff < 0.5) {
-                setIsSeeking(false);
-                lastSeekValueRef.current = null;
-                if (seekTimeoutRef.current) {
-                    clearTimeout(seekTimeoutRef.current);
-                    seekTimeoutRef.current = null;
-                }
-            }
+        if (!isSeeking || releasedAtRef.current === null) {
+            return;
         }
-    }, [currentTime, isSeeking]);
 
-    useEffect(() => {
-        return () => {
-            if (seekTimeoutRef.current) {
-                clearTimeout(seekTimeoutRef.current);
-            }
-        };
-    }, []);
+        const closeEnough = Math.abs(currentTime - seekValue) < 0.5;
+        const timedOut = Date.now() - releasedAtRef.current > SEEK_RESOLVE_MS;
+
+        if (closeEnough || timedOut) {
+            setIsSeeking(false);
+            releasedAtRef.current = null;
+        }
+    }, [currentTime, isSeeking, seekValue]);
 
     return (
         <CustomPlayerbarSlider
@@ -53,45 +47,26 @@ export const PlayerbarSeekSlider = ({ max, min }: PlayerbarSeekSliderProps) => {
             max={max}
             min={min}
             onChange={(e) => {
-                // Cancel any pending timeout if user starts seeking again
-                if (seekTimeoutRef.current) {
-                    clearTimeout(seekTimeoutRef.current);
-                    seekTimeoutRef.current = null;
-                }
+                releasedAtRef.current = null;
                 setIsSeeking(true);
                 setSeekValue(e);
             }}
             onChangeEnd={(e) => {
                 setSeekValue(e);
-                lastSeekValueRef.current = e;
-                handleSeekToTimestamp(e);
+                mediaSeekToTimestamp(e);
 
-                if (seekTimeoutRef.current) {
-                    clearTimeout(seekTimeoutRef.current);
-                }
-
-                // Keep isSeeking true to prevent slider from snapping back.
-                // The useEffect will detect when currentTime catches up and clear isSeeking.
-                // Also set a fallback timeout to clear isSeeking after a max delay
-                // in case the seek doesn't complete (e.g., network issues).
-                seekTimeoutRef.current = setTimeout(() => {
+                if (Math.abs(currentTime - e) < 0.5) {
                     setIsSeeking(false);
-                    lastSeekValueRef.current = null;
-                    seekTimeoutRef.current = null;
-                }, 1000);
+                    releasedAtRef.current = null;
+                } else {
+                    releasedAtRef.current = Date.now();
+                }
             }}
             onClick={(e) => {
                 e?.stopPropagation();
             }}
             size={6}
-            value={
-                isSeeking
-                    ? seekValue
-                    : lastSeekValueRef.current !== null &&
-                        Math.abs(currentTime - lastSeekValueRef.current) > 0.5
-                      ? lastSeekValueRef.current
-                      : currentTime
-            }
+            value={isSeeking ? seekValue : currentTime}
             w="100%"
         />
     );
