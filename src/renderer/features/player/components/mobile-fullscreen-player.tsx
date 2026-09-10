@@ -218,11 +218,10 @@ const overlayVariants: Variants = {
 interface BackgroundImageOverlayProps {
     dynamicBackground: boolean | undefined;
     dynamicImageBlur: number | undefined;
-    dynamicIsImage: boolean | undefined;
 }
 
 const BackgroundImageOverlay = memo(
-    ({ dynamicBackground, dynamicImageBlur, dynamicIsImage }: BackgroundImageOverlayProps) => {
+    ({ dynamicBackground, dynamicImageBlur }: BackgroundImageOverlayProps) => {
         const currentSong = usePlayerSong();
         const { nextSong } = usePlayerData();
 
@@ -256,7 +255,7 @@ const BackgroundImageOverlay = memo(
             previousSongRef.current = currentSong?._uniqueId;
         }, [currentSong?._uniqueId, nextSong?._uniqueId]);
 
-        if (!dynamicBackground || !dynamicIsImage) {
+        if (!dynamicBackground) {
             return null;
         }
 
@@ -395,7 +394,6 @@ const MobilePlayerContainer = memo(
                 <BackgroundImageOverlay
                     dynamicBackground={dynamicBackground}
                     dynamicImageBlur={dynamicImageBlur}
-                    dynamicIsImage={dynamicIsImage}
                 />
                 {children}
             </motion.div>
