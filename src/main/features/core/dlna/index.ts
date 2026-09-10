@@ -85,9 +85,10 @@ let positionOffsetSeconds = 0;
 let playInFlight = false; // a load (SetAVTransportURI through Play) or a Play is in progress
 let nextUriInFlight = false; // a SetNext/ClearNext call is in progress
 const NEXT_URI_SETTLE_MS = 1000;
-async function settleAfterPlay(): Promise<void> {
+async function settleBeforeNextUriChange(): Promise<void> {
     while (playInFlight) await new Promise((r) => setTimeout(r, 100));
-    const wait = NEXT_URI_SETTLE_MS - (Date.now() - lastPlayCommandAt);
+    const wait =
+        NEXT_URI_SETTLE_MS - (Date.now() - Math.max(lastPlayCommandAt, lastAutoAdvancedAt));
     if (wait > 0) await new Promise((r) => setTimeout(r, wait));
 }
 // The converse: Play must not be issued while a next-URI call is still being answered.
@@ -1947,7 +1948,7 @@ ipcMain.on(
 // Set the next track for gapless playback
 ipcMain.on('dlna-set-next-url', async (_event, data: { metadata: TrackMetadata; url: string }) => {
     if (!connectedDevice) return;
-    await settleAfterPlay();
+    await settleBeforeNextUriChange();
     if (!connectedDevice) return;
     const device = connectedDevice;
     try {
@@ -2025,7 +2026,7 @@ ipcMain.on('dlna-pause', async () => {
 
 ipcMain.on('dlna-clear-next', async () => {
     if (!connectedDevice) return;
-    await settleAfterPlay();
+    await settleBeforeNextUriChange();
     if (!connectedDevice) return;
     const device = connectedDevice;
     lastQueuedNextUri = '';
