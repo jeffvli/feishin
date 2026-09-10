@@ -1,12 +1,11 @@
-import { Loader } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 
 import type { DlnaDevice } from './types';
 
-import styles from './device-list.module.css';
-
+import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { AppIcon } from '/@/shared/components/icon/icon';
+import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Text } from '/@/shared/components/text/text';
 
 export const DeviceList = ({
@@ -26,7 +25,7 @@ export const DeviceList = ({
     if (isLoading) {
         return (
             <Group justify={'center'} p="sm">
-                <Loader color="gray" size={12} type="bars" />
+                <Spinner size="sm" />
                 <Text c="dimmed">{t('dlna.searching')}</Text>
             </Group>
         );
@@ -68,18 +67,19 @@ const DeviceListItem = ({
     const { t } = useTranslation();
 
     return (
-        <button
-            className={styles.device}
+        <Button
             disabled={disabled}
+            fullWidth
+            justify="space-between"
             onClick={() => onSelect(device)}
-            type="button"
+            variant={disabled ? 'filled' : 'subtle'}
         >
             {device.name}
             {disabled && (
-                <Text c="primary" component="span" size="xs">
+                <Text component="span" size="xs">
                     {t('dlna.connected')}
                 </Text>
             )}
-        </button>
+        </Button>
     );
 };

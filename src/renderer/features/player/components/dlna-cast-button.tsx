@@ -1,4 +1,3 @@
-import { Loader } from '@mantine/core';
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,6 +23,7 @@ import { Group } from '/@/shared/components/group/group';
 import { AppIcon } from '/@/shared/components/icon/icon';
 import { Paper } from '/@/shared/components/paper/paper';
 import { Popover } from '/@/shared/components/popover/popover';
+import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { PlayerStatus, PlayerType } from '/@/shared/types/types';
@@ -410,7 +410,7 @@ export const DlnaCastButton = () => {
                 <Paper p="md" radius="md">
                     {screen === 'connecting' && (
                         <Group p="sm">
-                            <Loader color="gray" size={12} type="bars" />
+                            <Spinner size="sm" />
                             <Text c="dimmed">{t('dlna.connecting')}</Text>
                         </Group>
                     )}

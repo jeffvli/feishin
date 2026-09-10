@@ -1,7 +1,5 @@
-import type { ErrorInfo, ReactNode } from 'react';
-
 import isElectron from 'is-electron';
-import { Component, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/events/events';
@@ -37,6 +35,7 @@ import { RemoteLibraryHook } from '/@/renderer/features/remote/hooks/use-remote-
 import { RemoteQueuePushHook } from '/@/renderer/features/remote/hooks/use-remote-queue-push';
 import { RemoteRadioPushHook } from '/@/renderer/features/remote/hooks/use-remote-radio-push';
 import { RemoteSettingsPushHook } from '/@/renderer/features/remote/hooks/use-remote-settings-push';
+import { ComponentErrorBoundary } from '/@/renderer/features/shared/components/component-error-boundary';
 import { VisualizerSystemAudioBridgeHook } from '/@/renderer/features/visualizer/components/visualizer-system-audio-bridge';
 import { useSettingsStore } from '/@/renderer/store';
 import {
@@ -384,18 +383,10 @@ const AudioPlayersContent = ({
     }
 
     if (playbackType === PlayerType.DLNA) {
-        if (isRadioActive) {
-            return (
-                <DlnaErrorBoundary>
-                    <RadioDlnaPlayer />
-                </DlnaErrorBoundary>
-            );
-        }
-
         return (
-            <DlnaErrorBoundary>
-                <DlnaPlayer />
-            </DlnaErrorBoundary>
+            <ComponentErrorBoundary>
+                {isRadioActive ? <RadioDlnaPlayer /> : <DlnaPlayer />}
+            </ComponentErrorBoundary>
         );
     }
 
@@ -405,25 +396,3 @@ const AudioPlayersContent = ({
 
     return null;
 };
-
-class DlnaErrorBoundary extends Component<{ children: ReactNode }, { error: Error | null }> {
-    constructor(props: { children: ReactNode }) {
-        super(props);
-        this.state = { error: null };
-    }
-
-    static getDerivedStateFromError(error: Error) {
-        return { error };
-    }
-
-    componentDidCatch(error: Error, info: ErrorInfo) {
-        console.error('[DLNA] Player error:', error, info);
-    }
-
-    render() {
-        if (this.state.error) {
-            return <div id="dlna-player-error" style={{ display: 'none' }} />;
-        }
-        return this.props.children;
-    }
-}

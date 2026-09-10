@@ -118,6 +118,8 @@ export const SpeakerPropertiesButton = ({
             <Popover.Dropdown
                 miw={340}
                 onClick={(event) => event.stopPropagation()}
+                onMouseDown={(event) => event.stopPropagation()}
+                onTouchStart={(event) => event.stopPropagation()}
                 p="sm"
                 style={{ overflowX: 'hidden' }}
             >
