@@ -960,7 +960,12 @@
         "fullscreenAutoOpenTimeout_description": "播放歌曲期間，閒置達指定時間後自動開啟全螢幕播放器。設定至0來停用此功能",
         "fullscreenAutoOpenTimeout": "全螢幕播放器自動開啟時間 (分鐘)",
         "sidebarImageEnabled": "展開專輯封面按鈕",
-        "sidebarImageEnabled_description": "在播放器欄的專輯封面上顯示按鈕，可將專輯封面展開至側邊欄。停用此選項會隱藏按鈕，且若專輯封面處於展開狀態會將其收合"
+        "sidebarImageEnabled_description": "在播放器欄的專輯封面上顯示按鈕，可將專輯封面展開至側邊欄。停用此選項會隱藏按鈕，且若專輯封面處於展開狀態會將其收合",
+        "scrobbleMinimumMode_description": "在播放達特定歌曲百分比、指定秒數，或兩者其一滿足後記錄",
+        "scrobbleMinimumMode_optionBoth": "兩者",
+        "scrobbleMinimumMode_optionSeconds": "秒",
+        "scrobbleMinimumMode_optionPercentage": "百分比",
+        "scrobbleMinimumMode": "設定記錄觸發條件模式"
     },
     "table": {
         "config": {

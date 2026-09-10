@@ -529,7 +529,12 @@
         "fullscreenAutoOpenTimeout_description": "Abre el reproductor a pantalla completa automáticamente tras estos minutos de inactividad mientras se reproduce una canción. Establece a 0 para desactivar",
         "fullscreenAutoOpenTimeout": "Tiempo de espera de apertura automática del reproductor a pantalla completa (minutos)",
         "sidebarImageEnabled": "Expandir botón del arte del álbum",
-        "sidebarImageEnabled_description": "Muestra un botón en el arte del álbum de la barra del reproductor para expandirlo en la barra lateral. Desactivar esto también esconde el botón y contrae el arte del álbum si está expandido actualmente"
+        "sidebarImageEnabled_description": "Muestra un botón en el arte del álbum de la barra del reproductor para expandirlo en la barra lateral. Desactivar esto también esconde el botón y contrae el arte del álbum si está expandido actualmente",
+        "scrobbleMinimumMode_optionBoth": "Ambos",
+        "scrobbleMinimumMode_optionSeconds": "Segundos",
+        "scrobbleMinimumMode_optionPercentage": "Porcentaje",
+        "scrobbleMinimumMode": "Establecer modo mínimo de scrobble",
+        "scrobbleMinimumMode_description": "Scrobblea después de un porcentaje de la canción, un número determinado de segundos, o cualquiera de los dos"
     },
     "action": {
         "editPlaylist": "Editar $t(entity.playlist, {\"count\": 1})",

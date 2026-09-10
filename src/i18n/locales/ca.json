@@ -109,7 +109,8 @@
             "mostPlayed": "Els més reproduïts",
             "recentlyPlayed": "Reproduït recentment",
             "recentlyReleased": "Estrenat fa poc",
-            "genres": "$t(entity.genre, {\"count\": 2})"
+            "genres": "$t(entity.genre, {\"count\": 2})",
+            "playlists": "Llistes de reproducció"
         },
         "playlistList": {
             "title": "$t(entity.playlist, {\"count\": 2})"
@@ -162,7 +163,13 @@
                 "lyricOpacityNonActive_description": "Opacitat de les línies inactives de la lletra",
                 "lyricScaleNonActive_description": "Escala de les línies inactives de la lletra",
                 "showLyricMatch_description": "Mostra el nom de la cançó i l'artista de la lletra coincident",
-                "showLyricProvider_description": "Mostra quin proveïdor proporciona la lletra actual"
+                "showLyricProvider_description": "Mostra quin proveïdor proporciona la lletra actual",
+                "coverArtSize": "Mida de la caràtula",
+                "playerItemAlignment": "Alineació d'elements del reproductor",
+                "titleDisplayType": "Estil del títol",
+                "titleDisplayType_optionMultiLine": "Multilínia",
+                "titleDisplayType_optionScroll": "Desplaça",
+                "titleLineCount": "Nombre de línies del títol"
             },
             "lyrics": "Lletres",
             "visualizer": "Visualitzador",
@@ -863,9 +870,9 @@
         "discordDisplayType_artistname": "Nom de l'artista",
         "hotkey_navigateHome": "Ves a l'inici",
         "preventSleepOnPlayback": "Evitar entrar en repòs durant la reproducció",
-        "preventSleepOnPlayback_description": "Evita que la pantalla s'adormi mentre la música es reprodueix",
+        "preventSleepOnPlayback_description": "Evita que la pantalla s'apagui mentre la música es reprodueix",
         "discordLinkType": "Enllaços d'estat de {{discord}}",
-        "discordLinkType_description": "Afegeix enllaços externs a {{lastfm}} o {{musicbrainz}} als camps de cançó i artista a l'estat d'activitat de {{discord}}. {{musicbrainz}} és el més precís, però requereix etiquetes i no proporciona enllaços d'artista, mentre que {{lastfm}} hauria de propocionar un enllaç sempre. no fa sol·licituds de xarxa addicionals",
+        "discordLinkType_description": "Afegeix enllaços de {{lastfm}} o {{musicbrainz}} a l'estat d'activitat de {{discord}}. {{musicbrainz}} és el més precís, però requereix etiquetes i no proporciona enllaços d'artista, mentre que {{lastfm}} hauria de propocionar un enllaç sempre. no fa sol·licituds de xarxa addicionals",
         "discordLinkType_none": "$t(common.none)",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}} amb {{lastfm}} com a alternativa",
         "artistBackground": "Imatge de fons de l'artista",
@@ -990,7 +997,7 @@
         "primaryShade": "Ombra primària",
         "primaryShade_description": "Substitueix el to primari (0–9) utilitzat per a botons, enllaços i altres elements de color primari",
         "playerItemConfiguration_description": "Configurar quins elements es mostren i en quin ordre al reproductor de pantalla completa",
-        "playerItemConfiguration": "Configuració d'elements del jugador",
+        "playerItemConfiguration": "Configuració d'elements del reproductor",
         "listenbrainz_description": "Mostra enllaços a ListenBrainz a les pàgines d'artista/àlbum",
         "listenbrainz": "Mostra enllaços a ListenBrainz",
         "qobuz_description": "Mostra enllaços a Qobuz a les pàgines d'artista/àlbum",
@@ -1007,8 +1014,8 @@
         "sidePlayQueueLayout_optionVertical": "Vertical",
         "waveformLoadingDelay": "Demora de càrrega de la forma d'ona",
         "waveformLoadingDelay_description": "Demora en segons abans de carregar la forma d'ona. Incrementeu aquest valor si patiu interrupcions en fer servir el reproductor web.",
-        "preventSuspendOnPlayback_description": "Evita que l'aplicació quedi suspesa mentre es reprodueix música",
-        "preventSuspendOnPlayback": "Evita la suspensió durant la reproducció",
+        "preventSuspendOnPlayback_description": "Evita que el sistema entri en repòs mentre es reprodueix música",
+        "preventSuspendOnPlayback": "Evita entrar en repòs durant la reproducció",
         "hotkey_listShowPlayingSong": "Mostra la cançó en reproducció a la llista",
         "sidebarPlaylistFolders_description": "Create una vista de carpeta per lliste de reproducció que inclogui el separador configurat al nom",
         "sidebarPlaylistFolders": "Habilita les carpetes",
@@ -1103,7 +1110,16 @@
         "customThemeWarnings_description": "Aquests temes s'han carregat, però alguns dels seus valors són invàlids i s'han omès.",
         "customThemeWarnings": "Advertències",
         "customThemes_description": "Arrossegueu fitxers de tema .json en aquesta carpeta per afegir temes personalitzats. Es registren automàticament cada cop que afegiu, editeu o elimineu un fitxer.",
-        "customThemes": "Temes personalitzats"
+        "customThemes": "Temes personalitzats",
+        "fullscreenAutoOpenTimeout_description": "Obre automàticament el reproductor a pantalla completa després d'aquesta quantitat de minuts d'inactivitat mentre es reprodueix una cançó. Assigna un 0 per desactivar",
+        "fullscreenAutoOpenTimeout": "Temps d'espera per l'obertura automàtica del reproductor a pantalla completa (minuts)",
+        "scrobbleMinimumMode_description": "Fes scrobble després d'un percentatge de la cançó, cert # de segons, o qualsevol dels dos ha passat",
+        "scrobbleMinimumMode_optionBoth": "Ambdós",
+        "scrobbleMinimumMode_optionSeconds": "Segons",
+        "scrobbleMinimumMode_optionPercentage": "Percentatge",
+        "scrobbleMinimumMode": "Estableix el mode de scrobble mínim",
+        "sidebarImageEnabled": "Botó d'expandir la caràtula de l'àlbum",
+        "sidebarImageEnabled_description": "Mostra un botó a la caràtula de l'àlbum de la barra del reproductor per expandir-lo a la barra lateral. Desactivar això, també amaga el botó i col·lapsa l'art de l'àlbum si es troba expandit actualment"
     },
     "table": {
         "column": {

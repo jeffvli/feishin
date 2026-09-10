@@ -1253,7 +1253,12 @@
         "fullscreenAutoOpenTimeout_description": "Automatycznie otwiera odtwarzacz pełnoekranowy po tylu minutach nieaktywności podczas odtwarzania piosenki. Ustaw na 0, aby wyłączyć",
         "fullscreenAutoOpenTimeout": "Czas do automatycznego otwarcia odtwarzacza pełnoekranowego (w minutach)",
         "sidebarImageEnabled": "Przycisk powiększania okładki",
-        "sidebarImageEnabled_description": "Pokazuje przycisk na okładce w pasku odtwarzacza, aby powiększyć okładkę do paska bocznego. Wyłączenie tego ukrywa też ten przycisk i pomniejsza okładkę jeśli jest aktualnie powiększona"
+        "sidebarImageEnabled_description": "Pokazuje przycisk na okładce w pasku odtwarzacza, aby powiększyć okładkę do paska bocznego. Wyłączenie tego ukrywa też ten przycisk i pomniejsza okładkę jeśli jest aktualnie powiększona",
+        "scrobbleMinimumMode_description": "Scrobbluj po pewnym procencie piosenki, wybranej liczbie sekund, lub którekolwiek z tych stanie się pierwsze",
+        "scrobbleMinimumMode_optionBoth": "Oba",
+        "scrobbleMinimumMode_optionSeconds": "Sekundy",
+        "scrobbleMinimumMode_optionPercentage": "Procent",
+        "scrobbleMinimumMode": "Ustaw tryb minimalnego scrobblowania"
     },
     "table": {
         "config": {
