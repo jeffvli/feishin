@@ -37,13 +37,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Make Gradle wrapper executable
-        run: |
-          chmod +x android/gradlew
-
       - name: Build Android APK
         working-directory: ./android
         run: |
+          gradle wrapper --gradle-version 8.7
+          chmod +x gradlew
           ./gradlew assembleRelease --no-daemon --stacktrace
 
       - name: Prepare APK Release Artifact
@@ -85,7 +83,6 @@ jobs:
           BODY
           )
 
-          # Delete pre-existing release if clobbering existing tag
           gh release delete "$TAG" --yes || true
           git tag -f "$TAG" || true
           git push origin "$TAG" -f || true
