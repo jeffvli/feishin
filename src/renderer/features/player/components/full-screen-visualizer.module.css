@@ -1,14 +1,21 @@
 .container {
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
     z-index: 200;
     display: flex;
     flex-direction: column;
-    width: 100%;
-    height: 100%;
     overflow: hidden;
     background: var(--theme-colors-background);
+}
+
+/* Mobile layout mounts the container in a full-viewport overlay, so pin it to the
+   main-content row (below the window bar, above the playerbar) instead. */
+.mobile-container {
+    bottom: 90px;
+}
+
+.mobile-container-with-window-bar {
+    top: 30px;
 }
 
 .controls-container {
