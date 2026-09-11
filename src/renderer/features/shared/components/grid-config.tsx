@@ -27,7 +27,6 @@ import {
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
-import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Slider } from '/@/shared/components/slider/slider';
@@ -52,6 +51,7 @@ type GridConfigProps = {
             hidden?: boolean;
         };
     };
+    section: 'columns' | 'general';
 };
 
 export const GridConfig = ({
@@ -59,6 +59,7 @@ export const GridConfig = ({
     gridRowsData,
     listKey,
     optionsConfig,
+    section,
 }: GridConfigProps) => {
     const { t } = useTranslation();
 
@@ -271,13 +272,14 @@ export const GridConfig = ({
 
     return (
         <>
-            <ListConfigTable options={options} />
-            <Divider />
-            <GridRowConfig
-                data={gridRowsData}
-                onChange={(rows) => setList(listKey, { grid: { rows } })}
-                value={grid.rows}
-            />
+            {section === 'general' && <ListConfigTable options={options} />}
+            {section === 'columns' && (
+                <GridRowConfig
+                    data={gridRowsData}
+                    onChange={(rows) => setList(listKey, { grid: { rows } })}
+                    value={grid.rows}
+                />
+            )}
         </>
     );
 };
