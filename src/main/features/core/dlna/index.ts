@@ -1461,8 +1461,8 @@ function stopSpeedProxy(): void {
     if (speedProxyProcess) {
         try {
             speedProxyProcess.kill('SIGKILL');
-        } catch {
-            // Catch
+        } catch (error) {
+            log.error('[DLNA] Failed to stop playback speed proxy', error);
         }
         speedProxyProcess = null;
     }
@@ -1498,8 +1498,8 @@ async function stopTopologySubscription(device: DlnaDevice): Promise<void> {
             req.end();
         });
         dlnaLog('Unsubscribed from ZoneGroupTopology events');
-    } catch {
-        // Catch
+    } catch (error) {
+        log.error('[DLNA] Failed to unsubscribe from ZoneGroupTopology events', error);
     }
     topologySubscriptionSid = null;
 }
@@ -1542,8 +1542,8 @@ async function waitForTransportState(
         try {
             const state = await getTransportInfo(device);
             if (states.includes(state)) return;
-        } catch {
-            // Catch
+        } catch (error) {
+            log.error('[DLNA] Failed to get transport state while waiting', error);
         }
     }
 }

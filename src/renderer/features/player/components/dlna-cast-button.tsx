@@ -555,7 +555,7 @@ export const DlnaCastButton = () => {
                                     style={{
                                         color: isShiftDown
                                             ? undefined
-                                            : 'var(--mantine-color-red-4, #ff6b6b)',
+                                            : 'var(--theme-colors-state-error)',
                                     }}
                                     variant="outline"
                                 >
@@ -606,7 +606,7 @@ export const DlnaCastButton = () => {
                                                 onClick={() => handleRemoveMember(member.device.id)}
                                                 size="compact-xs"
                                                 style={{
-                                                    color: 'var(--mantine-color-red-4, #ff6b6b)',
+                                                    color: 'var(--theme-colors-state-error)',
                                                 }}
                                                 variant="subtle"
                                             >
@@ -644,7 +644,7 @@ export const DlnaCastButton = () => {
                                     style={{
                                         color: isShiftDown
                                             ? undefined
-                                            : 'var(--mantine-color-red-4, #ff6b6b)',
+                                            : 'var(--theme-colors-state-error)',
                                     }}
                                     variant="outline"
                                 >

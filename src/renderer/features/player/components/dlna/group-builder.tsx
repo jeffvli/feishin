@@ -1,4 +1,3 @@
-import { Loader } from '@mantine/core';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -10,6 +9,7 @@ import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
 import { AppIcon } from '/@/shared/components/icon/icon';
+import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Text } from '/@/shared/components/text/text';
 
 export const GroupBuilder = ({
@@ -53,7 +53,7 @@ export const GroupBuilder = ({
 
             {isLoading && (
                 <Group p="sm">
-                    <Loader color="gray" size={12} type="bars" />
+                    <Spinner size="sm" />
                     <Text c="dimmed">{t('dlna.group.searching')}</Text>
                 </Group>
             )}

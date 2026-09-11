@@ -5,6 +5,8 @@ import os from 'os';
 
 import { DlnaDevice } from './soap-client';
 
+import log from '/@/main/logger';
+
 const MEDIA_RENDERER_URN = 'urn:schemas-upnp-org:device:MediaRenderer:1';
 const AV_TRANSPORT_URN = 'urn:schemas-upnp-org:service:AVTransport:1';
 const RENDERING_CONTROL_URN = 'urn:schemas-upnp-org:service:RenderingControl:1';
@@ -22,8 +24,8 @@ export async function discoverDevices(timeout: number = 5000): Promise<DlnaDevic
     for (const socket of sockets) {
         try {
             socket.close();
-        } catch {
-            // Catch
+        } catch (error) {
+            log.error('[DLNA] Failed to close SSDP discovery socket', error);
         }
     }
     const devices: DlnaDevice[] = [];
@@ -32,8 +34,8 @@ export async function discoverDevices(timeout: number = 5000): Promise<DlnaDevic
             const xml = await fetchXml(loc);
             const device = parseDevice(xml, loc);
             if (device) devices.push(device);
-        } catch {
-            // Catch
+        } catch (error) {
+            log.error(`[DLNA] Failed to load device description from ${loc}`, error);
         }
     }
     return devices;
@@ -56,11 +58,12 @@ function createSocketForInterface(
         const send = () => {
             socket.send(message, 0, message.length, SSDP_PORT, SSDP_ADDRESS, () => {});
         };
-        socket.once('error', () => {
+        socket.once('error', (error) => {
+            log.error(`[DLNA] SSDP discovery socket failed on ${localAddress}`, error);
             try {
                 socket.close();
-            } catch {
-                // Socket may not have finished binding
+            } catch (closeError) {
+                log.error('[DLNA] Failed to close errored SSDP discovery socket', closeError);
             }
             resolve(socket);
         });
@@ -72,8 +75,11 @@ function createSocketForInterface(
             try {
                 socket.setMulticastInterface(localAddress);
                 socket.setMulticastTTL(4);
-            } catch {
-                // Catch
+            } catch (error) {
+                log.error(
+                    `[DLNA] Failed to configure SSDP discovery socket on ${localAddress}`,
+                    error,
+                );
             }
             send();
             setTimeout(send, 500);
