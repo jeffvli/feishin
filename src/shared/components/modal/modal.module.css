@@ -14,7 +14,6 @@
 }
 
 .content {
-    padding: var(--theme-spacing-sm);
     overflow: hidden;
     background: var(--theme-colors-background);
     border: 2px solid var(--theme-colors-border);
@@ -26,4 +25,8 @@
 .close {
     position: absolute;
     right: var(--theme-spacing-md);
+}
+
+.body {
+    padding: var(--theme-spacing-md);
 }
