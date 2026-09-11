@@ -11,6 +11,7 @@ import { TagFieldRow } from './tag-field-row';
 
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { PathSettings } from '/@/renderer/features/settings/components/general/path-settings';
+import { useCurrentServer } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
@@ -25,6 +26,7 @@ import { LibraryItem, Song } from '/@/shared/types/domain-types';
 
 export const SongEditModal = ({ songs }: { songs: Song[] }) => {
     const { t } = useTranslation();
+    const currentServer = useCurrentServer();
     const tableContainerRef = useRef<HTMLDivElement>(null);
 
     const editor = useMetadataEditor({
@@ -262,12 +264,13 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
 
             {tab !== 'settings' && (
                 <>
-                    <Checkbox
-                        checked={editor.rescan}
-                        label={t('page.itemDetail.triggerRescan')}
-                        onChange={(e) => editor.setRescan(e.currentTarget.checked)}
-                    />
-
+                    {currentServer.isAdmin && (
+                        <Checkbox
+                            checked={editor.rescan}
+                            label={t('page.itemDetail.triggerRescan')}
+                            onChange={(e) => editor.setRescan(e.currentTarget.checked)}
+                        />
+                    )}
                     <Group justify="flex-end">
                         <Button
                             disabled={editor.isSaving}
