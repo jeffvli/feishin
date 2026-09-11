@@ -176,10 +176,25 @@ const SongEditContextModal = (props: any) => (
     </Suspense>
 );
 
+const LazyFullScreenPlayerSettingsContextModal = lazy(() =>
+    import('/@/renderer/features/player/components/full-screen-player-settings-modal').then(
+        (module) => ({
+            default: module.FullScreenPlayerSettingsContextModal,
+        }),
+    ),
+);
+
+const FullScreenPlayerSettingsContextModal = (props: any) => (
+    <Suspense fallback={<Spinner container />}>
+        <LazyFullScreenPlayerSettingsContextModal {...props} />
+    </Suspense>
+);
+
 const appRouterModals = {
     addToPlaylist: AddToPlaylistContextModal,
     base: BaseContextModal,
     editMetadata: SongEditContextModal,
+    fullScreenPlayerSettings: FullScreenPlayerSettingsContextModal,
     lyricsSettings: LyricsSettingsContextModal,
     saveAndReplace: SaveAndReplaceContextModal,
     settings: SettingsContextModal,
