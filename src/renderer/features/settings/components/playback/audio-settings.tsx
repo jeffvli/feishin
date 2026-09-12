@@ -119,6 +119,7 @@ export const AudioSettings = memo(() => {
     const audioDevices = useAudioDevices(playbackType);
     const audioDeviceId =
         playbackType === PlayerType.LOCAL ? settings.mpvAudioDeviceId : settings.audioDeviceId;
+    const isCasting = settings.type === PlayerType.DLNA;
 
     // Dynamically build the options for the dropdown
     const selectData = [
@@ -134,6 +135,10 @@ export const AudioSettings = memo(() => {
         selectData.push({ label: 'Jukebox', value: PlayerType.JUKEBOX });
     }
 
+    if (isCasting) {
+        selectData.push({ disabled: true, label: 'DLNA', value: PlayerType.DLNA });
+    }
+
     const audioOptions: SettingOption[] = [
         {
             control: (
@@ -141,7 +146,7 @@ export const AudioSettings = memo(() => {
                     <Select
                         data={selectData}
                         defaultValue={settings.type}
-                        disabled={status === PlayerStatus.PLAYING}
+                        disabled={status === PlayerStatus.PLAYING || isCasting}
                         onChange={(e) => {
                             setSettings({ playback: { type: e as PlayerType } });
                             ipc?.send('settings-set', { property: 'playbackType', value: e });

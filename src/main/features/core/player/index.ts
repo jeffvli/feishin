@@ -591,6 +591,10 @@ ipcMain.handle('player-get-time', async (): Promise<number | undefined> => {
         if (!mpv) {
             return undefined;
         }
+        const isIdle = await mpv.getProperty('idle-active').catch(() => true);
+        if (isIdle) {
+            return undefined;
+        }
         return await mpv.getTimePosition();
     } catch (err: any | NodeMpvError) {
         // Err 3: IPC command invalid — e.g. time-pos unavailable when idle / between tracks

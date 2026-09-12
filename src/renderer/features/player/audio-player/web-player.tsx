@@ -4,6 +4,8 @@ import type ReactPlayer from 'react-player';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { playerHandoff } from './engine/player-handoff';
+
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import {
     WebPlayerEngine,
@@ -47,7 +49,16 @@ export function WebPlayer() {
     const volume = usePlayerVolume();
     const { audioFadeOnStatusChange, preservePitch, transcode } = usePlaybackSettings();
 
-    const [localPlayerStatus, setLocalPlayerStatus] = useState<PlayerStatus>(status);
+    const pendingLocalSeekRef = useRef(-1);
+
+    const [localPlayerStatus, setLocalPlayerStatus] = useState<PlayerStatus>(() => {
+        if (playerHandoff.pendingLocalSeek > 0) {
+            pendingLocalSeekRef.current = playerHandoff.pendingLocalSeek;
+            playerHandoff.pendingLocalSeek = -1;
+            return PlayerStatus.PAUSED;
+        }
+        return status;
+    });
     const [isTransitioning, setIsTransitioning] = useState<boolean | string>(false);
     const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -248,12 +259,12 @@ export function WebPlayer() {
     );
 
     const handleOnEndedPlayer1 = useCallback(() => {
-        const promise = new Promise((resolve) => {
-            mediaAutoNext();
-            resolve(true);
-        });
-
-        promise.then(() => {
+        mediaAutoNext();
+        const storeStatus = usePlayerStoreBase.getState().player.status;
+        if (storeStatus === PlayerStatus.PAUSED) {
+            setLocalPlayerStatus(PlayerStatus.PAUSED);
+            playerRef.current?.pause();
+        } else {
             playerRef.current?.player1()?.ref?.getInternalPlayer().pause();
 
             // If mediaAutoNext resulted in a stopped/paused state (e.g. end of queue,
@@ -265,16 +276,15 @@ export function WebPlayer() {
                 playerRef.current?.setVolume(volume);
             }
             setIsTransitioning(false);
-        });
+        }
     }, [mediaAutoNext, volume]);
-
     const handleOnEndedPlayer2 = useCallback(() => {
-        const promise = new Promise((resolve) => {
-            mediaAutoNext();
-            resolve(true);
-        });
-
-        promise.then(() => {
+        mediaAutoNext();
+        const storeStatus = usePlayerStoreBase.getState().player.status;
+        if (storeStatus === PlayerStatus.PAUSED) {
+            setLocalPlayerStatus(PlayerStatus.PAUSED);
+            playerRef.current?.pause();
+        } else {
             playerRef.current?.player2()?.ref?.getInternalPlayer().pause();
 
             const currentStatus = usePlayerStoreBase.getState().player.status;
@@ -284,7 +294,7 @@ export function WebPlayer() {
                 playerRef.current?.setVolume(volume);
             }
             setIsTransitioning(false);
-        });
+        }
     }, [mediaAutoNext, volume]);
 
     const player = usePlayer();
@@ -391,7 +401,7 @@ export function WebPlayer() {
     }, []);
 
     useEffect(() => {
-        if (localPlayerStatus !== PlayerStatus.PLAYING) {
+        if (status !== PlayerStatus.PLAYING) {
             return;
         }
 
@@ -416,7 +426,19 @@ export function WebPlayer() {
         }, 500);
 
         return () => clearInterval(interval);
-    }, [localPlayerStatus, num, setTimestamp, transitionType]);
+    }, [status, num, setTimestamp, transitionType]);
+
+    useEffect(() => {
+        if (status !== PlayerStatus.PLAYING || localPlayerStatus === PlayerStatus.PLAYING) {
+            return;
+        }
+        if (fadeIntervalRef.current) {
+            clearInterval(fadeIntervalRef.current);
+            fadeIntervalRef.current = null;
+        }
+        playerRef.current?.setVolume(volume);
+        setLocalPlayerStatus(PlayerStatus.PLAYING);
+    }, [status, localPlayerStatus, volume]);
 
     const calculateReplayGain = useCallback(
         (song: QueueSong): number => {
@@ -507,8 +529,24 @@ export function WebPlayer() {
     const player1Url = useSongUrl(player1, num === 1, transcode);
     const player2Url = useSongUrl(player2, num === 2, transcode);
 
+    const applyPendingSeekIfNeeded = useCallback(
+        (reactPlayer: ReactPlayer, activeSlot: 1 | 2) => {
+            if (pendingLocalSeekRef.current <= 0) return;
+            if (activeSlot !== num) return;
+            const seekTo = pendingLocalSeekRef.current;
+            pendingLocalSeekRef.current = -1;
+            reactPlayer.seekTo(seekTo, 'seconds');
+            if (status === PlayerStatus.PLAYING) {
+                playerRef.current?.setVolume(volume);
+                setLocalPlayerStatus(PlayerStatus.PLAYING);
+            }
+        },
+        [num, status, volume],
+    );
+
     const handlePlayer1Start = useCallback(
-        async (player: ReactPlayer) => {
+        async (reactPlayer: ReactPlayer) => {
+            applyPendingSeekIfNeeded(reactPlayer, 1);
             if (!webAudio || player1Source) return;
             if (player1Url) {
                 // This should fire once, only if the source is real (meaning we
@@ -518,7 +556,7 @@ export function WebPlayer() {
                 }
             }
 
-            const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
+            const internal = reactPlayer.getInternalPlayer() as HTMLMediaElement | undefined;
             if (internal) {
                 const { context, gains } = webAudio;
                 const source = context.createMediaElementSource(internal);
@@ -526,11 +564,12 @@ export function WebPlayer() {
                 setPlayer1Source(source);
             }
         },
-        [player1Source, player1Url, webAudio],
+        [applyPendingSeekIfNeeded, player1Source, player1Url, webAudio],
     );
 
     const handlePlayer2Start = useCallback(
-        async (player: ReactPlayer) => {
+        async (reactPlayer: ReactPlayer) => {
+            applyPendingSeekIfNeeded(reactPlayer, 2);
             if (!webAudio || player2Source) return;
             if (player2Url) {
                 if (webAudio.context.state !== 'running') {
@@ -538,7 +577,7 @@ export function WebPlayer() {
                 }
             }
 
-            const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
+            const internal = reactPlayer.getInternalPlayer() as HTMLMediaElement | undefined;
             if (internal) {
                 const { context, gains } = webAudio;
                 const source = context.createMediaElementSource(internal);
@@ -546,7 +585,7 @@ export function WebPlayer() {
                 setPlayer2Source(source);
             }
         },
-        [player2Source, player2Url, webAudio],
+        [applyPendingSeekIfNeeded, player2Source, player2Url, webAudio],
     );
 
     const handleOnErrorPause = useCallback(() => {
@@ -742,6 +781,8 @@ function gaplessHandler(args: {
     }
 
     if (!hasNextSong) {
+        nextPlayer.ref?.getInternalPlayer()?.pause();
+        if (isTransitioning) setIsTransitioning(false);
         return null;
     }
 

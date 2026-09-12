@@ -164,6 +164,9 @@ importers:
       node-mpv:
         specifier: github:jeffvli/Node-MPV#32b4d64395289ad710c41d481d2707a7acfc228f
         version: https://codeload.github.com/jeffvli/Node-MPV/tar.gz/32b4d64395289ad710c41d481d2707a7acfc228f
+      node-ssdp:
+        specifier: ^4.0.1
+        version: 4.0.1
       overlayscrollbars:
         specifier: ^2.16.0
         version: 2.16.0
@@ -261,6 +264,9 @@ importers:
       '@types/node':
         specifier: ^24.13.1
         version: 24.13.2
+      '@types/node-ssdp':
+        specifier: ^4.0.5
+        version: 4.0.5
       '@types/react':
         specifier: ^19.2.17
         version: 19.2.17
@@ -2439,6 +2445,9 @@ packages:
   '@types/ms@2.1.0':
     resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
 
+  '@types/node-ssdp@4.0.5':
+    resolution: {integrity: sha512-81biErjb57hFXyqp4fjAUp37MO1cGKJz1DYqQRbw3ErU/zExuFTidS3AlPpNVl/o9cqrzMX2gkP1z6rgVI6AJw==}
+
   '@types/node@24.13.2':
     resolution: {integrity: sha512-fRa09kZTgu8o71KFcDjUFuc7F+dEbZYZmkI0mg5YBTRs0yMKjYHsq/c0urDKeDb+D5qVgXOdFcuu+DZPKOITwA==}
 
@@ -3141,6 +3150,14 @@ packages:
       supports-color:
         optional: true
 
+  debug@3.2.7:
+    resolution: {integrity: sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
+
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
     engines: {node: '>=6.0'}
@@ -3551,6 +3568,9 @@ packages:
 
   exponential-backoff@3.1.3:
     resolution: {integrity: sha512-ZgEeZXj30q+I0EN+CbSSpIyPaJ5HVQD18Z1m+u1FXbAeT94mr1zw50q4q6jiiC447Nl/YTcIYSAftiGqetwXCA==}
+
+  extend@3.0.2:
+    resolution: {integrity: sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==}
 
   fast-average-color@9.5.0:
     resolution: {integrity: sha512-nC6x2YIlJ9xxgkMFMd1BNoM1ctMjNoRKfRliPmiEWW3S6rLTHiQcy9g3pt/xiKv/D0NAAkhb9VyV+WJFvTqMGg==}
@@ -4027,6 +4047,9 @@ packages:
   internal-slot@1.1.0:
     resolution: {integrity: sha512-4gd7VpWNQNB4UKKCFFVcp1AVv+FMOgs9NKzjHKusc8jTMhd5eL1NqQqOpE0KzMds804/yHlglp3uxgluOqAPLw==}
     engines: {node: '>= 0.4'}
+
+  ip@1.1.9:
+    resolution: {integrity: sha512-cyRxvOEpNHNtchU3Ln9KC/auJgup87llfQpQ+t5ghoC/UhL16SWzbueiCsdTnWmqAWl7LadfuwhlqmtOaqMHdQ==}
 
   is-arguments@1.2.0:
     resolution: {integrity: sha512-7bVbi0huj/wrIAOzb8U1aszg9kdi3KN/CyU19CTI7tAoZYEZoL9yCDXpbXN+uPsuWnP02cyug1gleqq+TU+YCA==}
@@ -4606,7 +4629,7 @@ packages:
     resolution: {integrity: sha512-O5lz91xSOeoXP6DulyHfllpq+Eg00MWitZIbtPfoSEvqIHdl5gfcY6hYzDWnj0qD5tz52PI08u9qUvSVeUBeHw==}
 
   node-mpv@https://codeload.github.com/jeffvli/Node-MPV/tar.gz/32b4d64395289ad710c41d481d2707a7acfc228f:
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/jeffvli/Node-MPV/tar.gz/32b4d64395289ad710c41d481d2707a7acfc228f}
+    resolution: {gitHosted: true, integrity: sha512-jWGM4rQH2NnorZ8BEG+AIEGqP3PzahlRosqJVGhd0Qu2sEu/aDG5FVO0nbMSbkYEeLMvB16PqXl+Hsd9xbQFgA==, tarball: https://codeload.github.com/jeffvli/Node-MPV/tar.gz/32b4d64395289ad710c41d481d2707a7acfc228f}
     version: 2.0.0-beta.3
 
   node-releases@2.0.47:
@@ -4616,6 +4639,10 @@ packages:
   node-releases@2.0.53:
     resolution: {integrity: sha512-D9UOmYG3UH1V+ENW56t5QXBwJw1YEY18ruVeus89Rw+SyIgjPkCO84bRzO3uNIYosJbNwiabWVn48o3uJLjxFQ==}
     engines: {node: '>=18'}
+
+  node-ssdp@4.0.1:
+    resolution: {integrity: sha512-uJXkLZVuyaMg1qNbMbGQ6YzNzyOD+NLxYyxIJocPTKTVECPDokOiCZA686jTLXHMUnV34uY/lcUSJ+/5fhY43A==}
+    engines: {node: '>=0.10.0'}
 
   nopt@9.0.0:
     resolution: {integrity: sha512-Zhq3a+yFKrYwSBluL4H9XP3m3y5uvQkB/09CwDruCiRmR/UJYnn9W4R48ry0uGC70aeTPKLynBtscP9efFFcPw==}
@@ -8200,6 +8227,10 @@ snapshots:
 
   '@types/ms@2.1.0': {}
 
+  '@types/node-ssdp@4.0.5':
+    dependencies:
+      '@types/node': 24.13.2
+
   '@types/node@24.13.2':
     dependencies:
       undici-types: 7.18.2
@@ -9036,6 +9067,10 @@ snapshots:
     dependencies:
       ms: 2.0.0
 
+  debug@3.2.7:
+    dependencies:
+      ms: 2.1.3
+
   debug@4.4.3:
     dependencies:
       ms: 2.1.3
@@ -9654,6 +9689,8 @@ snapshots:
 
   exponential-backoff@3.1.3: {}
 
+  extend@3.0.2: {}
+
   fast-average-color@9.5.0: {}
 
   fast-deep-equal@3.1.3: {}
@@ -10209,6 +10246,8 @@ snapshots:
       hasown: 2.0.4
       side-channel: 1.1.1
 
+  ip@1.1.9: {}
+
   is-arguments@1.2.0:
     dependencies:
       call-bound: 1.0.4
@@ -10736,6 +10775,16 @@ snapshots:
   node-releases@2.0.47: {}
 
   node-releases@2.0.53: {}
+
+  node-ssdp@4.0.1:
+    dependencies:
+      async: 2.6.4
+      bluebird: 3.7.2
+      debug: 3.2.7
+      extend: 3.0.2
+      ip: 1.1.9
+    transitivePeerDependencies:
+      - supports-color
 
   nopt@9.0.0:
     dependencies:

@@ -1472,12 +1472,63 @@ export const JellyfinController: InternalControllerEndpoint = {
             query: { ...query, limit: 1, startIndex: 0 },
         }).then((result) => result!.totalRecordCount!),
     getStreamUrl: async ({ apiClientProps: { server }, query }) => {
-        const { bitrate, format, id, transcode } = query;
+        // Lossy encoders top out at 48 kHz (libmp3lame, libopus, aac); asking Jellyfin
+        // for more makes ffmpeg fail and the stream never starts.
+        const clampSampleRate = (rate: number | undefined, codec: string) =>
+            rate && ['aac', 'mp3', 'ogg', 'opus', 'vorbis'].includes(codec)
+                ? Math.min(rate, 48000)
+                : rate;
+        const {
+            bitrate,
+            container,
+            format,
+            forRenderer,
+            id,
+            maxSampleRate,
+            sampleRate,
+            startTime,
+            transcode,
+        } = query;
+        // A transcoded stream is chunked and cannot be ranged into, so a seek is expressed
+        // as a new stream that starts at the requested offset.
+        const startTimeTicks =
+            transcode && startTime && startTime > 0 ? Math.round(startTime * 10_000_000) : 0;
+        // Jellyfin keys a running transcode on media path, user agent, device id and play
+        // session id only. With an empty session id a request for the same file with new
+        // parameters (another offset, a changed cap) is served from the job already running,
+        // and a running job is also found by session id alone, so the id carries the item and
+        // every parameter that must yield a different stream.
+        const transcodeSession = (codec: string, rate: number | undefined) =>
+            `feishin-${id}-${codec}-${rate ?? 0}-${startTimeTicks}`;
         const deviceId = '';
 
         let url = `${server?.url}/Items/${id}/Download?apiKey=${server?.credential}&playSessionId=${deviceId}`;
 
-        if (transcode) {
+        if (transcode && forRenderer) {
+            // UPnP/DLNA renderers commonly pick a decoder from the URL's file extension and
+            // refuse the extension-less universal route, so build a stream.{format} URL for
+            // them. That route takes an exact sample rate, so only cap when the source is
+            // above the configured maximum, and send the file untouched when it already
+            // matches the requested format.
+            const realFormat = (format || 'mp3').toLowerCase();
+            if (container?.toLowerCase() !== realFormat) {
+                const cappedRate = clampSampleRate(maxSampleRate, realFormat);
+                url =
+                    `${server?.url}/Audio/${id}/stream.${realFormat}` +
+                    `?audioCodec=${realFormat}&static=false` +
+                    `&apiKey=${server?.credential}` +
+                    `&playSessionId=${transcodeSession(realFormat, cappedRate)}`;
+                if (bitrate !== undefined) {
+                    url += `&audioBitRate=${bitrate * 1000}`;
+                }
+                if (cappedRate && sampleRate && sampleRate > cappedRate) {
+                    url += `&audioSampleRate=${cappedRate}`;
+                }
+                if (startTimeTicks > 0) {
+                    url += `&startTimeTicks=${startTimeTicks}`;
+                }
+            }
+        } else if (transcode) {
             // Some format appears to be required. Fall back to trusty MP3 if not specified
             // Otherwise, ffmpeg appears to crash
             const realFormat = format || 'mp3';
@@ -1502,6 +1553,17 @@ export const JellyfinController: InternalControllerEndpoint = {
             if (bitrate !== undefined) {
                 url += `&maxStreamingBitrate=${bitrate * 1000}`;
             }
+            const cappedRate = clampSampleRate(maxSampleRate, realFormat.toLowerCase());
+            if (cappedRate) {
+                url += `&maxAudioSampleRate=${cappedRate}`;
+            }
+            if (startTimeTicks > 0) {
+                url += `&startTimeTicks=${startTimeTicks}`;
+            }
+            url = url.replace(
+                `&playSessionId=${deviceId}`,
+                `&playSessionId=${transcodeSession(realFormat.toLowerCase(), cappedRate)}`,
+            );
         }
 
         return url;

@@ -280,6 +280,7 @@ const TranscodingConfigSchema = z.object({
     bitrate: z.number().optional(),
     enabled: z.boolean(),
     format: z.string().optional(),
+    maxSampleRate: z.number().optional(),
 });
 
 const MpvSettingsSchema = z.object({
@@ -714,6 +715,8 @@ const PlaybackSettingsSchema = z.object({
     mpvExtraParameters: z.array(z.string()),
     mpvProperties: MpvSettingsSchema,
     preservePitch: z.boolean(),
+    previousLocalVolume: z.number().min(0).max(100).optional(),
+    previousPlayerType: z.nativeEnum(PlayerType).optional(),
     scrobble: ScrobbleSettingsSchema,
     transcode: TranscodingConfigSchema,
     type: z.nativeEnum(PlayerType),
@@ -2112,6 +2115,8 @@ const initialState: SettingsState = {
             replayGainPreampDB: 0,
         },
         preservePitch: true,
+        previousLocalVolume: undefined,
+        previousPlayerType: undefined,
         scrobble: {
             enabled: true,
             minimumMode: ScrobbleMinimumMode.BOTH,
