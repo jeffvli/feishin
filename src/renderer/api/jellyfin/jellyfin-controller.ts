@@ -287,6 +287,12 @@ export const JellyfinController: InternalControllerEndpoint = {
             }
             case 'password':
             case undefined: {
+                if (typeof body.password !== 'string' || typeof body.username !== 'string') {
+                    throw new Error(
+                        'Jellyfin password authentication requires a username and password',
+                    );
+                }
+
                 const res = await jfApiClient({ server: null, url: normalizedUrl }).authenticate({
                     body: {
                         Pw: body.password,
@@ -306,6 +312,10 @@ export const JellyfinController: InternalControllerEndpoint = {
                 };
             }
             case 'quickConnectAuthenticate': {
+                if (typeof body.secret !== 'string') {
+                    throw new Error('Jellyfin Quick Connect authentication requires a secret');
+                }
+
                 const res = await jfApiClient({
                     server: null,
                     url: normalizedUrl,
@@ -339,6 +349,10 @@ export const JellyfinController: InternalControllerEndpoint = {
                 return { code: res.body.Code, secret: res.body.Secret };
             }
             case 'quickConnectState': {
+                if (typeof body.secret !== 'string') {
+                    throw new Error('Jellyfin Quick Connect state requires a secret');
+                }
+
                 const res = await jfApiClient({
                     server: null,
                     url: normalizedUrl,
@@ -352,6 +366,8 @@ export const JellyfinController: InternalControllerEndpoint = {
 
                 return Boolean(res.body.Authenticated);
             }
+            default:
+                throw new Error('Jellyfin does not support this authentication method');
         }
     },
     createFavorite: async (args) => {

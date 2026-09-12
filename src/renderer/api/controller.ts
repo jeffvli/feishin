@@ -7,9 +7,6 @@ import { getServerById, useAuthStore, useSettingsStore } from '/@/renderer/store
 import { logger } from '/@/renderer/utils/logger';
 import { toast } from '/@/shared/components/toast/toast';
 import {
-    AuthenticateBody,
-    AuthenticateResult,
-    AuthenticationResponse,
     ControllerEndpoint,
     InternalControllerEndpoint,
     ServerType,
@@ -213,68 +210,7 @@ const addContext = <T extends { apiClientProps: any; context?: any }>(args: T): 
     };
 };
 
-export interface GeneralController extends Omit<Required<ControllerEndpoint>, 'authenticate'> {
-    authenticate(
-        url: string,
-        body: { action?: 'password'; legacy?: boolean; password: string; username: string },
-        type: ServerType,
-    ): Promise<AuthenticationResponse>;
-    authenticate(
-        url: string,
-        body: { action: 'quickConnectAuthenticate'; secret: string },
-        type: ServerType.JELLYFIN,
-    ): Promise<AuthenticationResponse>;
-    authenticate(
-        url: string,
-        body: { action: 'isQuickConnectEnabled' },
-        type: ServerType.JELLYFIN,
-    ): Promise<boolean>;
-    authenticate(
-        url: string,
-        body: { action: 'quickConnectInitiate' },
-        type: ServerType.JELLYFIN,
-    ): Promise<{ code: string; secret: string }>;
-    authenticate(
-        url: string,
-        body: { action: 'quickConnectState'; secret: string },
-        type: ServerType.JELLYFIN,
-    ): Promise<boolean>;
-}
-
-function authenticate(
-    url: string,
-    body: { action?: 'password'; legacy?: boolean; password: string; username: string },
-    type: ServerType,
-): Promise<AuthenticationResponse>;
-function authenticate(
-    url: string,
-    body: { action: 'quickConnectAuthenticate'; secret: string },
-    type: ServerType.JELLYFIN,
-): Promise<AuthenticationResponse>;
-function authenticate(
-    url: string,
-    body: { action: 'isQuickConnectEnabled' },
-    type: ServerType.JELLYFIN,
-): Promise<boolean>;
-function authenticate(
-    url: string,
-    body: { action: 'quickConnectInitiate' },
-    type: ServerType.JELLYFIN,
-): Promise<{ code: string; secret: string }>;
-function authenticate(
-    url: string,
-    body: { action: 'quickConnectState'; secret: string },
-    type: ServerType.JELLYFIN,
-): Promise<boolean>;
-function authenticate(
-    url: string,
-    body: AuthenticateBody,
-    type: ServerType,
-): Promise<AuthenticateResult> {
-    return apiController('authenticate', type)(url, body);
-}
-
-export const controller: GeneralController = {
+export const controller = {
     addToPlaylist(args) {
         const server = getServerById(args.apiClientProps.serverId);
 
@@ -287,7 +223,9 @@ export const controller: GeneralController = {
             server.type,
         )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
     },
-    authenticate,
+    authenticate(url, body, type) {
+        return apiController('authenticate', type)(url, body);
+    },
     createFavorite(args) {
         const server = getServerById(args.apiClientProps.serverId);
 

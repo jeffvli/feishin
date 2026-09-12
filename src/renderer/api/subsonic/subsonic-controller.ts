@@ -318,6 +318,10 @@ export const SubsonicController: InternalControllerEndpoint = {
             throw new Error('Subsonic does not support this authentication method');
         }
 
+        if (typeof body.password !== 'string' || typeof body.username !== 'string') {
+            throw new Error('Subsonic authentication requires a username and password');
+        }
+
         let credential: string;
         let credentialParams: {
             p?: string;

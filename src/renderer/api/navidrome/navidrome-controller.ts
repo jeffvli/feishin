@@ -145,6 +145,10 @@ export const NavidromeController: InternalControllerEndpoint = {
             throw new Error('Navidrome does not support this authentication method');
         }
 
+        if (typeof body.password !== 'string' || typeof body.username !== 'string') {
+            throw new Error('Navidrome authentication requires a username and password');
+        }
+
         const cleanServerUrl = url.replace(/\/$/, '');
 
         const res = await ndApiClient({ server: null, url: cleanServerUrl }).authenticate({

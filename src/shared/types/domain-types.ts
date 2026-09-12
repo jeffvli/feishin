@@ -240,22 +240,6 @@ export type Artist = Omit<AlbumArtist, '_itemType'> & {
     _itemType: LibraryItem.ARTIST;
 };
 
-// Quick Connect is Jellyfin-specific. Rather than adding a separate controller
-// endpoint per Quick Connect step, they're all routed through `authenticate`
-// via the `action` discriminant so the per-server controller surface doesn't
-// grow with every server-specific auth flow.
-export type AuthenticateBody =
-    | { action: 'isQuickConnectEnabled' }
-    | { action: 'quickConnectAuthenticate'; secret: string }
-    | { action: 'quickConnectInitiate' }
-    | { action: 'quickConnectState'; secret: string }
-    | { action?: 'password'; legacy?: boolean; password: string; username: string };
-
-export type AuthenticateResult =
-    | AuthenticationResponse
-    | boolean
-    | { code: string; secret: string };
-
 export type AuthenticationResponse = {
     credential: string;
     isAdmin?: boolean;
@@ -1569,7 +1553,7 @@ export type ArtistRadioQuery = {
 
 export type ControllerEndpoint = {
     addToPlaylist: (args: AddToPlaylistArgs) => Promise<AddToPlaylistResponse>;
-    authenticate: (url: string, body: AuthenticateBody) => Promise<AuthenticateResult>;
+    authenticate: (url: string, body: Record<string, any>) => Promise<any>;
     createFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
     createInternetRadioStation: (
         args: CreateInternetRadioStationArgs,
@@ -1703,7 +1687,7 @@ export type InternalControllerEndpoint = {
     addToPlaylist: (
         args: ReplaceApiClientProps<AddToPlaylistArgs>,
     ) => Promise<AddToPlaylistResponse>;
-    authenticate: (url: string, body: AuthenticateBody) => Promise<AuthenticateResult>;
+    authenticate: (url: string, body: Record<string, any>) => Promise<any>;
     createFavorite: (args: ReplaceApiClientProps<FavoriteArgs>) => Promise<FavoriteResponse>;
     createInternetRadioStation: (
         args: ReplaceApiClientProps<CreateInternetRadioStationArgs>,
