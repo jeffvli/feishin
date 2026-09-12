@@ -13,7 +13,7 @@
         "removeFromQueue": "从播放队列中移除",
         "deselectAll": "取消全选",
         "moveToBottom": "移至底部",
-        "setRating": "评分",
+        "setRating": "设置评分",
         "toggleSmartPlaylistEditor": "切换 $t(entity.smartPlaylist) 编辑器",
         "removeFromFavorites": "从 $t(entity.favorite, {\"count\": 2}) 移除",
         "goToPage": "转到页面",
@@ -43,7 +43,8 @@
         "openApplicationDirectory": "打开应用程序目录",
         "goToCurrent": "转到当前项目",
         "collapseAllFolders": "折叠所有文件夹",
-        "expandAllFolders": "展开所有文件夹"
+        "expandAllFolders": "展开所有文件夹",
+        "createPlaylistFromQueue": "根据队列创建 $t(entity.playlist, {\"count\": 1})"
     },
     "common": {
         "increase": "增高",
@@ -166,7 +167,13 @@
         "numberOfResults": "{{numberOfResults}} 结果",
         "grouping": "分组",
         "back": "返回",
-        "openFolder": "打开文件夹"
+        "openFolder": "打开文件夹",
+        "saveAndClose": "保存并关闭",
+        "undo": "撤销",
+        "lastScan": "上次扫描 {{date}}",
+        "scanFolderCount": "{{count}} 个文件夹",
+        "scanItemCount": "{{count}} 个项目",
+        "scanningLibrary": "正在扫描媒体库…"
     },
     "entity": {
         "albumArtist_other": "专辑艺术家",
@@ -714,7 +721,9 @@
         "explicitStatus": "$t(common.explicitStatus)",
         "sortName": "排序名称",
         "matchAnd": "和",
-        "matchOr": "或"
+        "matchOr": "或",
+        "date": "日期",
+        "year": "年份"
     },
     "page": {
         "sidebar": {
@@ -751,7 +760,30 @@
                 "dynamicImageBlur": "图像模糊大小",
                 "dynamicIsImage": "启用背景图像",
                 "lyricOffset": "歌词延迟补偿（毫秒）",
-                "lyricOpacityNonActive": "静态歌词不透明度"
+                "lyricOpacityNonActive": "静态歌词不透明度",
+                "coverArtSize": "封面图尺寸",
+                "followCurrentLyric_description": "自动滚动以保持当前歌词行在视野内",
+                "lyricFollowScrollAlignment": "歌词与对齐方式保持一致",
+                "lyricFollowScrollAlignment_description": "跟随歌词时，目前歌词的垂直显示位置",
+                "lyricAlignment_description": "歌词文本的水平对齐方式",
+                "lyricGapSynchronized_description": "同步歌词行之间的垂直间距",
+                "lyricGapUnsynchronized_description": "未同步歌词行之间的垂直间距",
+                "lyricLineLeadTime": "歌词提前显示时间 (ms)",
+                "lyricLineLeadTime_description": "提前指定毫秒数显示目前歌词",
+                "lyricPaddingLeft": "歌词左侧留白 (%)",
+                "lyricPaddingLeft_description": "左侧内边距（占歌词区域的百分比）",
+                "lyricPaddingRight": "歌词右侧留白 (%)",
+                "lyricPaddingRight_description": "右侧内边距（占歌词区域的百分比）",
+                "lyricSizeSynchronized_description": "同步（带时间轴）歌词的字体大小",
+                "lyricSizeUnsynchronized_description": "未同步（纯文本）歌词的字体大小",
+                "lyricOpacityNonActive_description": "当前未激活的歌词行的不透明度",
+                "lyricScaleNonActive": "非活跃歌词的比例",
+                "lyricScaleNonActive_description": "非目前歌词的缩放比例",
+                "playerItemAlignment": "播放器项目对齐方式",
+                "showLyricMatch_description": "显示匹配歌词的歌曲名称和艺人",
+                "showLyricProvider_description": "显示提供当前歌词的服务商",
+                "titleDisplayType": "标题显示样式",
+                "titleDisplayType_optionMultiLine": "多行"
             },
             "lyrics": "歌词",
             "related": "相关",
@@ -777,12 +809,14 @@
             "multipleMusicFolders": "已选择{{count}}个媒体库",
             "noMusicFolder": "未选择任何音乐库",
             "selectMusicFolder": "选择媒体库",
-            "commandPalette": "打开命令面板"
+            "commandPalette": "打开命令面板",
+            "rescanLibrary": "重新扫描媒体库",
+            "logout": "退出登录"
         },
         "home": {
             "mostPlayed": "最多播放",
             "newlyAdded": "最近添加的发布",
-            "explore": "从库中搜索",
+            "explore": "从您的媒体库中搜索",
             "recentlyPlayed": "最近播放",
             "title": "$t(common.home)",
             "recentlyReleased": "最近发布",
@@ -852,7 +886,8 @@
             "goToAlbum": "转到 $t(entity.album, {\"count\": 1})",
             "goToAlbumArtist": "转到 $t(entity.albumArtist, {\"count\": 1})",
             "moveItems": "$t(action.moveItems)",
-            "goTo": "转到"
+            "goTo": "转到",
+            "editMetadata": "编辑元数据"
         },
         "trackList": {
             "title": "$t(entity.track, {\"count\": 2})",
@@ -895,7 +930,8 @@
         "itemDetail": {
             "copyPath": "将路径复制到剪贴板",
             "copiedPath": "路径复制成功",
-            "openFile": "在文件管理器中显示曲目"
+            "openFile": "在文件管理器中显示曲目",
+            "triggerRescan": "保存后触发媒体库重新扫描"
         },
         "playlist": {
             "reorder": "仅在按 ID 排序时启用重排序"
@@ -953,7 +989,8 @@
             "input_preferInstantMix": "首选即时混音",
             "input_preferRemoteUrl": "首选公共 URL",
             "input_remoteUrl": "公共 URL",
-            "input_remoteUrlPlaceholder": "可选：对外功能的公共 URL"
+            "input_remoteUrlPlaceholder": "可选：对外功能的公共 URL",
+            "input_passwordNoSSO": "不支持反向代理 (SSO) 认证。仅支持用户名/密码认证和 Subsonic 认证"
         },
         "addToPlaylist": {
             "success": "已将 $t(entity.trackWithCount, {\"count\": {{message}} }) 添加到 $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -1003,7 +1040,9 @@
             "setExpiration": "设置过期时间",
             "success": "共享链接已复制到剪贴板（或单击此处打开）",
             "copyToClipboard": "复制到剪贴板：Ctrl+C，Enter",
-            "successMustClick": "分享创建成功。点击此处打开"
+            "successMustClick": "分享创建成功。点击此处打开",
+            "setExpiration_description": "留空以使用服务器默认过期时间",
+            "setExpiration_serverDefault": "服务器默认值"
         },
         "privateMode": {
             "enabled": "启用私人模式，播放状态现在对外部集成隐藏",
@@ -1047,6 +1086,13 @@
         },
         "editRadioStation": {
             "success": "电台更新成功"
+        },
+        "queueChangeConfirmation": {
+            "title": "放弃当前队列？",
+            "description": "这将从当前队列中移除所有项目。"
+        },
+        "createPrefilledPlaylist": {
+            "title": "根据所选歌曲创建 $t(entity.playlist, {\"count\": 1})"
         }
     },
     "table": {
@@ -1206,13 +1252,21 @@
         "inTheRangeDate": "在（日期）范围内",
         "notInPlaylist": "不在…中",
         "notInTheLast": "不在最后",
-        "isMissing": "丢失的项目"
+        "isMissing": "丢失的项目",
+        "isPresent": "存在"
     },
     "datetime": {
         "minuteShort": "分",
         "secondShort": "秒",
         "hourShort": "小时",
-        "dayShort": "天"
+        "dayShort": "天",
+        "secondLong": "秒",
+        "minuteLong": "分",
+        "hourLong": "小时",
+        "dayLong": "天",
+        "weekLong": "周",
+        "monthLong": "月",
+        "yearLong": "年"
     },
     "visualizer": {
         "configPasteFailed": "应用配置失败，请检查配置格式。",
