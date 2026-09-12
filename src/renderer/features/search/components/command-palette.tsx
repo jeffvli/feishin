@@ -175,10 +175,7 @@ export const CommandPalette = ({ modalProps }: CommandPaletteProps) => {
                 },
             }}
             size="lg"
-            styles={{
-                body: { padding: '0' },
-                header: { display: 'none' },
-            }}
+            withCloseButton={false}
         >
             <Command
                 filter={(value, search) => {
