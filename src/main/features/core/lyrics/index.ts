@@ -230,6 +230,10 @@ ipcMain.handle('lyric-by-song', async (_event, song: any) => {
     return lyric;
 });
 
+ipcMain.handle('lyric-clear-cache', (_event, songId: string) => {
+    lyricCache.delete(songId.toString());
+});
+
 ipcMain.handle('lyric-search', async (_event, params: LyricSearchQuery) => {
     const lyricResults = await searchRemoteLyrics(params);
     return lyricResults;
