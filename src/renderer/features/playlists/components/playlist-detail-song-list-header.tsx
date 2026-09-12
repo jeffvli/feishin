@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useCallback, useMemo } from 'react';
+import { ReactNode, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router';
 
@@ -40,10 +40,9 @@ import { ServerFeature } from '/@/shared/types/features-types';
 import { Play } from '/@/shared/types/types';
 
 interface PlaylistDetailSongListHeaderProps {
+    editActions?: ReactNode;
     isSmartPlaylist?: boolean;
-    onConvertToSmart?: () => void;
     onDelete?: () => void;
-    onToggleQueryBuilder?: () => void;
 }
 
 function ImageUploadOverlay({
@@ -102,6 +101,7 @@ function ImageUploadOverlay({
 }
 
 export const PlaylistDetailSongListHeader = ({
+    editActions,
     isSmartPlaylist,
 }: PlaylistDetailSongListHeaderProps) => {
     const { t } = useTranslation();
@@ -242,7 +242,10 @@ export const PlaylistDetailSongListHeader = ({
                 </LibraryHeader>
             )}
             <FilterBar>
-                <PlaylistDetailSongListHeaderFilters isSmartPlaylist={isSmartPlaylist} />
+                <PlaylistDetailSongListHeaderFilters
+                    editActions={editActions}
+                    isSmartPlaylist={isSmartPlaylist}
+                />
             </FilterBar>
         </Stack>
     );
