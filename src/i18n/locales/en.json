@@ -34,7 +34,6 @@
         "removeFromPlaylist": "Remove from $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "Remove from queue",
         "setRating": "Set rating",
-        "toggleSmartPlaylistEditor": "Toggle $t(entity.smartPlaylist) editor",
         "viewPlaylists": "View $t(entity.playlist, {\"count\": 2})",
         "viewMore": "View more",
         "openApplicationDirectory": "Open application directory",

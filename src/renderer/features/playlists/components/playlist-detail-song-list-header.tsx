@@ -42,7 +42,6 @@ import { Play } from '/@/shared/types/types';
 interface PlaylistDetailSongListHeaderProps {
     editActions?: ReactNode;
     isSmartPlaylist?: boolean;
-    onDelete?: () => void;
 }
 
 function ImageUploadOverlay({

@@ -15,7 +15,6 @@ import {
 } from '/@/renderer/features/playlists/components/playlist-query-editor';
 import { SaveAsPlaylistForm } from '/@/renderer/features/playlists/components/save-as-playlist-form';
 import { usePlaylistSongListFilters } from '/@/renderer/features/playlists/hooks/use-playlist-song-list-filters';
-import { useDeletePlaylist } from '/@/renderer/features/playlists/mutations/delete-playlist-mutation';
 import { useUpdatePlaylist } from '/@/renderer/features/playlists/mutations/update-playlist-mutation';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { ListWithSidebarContainer } from '/@/renderer/features/shared/components/list-with-sidebar-container';
@@ -81,7 +80,6 @@ const PlaylistDetailSongListRoute = () => {
     const detailQuery = useSuspenseQuery({
         ...playlistsQueries.detail({ query: { id: playlistId }, serverId: server?.id }),
     });
-    const deletePlaylistMutation = useDeletePlaylist({});
     const updatePlaylistMutation = useUpdatePlaylist({});
     const [mode, setMode] = useState<'edit' | 'view'>('view');
     const queryEditorRef = useRef<PlaylistQueryEditorRef>(null);
@@ -199,39 +197,6 @@ const PlaylistDetailSongListRoute = () => {
         });
     };
 
-    const openDeletePlaylistModal = () => {
-        openModal({
-            children: (
-                <ConfirmModal
-                    onConfirm={() => {
-                        if (!detailQuery?.data) return;
-                        deletePlaylistMutation?.mutate(
-                            {
-                                apiClientProps: { serverId: detailQuery.data._serverId },
-                                query: { id: detailQuery.data.id },
-                            },
-                            {
-                                onError: (err) => {
-                                    toast.error({
-                                        message: err.message,
-                                        title: t('error.genericError'),
-                                    });
-                                },
-                                onSuccess: () => {
-                                    navigate(AppRoute.PLAYLISTS, { replace: true });
-                                },
-                            },
-                        );
-                        closeAllModals();
-                    }}
-                >
-                    <Text>Are you sure you want to delete this playlist?</Text>
-                </ConfirmModal>
-            ),
-            title: t('form.deletePlaylist.title'),
-        });
-    };
-
     const isSmartPlaylist = Boolean(
         detailQuery?.data?.rules && server?.type === ServerType.NAVIDROME,
     );
@@ -308,7 +273,6 @@ const PlaylistDetailSongListRoute = () => {
                 <PlaylistDetailSongListHeader
                     editActions={editActions}
                     isSmartPlaylist={!!isSmartPlaylist}
-                    onDelete={() => openDeletePlaylistModal()}
                 />
 
                 <ListWithSidebarContainer>
