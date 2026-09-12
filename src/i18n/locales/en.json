@@ -1180,6 +1180,8 @@
         "compressorThreshold": "Threshold",
         "preservePitch_description": "Preserves pitch when modifying playback speed",
         "preservePitch": "Preserve pitch",
+        "restartQueueOnEnd_description": "When the queue finishes playing, loop back to the first track instead of staying parked on the last one. This does not resume playback - it only resets the queue position.",
+        "restartQueueOnEnd": "Loop queue back to start on end",
         "audioFadeOnStatusChange": "Audio fade on status change",
         "audioFadeOnStatusChange_description": "Enables fade out and fade in when play/pause status changes",
         "preventSleepOnPlayback_description": "Prevent the display from turning off while music is playing",

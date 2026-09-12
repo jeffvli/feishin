@@ -237,6 +237,20 @@ export const AudioSettings = memo(() => {
             description: t('setting.audioFadeOnStatusChange', { context: 'description' }),
             title: t('setting.audioFadeOnStatusChange'),
         },
+        {
+            control: (
+                <Switch
+                    defaultChecked={settings.restartQueueOnEnd}
+                    onChange={(e) => {
+                        setSettings({
+                            playback: { restartQueueOnEnd: e.currentTarget.checked },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.restartQueueOnEnd', { context: 'description' }),
+            title: t('setting.restartQueueOnEnd'),
+        },
     ];
 
     return <SettingsSection options={audioOptions} title={t('page.setting.audio')} />;

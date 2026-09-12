@@ -208,6 +208,7 @@ function calculateNextIndex(
     currentIndex: number,
     queueLength: number,
     repeat: PlayerRepeat,
+    restartOnEnd: boolean,
 ): { nextIndex: number; shouldStop: boolean } {
     const isLastTrack = currentIndex === queueLength - 1;
 
@@ -224,7 +225,7 @@ function calculateNextIndex(
     } else {
         // Repeat none: move to next track, or stop if at the end
         if (isLastTrack) {
-            return { nextIndex: currentIndex, shouldStop: true };
+            return { nextIndex: restartOnEnd ? 0 : currentIndex, shouldStop: true };
         } else {
             return { nextIndex: currentIndex + 1, shouldStop: false };
         }
@@ -943,11 +944,13 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     const playbackLength = isShuffle
                         ? stateSnapshot.queue.shuffled.length
                         : queue.items.length;
+                    const restartOnEnd = useSettingsStore.getState().playback.restartQueueOnEnd;
 
                     const { nextIndex: nextPlaybackIndex, shouldStop } = calculateNextIndex(
                         currentIndex,
                         playbackLength,
                         repeat,
+                        restartOnEnd,
                     );
 
                     const isRepeatOneSameTrack =
@@ -1088,7 +1091,13 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         return;
                     }
 
-                    const nextIndexProps = calculateNextIndex(currentIndex, playbackLength, repeat);
+                    const restartOnEnd = useSettingsStore.getState().playback.restartQueueOnEnd;
+                    const nextIndexProps = calculateNextIndex(
+                        currentIndex,
+                        playbackLength,
+                        repeat,
+                        restartOnEnd,
+                    );
                     let { nextIndex } = nextIndexProps;
                     const { shouldStop } = nextIndexProps;
 
@@ -1115,6 +1124,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
 
                     if (shouldStop) {
                         set((state) => {
+                            state.player.index = nextIndex;
                             state.player.status = PlayerStatus.STOPPED;
                             state.player.playerNum = 1;
                             setTimestampStore(0);

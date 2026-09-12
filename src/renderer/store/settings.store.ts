@@ -719,6 +719,7 @@ const PlaybackSettingsSchema = z.object({
     preservePitch: z.boolean(),
     previousLocalVolume: z.number().min(0).max(100).optional(),
     previousPlayerType: z.nativeEnum(PlayerType).optional(),
+    restartQueueOnEnd: z.boolean(),
     scrobble: ScrobbleSettingsSchema,
     transcode: TranscodingConfigSchema,
     type: z.nativeEnum(PlayerType),
@@ -2120,6 +2121,7 @@ const initialState: SettingsState = {
         preservePitch: true,
         previousLocalVolume: undefined,
         previousPlayerType: undefined,
+        restartQueueOnEnd: false,
         scrobble: {
             enabled: true,
             minimumMode: ScrobbleMinimumMode.BOTH,
