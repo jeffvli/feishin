@@ -275,7 +275,9 @@
         "noNetworkDescription": "Nie udało się połączyć z tym serwerem",
         "invalidJson": "Nieprawidłowy JSON",
         "serverLockSingleServer": "Dozwolony jest tylko jeden serwer gdy serwer jest zablokowany",
-        "playbackPausedDueToError": "Odtwarzanie zostało wstrzymane z powodu błędu"
+        "playbackPausedDueToError": "Odtwarzanie zostało wstrzymane z powodu błędu",
+        "jellyfinQuickConnectDeactivated": "Prośba o szybkie łączenie wygasła",
+        "jellyfinQuickConnectNotActive": "Szybkie łączenie nie jest aktywne na tym serwerze"
     },
     "filter": {
         "mostPlayed": "Najczęściej odtwarzane",
@@ -358,7 +360,17 @@
             "input_preferRemoteUrl": "Preferuj publiczny url",
             "input_remoteUrl": "Publiczny url",
             "input_remoteUrlPlaceholder": "Opcjonalne: publiczny url dla funkcji zewnętrznych",
-            "input_passwordNoSSO": "Autoryzacja przez reverse proxy (SSO) nie jest obsługiwana. Tylko autoryzacja nazwą użytkownika/hasłem i autoryzacja Subsonic są obsługiwane"
+            "input_passwordNoSSO": "Autoryzacja przez reverse proxy (SSO) nie jest obsługiwana. Tylko autoryzacja nazwą użytkownika/hasłem i autoryzacja Subsonic są obsługiwane",
+            "input_jellyfinQuickConnect": "Szybkie łączenie",
+            "input_jellyfinQuickConnectCode": "Wpisz ten kod w swoim interfejsie webowym Jellyfin, aby autoryzować",
+            "input_jellyfinQuickConnectCodeCopied": "Skopiowano",
+            "input_jellyfinQuickConnectCodeCopy": "Skopiuj kod",
+            "input_jellyfinQuickConnectOpen": "Otwórz Szybkie łączenie",
+            "input_jellyfinQuickConnectWaiting": "Oczekiwanie na zezwolenie na twoim serwerze Jellyfin…",
+            "input_jellyfinSignInMethod": "Zaloguj się za pomocą",
+            "input_jellyfinSignInMethodPassword": "Hasła",
+            "input_jellyfinSignInMethodQuickConnect": "Szybkiego łączenia",
+            "input_remoteUrlDescription": "Używany w miejscu URL dla zewnętrznych funkcji, takich jak udostępnione linki. Pozostaw puste, chyba że twój serwer jest dostępny pod innym adresem poza twoją siecią."
         },
         "addToPlaylist": {
             "success": "Dodano $t(entity.trackWithCount, {\"count\": {{message}} }) do $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -940,7 +952,7 @@
         "clearCache": "Wyczyść pamięć podręczną przeglądarki",
         "externalLinks": "Pokaż zewnętrzne linki",
         "mpvExtraParameters_help": "Po jednym na linię",
-        "passwordStore": "Hasła",
+        "passwordStore": "Hasła/pamięć sekretów",
         "passwordStore_description": "Jakie hasło ma być używane. zmień to, jeśli masz problemy z przechowywaniem haseł",
         "startMinimized": "Uruchom zminimalizowany",
         "startMinimized_description": "Uruchom aplikację w zasobniku systemowym",
@@ -1258,7 +1270,10 @@
         "scrobbleMinimumMode_optionBoth": "Oba",
         "scrobbleMinimumMode_optionSeconds": "Sekundy",
         "scrobbleMinimumMode_optionPercentage": "Procent",
-        "scrobbleMinimumMode": "Ustaw tryb minimalnego scrobblowania"
+        "scrobbleMinimumMode": "Ustaw tryb minimalnego scrobblowania",
+        "transcodeNote": "Transkodowanie jest wykonywane przez serwer i jest stosowane od następnego utworu",
+        "transcodeSampleRate_description": "Maksymalna częstotliwość próbkowania w Hz dla transkodowanego audio, np. 192000. Pozostaw puste, aby pozostawić jakość źródłową. Tylko Jellyfin",
+        "transcodeSampleRate": "Maksymalna częstotliwość próbkowania do transkodowania"
     },
     "table": {
         "config": {
@@ -1601,5 +1616,53 @@
         "systemAudioCaptureFailed": "Nie udało się rozpocząć przechwytywania: {{message}}",
         "systemAudioNoAudioTrack": "Nie została zwrócona żadna ścieżka audio. Sprawdź czy przechwytywanie audio będzie włączone, gdy będzie o to prośba.",
         "systemAudioExclusiveModeNotSupported": "Wizualizer jest niedostępny w gdy tryb wyłącznie z dźwiękiek jest włączony. Wyłącz tryb wyłącznie audio w ustawieniach MPV i spróbuj ponownie."
+    },
+    "dlna": {
+        "castToDevice": "Przesyłanie do urządzenia DLNA",
+        "castingToDevice": "Przesyłanie do {{name}}",
+        "castingToGroup": "Przesyłanie do grupy {{count}}",
+        "connected": "połączono",
+        "connecting": "Łączenie…",
+        "createGroup": "Utwórz grupę",
+        "devices": "Urządzenia DLNA",
+        "disconnect": "Rozłącz",
+        "disconnectAndContinue": "Rozłącz i kontynuuj",
+        "noDevicesFound": "Nie znaleziono urządzeń DLNA",
+        "nowCasting": "Aktualnie przesyłam",
+        "searching": "Szukanie urządzeń…",
+        "shiftDisconnectHint": "Przytrzymaj Shift i wciśnij Rozłącz, aby dalej odtwarzać na głośniku",
+        "group": {
+            "add": "Dodaj",
+            "addSpeaker": "Dodaj głośnik",
+            "addSpeakers": "Dodaj głośniki",
+            "addToGroup": "Dodaj do grupy",
+            "cancel": "Anuluj",
+            "connect": "Połącz",
+            "coordinator": "koordynator",
+            "failedToAddMessage": "Nie można dodać {{name}}. Może nie być w tym samym systemie Sonos.",
+            "failedToAddTitle": "Nie udało się dodać głośnika",
+            "firstSelectedIsCoordinator": "Pierwszy wybrany = koordynator",
+            "noSonosFound": "Nie znaleziono urządzeń Sonos",
+            "refresh": "Odśwież",
+            "remove": "Usuń",
+            "searching": "Szukanie…",
+            "selectSpeakers": "Wybierz głośniki grupy",
+            "title": "Grupa ({{count}} głośników)"
+        },
+        "speakerProperties": {
+            "bass": "Bas",
+            "crossfade": "Crossfade",
+            "ledState": "Dioda stanu",
+            "loadFailed": "Nie udało się załadować właściwości",
+            "loading": "Ładowanie…",
+            "longPressHint": "Wciśnij długo dla właściwości głośnika",
+            "loudness": "Głośność",
+            "touchControls": "Sterowanie dotykowe",
+            "treble": "Wysokie tony"
+        },
+        "volume": {
+            "groupControl": "Przytrzymaj Shift, aby zmodyfikować indywidualne głośności głośników",
+            "individualControl": "Puść Shift, aby zmodyfikować głośność wszystkich głośników"
+        }
     }
 }

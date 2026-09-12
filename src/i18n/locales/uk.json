@@ -275,7 +275,9 @@
         "settingsSyncError": "Виявлено розбіжності між налаштуваннями рендерера та основного процесу. Перезапустіть програму, щоб застосувати зміни",
         "invalidJson": "Недійсний JSON",
         "playbackPausedDueToError": "Відтворення призупинено через помилку",
-        "serverLockSingleServer": "Коли сервер заблоковано, дозволено лише один сервер"
+        "serverLockSingleServer": "Коли сервер заблоковано, дозволено лише один сервер",
+        "jellyfinQuickConnectDeactivated": "Швидке підключення Jellyfin деактивовано",
+        "jellyfinQuickConnectNotActive": "Швидке підключення Jellyfin неактивне"
     },
     "filter": {
         "album": "$t(entity.album, {\"count\": 1})",
@@ -381,7 +383,17 @@
             "input_username": "Ім’я користувача",
             "success": "Сервер успішно додано",
             "title": "Додати сервер",
-            "input_passwordNoSSO": "Автентифікація через зворотний проксі (SSO) не підтримується. Підтримуються лише автентифікація за іменем користувача й паролем та автентифікація Subsonic"
+            "input_passwordNoSSO": "Автентифікація через зворотний проксі (SSO) не підтримується. Підтримуються лише автентифікація за іменем користувача й паролем та автентифікація Subsonic",
+            "input_jellyfinQuickConnect": "Швидке підключення",
+            "input_jellyfinQuickConnectCode": "Код швидкого підключення",
+            "input_jellyfinQuickConnectCodeCopied": "Скопійовано!",
+            "input_jellyfinQuickConnectCodeCopy": "Скопіювати код",
+            "input_jellyfinQuickConnectOpen": "Відкрити швидке підключення",
+            "input_jellyfinQuickConnectWaiting": "Очікування авторизації…",
+            "input_jellyfinSignInMethod": "Спосіб входу",
+            "input_jellyfinSignInMethodPassword": "Пароль",
+            "input_jellyfinSignInMethodQuickConnect": "Швидке підключення",
+            "input_remoteUrlDescription": "URL-адреса віддаленого сервера"
         },
         "largeFetchConfirmation": {
             "title": "Додати елементи до черги",
@@ -1321,7 +1333,10 @@
         "scrobbleMinimumMode_optionBoth": "Обидва",
         "scrobbleMinimumMode_optionSeconds": "Секунди",
         "scrobbleMinimumMode_optionPercentage": "Відсоток",
-        "scrobbleMinimumMode": "Мінімальний режим скроблінгу"
+        "scrobbleMinimumMode": "Мінімальний режим скроблінгу",
+        "transcodeNote": "Примітка щодо транскодування",
+        "transcodeSampleRate_description": "Визначає частоту дискретизації для транскодування аудіо.",
+        "transcodeSampleRate": "Частота дискретизації транскодування"
     },
     "table": {
         "column": {
@@ -1600,6 +1615,54 @@
                 "d": "D",
                 "z": "Z"
             }
+        }
+    },
+    "dlna": {
+        "castToDevice": "Транслювати на пристрій",
+        "castingToDevice": "Транслювання на пристрій",
+        "castingToGroup": "Транслювання на групу",
+        "connected": "Підключено",
+        "connecting": "Підключення…",
+        "createGroup": "Створити групу",
+        "devices": "Пристрої",
+        "disconnect": "Відключити",
+        "disconnectAndContinue": "Відключити та продовжити відтворення",
+        "noDevicesFound": "Пристроїв не знайдено",
+        "nowCasting": "Зараз транслюється",
+        "searching": "Пошук…",
+        "shiftDisconnectHint": "Shift+Клік, щоб відключити",
+        "group": {
+            "add": "Додати",
+            "addSpeaker": "Додати динамік",
+            "addSpeakers": "Додати динаміки",
+            "addToGroup": "Додати до групи",
+            "cancel": "Скасувати",
+            "connect": "Підключити",
+            "coordinator": "Координатор",
+            "failedToAddMessage": "Не вдалося додати пристрій до групи.",
+            "failedToAddTitle": "Помилка додавання",
+            "firstSelectedIsCoordinator": "Перший вибраний пристрій стає координатором",
+            "noSonosFound": "Пристроїв Sonos не знайдено",
+            "refresh": "Оновити",
+            "remove": "Видалити",
+            "searching": "Пошук…",
+            "selectSpeakers": "Виберіть динаміки",
+            "title": "Назва групи"
+        },
+        "speakerProperties": {
+            "bass": "Баси",
+            "crossfade": "Плавний перехід",
+            "ledState": "Стан індикатора",
+            "loadFailed": "Не вдалося завантажити",
+            "loading": "Завантаження…",
+            "longPressHint": "Довге натискання для додаткових опцій",
+            "loudness": "Тонкомпенсація (Гучність)",
+            "touchControls": "Сенсорне керування",
+            "treble": "Високі частоти"
+        },
+        "volume": {
+            "groupControl": "Керування групою",
+            "individualControl": "Індивідуальне керування"
         }
     }
 }
