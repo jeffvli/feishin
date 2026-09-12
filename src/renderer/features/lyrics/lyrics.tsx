@@ -10,6 +10,7 @@ import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { PlayerLyricsFetchedEventPayload } from '/@/renderer/events/events';
 import { translateLyrics } from '/@/renderer/features/lyrics/api/lyric-translate';
 import {
+    clearRemoteLyricsCache,
     computeSelectedFromResult,
     getDisplayOffset,
     lyricsQueries,
@@ -390,6 +391,23 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
         await queryClient.invalidateQueries({ queryKey: lyricsKey });
     }, [currentSong, lyricsKey]);
 
+    const handleOnRefreshLyric = useCallback(async () => {
+        if (!currentSong || !lyricsKey) return;
+
+        clearRemoteLyricsCache(currentSong.id);
+
+        queryClient.setQueryData<LyricsQueryResult>(lyricsKey, (prev) =>
+            prev
+                ? {
+                      ...prev,
+                      remoteAuto: null,
+                      suppressRemoteAuto: false,
+                  }
+                : prev,
+        );
+        await queryClient.invalidateQueries({ queryKey: lyricsKey });
+    }, [currentSong, lyricsKey]);
+
     const fetchTranslation = useCallback(async () => {
         if (!lyrics || isLyricsDisabled) return;
         const originalLyrics = Array.isArray(lyrics.lyrics)
@@ -576,6 +594,7 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
                         languages={languages}
                         offsetMs={displayOffsetMs}
                         onExportLyrics={handleExportLyrics}
+                        onRefreshLyric={handleOnRefreshLyric}
                         onRemoveLyric={handleOnRemoveLyric}
                         onSearchOverride={handleOnSearchOverride}
                         onToggleOverlayLayer={handleToggleOverlayLayer}

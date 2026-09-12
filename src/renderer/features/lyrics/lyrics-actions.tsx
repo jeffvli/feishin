@@ -31,6 +31,7 @@ interface LyricsActionsProps {
     languages: { label: string; value: string }[];
     offsetMs: number;
     onExportLyrics: () => void;
+    onRefreshLyric: () => void;
     onRemoveLyric: () => void;
     onSearchOverride: (params: LyricsOverride) => void;
     onToggleOverlayLayer?: (key: string) => void;
@@ -72,6 +73,7 @@ export const LyricsActions = ({
     languages,
     offsetMs,
     onExportLyrics,
+    onRefreshLyric,
     onRemoveLyric,
     onSearchOverride,
     onToggleOverlayLayer,
@@ -297,14 +299,14 @@ export const LyricsActions = ({
                     }}
                     variant="subtle"
                 />
-                {isDesktop && sources.length ? (
+                {sources.length ? (
                     <Button
                         disabled={isActionsDisabled}
-                        onClick={onRemoveLyric}
+                        onClick={isDesktop ? onRemoveLyric : onRefreshLyric}
                         uppercase
                         variant="subtle"
                     >
-                        {hasLyrics ? t('common.clear') : t('common.refresh')}
+                        {hasLyrics && isDesktop ? t('common.clear') : t('common.refresh')}
                     </Button>
                 ) : null}
                 {isDesktop && sources.length && onTranslateLyric && !hasServerTranslationLayer ? (
