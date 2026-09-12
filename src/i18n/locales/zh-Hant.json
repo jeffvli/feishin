@@ -965,7 +965,10 @@
         "scrobbleMinimumMode_optionBoth": "兩者",
         "scrobbleMinimumMode_optionSeconds": "秒",
         "scrobbleMinimumMode_optionPercentage": "百分比",
-        "scrobbleMinimumMode": "設定記錄觸發條件模式"
+        "scrobbleMinimumMode": "設定記錄觸發條件模式",
+        "transcodeNote": "轉碼由伺服器端執行，下一首曲目開始套用",
+        "transcodeSampleRate_description": "轉碼音訊的最高取樣率（以 Hz 為單位，例如 192000）。留空則保留原始取樣率。僅適用於 Jellyfin",
+        "transcodeSampleRate": "轉碼最高取樣率"
     },
     "table": {
         "config": {
@@ -1555,5 +1558,53 @@
         "systemAudioConsentDecline": "拒絕",
         "systemAudioConsentTitle": "允許存取系統音訊？",
         "systemAudioExclusiveModeNotSupported": "啟用音訊獨佔模式時，視覺化不可用。 在MPV設定中停用音訊獨佔模式，然後再試一次。"
+    },
+    "dlna": {
+        "castToDevice": "投放至 DLNA 裝置",
+        "castingToDevice": "正在投放至 {{name}}",
+        "castingToGroup": "正在投放至群組 ({{count}})",
+        "connected": "已連線",
+        "connecting": "連線中…",
+        "createGroup": "建立群組",
+        "devices": "DLNA 裝置",
+        "disconnect": "中斷連線",
+        "disconnectAndContinue": "中斷連線並繼續",
+        "noDevicesFound": "未找到 DLNA 裝置",
+        "nowCasting": "正在投放",
+        "searching": "正在搜尋裝置…",
+        "shiftDisconnectHint": "按住 Shift 鍵並點擊「中斷連線」以讓揚聲器繼續播放",
+        "group": {
+            "add": "新增",
+            "addSpeaker": "新增揚聲器",
+            "addSpeakers": "新增揚聲器",
+            "addToGroup": "加入群組",
+            "cancel": "取消",
+            "connect": "連線",
+            "coordinator": "協調裝置",
+            "failedToAddMessage": "無法新增 {{name}}。該裝置可能不在同一個 Sonos 系統中。",
+            "failedToAddTitle": "揚聲器新增失敗",
+            "firstSelectedIsCoordinator": "第一個選擇的裝置 = 協調裝置",
+            "noSonosFound": "未找到 Sonos 裝置",
+            "refresh": "重新整理",
+            "remove": "移除",
+            "searching": "搜尋中…",
+            "selectSpeakers": "選取群組揚聲器",
+            "title": "群組（{{count}} 個揚聲器）"
+        },
+        "speakerProperties": {
+            "bass": "低音",
+            "crossfade": "淡入淡出",
+            "ledState": "狀態指示燈",
+            "loadFailed": "無法載入內容",
+            "loading": "載入中…",
+            "longPressHint": "長按可查看揚聲器內容",
+            "loudness": "響度",
+            "touchControls": "觸控控制",
+            "treble": "高音"
+        },
+        "volume": {
+            "groupControl": "按住 Shift 鍵可個別調整各揚聲器音量",
+            "individualControl": "放開 Shift 鍵可統一調整所有揚聲器音量"
+        }
     }
 }

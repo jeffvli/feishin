@@ -1119,7 +1119,10 @@
         "scrobbleMinimumMode_optionPercentage": "Percentatge",
         "scrobbleMinimumMode": "Estableix el mode de scrobble mínim",
         "sidebarImageEnabled": "Botó d'expandir la caràtula de l'àlbum",
-        "sidebarImageEnabled_description": "Mostra un botó a la caràtula de l'àlbum de la barra del reproductor per expandir-lo a la barra lateral. Desactivar això, també amaga el botó i col·lapsa l'art de l'àlbum si es troba expandit actualment"
+        "sidebarImageEnabled_description": "Mostra un botó a la caràtula de l'àlbum de la barra del reproductor per expandir-lo a la barra lateral. Desactivar això, també amaga el botó i col·lapsa l'art de l'àlbum si es troba expandit actualment",
+        "transcodeNote": "La transcodificació la realitza el servidor i s'aplica des de la pista següent",
+        "transcodeSampleRate_description": "Freqüència de mostreig màxima en Hz per a àudio transcodificat, p. ex. 192000. Deixeu-ho buit per a mantenir la freqüència original. Només Jellyfin",
+        "transcodeSampleRate": "Taxa de mostreig màxima a transcodificar"
     },
     "table": {
         "column": {
@@ -1601,5 +1604,53 @@
         "systemAudioCaptureFailed": "No s'ha pogut iniciar la captura: {{message}}",
         "systemAudioNoAudioTrack": "No s'ha tornat cap pista d'àudio. Comproveu que la captura d'àudio estigui activada quan se sol·liciti.",
         "systemAudioExclusiveModeNotSupported": "El visualitzador no està disponible amb el mode d'àudio exclusiu activat. Desactiveu-lo a la configuració d'MPV i torneu-ho a intentar."
+    },
+    "dlna": {
+        "castToDevice": "Transmet a un dispositiu DLNA",
+        "castingToDevice": "Transmetent a {{name}}",
+        "castingToGroup": "Transmetent al grup ({{count}})",
+        "connected": "connectat",
+        "connecting": "Connectant…",
+        "createGroup": "Crea un grup",
+        "devices": "Dispositius DLNA",
+        "disconnect": "Desconnecta",
+        "disconnectAndContinue": "Desconnecta i continua",
+        "noDevicesFound": "No s'ha trobat cap dispositiu DLNA",
+        "nowCasting": "Transmetent ara",
+        "searching": "Buscant dispositius…",
+        "shiftDisconnectHint": "Mantén shift premut i prem desconnectar per mantenir la reproducció a l'altaveu",
+        "group": {
+            "add": "Afegir",
+            "addSpeaker": "Afegir altaveu",
+            "addSpeakers": "Afegir altaveus",
+            "addToGroup": "Afegir al grup",
+            "cancel": "Cancel·la",
+            "connect": "Connecta",
+            "coordinator": "coordinador",
+            "failedToAddMessage": "No es pot afegir {{name}}. Potser no està al mateix sistema Sonos.",
+            "failedToAddTitle": "Error en afegir l'altaveu",
+            "firstSelectedIsCoordinator": "Primer seleccionat = coordinador",
+            "noSonosFound": "No s'han trobat dispositius Sonos",
+            "refresh": "Refresca",
+            "remove": "Elimina",
+            "searching": "Buscant…",
+            "selectSpeakers": "Selecciona grup d'altaveus",
+            "title": "Grup ({{count}} altaveus)"
+        },
+        "speakerProperties": {
+            "bass": "Baix",
+            "crossfade": "Fosa encadenada",
+            "ledState": "Llum d'estat",
+            "loadFailed": "No s'han pogut carregar les propietats",
+            "loading": "Carregant…",
+            "longPressHint": "Mantén premut per a les propietats de l'altaveu",
+            "loudness": "Potència acústica",
+            "touchControls": "Controls tàctils",
+            "treble": "To agut"
+        },
+        "volume": {
+            "groupControl": "Mantén shift premut per modificar individualment els volums dels altaveus",
+            "individualControl": "Deixa anar el shift per modificar tots els volums dels altaveus"
+        }
     }
 }
