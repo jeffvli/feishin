@@ -1553,10 +1553,7 @@ export type ArtistRadioQuery = {
 
 export type ControllerEndpoint = {
     addToPlaylist: (args: AddToPlaylistArgs) => Promise<AddToPlaylistResponse>;
-    authenticate: (
-        url: string,
-        body: { legacy?: boolean; password: string; username: string },
-    ) => Promise<AuthenticationResponse>;
+    authenticate: (url: string, body: Record<string, any>) => Promise<any>;
     createFavorite: (args: FavoriteArgs) => Promise<FavoriteResponse>;
     createInternetRadioStation: (
         args: CreateInternetRadioStationArgs,
@@ -1690,10 +1687,7 @@ export type InternalControllerEndpoint = {
     addToPlaylist: (
         args: ReplaceApiClientProps<AddToPlaylistArgs>,
     ) => Promise<AddToPlaylistResponse>;
-    authenticate: (
-        url: string,
-        body: { legacy?: boolean; password: string; username: string },
-    ) => Promise<AuthenticationResponse>;
+    authenticate: (url: string, body: Record<string, any>) => Promise<any>;
     createFavorite: (args: ReplaceApiClientProps<FavoriteArgs>) => Promise<FavoriteResponse>;
     createInternetRadioStation: (
         args: ReplaceApiClientProps<CreateInternetRadioStationArgs>,

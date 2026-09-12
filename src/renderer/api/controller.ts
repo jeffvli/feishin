@@ -7,7 +7,6 @@ import { getServerById, useAuthStore, useSettingsStore } from '/@/renderer/store
 import { logger } from '/@/renderer/utils/logger';
 import { toast } from '/@/shared/components/toast/toast';
 import {
-    AuthenticationResponse,
     ControllerEndpoint,
     InternalControllerEndpoint,
     ServerType,
@@ -211,15 +210,7 @@ const addContext = <T extends { apiClientProps: any; context?: any }>(args: T): 
     };
 };
 
-export interface GeneralController extends Omit<Required<ControllerEndpoint>, 'authenticate'> {
-    authenticate: (
-        url: string,
-        body: { legacy?: boolean; password: string; username: string },
-        type: ServerType,
-    ) => Promise<AuthenticationResponse>;
-}
-
-export const controller: GeneralController = {
+export const controller = {
     addToPlaylist(args) {
         const server = getServerById(args.apiClientProps.serverId);
 

@@ -309,6 +309,41 @@ export const contract = c.router({
             400: jfType._response.error,
         },
     },
+    quickConnectAuthenticate: {
+        body: jfType._parameters.quickConnectAuthenticate,
+        method: 'POST',
+        path: 'Users/AuthenticateWithQuickConnect',
+        responses: {
+            200: jfType._response.authenticate,
+            400: jfType._response.error,
+        },
+    },
+    quickConnectEnabled: {
+        method: 'GET',
+        path: 'QuickConnect/Enabled',
+        responses: {
+            200: z.boolean(),
+            400: jfType._response.error,
+        },
+    },
+    quickConnectInitiate: {
+        body: z.null(),
+        method: 'POST',
+        path: 'QuickConnect/Initiate',
+        responses: {
+            200: jfType._response.quickConnectResult,
+            400: jfType._response.error,
+        },
+    },
+    quickConnectState: {
+        method: 'GET',
+        path: 'QuickConnect/Connect',
+        query: z.object({ secret: z.string() }),
+        responses: {
+            200: jfType._response.quickConnectResult,
+            400: jfType._response.error,
+        },
+    },
     refreshItem: {
         body: z.null(),
         method: 'POST',

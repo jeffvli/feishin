@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { createAuthHeader, jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { useRadioStore } from '/@/renderer/features/radio/store/radio-store';
 import { isShuffleEnabled, usePlayerStoreBase } from '/@/renderer/store/player.store';
-import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
+import { getServerUrl, normalizeServerUrl } from '/@/renderer/utils/normalize-server-url';
 import { jfNormalize } from '/@/shared/api/jellyfin/jellyfin-normalize';
 import { JFSongListSort, JFSortOrder, jfType } from '/@/shared/api/jellyfin/jellyfin-types';
 import { getFeatures, hasFeature, sortSongList, VersionInfo } from '/@/shared/api/utils';
@@ -271,25 +271,104 @@ export const JellyfinController: InternalControllerEndpoint = {
         return null;
     },
     authenticate: async (url, body) => {
-        const cleanServerUrl = url.replace(/\/$/, '');
+        const normalizedUrl = normalizeServerUrl(url);
 
-        const res = await jfApiClient({ server: null, url: cleanServerUrl }).authenticate({
-            body: {
-                Pw: body.password,
-                Username: body.username,
-            },
-        });
+        switch (body.action) {
+            case 'isQuickConnectEnabled': {
+                try {
+                    const res = await jfApiClient({
+                        server: null,
+                        url: normalizedUrl,
+                    }).quickConnectEnabled();
+                    return res.status === 200 && res.body === true;
+                } catch {
+                    return false;
+                }
+            }
+            case 'password':
+            case undefined: {
+                if (typeof body.password !== 'string' || typeof body.username !== 'string') {
+                    throw new Error(
+                        'Jellyfin password authentication requires a username and password',
+                    );
+                }
 
-        if (res.status !== 200) {
-            throw new Error('Failed to authenticate');
+                const res = await jfApiClient({ server: null, url: normalizedUrl }).authenticate({
+                    body: {
+                        Pw: body.password,
+                        Username: body.username,
+                    },
+                });
+
+                if (res.status !== 200) {
+                    throw new Error('Failed to authenticate');
+                }
+
+                return {
+                    credential: res.body.AccessToken,
+                    isAdmin: Boolean(res.body.User.Policy.IsAdministrator),
+                    userId: res.body.User.Id,
+                    username: res.body.User.Name,
+                };
+            }
+            case 'quickConnectAuthenticate': {
+                if (typeof body.secret !== 'string') {
+                    throw new Error('Jellyfin Quick Connect authentication requires a secret');
+                }
+
+                const res = await jfApiClient({
+                    server: null,
+                    url: normalizedUrl,
+                }).quickConnectAuthenticate({
+                    body: { Secret: body.secret },
+                });
+
+                if (res.status !== 200) {
+                    throw new Error('Failed to authenticate with Quick Connect');
+                }
+
+                return {
+                    credential: res.body.AccessToken,
+                    isAdmin: Boolean(res.body.User.Policy.IsAdministrator),
+                    userId: res.body.User.Id,
+                    username: res.body.User.Name,
+                };
+            }
+            case 'quickConnectInitiate': {
+                const res = await jfApiClient({
+                    server: null,
+                    url: normalizedUrl,
+                }).quickConnectInitiate({
+                    body: null,
+                });
+
+                if (res.status !== 200 || !res.body.Secret || !res.body.Code) {
+                    throw new Error('Quick Connect is not active on this server');
+                }
+
+                return { code: res.body.Code, secret: res.body.Secret };
+            }
+            case 'quickConnectState': {
+                if (typeof body.secret !== 'string') {
+                    throw new Error('Jellyfin Quick Connect state requires a secret');
+                }
+
+                const res = await jfApiClient({
+                    server: null,
+                    url: normalizedUrl,
+                }).quickConnectState({
+                    query: { secret: body.secret },
+                });
+
+                if (res.status !== 200) {
+                    throw new Error('Quick Connect request expired or was deactivated');
+                }
+
+                return Boolean(res.body.Authenticated);
+            }
+            default:
+                throw new Error('Jellyfin does not support this authentication method');
         }
-
-        return {
-            credential: res.body.AccessToken,
-            isAdmin: Boolean(res.body.User.Policy.IsAdministrator),
-            userId: res.body.User.Id,
-            username: res.body.User.Name,
-        };
     },
     createFavorite: async (args) => {
         const { apiClientProps, query } = args;
