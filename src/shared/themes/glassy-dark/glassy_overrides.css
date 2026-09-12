@@ -115,18 +115,81 @@ table {
     border-radius: 8px;
 }
 
-/*
 .fs-main-content-module-main-content-container {
-    height: 100vh;
-}
-*/
-
-.fs-main-content-module-main-content-body {
     height: 100vh;
 }
 
 :has(.fs-window-bar-module-window-bar) .fs-main-content-module-main-content-container {
     height: calc(100vh - 30px);
+}
+
+.fs-main-content-module-main-content-body .fs-native-scroll-area-module-scroll-area {
+    height: 100%;
+}
+
+/* Home, Artist, Album, Radio */
+.fs-main-content-module-main-content-body .fs-library-container-module-container > .m_6d731127,
+.fs-album-artist-detail-content-module-content-container,
+.fs-album-detail-content-module-content-container > .fs-album-detail-content-module-detail-container > div:nth-child(3),
+.fs-animated-page-module-animated-page > .fs-scroll-area-module-scroll-area > .m_6d731127 > .m_6d731127 {
+    padding-bottom: 90px;
+}
+
+/* Infinite  (Grid, Table, Detail) */
+.fs-main-content-module-main-content-body-scroll .fs-item-grid-list-module-item-grid-container > div:nth-child(2),
+.fs-main-content-module-main-content-body-scroll .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100,
+.fs-main-content-module-main-content-body-scroll .fs-item-detail-list-module-container > div:nth-child(1) {
+    padding-bottom: 90px !important;
+}
+
+/* Scrollbars in infinite views and settings */
+.fs-main-content-module-main-content-body .fs-native-scroll-area-module-scroll-area .os-scrollbar,
+.fs-main-content-module-main-content-body-scroll .fs-item-grid-list-module-item-grid-container > .os-scrollbar,
+.fs-main-content-module-main-content-body-scroll .fs-item-table-list-module-item-table-grid-container > .os-scrollbar,
+.fs-main-content-module-main-content-body-scroll .fs-item-detail-list-module-container > .os-scrollbar,
+.fs-animated-page-module-animated-page > .fs-scroll-area-module-scroll-area > .os-scrollbar,
+.fs-library-container-module-container > .m_8bffd616 > .fs-library-container-module-container {
+    margin-bottom: 90px;
+}
+
+/* Fixes the home padding issue in album dedicated pages */
+:has(.fs-album-detail-content-module-content-container) .fs-library-container-module-container > .m_6d731127 {
+    padding-bottom: 0;
+}
+
+/* Fixes favourite scroll in artist pages */
+.fs-album-artist-detail-content-module-content-container .fs-item-table-list-module-item-table-pinned-rows-container > .fs-item-table-list-module-item-table-grid-container > .os-scrollbar {
+    margin-bottom: 0 !important;
+}
+
+.fs-album-artist-detail-content-module-content-container .fs-item-table-list-module-item-table-pinned-rows-container > .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100 {
+    padding-bottom: 0 !important;
+}
+
+/* Paginated (Table, Grid, Detail), Album page */
+.fs-item-list-pagination-module-container .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100,
+.fs-item-list-pagination-module-container .fs-item-grid-list-module-item-grid-container > div:nth-child(2),
+.fs-item-list-pagination-module-container .fs-item-detail-list-module-container > div:nth-child(1),
+.fs-album-detail-content-module-content-container .fs-item-table-list-module-item-table-grid-container > .fs-item-table-list-module-height-100 {
+    padding-bottom: 0 !important;
+}
+
+/* Scrollbars in paginated lists, artist pages, and settings windows */
+.fs-item-list-pagination-module-container .fs-item-table-list-module-item-table-grid-container > .os-scrollbar,
+.fs-item-list-pagination-module-container .fs-item-grid-list-module-item-grid-container > .os-scrollbar,
+.fs-item-list-pagination-module-container .fs-item-detail-list-module-container > .os-scrollbar,
+.fs-album-artist-detail-content-module-content-container .os-scrollbar,
+.m_60c222c7.m_1f958f16.mantine-Modal-inner > .m_fd1ab0aa > .fs-scroll-area-module-scroll-area > .os-scrollbar {
+    margin-bottom: 0;
+}
+
+/* Paginated container and folders */
+.fs-item-list-pagination-module-container .fs-item-list-pagination-module-pagination-container {
+    padding-bottom: calc(90px + var(--theme-spacing-md)) !important;
+}
+
+.fs-main-content-module-main-content-body-scroll > div > .m_4451eb3a {
+    padding-bottom: calc(90px + var(--mantine-spacing-md)) !important;
 }
 
 .mantine-Tabs-root {
@@ -216,13 +279,23 @@ table {
 }
 
 .fs-expanded-list-item-module-container {
-    position: relative;
-    bottom: 90px;
+    padding-bottom: 90px;
     border-radius: 18px;
 }
 
-.fs-sidebar-play-queue-module-lyrics-section {
-    bottom: 90px;
+.fs-right-sidebar-module-right-sidebar-container {
+    height: calc(100% - 90px);
+}
+
+.fs-main-content-module-main-content-body .fs-list-with-sidebar-container-module-sidebar-container {
+    height: calc(100% - 90px);
+}
+
+:has(.fs-right-sidebar-module-vertical-layout) .fs-right-sidebar-module-right-sidebar-container {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    transform: translateY(-90px);
 }
 
 .fs-page-header-module-container {
@@ -300,6 +373,10 @@ table {
     background-color: var(--theme-colors-surface) !important;
 }
 
+.fs-feature-carousel-module-carousel-item {
+    border-radius: 18px !important;
+}
+
 .fs-library-background-overlay-module-background-overlay {
     border-radius: 18px;
 }
@@ -318,8 +395,4 @@ table {
 .mantine-Accordion-root .mantine-Accordion-item {
     background-color: transparent;
     border: 0;
-}
-
-.fs-item-table-list-module-height-100 {
-    padding-bottom: 65px !important;
 }
