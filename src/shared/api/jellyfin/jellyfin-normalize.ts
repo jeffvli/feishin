@@ -69,11 +69,12 @@ const getPlaylistImageId = (item: z.infer<typeof jfType._response.playlist>): nu
     return null;
 };
 
-const getThumbHash = (
+const getBlurHash = (
     item:
         | z.infer<typeof jfType._response.album>
         | z.infer<typeof jfType._response.albumArtist>
-        | z.infer<typeof jfType._response.playlist>,
+        | z.infer<typeof jfType._response.playlist>
+        | z.infer<typeof jfType._response.song>,
 ): null | string => {
     return item.ImageBlurHashes?.Primary?.[item.ImageTags?.Primary ?? ''] || null;
 };
@@ -160,6 +161,7 @@ const normalizeSong = (
         ),
         bitDepth,
         bitRate,
+        blurHash: getBlurHash(item),
         bpm: null,
         channels,
         codec,
@@ -226,6 +228,7 @@ const normalizeSong = (
         size,
         sortName: item.SortName || item.Name,
         tags: getTags(item),
+        thumbHash: null,
         trackNumber: item.IndexNumber,
         trackSubtitle: null,
         updatedAt: item.DateCreated,
@@ -265,6 +268,7 @@ const normalizeAlbum = (
                 userRating: null,
             }),
         ),
+        blurHash: getBlurHash(item),
         comment: null,
         createdAt: item.DateCreated,
         discs: null,
@@ -310,7 +314,7 @@ const normalizeAlbum = (
         sortName: item.SortName || item.Name,
         starredAt: null,
         tags: getTags(item),
-        thumbHash: getThumbHash(item),
+        thumbHash: null,
         trackYearRange: null,
         updatedAt: item?.DateLastMediaAdded || item.DateCreated,
         userFavorite: item.UserData?.IsFavorite || false,
@@ -343,6 +347,7 @@ const normalizeAlbumArtist = (
         _serverType: ServerType.JELLYFIN,
         albumCount: item.AlbumCount ?? null,
         biography: item.Overview || null,
+        blurHash: getBlurHash(item),
         dominantColor: null,
         duration: item.RunTimeTicks / TICKS_PER_MS,
         genres: item.GenreItems?.map((entry) => ({
@@ -368,7 +373,7 @@ const normalizeAlbumArtist = (
         similarArtists,
         songCount: item.SongCount ?? null,
         starredAt: null,
-        thumbHash: getThumbHash(item),
+        thumbHash: null,
         uploadedImage: item.ImageTags?.Primary ?? undefined,
         userFavorite: item.UserData?.IsFavorite || false,
         userRating: null,
@@ -383,6 +388,7 @@ const normalizePlaylist = (
         _itemType: LibraryItem.PLAYLIST,
         _serverId: server?.id || '',
         _serverType: ServerType.JELLYFIN,
+        blurHash: getBlurHash(item),
         description: item.Overview || null,
         dominantColor: null,
         duration: item.RunTimeTicks / TICKS_PER_MS,
@@ -409,7 +415,7 @@ const normalizePlaylist = (
         size: null,
         songCount: item?.ChildCount || null,
         sync: null,
-        thumbHash: getThumbHash(item),
+        thumbHash: null,
         uploadedImage: item.ImageTags?.Primary ?? undefined,
     };
 };

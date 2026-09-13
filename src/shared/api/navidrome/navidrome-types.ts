@@ -649,6 +649,7 @@ const song = z.object({
     starredAt: z.string().optional(),
     suffix: z.string(),
     tags: z.record(z.string(), z.array(z.string())).optional(),
+    thumbHash: z.string().optional(),
     title: z.string(),
     trackNumber: z.number(),
     updatedAt: z.string(),

@@ -180,6 +180,7 @@ export type Album = {
     albumArtistName: string;
     albumArtists: RelatedArtist[];
     artists: RelatedArtist[];
+    blurHash: null | string;
     comment: null | string;
     createdAt: string;
     discs: Disc | null;
@@ -228,6 +229,7 @@ export type AlbumArtist = {
     _serverType: ServerType;
     albumCount: null | number;
     biography: null | string;
+    blurHash: null | string;
     dominantColor: null | string;
     duration: null | number;
     genres: Genre[];
@@ -354,6 +356,7 @@ export type Playlist = {
     _itemType: LibraryItem.PLAYLIST;
     _serverId: string;
     _serverType: ServerType;
+    blurHash: null | string;
     description: null | string;
     dominantColor: null | string;
     duration: null | number;
@@ -400,6 +403,7 @@ export type Song = {
     artists: RelatedArtist[];
     bitDepth: null | number;
     bitRate: number;
+    blurHash: null | string;
     bpm: null | number;
     channels: null | number;
     codec: null | string;
@@ -442,6 +446,7 @@ export type Song = {
     size: number;
     sortName: string;
     tags: null | Record<string, string[]>;
+    thumbHash: null | string;
     trackNumber: number;
     trackSubtitle: null | string;
     updatedAt: string;
