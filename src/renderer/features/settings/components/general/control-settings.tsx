@@ -520,6 +520,34 @@ export const ControlSettings = memo(() => {
                       isHidden: false,
                       title: t('setting.waveformLoadingDelay'),
                   },
+                  {
+                      control: (
+                          <NumberInput
+                              defaultValue={playerbarSlider?.preloadCount ?? 3}
+                              max={10}
+                              min={0}
+                              onBlur={(e) => {
+                                  setSettings({
+                                      general: {
+                                          ...settings,
+                                          playerbarSlider: {
+                                              ...playerbarSlider,
+                                              preloadCount: e.currentTarget.value
+                                                  ? Number(e.currentTarget.value)
+                                                  : 0,
+                                          },
+                                      },
+                                  });
+                              }}
+                              width={75}
+                          />
+                      ),
+                      description: t('setting.waveformPreloadCount', {
+                          context: 'description',
+                      }),
+                      isHidden: false,
+                      title: t('setting.waveformPreloadCount'),
+                  },
               ]
             : []),
         {
