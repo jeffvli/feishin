@@ -28,13 +28,11 @@ import { useFastAverageColor } from '/@/renderer/hooks';
 import {
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
-    useImagePlaceholderPriority,
     usePlayerData,
     usePlayerSong,
 } from '/@/renderer/store';
 import { Group } from '/@/shared/components/group/group';
-import { useImageHashUrl } from '/@/shared/hooks/use-image-hash-url';
-import { ExplicitStatus, LibraryItem, QueueSong } from '/@/shared/types/domain-types';
+import { LibraryItem } from '/@/shared/types/domain-types';
 
 const mainBackground = 'var(--theme-colors-background)';
 
@@ -82,24 +80,9 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
         type: 'itemCard',
     });
 
-    // Hash previews are free (no network fetch), so they are preferred for the background
-    const imagePlaceholderPriority = useImagePlaceholderPriority();
-    const currentHashUrl = useImageHashUrl(
-        currentSong?.thumbHash,
-        currentSong?.blurHash,
-        imagePlaceholderPriority,
-    );
-    const nextHashUrl = useImageHashUrl(
-        nextSong?.thumbHash,
-        nextSong?.blurHash,
-        imagePlaceholderPriority,
-    );
-
     const [imageState, setImageState] = useState({
-        bottomHash: nextHashUrl,
         bottomImage: nextImageUrl,
         current: 0,
-        topHash: currentHashUrl,
         topImage: currentImageUrl,
     });
 
@@ -120,22 +103,13 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
         const isTop = imageStateRef.current.current === 0;
 
         setImageState({
-            bottomHash: isTop ? currentHashUrl : nextHashUrl,
             bottomImage: isTop ? currentImageUrl : nextImageUrl,
             current: isTop ? 1 : 0,
-            topHash: isTop ? nextHashUrl : currentHashUrl,
             topImage: isTop ? nextImageUrl : currentImageUrl,
         });
 
         previousSongRef.current = currentSong?._uniqueId;
-    }, [
-        currentSong?._uniqueId,
-        currentHashUrl,
-        currentImageUrl,
-        nextSong?._uniqueId,
-        nextHashUrl,
-        nextImageUrl,
-    ]);
+    }, [currentSong?._uniqueId, currentImageUrl, nextSong?._uniqueId, nextImageUrl]);
 
     if (!dynamicBackground || !dynamicIsImage) {
         return null;
@@ -152,23 +126,6 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
         return imageUrl.replace(songId, albumId);
     };
 
-    // Explicit songs keep the fetched background; everyone else gets the instant hash preview
-    const getBackgroundStyle = (
-        song: QueueSong | undefined,
-        hashUrl: null | string,
-        imageUrl: string | undefined,
-    ) => {
-        if (hashUrl && song?.explicitStatus !== ExplicitStatus.EXPLICIT) {
-            return { backgroundImage: `url("${hashUrl}")` } as CSSProperties;
-        }
-
-        return {
-            backgroundImage: imageUrl
-                ? `url("${getBackgroundImageUrl(imageUrl, song?.id, song?.albumId)}"), url("${imageUrl}")`
-                : undefined,
-        } as CSSProperties;
-    };
-
     // Determine which song IDs to use for keys and image URLs
     const topSongId = imageState.current === 0 ? currentSong?._uniqueId : nextSong?._uniqueId;
     const bottomSongId = imageState.current === 0 ? nextSong?._uniqueId : currentSong?._uniqueId;
@@ -177,7 +134,7 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
 
     return (
         <AnimatePresence initial={false} mode="sync">
-            {imageState.current === 0 && (imageState.topHash || imageState.topImage) && (
+            {imageState.current === 0 && imageState.topImage && (
                 <motion.div
                     animate="open"
                     className={styles.backgroundImage}
@@ -185,12 +142,22 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
                     exit="closed"
                     initial="closed"
                     key={`top-${topSongId || 'none'}`}
-                    style={getBackgroundStyle(topSong, imageState.topHash, imageState.topImage)}
+                    style={
+                        {
+                            backgroundImage: imageState.topImage
+                                ? `url("${getBackgroundImageUrl(
+                                      imageState.topImage,
+                                      topSong?.id,
+                                      topSong?.albumId,
+                                  )}"), url("${imageState.topImage}")`
+                                : undefined,
+                        } as CSSProperties
+                    }
                     variants={backgroundImageVariants}
                 />
             )}
 
-            {imageState.current === 1 && (imageState.bottomHash || imageState.bottomImage) && (
+            {imageState.current === 1 && imageState.bottomImage && (
                 <motion.div
                     animate="open"
                     className={styles.backgroundImage}
@@ -198,11 +165,17 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
                     exit="closed"
                     initial="closed"
                     key={`bottom-${bottomSongId || 'none'}`}
-                    style={getBackgroundStyle(
-                        bottomSong,
-                        imageState.bottomHash,
-                        imageState.bottomImage,
-                    )}
+                    style={
+                        {
+                            backgroundImage: imageState.bottomImage
+                                ? `url("${getBackgroundImageUrl(
+                                      imageState.bottomImage,
+                                      bottomSong?.id,
+                                      bottomSong?.albumId,
+                                  )}"), url("${imageState.bottomImage}")`
+                                : undefined,
+                        } as CSSProperties
+                    }
                     variants={backgroundImageVariants}
                 />
             )}
