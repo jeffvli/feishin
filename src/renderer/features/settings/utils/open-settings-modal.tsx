@@ -1,8 +1,9 @@
 import { openContextModal } from '@mantine/modals';
 
+import { SettingsHeader } from '/@/renderer/features/settings/components/settings-header';
+
 export const openSettingsModal = () => {
     openContextModal({
-        innerProps: {},
         modal: 'settings',
         overlayProps: {
             opacity: 1,
@@ -15,6 +16,7 @@ export const openSettingsModal = () => {
                 width: '100%',
             },
         },
+        title: <SettingsHeader showUpdateAvailable />,
         transitionProps: {
             transition: 'pop',
         },

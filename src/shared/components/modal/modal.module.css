@@ -2,6 +2,7 @@
     display: flex;
     justify-content: center;
     margin-bottom: var(--theme-spacing-md);
+    margin-bottom: 0;
     background: var(--theme-colors-background);
     border-radius: 0;
 }
