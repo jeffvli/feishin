@@ -69,6 +69,15 @@ const getPlaylistImageId = (item: z.infer<typeof jfType._response.playlist>): nu
     return null;
 };
 
+const getThumbHash = (
+    item:
+        | z.infer<typeof jfType._response.album>
+        | z.infer<typeof jfType._response.albumArtist>
+        | z.infer<typeof jfType._response.playlist>,
+): null | string => {
+    return item.ImageBlurHashes?.Primary?.[item.ImageTags?.Primary ?? ''] || null;
+};
+
 const jellyfinPremiereFields = (item: {
     PremiereDate?: string;
     ProductionYear?: number;
@@ -89,6 +98,7 @@ const normalizeSong = (
     let bitDepth: null | number = null;
     let bitRate = 0;
     let channels: null | number = null;
+    let codec: null | string = null;
     let container: null | string = null;
     let path: null | string = null;
     let sampleRate: null | number = null;
@@ -110,6 +120,7 @@ const normalizeSong = (
                             ? Number(Math.trunc(stream.BitRate / 1000))
                             : 0;
                     channels = stream.Channels || null;
+                    codec = stream.Codec || null;
                     sampleRate = stream.SampleRate || null;
                     break;
                 }
@@ -119,7 +130,7 @@ const normalizeSong = (
         console.warn('Jellyfin song retrieved with no media sources', item);
     }
 
-    const { releaseDate, releaseYear } = jellyfinPremiereFields(item);
+    const { originalYear, releaseDate, releaseYear } = jellyfinPremiereFields(item);
 
     return {
         _itemType: LibraryItem.SONG,
@@ -151,6 +162,7 @@ const normalizeSong = (
         bitRate,
         bpm: null,
         channels,
+        codec,
         comment: null,
         compilation: null,
         container,
@@ -160,6 +172,7 @@ const normalizeSong = (
         discSubtitle: null,
         duration: item.RunTimeTicks / TICKS_PER_MS,
         explicitStatus: null,
+        folderId: null,
         gain:
             item.AlbumNormalizationGain !== undefined ||
             item.NormalizationGain !== undefined ||
@@ -190,11 +203,18 @@ const normalizeSong = (
         imageId: getSongImageId(item),
         imageUrl: null,
         lastPlayedAt: null,
+        libraryId: null,
+        libraryName: null,
         lyrics: null,
         mbzAlbumId: item.ProviderIds?.MusicBrainzAlbum || null,
+        mbzAlbumType: null,
         mbzRecordingId: null,
+        mbzReleaseGroupId: null,
         mbzTrackId: item.ProviderIds?.MusicBrainzTrack || null,
+        missing: null,
         name: item.Name,
+        originalDate: releaseDate,
+        originalYear,
         participants: null,
         path: path || '',
         peak: null,
@@ -247,8 +267,11 @@ const normalizeAlbum = (
         ),
         comment: null,
         createdAt: item.DateCreated,
+        discs: null,
+        dominantColor: null,
         duration: item.RunTimeTicks / TICKS_PER_MS,
         explicitStatus: null,
+        gain: null,
         genres:
             item.GenreItems?.map((entry) => ({
                 _itemType: LibraryItem.GENRE,
@@ -268,11 +291,14 @@ const normalizeAlbum = (
         lastPlayedAt: null,
         mbzId: item.ProviderIds?.MusicBrainzAlbum || null,
         mbzReleaseGroupId: item.ProviderIds?.MusicBrainzReleaseGroup || null,
+        missing: null,
         name: item.Name,
         originalDate: releaseDate,
         originalYear,
         participants: null,
+        peak: null,
         playCount: item.UserData?.PlayCount || 0,
+        ratedAt: null,
         recordLabels: item.Studios?.map((entry) => entry.Name) || [],
         releaseDate,
         releaseType: null,
@@ -282,7 +308,9 @@ const normalizeAlbum = (
         songCount: item?.ChildCount || null,
         songs: item.Songs?.map((song) => normalizeSong(song, server)),
         sortName: item.SortName || item.Name,
+        starredAt: null,
         tags: getTags(item),
+        thumbHash: getThumbHash(item),
         trackYearRange: null,
         updatedAt: item?.DateLastMediaAdded || item.DateCreated,
         userFavorite: item.UserData?.IsFavorite || false,
@@ -315,6 +343,7 @@ const normalizeAlbumArtist = (
         _serverType: ServerType.JELLYFIN,
         albumCount: item.AlbumCount ?? null,
         biography: item.Overview || null,
+        dominantColor: null,
         duration: item.RunTimeTicks / TICKS_PER_MS,
         genres: item.GenreItems?.map((entry) => ({
             _itemType: LibraryItem.GENRE,
@@ -332,10 +361,14 @@ const normalizeAlbumArtist = (
         imageUrl: null,
         lastPlayedAt: null,
         mbz: item.ProviderIds?.MusicBrainzArtist || null,
+        missing: null,
         name: item.Name,
         playCount: item.UserData?.PlayCount || 0,
+        ratedAt: null,
         similarArtists,
         songCount: item.SongCount ?? null,
+        starredAt: null,
+        thumbHash: getThumbHash(item),
         uploadedImage: item.ImageTags?.Primary ?? undefined,
         userFavorite: item.UserData?.IsFavorite || false,
         userRating: null,
@@ -351,7 +384,9 @@ const normalizePlaylist = (
         _serverId: server?.id || '',
         _serverType: ServerType.JELLYFIN,
         description: item.Overview || null,
+        dominantColor: null,
         duration: item.RunTimeTicks / TICKS_PER_MS,
+        evaluatedAt: null,
         genres: item.GenreItems?.map((entry) => ({
             _itemType: LibraryItem.GENRE,
             _serverId: server?.id || '',
@@ -374,6 +409,7 @@ const normalizePlaylist = (
         size: null,
         songCount: item?.ChildCount || null,
         sync: null,
+        thumbHash: getThumbHash(item),
         uploadedImage: item.ImageTags?.Primary ?? undefined,
     };
 };

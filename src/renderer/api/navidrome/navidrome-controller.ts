@@ -181,7 +181,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 name: body.name,
                 ownerId: body.ownerId,
                 public: body.public,
-                rules: body.queryBuilderRules,
+                rules: body.queryBuilderRules ?? null,
                 sync: body.sync,
             },
         });

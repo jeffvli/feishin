@@ -182,8 +182,11 @@ export type Album = {
     artists: RelatedArtist[];
     comment: null | string;
     createdAt: string;
+    discs: Disc | null;
+    dominantColor: null | string;
     duration: null | number;
     explicitStatus: ExplicitStatus | null;
+    gain: GainInfo | null;
     genres: Genre[];
     id: string;
     imageId: null | string;
@@ -192,11 +195,14 @@ export type Album = {
     lastPlayedAt: null | string;
     mbzId: null | string;
     mbzReleaseGroupId: null | string;
+    missing: boolean | null;
     name: string;
     originalDate: null | PartialIsoDateString;
     originalYear: number;
     participants: null | Record<string, RelatedArtist[]>;
+    peak: GainInfo | null;
     playCount: null | number;
+    ratedAt: null | string;
     recordLabels: string[];
     releaseDate: null | PartialIsoDateString;
     releaseType: null | string;
@@ -206,7 +212,9 @@ export type Album = {
     songCount: null | number;
     songs?: Song[];
     sortName: string;
+    starredAt: null | string;
     tags: null | Record<string, string[]>;
+    thumbHash: null | string;
     trackYearRange: null | { max: number; min: number };
     updatedAt: string;
     userFavorite: boolean;
@@ -220,6 +228,7 @@ export type AlbumArtist = {
     _serverType: ServerType;
     albumCount: null | number;
     biography: null | string;
+    dominantColor: null | string;
     duration: null | number;
     genres: Genre[];
     id: string;
@@ -227,10 +236,14 @@ export type AlbumArtist = {
     imageUrl: null | string;
     lastPlayedAt: null | string;
     mbz: null | string;
+    missing: boolean | null;
     name: string;
     playCount: null | number;
+    ratedAt: null | string;
     similarArtists: null | RelatedArtist[];
     songCount: null | number;
+    starredAt: null | string;
+    thumbHash: null | string;
     uploadedImage?: string;
     userFavorite: boolean;
     userRating: null | number;
@@ -259,6 +272,8 @@ export interface BaseQuery<T> {
     sortBy: T;
     sortOrder: SortOrder;
 }
+
+export type Disc = Record<number, string>;
 
 export type EndpointDetails = {
     server: ServerListItem;
@@ -340,7 +355,9 @@ export type Playlist = {
     _serverId: string;
     _serverType: ServerType;
     description: null | string;
+    dominantColor: null | string;
     duration: null | number;
+    evaluatedAt: null | string;
     genres: Genre[];
     id: string;
     imageId: null | string;
@@ -353,6 +370,7 @@ export type Playlist = {
     size: null | number;
     songCount: null | number;
     sync?: boolean | null;
+    thumbHash: null | string;
     uploadedImage?: string;
 };
 
@@ -384,6 +402,7 @@ export type Song = {
     bitRate: number;
     bpm: null | number;
     channels: null | number;
+    codec: null | string;
     comment: null | string;
     compilation: boolean | null;
     container: null | string;
@@ -393,17 +412,25 @@ export type Song = {
     discSubtitle: null | string;
     duration: number;
     explicitStatus: ExplicitStatus | null;
+    folderId: null | string;
     gain: GainInfo | null;
     genres: Genre[];
     id: string;
     imageId: null | string;
     imageUrl: null | string;
     lastPlayedAt: null | string;
+    libraryId: null | number;
+    libraryName: null | string;
     lyrics: null | string;
     mbzAlbumId: null | string;
+    mbzAlbumType: null | string;
     mbzRecordingId: null | string;
+    mbzReleaseGroupId: null | string;
     mbzTrackId: null | string;
+    missing: boolean | null;
     name: string;
+    originalDate: null | PartialIsoDateString;
+    originalYear: null | number;
     participants: null | Record<string, RelatedArtist[]>;
     path: null | string;
     peak: GainInfo | null;
@@ -1077,6 +1104,7 @@ export type PlaylistListResponse = BasePaginatedResponse<Playlist[]>;
 export type PlaylistRules = Record<string, any> & {
     limit?: number;
     limitPercent?: number;
+    refreshDelay?: string;
     sort?: string;
 };
 

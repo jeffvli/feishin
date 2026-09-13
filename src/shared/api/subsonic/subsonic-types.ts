@@ -92,7 +92,7 @@ const user = z.object({
         commentRole: z.boolean(),
         coverArtRole: z.boolean(),
         downloadRole: z.boolean(),
-        folder: z.string().array(),
+        folder: z.number().array(),
         jukeboxRole: z.boolean(),
         playlistRole: z.boolean(),
         podcastRole: z.boolean(),
