@@ -4,6 +4,7 @@ import { SettingsHeader } from '/@/renderer/features/settings/components/setting
 
 export const openSettingsModal = () => {
     openContextModal({
+        innerProps: {},
         modal: 'settings',
         overlayProps: {
             opacity: 1,
