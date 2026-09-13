@@ -3,6 +3,7 @@ import { z } from 'zod';
 const baseResponse = z.object({
     'subsonic-response': z.object({
         status: z.string(),
+        type: z.string().optional(),
         version: z.string(),
     }),
 });

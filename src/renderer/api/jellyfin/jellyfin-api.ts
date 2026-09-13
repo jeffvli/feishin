@@ -7,6 +7,7 @@ import { z } from 'zod';
 import packageJson from '../../../../package.json';
 
 import i18n from '/@/i18n/i18n';
+import { validateResponse } from '/@/renderer/api/response-validation';
 import { authenticationFailure } from '/@/renderer/api/utils';
 import { useAuthStore } from '/@/renderer/store';
 import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
@@ -508,7 +509,7 @@ export const jfApiClient = (args: {
     const { forceRemoteUrl, server, signal, url } = args;
 
     return initClient(contract, {
-        api: async ({ body, headers, method, path }) => {
+        api: async ({ body, headers, method, path, route }) => {
             let baseUrl: string | undefined;
             let token: string | undefined;
 
@@ -536,6 +537,14 @@ export const jfApiClient = (args: {
                     signal,
                     url: `${baseUrl}/${api}`,
                 });
+                validateResponse({
+                    controller: 'Jellyfin',
+                    method,
+                    path: api,
+                    response: result.data,
+                    route,
+                    status: result.status,
+                });
                 return {
                     body: result.data,
                     headers: result.headers as any,
@@ -549,6 +558,14 @@ export const jfApiClient = (args: {
 
                     const error = e as AxiosError;
                     const response = error.response as AxiosResponse;
+                    validateResponse({
+                        controller: 'Jellyfin',
+                        method,
+                        path: api,
+                        response: response?.data,
+                        route,
+                        status: response?.status,
+                    });
                     return {
                         body: response?.data,
                         headers: response?.headers as any,
