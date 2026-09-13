@@ -26,6 +26,7 @@ import {
     useAppStoreActions,
     useFullScreenPlayerStore,
     useGeneralSettings,
+    useImagePlaceholderPriority,
     usePlayerSong,
     useSetFullScreenPlayerStore,
 } from '/@/renderer/store';
@@ -180,7 +181,12 @@ const SidebarImage = () => {
         serverId: currentSong?._serverId,
         type: 'sidebar',
     });
-    const songHashUrl = useImageHashUrl(currentSong?.thumbHash, currentSong?.blurHash);
+    const imagePlaceholderPriority = useImagePlaceholderPriority();
+    const songHashUrl = useImageHashUrl(
+        currentSong?.thumbHash,
+        currentSong?.blurHash,
+        imagePlaceholderPriority,
+    );
 
     const radioImageUrl = useItemImageUrl({
         id: isRadioActive ? currentStationArt?.imageId || undefined : undefined,

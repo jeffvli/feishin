@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './context-menu-preview.module.css';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { useImagePlaceholderPriority } from '/@/renderer/store';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 import { useImageHashUrl } from '/@/shared/hooks/use-image-hash-url';
@@ -59,7 +60,13 @@ export const ContextMenuPreview = ({ items, itemType }: ContextMenuPreviewProps)
               dominantColor?: null | string;
               thumbHash?: null | string;
           };
-    const hashUrl = useImageHashUrl(item?.thumbHash, item?.blurHash, item?.dominantColor);
+    const imagePlaceholderPriority = useImagePlaceholderPriority();
+    const hashUrl = useImageHashUrl(
+        item?.thumbHash,
+        item?.blurHash,
+        item?.dominantColor,
+        imagePlaceholderPriority,
+    );
 
     if (itemCount === 0) {
         return null;

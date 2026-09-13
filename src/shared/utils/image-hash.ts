@@ -1,9 +1,28 @@
 import { blurHashToRgba } from '/@/shared/utils/blurhash';
 import { thumbHashToRgba } from '/@/shared/utils/thumbhash';
 
+export const IMAGE_PLACEHOLDER_PRIORITIES = [
+    'blurhash',
+    'dominantColor',
+    'off',
+    'thumbhash',
+] as const;
+
+export type ImagePlaceholderPriority = (typeof IMAGE_PLACEHOLDER_PRIORITIES)[number];
+
+const PRIORITY_FALLBACK_ORDER: Record<
+    ImagePlaceholderPriority,
+    readonly ImagePlaceholderPriority[]
+> = {
+    blurhash: ['blurhash', 'thumbhash', 'dominantColor'],
+    dominantColor: ['dominantColor', 'thumbhash', 'blurhash'],
+    off: [],
+    thumbhash: ['thumbhash', 'blurhash', 'dominantColor'],
+};
+
 // Module-level cache of decoded PNG data URLs, capped FIFO (~1000 entries) so a
 // long session over a large library does not accumulate unbounded data URLs.
-const CACHE_CAP = 1000;
+const CACHE_CAP = 5000;
 const urlCache = new Map<string, string>();
 
 /**
@@ -25,31 +44,35 @@ export function decodeBlurHashDataUrl(hash: string): null | string {
 }
 
 /**
- * Picks a placeholder to render by field, never by sniffing the string:
- * `thumbHash` wins, then `blurHash`, then a solid `dominantColor` swatch.
- * This is the single decode entry point the image-hash hook calls. Returns
- * null when no field yields a placeholder.
+ * Picks a placeholder to render by field, never by sniffing the string.
+ * By default `thumbHash` wins, then `blurHash`, then a solid `dominantColor`
+ * swatch; `priority` moves one source to the front of that order, or is
+ * `'off'` to disable placeholders. This is the single decode entry point the
+ * image-hash hook calls. Returns null when no field yields a placeholder.
  *
  * @param thumbHash A base64 ThumbHash, or null when the item has none.
  * @param blurHash A BlurHash string, or null when the item has none.
  * @param dominantColor A hex color, or null when the item has none.
+ * @param priority Which source to try first when the item has several.
  */
 export function decodeImageHashDataUrl(
     thumbHash: null | string,
     blurHash: null | string,
     dominantColor: null | string | undefined = null,
+    priority: ImagePlaceholderPriority = 'thumbhash',
 ): null | string {
-    if (thumbHash) {
-        const url = decodeThumbHashDataUrl(thumbHash);
+    const decoders: Record<ImagePlaceholderPriority, () => null | string> = {
+        blurhash: () => (blurHash ? decodeBlurHashDataUrl(blurHash) : null),
+        dominantColor: () => (dominantColor ? dominantColorToDataUrl(dominantColor) : null),
+        off: () => null,
+        thumbhash: () => (thumbHash ? decodeThumbHashDataUrl(thumbHash) : null),
+    };
+
+    for (const source of PRIORITY_FALLBACK_ORDER[priority]) {
+        const url = decoders[source]();
         if (url) return url;
     }
-    if (blurHash) {
-        const url = decodeBlurHashDataUrl(blurHash);
-        if (url) return url;
-    }
-    if (dominantColor) {
-        return dominantColorToDataUrl(dominantColor);
-    }
+
     return null;
 }
 

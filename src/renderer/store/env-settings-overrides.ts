@@ -1,6 +1,7 @@
 import type { PlayerFilter, SettingsState } from './settings.store';
 
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
+import { IMAGE_PLACEHOLDER_PRIORITIES } from '/@/shared/utils/image-hash';
 
 const PLAYER_FILTER_FIELDS = new Set([
     'albumArtist',
@@ -195,6 +196,12 @@ const ENV_SETTING_SPECS: EnvSettingSpec[] = [
         enumSet: HOME_FEATURE_STYLES,
         key: 'FS_GENERAL_HOME_FEATURE_STYLE',
         path: ['general', 'homeFeatureStyle'],
+        type: 'enum',
+    },
+    {
+        enumSet: new Set(IMAGE_PLACEHOLDER_PRIORITIES),
+        key: 'FS_GENERAL_IMAGE_PLACEHOLDER_PRIORITY',
+        path: ['general', 'imagePlaceholderPriority'],
         type: 'enum',
     },
     {

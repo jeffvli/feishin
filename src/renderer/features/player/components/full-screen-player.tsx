@@ -28,6 +28,7 @@ import { useFastAverageColor } from '/@/renderer/hooks';
 import {
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
+    useImagePlaceholderPriority,
     usePlayerData,
     usePlayerSong,
 } from '/@/renderer/store';
@@ -82,8 +83,17 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
     });
 
     // Hash previews are free (no network fetch), so they are preferred for the background
-    const currentHashUrl = useImageHashUrl(currentSong?.thumbHash, currentSong?.blurHash);
-    const nextHashUrl = useImageHashUrl(nextSong?.thumbHash, nextSong?.blurHash);
+    const imagePlaceholderPriority = useImagePlaceholderPriority();
+    const currentHashUrl = useImageHashUrl(
+        currentSong?.thumbHash,
+        currentSong?.blurHash,
+        imagePlaceholderPriority,
+    );
+    const nextHashUrl = useImageHashUrl(
+        nextSong?.thumbHash,
+        nextSong?.blurHash,
+        imagePlaceholderPriority,
+    );
 
     const [imageState, setImageState] = useState({
         bottomHash: nextHashUrl,

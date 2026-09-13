@@ -35,6 +35,7 @@ import {
     useCurrentServer,
     useFullScreenPlayerStore,
     useFullScreenPlayerStoreActions,
+    useImagePlaceholderPriority,
     usePlayerData,
     usePlayerSong,
     useSetFullScreenPlayerStore,
@@ -94,8 +95,17 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
         type: 'itemCard',
     });
 
-    const currentHashUrl = useImageHashUrl(currentSong?.thumbHash, currentSong?.blurHash);
-    const nextHashUrl = useImageHashUrl(nextSong?.thumbHash, nextSong?.blurHash);
+    const imagePlaceholderPriority = useImagePlaceholderPriority();
+    const currentHashUrl = useImageHashUrl(
+        currentSong?.thumbHash,
+        currentSong?.blurHash,
+        imagePlaceholderPriority,
+    );
+    const nextHashUrl = useImageHashUrl(
+        nextSong?.thumbHash,
+        nextSong?.blurHash,
+        imagePlaceholderPriority,
+    );
 
     const [imageState, setImageState] = useState({
         bottomHash: nextHashUrl,

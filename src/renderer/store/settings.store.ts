@@ -40,6 +40,7 @@ import {
     PlayerType,
     TableColumn,
 } from '/@/shared/types/types';
+import { IMAGE_PLACEHOLDER_PRIORITIES } from '/@/shared/utils/image-hash';
 
 const utils = isElectron() ? window.api.utils : null;
 
@@ -537,6 +538,7 @@ export const GeneralSettingsSchema = z.object({
     homeFeature: z.boolean(),
     homeFeatureStyle: z.nativeEnum(HomeFeatureStyle),
     homeItems: z.array(SortableItemSchema(HomeItemSchema)),
+    imagePlaceholderPriority: z.enum(IMAGE_PLACEHOLDER_PRIORITIES),
     imageRes: z.object({
         fullScreenPlayer: z.number(),
         header: z.number(),
@@ -1360,6 +1362,7 @@ const initialState: SettingsState = {
         homeFeature: true,
         homeFeatureStyle: HomeFeatureStyle.SINGLE,
         homeItems,
+        imagePlaceholderPriority: 'thumbhash',
         imageRes: {
             fullScreenPlayer: 0,
             header: 300,
@@ -3033,6 +3036,9 @@ export const useAccent = () => useSettingsStore((state) => state.general.accent,
 
 export const useNativeAspectRatio = () =>
     useSettingsStore((state) => state.general.nativeAspectRatio, shallow);
+
+export const useImagePlaceholderPriority = () =>
+    useSettingsStore((state) => state.general.imagePlaceholderPriority);
 
 export const useButtonSize = () => useSettingsStore((state) => state.general.buttonSize, shallow);
 

@@ -8,6 +8,7 @@ import {
     useAuthStore,
     useCurrentServerId,
     useGeneralSettings,
+    useImagePlaceholderPriority,
     useImageRes,
     useSettingsStore,
 } from '/@/renderer/store';
@@ -49,7 +50,8 @@ const BaseItemImage = (
 ) => {
     const { blurHash, dominantColor, explicitStatus, serverId, src, thumbHash, ...rest } = props;
     const { blurExplicitImages } = useGeneralSettings();
-    const hashUrl = useImageHashUrl(thumbHash, blurHash, dominantColor);
+    const imagePlaceholderPriority = useImagePlaceholderPriority();
+    const hashUrl = useImageHashUrl(thumbHash, blurHash, dominantColor, imagePlaceholderPriority);
 
     const imageUrl = useItemImageUrl({
         id: props.id,
