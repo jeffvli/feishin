@@ -117,6 +117,7 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
 
                     <div className={styles.imageSection}>
                         <ItemImage
+                            blurHash={album.blurHash}
                             className={styles.albumImage}
                             containerClassName={styles.albumImageContainer}
                             enableDebounce={false}
@@ -126,6 +127,7 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
                             id={album.imageId}
                             itemType={LibraryItem.ALBUM}
                             src={imageUrl}
+                            thumbHash={album.thumbHash}
                             type="itemCard"
                         />
                         <div className={styles.playButtonOverlay}>

@@ -28,6 +28,7 @@ export interface ImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 's
     enableDebounce?: boolean;
     enableViewport?: boolean;
     fetchPriority?: 'auto' | 'high' | 'low';
+    hashUrl?: null | string;
     imageContainerProps?: Omit<ImageContainerProps, 'children'>;
     imageRequest?: ImageRequest;
     includeLoader?: boolean;
@@ -39,6 +40,7 @@ export interface ImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 's
 
 interface ImageContainerProps extends HTMLAttributes<HTMLDivElement> {
     children: ReactNode;
+    hashUrl?: null | string;
     isExplicit?: boolean;
 }
 
@@ -61,6 +63,7 @@ export function BaseImage({
     enableDebounce = false,
     enableViewport = true,
     fetchPriority = 'low',
+    hashUrl,
     imageContainerProps,
     imageRequest,
     includeLoader = true,
@@ -123,14 +126,15 @@ export function BaseImage({
     return (
         <ImageContainer
             className={clsx(containerClassName, containerPropsClassName)}
+            {...restContainerProps}
+            hashUrl={hashUrl}
             isExplicit={isExplicit}
             ref={ref}
-            {...restContainerProps}
         >
             {nativeImage.displaySrc ? (
                 <img
                     className={clsx(styles.image, className, {
-                        [styles.animated]: enableAnimation,
+                        [styles.animated]: enableAnimation || Boolean(hashUrl),
                     })}
                     decoding="async"
                     fetchPriority={fetchPriority}
@@ -145,7 +149,7 @@ export function BaseImage({
                 includeUnloader ? (
                     <ImageUnloader className={className} icon={unloaderIcon} />
                 ) : null
-            ) : includeLoader ? (
+            ) : hashUrl ? null : includeLoader ? (
                 <ImageLoader className={className} />
             ) : null}
         </ImageContainer>
@@ -156,7 +160,7 @@ export const Image = memo(BaseImage);
 
 const ImageContainer = forwardRef(
     (
-        { children, className, isExplicit, ...props }: ImageContainerProps,
+        { children, className, hashUrl, isExplicit, ...props }: ImageContainerProps,
         ref: ForwardedRef<HTMLDivElement>,
     ) => {
         return (
@@ -167,6 +171,13 @@ const ImageContainer = forwardRef(
                 ref={ref}
                 {...props}
             >
+                {hashUrl && (
+                    <div
+                        aria-hidden
+                        className={styles.hash}
+                        style={{ backgroundImage: `url(${hashUrl})` }}
+                    />
+                )}
                 {children}
             </div>
         );

@@ -76,6 +76,7 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
             return (
                 <Group className={styles.scopeOption} gap="sm" wrap="nowrap">
                     <ItemImage
+                        blurHash={song.blurHash}
                         containerClassName={styles.scopeOptionImage}
                         enableViewport={false}
                         explicitStatus={song.explicitStatus}
@@ -83,6 +84,7 @@ export const SongEditModal = ({ songs }: { songs: Song[] }) => {
                         itemType={LibraryItem.SONG}
                         serverId={song._serverId}
                         src={song.imageUrl}
+                        thumbHash={song.thumbHash}
                         type="table"
                     />
                     <Stack className={styles.scopeOptionMeta} gap={2}>

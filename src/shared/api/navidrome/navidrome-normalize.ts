@@ -590,6 +590,7 @@ const normalizeInternetRadioStation = (
         imageUrl: null,
         name: item.name,
         streamUrl: item.streamUrl,
+        thumbHash: item.thumbHash || null,
         uploadedImage: item.uploadedImage || null,
     };
 };

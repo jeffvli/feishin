@@ -855,6 +855,7 @@ const radioStation = z.object({
     id: z.string(),
     name: z.string(),
     streamUrl: z.string(),
+    thumbHash: z.string().optional(),
     updatedAt: z.string(),
     uploadedImage: z.string().optional(),
 });

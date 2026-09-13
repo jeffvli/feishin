@@ -108,12 +108,14 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
                         onMouseLeave={() => setIsHovered(false)}
                     >
                         <ItemImage
+                            blurHash={item?.blurHash}
                             enableDebounce={true}
                             enableViewport={false}
                             explicitStatus={item?.explicitStatus}
                             id={item?.imageId}
                             itemType={item?._itemType}
                             src={item?.imageUrl}
+                            thumbHash={item?.thumbHash}
                             type="table"
                         />
                         {isHovered && (
@@ -273,11 +275,13 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
                         onMouseLeave={() => setIsHovered(false)}
                     >
                         <ItemImage
+                            blurHash={item?.blurHash}
                             explicitStatus={item?.explicitStatus}
                             id={item?.imageId}
                             itemType={item?._itemType}
                             serverId={item?._serverId}
                             src={item?.imageUrl}
+                            thumbHash={item?.thumbHash}
                             type="table"
                         />
                         {isHovered && (

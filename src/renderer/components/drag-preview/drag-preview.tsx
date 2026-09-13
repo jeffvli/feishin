@@ -5,6 +5,7 @@ import styles from './drag-preview.module.css';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { Icon } from '/@/shared/components/icon/icon';
+import { useImageHashUrl } from '/@/shared/hooks/use-image-hash-url';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { DragData, DragTarget } from '/@/shared/types/drag-and-drop';
 
@@ -37,6 +38,8 @@ export const DragPreview = memo(({ data }: DragPreviewProps) => {
         itemType: data.itemType || LibraryItem.SONG,
         type: 'table',
     });
+    const item = firstItem as undefined | { blurHash?: null | string; thumbHash?: null | string };
+    const hashUrl = useImageHashUrl(item?.thumbHash, item?.blurHash);
 
     const isMultiple = itemCount > 1;
 
@@ -44,9 +47,22 @@ export const DragPreview = memo(({ data }: DragPreviewProps) => {
         <div className={styles.container}>
             <div className={styles.preview}>
                 <div className={styles.content}>
-                    {itemImage ? (
-                        <div className={styles['image-container']}>
-                            <img alt={itemName} className={styles.image} src={itemImage} />
+                    {itemImage || hashUrl ? (
+                        <div
+                            className={styles['image-container']}
+                            style={
+                                hashUrl
+                                    ? {
+                                          backgroundImage: `url(${hashUrl})`,
+                                          backgroundPosition: 'center',
+                                          backgroundSize: 'cover',
+                                      }
+                                    : undefined
+                            }
+                        >
+                            {itemImage ? (
+                                <img alt={itemName} className={styles.image} src={itemImage} />
+                            ) : null}
                             <div className={styles['image-overlay']} />
                         </div>
                     ) : (

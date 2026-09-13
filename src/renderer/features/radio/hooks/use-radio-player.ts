@@ -13,6 +13,7 @@ export type RadioCurrentStationArt = {
     imageId?: null | string;
     imageUrl?: null | string;
     serverId: string;
+    thumbHash?: null | string;
 };
 
 export interface RadioMetadata {

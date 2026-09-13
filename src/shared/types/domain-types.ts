@@ -1088,6 +1088,7 @@ export type InternetRadioStation = {
     imageUrl?: null | string;
     name: string;
     streamUrl: string;
+    thumbHash?: null | string;
     uploadedImage?: null | string;
 };
 

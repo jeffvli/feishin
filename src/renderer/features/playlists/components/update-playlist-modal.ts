@@ -24,8 +24,10 @@ export const openUpdatePlaylistModal = async (args: { playlist: Playlist }) => {
                 sync: playlist?.sync || undefined,
             },
             playlistImage: {
+                blurHash: playlist.blurHash,
                 imageId: playlist.imageId,
                 imageUrl: playlist.imageUrl,
+                thumbHash: playlist.thumbHash,
                 uploadedImage: playlist.uploadedImage,
             },
             query: { id: playlist?.id },

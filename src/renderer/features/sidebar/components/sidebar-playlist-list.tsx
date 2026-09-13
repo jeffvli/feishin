@@ -8,7 +8,7 @@ import { generatePath, Link } from 'react-router';
 
 import styles from './sidebar-playlist-list.module.css';
 
-import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { ItemImage, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
@@ -44,7 +44,6 @@ import { animationVariants } from '/@/shared/components/animations/animation-var
 import { ButtonProps } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
-import { Image } from '/@/shared/components/image/image';
 import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
 import { Text } from '/@/shared/components/text/text';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
@@ -313,7 +312,14 @@ export const PlaylistRowButton = memo(
                 ) : (
                     <>
                         <div className={styles.rowGroup}>
-                            <Image containerClassName={styles.imageContainer} src={imageUrl} />
+                            <ItemImage
+                                blurHash={item.blurHash}
+                                containerClassName={styles.imageContainer}
+                                id={item.imageId}
+                                itemType={LibraryItem.PLAYLIST}
+                                src={imageUrl}
+                                thumbHash={item.thumbHash}
+                            />
                             <div className={styles.metadata}>
                                 <Text
                                     className={clsx(styles.name, {

@@ -9,6 +9,8 @@
 }
 
 .image {
+    position: relative;
+    z-index: 1;
     width: 100%;
     height: 100%;
     object-fit: var(--theme-image-fit);
@@ -33,6 +35,17 @@
     height: 100%;
     aspect-ratio: 1 / 1;
     overflow: hidden;
+}
+
+.hash {
+    position: absolute;
+    inset: 0;
+    background-position: center;
+    background-size: cover;
+}
+
+.censored .hash {
+    filter: blur(10px);
 }
 
 .censored .image {

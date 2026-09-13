@@ -286,9 +286,11 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
                 }
                 imageUrl={headerImageUrl}
                 item={{
+                    blurHash: detailQuery.data?.blurHash,
                     imageId: detailQuery.data?.imageId,
                     imageUrl: detailQuery.data?.imageUrl,
                     route: AppRoute.LIBRARY_ALBUM_ARTISTS,
+                    thumbHash: detailQuery.data?.thumbHash,
                     type: LibraryItem.ALBUM_ARTIST,
                 }}
                 onImageFileDrop={canUploadArtistImage ? handleArtistImageUpload : undefined}

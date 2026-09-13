@@ -5,6 +5,7 @@ import styles from './context-menu-preview.module.css';
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
+import { useImageHashUrl } from '/@/shared/hooks/use-image-hash-url';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface ContextMenuPreviewProps {
@@ -51,6 +52,8 @@ export const ContextMenuPreview = ({ items, itemType }: ContextMenuPreviewProps)
         serverId: (firstItem as { _serverId?: string })?._serverId,
         type: 'table',
     });
+    const item = firstItem as undefined | { blurHash?: null | string; thumbHash?: null | string };
+    const hashUrl = useImageHashUrl(item?.thumbHash, item?.blurHash);
 
     if (itemCount === 0) {
         return null;
@@ -61,9 +64,22 @@ export const ContextMenuPreview = ({ items, itemType }: ContextMenuPreviewProps)
             <div className={styles.divider} />
             <div className={styles.preview}>
                 <div className={styles.content}>
-                    {itemImage ? (
-                        <div className={styles.imageContainer}>
-                            <img alt={itemName} className={styles.image} src={imageUrl} />
+                    {itemImage || hashUrl ? (
+                        <div
+                            className={styles.imageContainer}
+                            style={
+                                hashUrl
+                                    ? {
+                                          backgroundImage: `url(${hashUrl})`,
+                                          backgroundPosition: 'center',
+                                          backgroundSize: 'cover',
+                                      }
+                                    : undefined
+                            }
+                        >
+                            {itemImage ? (
+                                <img alt={itemName} className={styles.image} src={imageUrl} />
+                            ) : null}
                             <div className={styles.imageOverlay} />
                         </div>
                     ) : (

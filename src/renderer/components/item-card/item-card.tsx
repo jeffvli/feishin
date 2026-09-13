@@ -255,6 +255,7 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
                 />
             ) : (
                 <ItemImage
+                    blurHash={(data as Album | AlbumArtist | Playlist | Song)?.blurHash}
                     className={clsx(styles.image, { [styles.isRound]: isRound })}
                     enableDebounce={false}
                     {...(variant === 'poster' ? { enableViewport: enableImageViewport } : {})}
@@ -263,6 +264,7 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
                     id={(data as { imageId?: string })?.imageId}
                     itemType={itemType}
                     src={(data as { imageUrl?: string })?.imageUrl}
+                    thumbHash={(data as Album | AlbumArtist | Playlist | Song)?.thumbHash}
                     type="itemCard"
                 />
             )}
@@ -391,6 +393,7 @@ const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
                 />
             ) : (
                 <ItemImage
+                    blurHash={(data as Album | AlbumArtist | Playlist | Song)?.blurHash}
                     className={clsx(styles.image, {
                         [styles.isRound]: isRound,
                     })}
@@ -400,6 +403,7 @@ const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
                     id={data?.imageId}
                     itemType={itemType}
                     src={(data as Album | AlbumArtist | Playlist | Song)?.imageUrl}
+                    thumbHash={(data as Album | AlbumArtist | Playlist | Song)?.thumbHash}
                     type="itemCard"
                 />
             )}

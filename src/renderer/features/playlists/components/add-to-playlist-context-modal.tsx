@@ -574,11 +574,13 @@ const PlaylistTableItem = memo(
                     <Grid.Col span="content">
                         <Flex align="center" justify="center" px="sm">
                             <ItemImage
+                                blurHash={item.blurHash}
                                 id={item.imageId}
                                 imageContainerProps={{
                                     className: styles.imageContainer,
                                 }}
                                 itemType={LibraryItem.PLAYLIST}
+                                thumbHash={item.thumbHash}
                                 type="table"
                             />
                         </Flex>

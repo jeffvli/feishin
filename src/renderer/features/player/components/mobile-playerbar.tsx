@@ -94,6 +94,7 @@ export const MobilePlayerbar = () => {
                                         openDelay={0}
                                     >
                                         <ItemImage
+                                            blurHash={isRadioActive ? null : currentSong.blurHash}
                                             className={clsx(
                                                 styles.playerbarImage,
                                                 PlaybackSelectors.playerCoverArt,
@@ -112,6 +113,7 @@ export const MobilePlayerbar = () => {
                                                     : currentSong.imageId
                                             }
                                             itemType={LibraryItem.SONG}
+                                            thumbHash={isRadioActive ? null : currentSong.thumbHash}
                                             type="table"
                                         />
                                     </Tooltip>
