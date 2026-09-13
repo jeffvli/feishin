@@ -1220,7 +1220,9 @@ export const getDataRows = (type?: 'compact' | 'default' | 'poster'): DataRow[] 
                 if ('releaseYear' in data && data.releaseYear != null) {
                     const releaseYear = data.releaseYear;
                     const originalYear =
-                        'originalYear' in data && data.originalYear > 0 ? data.originalYear : null;
+                        'originalYear' in data && data.originalYear != null && data.originalYear > 0
+                            ? data.originalYear
+                            : null;
 
                     if (originalYear !== null && originalYear !== releaseYear) {
                         return `${originalYear}${SEPARATOR_STRING}${releaseYear}`;
