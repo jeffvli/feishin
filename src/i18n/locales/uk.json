@@ -276,8 +276,8 @@
         "invalidJson": "Недійсний JSON",
         "playbackPausedDueToError": "Відтворення призупинено через помилку",
         "serverLockSingleServer": "Коли сервер заблоковано, дозволено лише один сервер",
-        "jellyfinQuickConnectDeactivated": "Швидке підключення Jellyfin деактивовано",
-        "jellyfinQuickConnectNotActive": "Швидке підключення Jellyfin неактивне"
+        "jellyfinQuickConnectDeactivated": "Термін дії запиту на швидке підключення минув",
+        "jellyfinQuickConnectNotActive": "Швидке підключення неактивне на цьому сервері"
     },
     "filter": {
         "album": "$t(entity.album, {\"count\": 1})",
@@ -385,15 +385,15 @@
             "title": "Додати сервер",
             "input_passwordNoSSO": "Автентифікація через зворотний проксі (SSO) не підтримується. Підтримуються лише автентифікація за іменем користувача й паролем та автентифікація Subsonic",
             "input_jellyfinQuickConnect": "Швидке підключення",
-            "input_jellyfinQuickConnectCode": "Код швидкого підключення",
-            "input_jellyfinQuickConnectCodeCopied": "Скопійовано!",
-            "input_jellyfinQuickConnectCodeCopy": "Скопіювати код",
+            "input_jellyfinQuickConnectCode": "Введіть цей код у вебінтерфейсі Jellyfin для авторизації",
+            "input_jellyfinQuickConnectCodeCopied": "Скопійовано",
+            "input_jellyfinQuickConnectCodeCopy": "Копіювати код",
             "input_jellyfinQuickConnectOpen": "Відкрити швидке підключення",
-            "input_jellyfinQuickConnectWaiting": "Очікування авторизації…",
-            "input_jellyfinSignInMethod": "Спосіб входу",
+            "input_jellyfinQuickConnectWaiting": "Очікування підтвердження на вашому сервері Jellyfin…",
+            "input_jellyfinSignInMethod": "Увійти за допомогою",
             "input_jellyfinSignInMethodPassword": "Пароль",
             "input_jellyfinSignInMethodQuickConnect": "Швидке підключення",
-            "input_remoteUrlDescription": "URL-адреса віддаленого сервера"
+            "input_remoteUrlDescription": "Використовується замість URL-адреси для зовнішніх функцій, таких як спільні посилання. Залиште це поле порожнім, якщо ваш сервер не доступний за іншою адресою за межами вашої мережі."
         },
         "largeFetchConfirmation": {
             "title": "Додати елементи до черги",
@@ -1334,9 +1334,9 @@
         "scrobbleMinimumMode_optionSeconds": "Секунди",
         "scrobbleMinimumMode_optionPercentage": "Відсоток",
         "scrobbleMinimumMode": "Мінімальний режим скроблінгу",
-        "transcodeNote": "Примітка щодо транскодування",
-        "transcodeSampleRate_description": "Визначає частоту дискретизації для транскодування аудіо.",
-        "transcodeSampleRate": "Частота дискретизації транскодування"
+        "transcodeNote": "Транскодування виконується сервером і застосовується з наступного треку",
+        "transcodeSampleRate_description": "Максимальна частота дискретизації в Гц для транскодованого аудіо, наприклад 192000. Залиште порожнім, щоб зберегти вихідну частоту. Лише для Jellyfin",
+        "transcodeSampleRate": "Макс. частота дискретизації для транскодування"
     },
     "table": {
         "column": {
@@ -1618,19 +1618,19 @@
         }
     },
     "dlna": {
-        "castToDevice": "Транслювати на пристрій",
-        "castingToDevice": "Транслювання на пристрій",
-        "castingToGroup": "Транслювання на групу",
-        "connected": "Підключено",
+        "castToDevice": "Транслювати на пристрій DLNA",
+        "castingToDevice": "Транслювання на {{name}}",
+        "castingToGroup": "Транслювання на групу ({{count}})",
+        "connected": "підключено",
         "connecting": "Підключення…",
         "createGroup": "Створити групу",
-        "devices": "Пристрої",
+        "devices": "Пристрої DLNA",
         "disconnect": "Відключити",
-        "disconnectAndContinue": "Відключити та продовжити відтворення",
-        "noDevicesFound": "Пристроїв не знайдено",
+        "disconnectAndContinue": "Відключити і продовжити",
+        "noDevicesFound": "Пристроїв DLNA не знайдено",
         "nowCasting": "Зараз транслюється",
-        "searching": "Пошук…",
-        "shiftDisconnectHint": "Shift+Клік, щоб відключити",
+        "searching": "Пошук пристроїв…",
+        "shiftDisconnectHint": "Утримуйте Shift і натисніть «Відключити», щоб продовжити відтворення на динаміку",
         "group": {
             "add": "Додати",
             "addSpeaker": "Додати динамік",
@@ -1638,31 +1638,31 @@
             "addToGroup": "Додати до групи",
             "cancel": "Скасувати",
             "connect": "Підключити",
-            "coordinator": "Координатор",
-            "failedToAddMessage": "Не вдалося додати пристрій до групи.",
-            "failedToAddTitle": "Помилка додавання",
-            "firstSelectedIsCoordinator": "Перший вибраний пристрій стає координатором",
+            "coordinator": "координатор",
+            "failedToAddMessage": "Не вдалося додати {{name}}. Можливо, він не в тій самій системі Sonos.",
+            "failedToAddTitle": "Не вдалося додати динамік",
+            "firstSelectedIsCoordinator": "Перший вибраний = координатор",
             "noSonosFound": "Пристроїв Sonos не знайдено",
             "refresh": "Оновити",
             "remove": "Видалити",
             "searching": "Пошук…",
-            "selectSpeakers": "Виберіть динаміки",
-            "title": "Назва групи"
+            "selectSpeakers": "Виберіть динаміки групи",
+            "title": "Група (К-сть динаміків: {{count}})"
         },
         "speakerProperties": {
             "bass": "Баси",
             "crossfade": "Плавний перехід",
-            "ledState": "Стан індикатора",
-            "loadFailed": "Не вдалося завантажити",
+            "ledState": "Індикатор стану",
+            "loadFailed": "Не вдалося завантажити властивості",
             "loading": "Завантаження…",
-            "longPressHint": "Довге натискання для додаткових опцій",
-            "loudness": "Тонкомпенсація (Гучність)",
+            "longPressHint": "Довге натискання для відкриття властивостей динаміка",
+            "loudness": "Тонкомпенсація",
             "touchControls": "Сенсорне керування",
             "treble": "Високі частоти"
         },
         "volume": {
-            "groupControl": "Керування групою",
-            "individualControl": "Індивідуальне керування"
+            "groupControl": "Утримуйте Shift, щоб змінити гучність окремих динаміків",
+            "individualControl": "Відпустіть Shift, щоб змінити гучність усіх динаміків"
         }
     }
 }

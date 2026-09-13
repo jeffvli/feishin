@@ -160,7 +160,9 @@
         "noNetworkDescription": "無法連線至此伺服器",
         "invalidJson": "無效的 JSON",
         "serverLockSingleServer": "當伺服器鎖定時只允許一個伺服器",
-        "playbackPausedDueToError": "播放因錯誤而暫停"
+        "playbackPausedDueToError": "播放因錯誤而暫停",
+        "jellyfinQuickConnectDeactivated": "快速連線請求已過期",
+        "jellyfinQuickConnectNotActive": "此伺服器未啟用快速連線"
     },
     "page": {
         "contextMenu": {
@@ -1225,7 +1227,17 @@
             "input_preferRemoteUrl": "偏好公開 URL",
             "input_remoteUrl": "公開 URL",
             "input_remoteUrlPlaceholder": "選用：外部功能的公開 URL",
-            "input_passwordNoSSO": "不支援反向代理 (SSO) 驗證。僅支援使用者名稱/密碼驗證及 Subsonic 驗證"
+            "input_passwordNoSSO": "不支援反向代理 (SSO) 驗證。僅支援使用者名稱/密碼驗證及 Subsonic 驗證",
+            "input_jellyfinQuickConnect": "快速連線",
+            "input_jellyfinQuickConnectCode": "請在 Jellyfin 網頁介面輸入此代碼以進行授權",
+            "input_jellyfinQuickConnectCodeCopied": "已複製",
+            "input_jellyfinQuickConnectCodeCopy": "複製代碼",
+            "input_jellyfinQuickConnectOpen": "開啟快速連線",
+            "input_jellyfinQuickConnectWaiting": "正在等待 Jellyfin 伺服器核准…",
+            "input_jellyfinSignInMethod": "登入方式",
+            "input_jellyfinSignInMethodPassword": "密碼",
+            "input_jellyfinSignInMethodQuickConnect": "快速連線",
+            "input_remoteUrlDescription": "取代原本的 URL 用於外部功能（例如分享連結）。除非您的伺服器可從外部網路透過不同的位址連線，否則請保持留空。"
         },
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",

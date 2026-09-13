@@ -514,7 +514,17 @@
             "input_preferRemoteUrl": "Prefereix l'url públic",
             "input_remoteUrl": "Url públic",
             "input_remoteUrlPlaceholder": "Opcional: url públic per característiques externes",
-            "input_passwordNoSSO": "No s'admet l'autenticació de proxy invers (SSO). Només s'admeten les autenticacions amb usuari/contrasenya i amb Subsonic"
+            "input_passwordNoSSO": "No s'admet l'autenticació de proxy invers (SSO). Només s'admeten les autenticacions amb usuari/contrasenya i amb Subsonic",
+            "input_jellyfinQuickConnect": "Quick Connect",
+            "input_jellyfinQuickConnectCode": "Introdueix aquest codi a la interfície web del teu Jellyfin per autoritzar",
+            "input_jellyfinQuickConnectCodeCopied": "Copiat",
+            "input_jellyfinQuickConnectCodeCopy": "Copia el codi",
+            "input_jellyfinQuickConnectOpen": "Obre el Quick Connect",
+            "input_jellyfinQuickConnectWaiting": "Esperant l'aprovació en el teu servidor de Jellyfin…",
+            "input_jellyfinSignInMethod": "Inicia sessió amb",
+            "input_jellyfinSignInMethodPassword": "Contrasenya",
+            "input_jellyfinSignInMethodQuickConnect": "Quick Connect",
+            "input_remoteUrlDescription": "S'utilitza en lloc de l'URL per a funcions externes, com ara enllaços compartits. Deixeu-ho en blanc a menys que el vostre servidor sigui accessible a una adreça diferent de fora de la vostra xarxa."
         },
         "shareItem": {
             "description": "Descripció",
@@ -1379,7 +1389,9 @@
         "noNetworkDescription": "No s'ha pogut connectar amb el servidor",
         "invalidJson": "JSON invàlid",
         "serverLockSingleServer": "Només es permet un servidor quan el servidor està bloquejat",
-        "playbackPausedDueToError": "La reproducció s'ha pausat a causa d'un error"
+        "playbackPausedDueToError": "La reproducció s'ha pausat a causa d'un error",
+        "jellyfinQuickConnectDeactivated": "La sol·licitud de Quick Connect ha caducat",
+        "jellyfinQuickConnectNotActive": "Quick Connect no està actiu en aquest servidor"
     },
     "releaseType": {
         "primary": {
