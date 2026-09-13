@@ -109,6 +109,7 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
                     >
                         <ItemImage
                             blurHash={item?.blurHash}
+                            dominantColor={item?.dominantColor}
                             enableDebounce={true}
                             enableViewport={false}
                             explicitStatus={item?.explicitStatus}
@@ -276,6 +277,7 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
                     >
                         <ItemImage
                             blurHash={item?.blurHash}
+                            dominantColor={item?.dominantColor}
                             explicitStatus={item?.explicitStatus}
                             id={item?.imageId}
                             itemType={item?._itemType}

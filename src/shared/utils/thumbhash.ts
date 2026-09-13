@@ -15,27 +15,14 @@ export type ThumbHashImage = {
     width: number;
 };
 
-// A valid ThumbHash decodes to 4..32 bytes.
-const MIN_BYTES = 4;
-const MAX_BYTES = 32;
-
 /**
  * Decodes a base64 ThumbHash string into RGBA pixels.
  *
- * @param hash The base64 ThumbHash string.
- * @returns The rendered placeholder pixels (RGBA, not premultiplied), or null
- * if the string is not a valid base64 ThumbHash. Never throws.
+ * @param hash A valid base64 ThumbHash string.
+ * @returns The rendered placeholder pixels (RGBA, not premultiplied).
  */
-export function thumbHashToRgba(hash: string): null | ThumbHashImage {
-    let bytes: Uint8Array;
-    try {
-        bytes = base64ToBytes(hash);
-    } catch {
-        return null;
-    }
-
-    if (bytes.length < MIN_BYTES || bytes.length > MAX_BYTES) return null;
-
+export function thumbHashToRgba(hash: string): ThumbHashImage {
+    const bytes = base64ToBytes(hash);
     const { cos, max, min, PI, round } = Math;
 
     // Read the constants.

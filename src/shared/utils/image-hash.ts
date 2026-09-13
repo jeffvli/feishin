@@ -8,37 +8,36 @@ const urlCache = new Map<string, string>();
 
 /**
  * Decodes a BlurHash string into a 32x32 PNG data URL. Each unique hash is
- * decoded once per session (module-level cache). Returns null for invalid or
- * empty input. Never throws.
+ * decoded once per session (module-level cache). Returns null only if the 2d
+ * canvas context is unavailable.
  *
- * @param hash The BlurHash string.
+ * @param hash A valid BlurHash string.
  */
 export function decodeBlurHashDataUrl(hash: string): null | string {
     const key = `blurhash:${hash}`;
     const cached = cacheGet(key);
     if (cached) return cached;
 
-    const rgba = blurHashToRgba(hash);
-    if (!rgba) return null;
-
-    const url = rgbaToCanvasDataUrl(32, 32, rgba);
+    const url = rgbaToCanvasDataUrl(32, 32, blurHashToRgba(hash));
     if (!url) return null;
     cacheSet(key, url);
     return url;
 }
 
 /**
- * Picks a hash to render by field, never by sniffing the string: `thumbHash`
- * wins, then `blurHash`. This is the single decode entry point the image-hash
- * hook calls. Returns null when neither field yields a decodable hash. Never
- * throws.
+ * Picks a placeholder to render by field, never by sniffing the string:
+ * `thumbHash` wins, then `blurHash`, then a solid `dominantColor` swatch.
+ * This is the single decode entry point the image-hash hook calls. Returns
+ * null when no field yields a placeholder.
  *
  * @param thumbHash A base64 ThumbHash, or null when the item has none.
  * @param blurHash A BlurHash string, or null when the item has none.
+ * @param dominantColor A hex color, or null when the item has none.
  */
 export function decodeImageHashDataUrl(
     thumbHash: null | string,
     blurHash: null | string,
+    dominantColor: null | string | undefined = null,
 ): null | string {
     if (thumbHash) {
         const url = decodeThumbHashDataUrl(thumbHash);
@@ -48,15 +47,18 @@ export function decodeImageHashDataUrl(
         const url = decodeBlurHashDataUrl(blurHash);
         if (url) return url;
     }
+    if (dominantColor) {
+        return dominantColorToDataUrl(dominantColor);
+    }
     return null;
 }
 
 /**
  * Decodes a base64 ThumbHash string into a PNG data URL. Each unique hash is
- * decoded once per session (module-level cache). Returns null for invalid or
- * empty input. Never throws.
+ * decoded once per session (module-level cache). Returns null only if the 2d
+ * canvas context is unavailable.
  *
- * @param hash The base64 ThumbHash string.
+ * @param hash A valid base64 ThumbHash string.
  */
 export function decodeThumbHashDataUrl(hash: string): null | string {
     const key = `thumbhash:${hash}`;
@@ -64,12 +66,23 @@ export function decodeThumbHashDataUrl(hash: string): null | string {
     if (cached) return cached;
 
     const image = thumbHashToRgba(hash);
-    if (!image) return null;
-
     const url = rgbaToCanvasDataUrl(image.width, image.height, image.rgba);
     if (!url) return null;
     cacheSet(key, url);
     return url;
+}
+
+/**
+ * Builds a solid-color SVG data URL for use as an image placeholder. No cache
+ * needed: the string is built inline and memoized by the calling hook. The
+ * quotes must stay %-encoded: the URL is consumed unquoted inside a CSS
+ * `url(...)` where a raw `'` makes the whole declaration drop out.
+ *
+ * @param color A hex color, e.g. `#1a2b3c` (3, 6, or 8 digits).
+ */
+export function dominantColorToDataUrl(color: string): string {
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='1' height='1'><rect width='1' height='1' fill='${color}' /></svg>`;
+    return `data:image/svg+xml,${encodeURIComponent(svg).replace(/'/g, '%27')}`;
 }
 
 function cacheGet(key: string): null | string {

@@ -566,6 +566,7 @@ const MetadataSection = memo(
                         <ItemImage
                             blurHash={item.blurHash}
                             className={styles.image}
+                            dominantColor={item.dominantColor}
                             explicitStatus={item.explicitStatus}
                             id={item.imageId}
                             itemType={item._itemType}

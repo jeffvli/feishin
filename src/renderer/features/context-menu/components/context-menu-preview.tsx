@@ -52,8 +52,14 @@ export const ContextMenuPreview = ({ items, itemType }: ContextMenuPreviewProps)
         serverId: (firstItem as { _serverId?: string })?._serverId,
         type: 'table',
     });
-    const item = firstItem as undefined | { blurHash?: null | string; thumbHash?: null | string };
-    const hashUrl = useImageHashUrl(item?.thumbHash, item?.blurHash);
+    const item = firstItem as
+        | undefined
+        | {
+              blurHash?: null | string;
+              dominantColor?: null | string;
+              thumbHash?: null | string;
+          };
+    const hashUrl = useImageHashUrl(item?.thumbHash, item?.blurHash, item?.dominantColor);
 
     if (itemCount === 0) {
         return null;

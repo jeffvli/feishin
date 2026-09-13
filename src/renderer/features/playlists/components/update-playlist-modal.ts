@@ -25,6 +25,7 @@ export const openUpdatePlaylistModal = async (args: { playlist: Playlist }) => {
             },
             playlistImage: {
                 blurHash: playlist.blurHash,
+                dominantColor: playlist.dominantColor,
                 imageId: playlist.imageId,
                 imageUrl: playlist.imageUrl,
                 thumbHash: playlist.thumbHash,

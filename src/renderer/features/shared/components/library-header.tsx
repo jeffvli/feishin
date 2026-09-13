@@ -44,6 +44,7 @@ interface LibraryHeaderProps {
     item: {
         blurHash?: null | string;
         children?: ReactNode;
+        dominantColor?: null | string;
         explicitStatus?: ExplicitStatus | null;
         imageId?: null | string;
         imageUrl?: null | string;
@@ -176,6 +177,7 @@ export const LibraryHeader = forwardRef(
                             blurHash={item.blurHash}
                             className={styles.image}
                             containerClassName={styles.image}
+                            dominantColor={item.dominantColor}
                             enableDebounce={false}
                             enableViewport={false}
                             explicitStatus={item.explicitStatus ?? null}
@@ -203,6 +205,7 @@ export const LibraryHeader = forwardRef(
                             blurHash={item.blurHash}
                             className={styles.image}
                             containerClassName={styles.image}
+                            dominantColor={item.dominantColor}
                             enableDebounce={false}
                             enableViewport={false}
                             explicitStatus={item.explicitStatus ?? null}

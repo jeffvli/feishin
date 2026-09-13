@@ -26,6 +26,7 @@ export function ArtistMultiSelectRow({
     options: VirtualMultiSelectOption<{
         albumCount: null | number;
         blurHash?: null | string;
+        dominantColor?: null | string;
         imageUrl: string | undefined;
         songCount: null | number;
         thumbHash?: null | string;
@@ -54,6 +55,7 @@ export function ArtistMultiSelectRow({
             <ItemImage
                 blurHash={options[index].blurHash}
                 containerClassName={styles.rowImage}
+                dominantColor={options[index].dominantColor}
                 enableDebounce={true}
                 enableViewport={false}
                 itemType={LibraryItem.ARTIST}

@@ -257,6 +257,7 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
                 <ItemImage
                     blurHash={(data as Album | AlbumArtist | Playlist | Song)?.blurHash}
                     className={clsx(styles.image, { [styles.isRound]: isRound })}
+                    dominantColor={(data as Album | AlbumArtist | Playlist)?.dominantColor}
                     enableDebounce={false}
                     {...(variant === 'poster' ? { enableViewport: enableImageViewport } : {})}
                     explicitStatus={'explicitStatus' in data && data ? data.explicitStatus : null}
@@ -397,6 +398,7 @@ const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
                     className={clsx(styles.image, {
                         [styles.isRound]: isRound,
                     })}
+                    dominantColor={(data as Album | AlbumArtist | Playlist)?.dominantColor}
                     enableDebounce={false}
                     explicitStatus={'explicitStatus' in data && data ? data.explicitStatus : null}
                     fetchPriority={imageFetchPriority}

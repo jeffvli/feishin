@@ -37,6 +37,7 @@ const getUnloaderIcon = (itemType: LibraryItem) => {
 const BaseItemImage = (
     props: Omit<ImageProps, 'id' | 'src'> & {
         blurHash?: null | string;
+        dominantColor?: null | string;
         explicitStatus?: ExplicitStatus | null;
         id?: null | string;
         itemType: LibraryItem;
@@ -46,9 +47,9 @@ const BaseItemImage = (
         type?: keyof z.infer<typeof GeneralSettingsSchema>['imageRes'];
     },
 ) => {
-    const { blurHash, explicitStatus, serverId, src, thumbHash, ...rest } = props;
+    const { blurHash, dominantColor, explicitStatus, serverId, src, thumbHash, ...rest } = props;
     const { blurExplicitImages } = useGeneralSettings();
-    const hashUrl = useImageHashUrl(thumbHash, blurHash);
+    const hashUrl = useImageHashUrl(thumbHash, blurHash, dominantColor);
 
     const imageUrl = useItemImageUrl({
         id: props.id,

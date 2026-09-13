@@ -38,8 +38,14 @@ export const DragPreview = memo(({ data }: DragPreviewProps) => {
         itemType: data.itemType || LibraryItem.SONG,
         type: 'table',
     });
-    const item = firstItem as undefined | { blurHash?: null | string; thumbHash?: null | string };
-    const hashUrl = useImageHashUrl(item?.thumbHash, item?.blurHash);
+    const item = firstItem as
+        | undefined
+        | {
+              blurHash?: null | string;
+              dominantColor?: null | string;
+              thumbHash?: null | string;
+          };
+    const hashUrl = useImageHashUrl(item?.thumbHash, item?.blurHash, item?.dominantColor);
 
     const isMultiple = itemCount > 1;
 

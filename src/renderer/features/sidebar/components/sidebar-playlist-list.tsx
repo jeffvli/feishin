@@ -315,6 +315,7 @@ export const PlaylistRowButton = memo(
                             <ItemImage
                                 blurHash={item.blurHash}
                                 containerClassName={styles.imageContainer}
+                                dominantColor={item.dominantColor}
                                 id={item.imageId}
                                 itemType={LibraryItem.PLAYLIST}
                                 src={imageUrl}

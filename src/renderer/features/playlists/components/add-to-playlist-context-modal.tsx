@@ -575,6 +575,7 @@ const PlaylistTableItem = memo(
                         <Flex align="center" justify="center" px="sm">
                             <ItemImage
                                 blurHash={item.blurHash}
+                                dominantColor={item.dominantColor}
                                 id={item.imageId}
                                 imageContainerProps={{
                                     className: styles.imageContainer,

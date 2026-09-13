@@ -205,6 +205,7 @@ export const PlaylistDetailSongListHeader = ({
                     imageUrl={imageUrl}
                     item={{
                         blurHash: detailQuery?.data?.blurHash,
+                        dominantColor: detailQuery?.data?.dominantColor,
                         imageId: detailQuery?.data?.imageId,
                         imageUrl: detailQuery?.data?.imageUrl,
                         route: AppRoute.PLAYLISTS,

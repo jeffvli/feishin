@@ -120,6 +120,7 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
                             blurHash={album.blurHash}
                             className={styles.albumImage}
                             containerClassName={styles.albumImageContainer}
+                            dominantColor={album.dominantColor}
                             enableDebounce={false}
                             enableViewport={false}
                             explicitStatus={album.explicitStatus}

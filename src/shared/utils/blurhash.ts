@@ -18,23 +18,12 @@ type Color = [number, number, number];
 /**
  * Decodes a BlurHash string into RGBA pixels (opaque, alpha 255).
  *
- * @param blurhash The BlurHash string.
+ * @param blurhash A valid BlurHash string.
  * @param width Output width in pixels (default 32).
  * @param height Output height in pixels (default 32).
- * @returns The rendered pixels, or null if the string is not a valid BlurHash.
- * Never throws.
+ * @returns The rendered pixels.
  */
-export function blurHashToRgba(
-    blurhash: string,
-    width = 32,
-    height = 32,
-): null | Uint8ClampedArray {
-    try {
-        validateBlurHash(blurhash);
-    } catch {
-        return null;
-    }
-
+export function blurHashToRgba(blurhash: string, width = 32, height = 32): Uint8ClampedArray {
     const sizeFlag = decode83(blurhash[0]);
     const numY = Math.floor(sizeFlag / 9) + 1;
     const numX = (sizeFlag % 9) + 1;
@@ -125,17 +114,4 @@ function signPow(value: number, exponent: number): number {
 function sRGBToLinear(value: number): number {
     const v = value / 255;
     return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
-}
-
-/** Throws if the string is not structurally a valid BlurHash. */
-function validateBlurHash(blurhash: string): void {
-    if (!blurhash || blurhash.length < 6) {
-        throw new Error('blurhash must be at least 6 characters');
-    }
-    const sizeFlag = decode83(blurhash[0]);
-    const numY = Math.floor(sizeFlag / 9) + 1;
-    const numX = (sizeFlag % 9) + 1;
-    if (blurhash.length !== 4 + 2 * numX * numY) {
-        throw new Error('blurhash length mismatch');
-    }
 }
