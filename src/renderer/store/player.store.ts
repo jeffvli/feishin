@@ -222,9 +222,9 @@ function calculateNextIndex(
             return { nextIndex: currentIndex + 1, shouldStop: false };
         }
     } else {
-        // Repeat none: move to next track, or stop if at the end
+        // Repeat none: move to next track, or loop back and stop if at the end
         if (isLastTrack) {
-            return { nextIndex: currentIndex, shouldStop: true };
+            return { nextIndex: 0, shouldStop: true };
         } else {
             return { nextIndex: currentIndex + 1, shouldStop: false };
         }
@@ -1115,6 +1115,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
 
                     if (shouldStop) {
                         set((state) => {
+                            state.player.index = nextIndex;
                             state.player.status = PlayerStatus.STOPPED;
                             state.player.playerNum = 1;
                             setTimestampStore(0);
