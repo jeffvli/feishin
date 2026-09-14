@@ -1,6 +1,6 @@
 {
     "name": "feishin",
-    "version": "1.15.1",
+    "version": "1.16.0",
     "description": "A modern self-hosted music player.",
     "keywords": [
         "subsonic",
@@ -26,8 +26,8 @@
         "build:remote": "vite build --config remote.vite.config.ts",
         "build:web": "vite build --config web.vite.config.ts",
         "dev": "electron-vite dev",
-        "dev:validate-api": "cross-env VITE_VALIDATE_API_RESPONSES=true electron-vite dev",
         "dev:remote": "vite dev --config remote.vite.config.ts",
+        "dev:validate-api": "cross-env VITE_VALIDATE_API_RESPONSES=true electron-vite dev",
         "dev:watch": "electron-vite dev --watch",
         "i18next": "i18next -c src/i18n/i18next-parser.config.js",
         "postinstall": "install-electron && electron-builder install-app-deps",
