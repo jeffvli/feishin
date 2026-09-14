@@ -3,8 +3,10 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import ar from './locales/ar.json';
+import bg from './locales/bg.json';
 import ca from './locales/ca.json';
 import cs from './locales/cs.json';
+import da from './locales/da.json';
 import de from './locales/de.json';
 import en from './locales/en.json';
 import es from './locales/es.json';
@@ -13,6 +15,7 @@ import eu from './locales/eu.json';
 import fa from './locales/fa.json';
 import fi from './locales/fi.json';
 import fr from './locales/fr.json';
+import gl from './locales/gl.json';
 import hu from './locales/hu.json';
 import id from './locales/id.json';
 import it from './locales/it.json';
@@ -21,10 +24,13 @@ import ko from './locales/ko.json';
 import lv from './locales/lv.json';
 import nbNO from './locales/nb-NO.json';
 import nl from './locales/nl.json';
+import nn from './locales/nn.json';
 import pl from './locales/pl.json';
 import ptBr from './locales/pt-BR.json';
 import pt from './locales/pt.json';
+import ro from './locales/ro.json';
 import ru from './locales/ru.json';
+import sk from './locales/sk.json';
 import sl from './locales/sl.json';
 import sr from './locales/sr.json';
 import sv from './locales/sv.json';
@@ -32,13 +38,16 @@ import ta from './locales/ta.json';
 import th from './locales/th.json';
 import tl from './locales/tl.json';
 import tr from './locales/tr.json';
+import uk from './locales/uk.json';
 import zhHans from './locales/zh-Hans.json';
 import zhHant from './locales/zh-Hant.json';
 
 const resources = {
     ar: { translation: ar },
+    bg: { translation: bg },
     ca: { translation: ca },
     cs: { translation: cs },
+    da: { translation: da },
     de: { translation: de },
     en: { translation: en },
     es: { translation: es },
@@ -47,6 +56,7 @@ const resources = {
     fa: { translation: fa },
     fi: { translation: fi },
     fr: { translation: fr },
+    gl: { translation: gl },
     hu: { translation: hu },
     id: { translation: id },
     it: { translation: it },
@@ -55,10 +65,13 @@ const resources = {
     lv: { translation: lv },
     'nb-NO': { translation: nbNO },
     nl: { translation: nl },
+    nn: { translation: nn },
     pl: { translation: pl },
     pt: { translation: pt },
     'pt-BR': { translation: ptBr },
+    ro: { translation: ro },
     ru: { translation: ru },
+    sk: { translation: sk },
     sl: { translation: sl },
     sr: { translation: sr },
     sv: { translation: sv },
@@ -66,6 +79,7 @@ const resources = {
     th: { translation: th },
     tl: { translation: tl },
     tr: { translation: tr },
+    uk: { translation: uk },
     'zh-Hans': { translation: zhHans },
     'zh-Hant': { translation: zhHant },
 };
@@ -80,12 +94,20 @@ export const languages = [
         value: 'ar',
     },
     {
+        label: 'Български',
+        value: 'bg',
+    },
+    {
         label: 'Català',
         value: 'ca',
     },
     {
         label: 'Čeština',
         value: 'cs',
+    },
+    {
+        label: 'Dansk',
+        value: 'da',
     },
     {
         label: 'Deutsch',
@@ -106,6 +128,10 @@ export const languages = [
     {
         label: 'Français',
         value: 'fr',
+    },
+    {
+        label: 'Galego',
+        value: 'gl',
     },
     {
         label: 'Bahasa Indonesia',
@@ -144,6 +170,10 @@ export const languages = [
         value: 'nb-NO',
     },
     {
+        label: 'Norsk (Nynorsk)',
+        value: 'nn',
+    },
+    {
         label: 'فارسی',
         value: 'fa',
     },
@@ -160,8 +190,16 @@ export const languages = [
         value: 'pl',
     },
     {
+        label: 'Română',
+        value: 'ro',
+    },
+    {
         label: 'Русский',
         value: 'ru',
+    },
+    {
+        label: 'Slovenčina',
+        value: 'sk',
     },
     {
         label: 'Slovenščina',
@@ -190,6 +228,10 @@ export const languages = [
     {
         label: 'Türkçe',
         value: 'tr',
+    },
+    {
+        label: 'Українська',
+        value: 'uk',
     },
     {
         label: '简体中文',
