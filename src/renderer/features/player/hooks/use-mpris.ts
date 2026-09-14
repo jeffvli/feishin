@@ -186,7 +186,7 @@ export const useMPRIS = () => {
 
                 const formattedLyrics = lyricsMetadataToLrc(
                     properties.lyrics,
-                    properties.offsetMs,
+                    properties.offsetMs ?? 0,
                     properties.synced,
                 );
 

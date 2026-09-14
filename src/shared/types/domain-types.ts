@@ -1384,7 +1384,7 @@ export type FavoriteSongListResponse = BasePaginatedResponse<Song[]>;
 
 export type FullLyricsMetadata = Omit<InternetProviderLyricResponse, 'id' | 'lyrics' | 'source'> & {
     lyrics: LyricsResponse;
-    offsetMs?: number;
+    offsetMs?: null | number;
     remote: boolean;
     source: string;
 };

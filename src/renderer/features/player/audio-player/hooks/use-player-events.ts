@@ -38,7 +38,7 @@ interface PlayerEventsCallbacks {
     onNextSongInsertion?: (song: QueueSong | undefined) => void;
     onPlayerLyricsFetched?: (properties: {
         lyrics: FullLyricsMetadata;
-        offsetMs: number;
+        offsetMs: null | number;
         synced: boolean;
     }) => void;
     onPlayerMute?: (properties: { muted: boolean }, prev: { muted: boolean }) => void;

@@ -104,7 +104,7 @@ export const mapStructuredLyric = (lyric: ApiStructuredLyric, source: string): S
         artist: lyric.displayArtist || '',
         lang: lyric.lang,
         name: lyric.displayTitle || '',
-        offsetMs: lyric.offset ?? 0,
+        offsetMs: lyric.offset || null,
         remote: false,
         source,
     };
