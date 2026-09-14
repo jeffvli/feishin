@@ -294,7 +294,7 @@ const createThrottledSetTableMeta = (
         const itemHeight =
             size === 'compact'
                 ? widthPerItem
-                : widthPerItem + (rowsCount || getDataRowsCount()) * 26;
+                : widthPerItem + (rowsCount ?? getDataRowsCount()) * 26;
 
         if (widthPerItem === 0) {
             return;
