@@ -6,6 +6,7 @@ import {
     WebPlayerEngine,
     WebPlayerEngineHandle,
 } from '/@/renderer/features/player/audio-player/engine/web-player-engine';
+import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
 import {
     useIsRadioActive,
@@ -33,6 +34,16 @@ export function RadioWebPlayer() {
     const [player1Source, setPlayer1Source] = useState<MediaElementAudioSourceNode | null>(null);
     const processedMediaElementRef = useRef<HTMLMediaElement | null>(null);
     const player1SourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+
+    usePlayerEvents(
+        {
+            onPlayerVolume: (properties) => {
+                const volume = properties.volume;
+                playerRef.current?.setVolume(volume);
+            },
+        },
+        [volume],
+    );
 
     useEffect(() => {
         player1SourceRef.current = player1Source;

@@ -529,7 +529,12 @@
         "fullscreenAutoOpenTimeout_description": "Automaticky otevře přehrávač na celou obrazovku po tomto počtu minut neaktivity během přehrávání skladby. Nastavte na 0 pro zakázání",
         "fullscreenAutoOpenTimeout": "Čas do automatického otevření přehrávače na celou obrazovku (minuty)",
         "sidebarImageEnabled": "Tlačítko rozbalení obalu alba",
-        "sidebarImageEnabled_description": "Zobrazit tlačítko na obalu alba na liště přehrávače pro jeho rozbalení do postranní lišty. Zakázáním také skryjete tlačítko a sbalíte obal alba, pokud je aktuálně rozbalen"
+        "sidebarImageEnabled_description": "Zobrazit tlačítko na obalu alba na liště přehrávače pro jeho rozbalení do postranní lišty. Zakázáním také skryjete tlačítko a sbalíte obal alba, pokud je aktuálně rozbalen",
+        "scrobbleMinimumMode_description": "Scrobblovat po dosažení procenta skladby, určitého opčtu sekund nebo jednoho z nich",
+        "scrobbleMinimumMode_optionBoth": "Oba",
+        "scrobbleMinimumMode_optionSeconds": "Sekundy",
+        "scrobbleMinimumMode_optionPercentage": "Procento",
+        "scrobbleMinimumMode": "Nastavit režim minimálního scrobblování"
     },
     "action": {
         "editPlaylist": "Upravit $t(entity.playlist, {\"count\": 1})",
@@ -1045,7 +1050,8 @@
             "explore": "Procházet z vaší knihovny",
             "recentlyPlayed": "Nedávno přehráno",
             "recentlyReleased": "Nedávno vydáno",
-            "genres": "$t(entity.genre, {\"count\": 2})"
+            "genres": "$t(entity.genre, {\"count\": 2})",
+            "playlists": "Seznamy skladeb"
         },
         "albumDetail": {
             "moreFromArtist": "Více od tohoto $t(entity.artist, {\"count\": 1})",

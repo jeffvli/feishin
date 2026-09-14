@@ -4,7 +4,9 @@ import { useTranslation } from 'react-i18next';
 import styles from './drag-preview.module.css';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { useImagePlaceholderPriority } from '/@/renderer/store';
 import { Icon } from '/@/shared/components/icon/icon';
+import { useImageHashUrl } from '/@/shared/hooks/use-image-hash-url';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { DragData, DragTarget } from '/@/shared/types/drag-and-drop';
 
@@ -37,6 +39,20 @@ export const DragPreview = memo(({ data }: DragPreviewProps) => {
         itemType: data.itemType || LibraryItem.SONG,
         type: 'table',
     });
+    const item = firstItem as
+        | undefined
+        | {
+              blurHash?: null | string;
+              dominantColor?: null | string;
+              thumbHash?: null | string;
+          };
+    const imagePlaceholderPriority = useImagePlaceholderPriority();
+    const hashUrl = useImageHashUrl(
+        item?.thumbHash,
+        item?.blurHash,
+        item?.dominantColor,
+        imagePlaceholderPriority,
+    );
 
     const isMultiple = itemCount > 1;
 
@@ -44,9 +60,22 @@ export const DragPreview = memo(({ data }: DragPreviewProps) => {
         <div className={styles.container}>
             <div className={styles.preview}>
                 <div className={styles.content}>
-                    {itemImage ? (
-                        <div className={styles['image-container']}>
-                            <img alt={itemName} className={styles.image} src={itemImage} />
+                    {itemImage || hashUrl ? (
+                        <div
+                            className={styles['image-container']}
+                            style={
+                                hashUrl
+                                    ? {
+                                          backgroundImage: `url(${hashUrl})`,
+                                          backgroundPosition: 'center',
+                                          backgroundSize: 'cover',
+                                      }
+                                    : undefined
+                            }
+                        >
+                            {itemImage ? (
+                                <img alt={itemName} className={styles.image} src={itemImage} />
+                            ) : null}
                             <div className={styles['image-overlay']} />
                         </div>
                     ) : (

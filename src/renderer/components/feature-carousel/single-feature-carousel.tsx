@@ -114,14 +114,17 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
                 <div className={styles.content}>
                     <div className={styles.imageSection}>
                         <ItemImage
+                            blurHash={album.blurHash}
                             className={styles.albumImage}
                             containerClassName={styles.albumImageContainer}
+                            dominantColor={album.dominantColor}
                             enableDebounce={false}
                             enableViewport={false}
                             explicitStatus={album.explicitStatus}
                             fetchPriority="high"
                             id={album.imageId}
                             itemType={LibraryItem.ALBUM}
+                            thumbHash={album.thumbHash}
                             type="itemCard"
                         />
                         <div className={styles.playButtonOverlay}>

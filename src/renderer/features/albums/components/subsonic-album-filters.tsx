@@ -66,6 +66,8 @@ export const SubsonicAlbumFilters = ({
 
         return items.map((artist) => ({
             albumCount: artist.albumCount,
+            blurHash: artist.blurHash,
+            dominantColor: artist.dominantColor,
             imageUrl: getItemImageUrl({
                 id: artist.id,
                 itemType: LibraryItem.ARTIST,
@@ -73,6 +75,7 @@ export const SubsonicAlbumFilters = ({
             }),
             label: artist.name,
             songCount: artist.songCount,
+            thumbHash: artist.thumbHash,
             value: artist.id,
         }));
     }, [items]);

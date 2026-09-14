@@ -43,7 +43,9 @@ mac:
     icon: media/feishin.icon
     type: distribution
     hardenedRuntime: false
-    identity: '-'
+    identity: "-"
+    entitlements: build/entitlements.mac.plist
+    entitlementsInherit: build/entitlements.mac.plist
     gatekeeperAssess: false
     notarize: false
     extendInfo:

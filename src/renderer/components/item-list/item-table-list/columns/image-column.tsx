@@ -84,6 +84,7 @@ const ImageColumnBase = (props: ItemTableListInnerColumn) => {
                     onMouseLeave={() => setIsHovered(false)}
                 >
                     <ItemImage
+                        blurHash={item?.blurHash}
                         containerClassName={clsx({
                             [styles.compactImageContainer]: props.size === 'compact',
                             [styles.imageContainerWithAspectRatio]:
@@ -95,6 +96,7 @@ const ImageColumnBase = (props: ItemTableListInnerColumn) => {
                         id={item?.imageId}
                         itemType={item?._itemType}
                         src={item?.imageUrl}
+                        thumbHash={item?.thumbHash}
                         type="table"
                     />
                     {isHovered && (

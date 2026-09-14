@@ -483,7 +483,7 @@ export const useMetadataEditor = ({ browser, songs: songsProp, utils }: UseMetad
                     await browser?.clearCache();
                 }
 
-                if (triggerRescan && server) {
+                if (server.isAdmin && triggerRescan && server) {
                     try {
                         await controller.refreshItems({
                             apiClientProps: { serverId: server.id },

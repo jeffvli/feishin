@@ -1,7 +1,7 @@
 import { ServerListItemWithCredential } from '/@/shared/types/domain-types';
 import { ServerType } from '/@/shared/types/types';
 
-export const normalizeServerUrl = (url: string) => url.replace(/\/$/, '');
+export const normalizeServerUrl = (url: string) => url.trim().replace(/\/$/, '');
 
 export const findExistingServerLockServer = (
     serverList: Record<string, ServerListItemWithCredential>,

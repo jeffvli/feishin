@@ -1,0 +1,38 @@
+.row {
+    min-height: 56px;
+    padding: 8px 16px;
+
+    /* pan-y, not none — keeps vertical list scrolling working while still
+       telling the browser not to treat a hold-and-move here as a
+       selection/zoom gesture, which otherwise races our long-press timer. */
+    touch-action: pan-y;
+    cursor: pointer;
+    user-select: none;
+    border-radius: var(--theme-radius-lg);
+    transition:
+        transform 100ms ease,
+        opacity 100ms ease;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+}
+
+.row:active {
+    opacity: 0.85;
+    transform: scale(0.97);
+}
+
+@media (hover: hover) {
+    .row:hover {
+        background-color: var(--theme-colors-surface);
+    }
+}
+
+.row-current {
+    background-color: var(--theme-colors-primary-transparent);
+}
+
+@media (hover: hover) {
+    .row-current:hover {
+        background-color: var(--theme-colors-primary-transparent);
+    }
+}

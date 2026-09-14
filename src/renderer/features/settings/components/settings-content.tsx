@@ -1,8 +1,6 @@
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 
-import styles from './settings-content.module.css';
-
 import { AdvancedTab } from '/@/renderer/features/settings/components/advanced/advanced-tab';
 import { GeneralTab } from '/@/renderer/features/settings/components/general/general-tab';
 import { HotkeysTab } from '/@/renderer/features/settings/components/hotkeys/hotkeys-tab';
@@ -10,6 +8,7 @@ import { PlaybackTab } from '/@/renderer/features/settings/components/playback/p
 import { WindowTab } from '/@/renderer/features/settings/components/window/window-tab';
 import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { useSettingsStore, useSettingsStoreActions } from '/@/renderer/store/settings.store';
+import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Tabs } from '/@/shared/components/tabs/tabs';
 
 export const SettingsContent = () => {
@@ -19,7 +18,7 @@ export const SettingsContent = () => {
 
     return (
         <LibraryContainer>
-            <div className={styles.scrollContainer}>
+            <ScrollArea>
                 <Tabs
                     keepMounted={false}
                     onChange={(e) => e && setSettings({ tab: e })}
@@ -54,7 +53,7 @@ export const SettingsContent = () => {
                         <AdvancedTab />
                     </Tabs.Panel>
                 </Tabs>
-            </div>
+            </ScrollArea>
         </LibraryContainer>
     );
 };

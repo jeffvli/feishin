@@ -3,6 +3,7 @@ import { z } from 'zod';
 const baseResponse = z.object({
     'subsonic-response': z.object({
         status: z.string(),
+        type: z.string().optional(),
         version: z.string(),
     }),
 });
@@ -91,7 +92,7 @@ const user = z.object({
         commentRole: z.boolean(),
         coverArtRole: z.boolean(),
         downloadRole: z.boolean(),
-        folder: z.string().array(),
+        folder: z.number().array(),
         jukeboxRole: z.boolean(),
         playlistRole: z.boolean(),
         podcastRole: z.boolean(),
@@ -334,8 +335,9 @@ const artistInfo2 = z.object({
 });
 
 const topSongsListParameters = z.object({
-    artist: z.string(), // The name of the artist, not the artist ID
+    artist: z.string().optional(), // The name of the artist, not the artist ID
     count: z.number().optional(),
+    id: z.string().optional(), // Added by topSongsByArtistId extension
 });
 
 const topSongsList = z.object({
@@ -507,6 +509,7 @@ export enum SubsonicExtensions {
     INDEX_BASED_QUEUE = 'indexBasedQueue',
     PLAYBACK_REPORT = 'playbackReport',
     SONG_LYRICS = 'songLyrics',
+    TOP_SONGS_BY_ARTIST_ID = 'topSongsByArtistId',
     TRANSCODE_OFFSET = 'transcodeOffset',
     TRANSCODING = 'transcoding',
 }

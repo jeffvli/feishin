@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 
 import { SettingsOptions } from '/@/renderer/features/settings/components/settings-option';
-import { useSettingSearchContext } from '/@/renderer/features/settings/context/search-context';
+import { useSettingSearchStore } from '/@/renderer/features/settings/store/search.store';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
 
@@ -21,7 +21,7 @@ interface SettingsSectionProps {
 }
 
 export const SettingsSection = ({ extra, options, title }: SettingsSectionProps) => {
-    const keyword = useSettingSearchContext();
+    const { search: keyword } = useSettingSearchStore();
     const hasKeyword = keyword !== '';
 
     const values = options.filter(

@@ -388,6 +388,25 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
     const lyricOptions = [
         {
             component: (
+                <NumberInput
+                    defaultValue={lyricsSettings.delayMs}
+                    onBlur={(e) => {
+                        const value = Number(e.currentTarget.value);
+                        updateLyricsSetting({ delayMs: value });
+                    }}
+                    step={10}
+                    width={100}
+                />
+            ),
+            description: t('setting.lyricOffset', {
+                context: 'description',
+            }),
+            id: 'delayMs',
+            isHidden: !isElectron(),
+            label: t('setting.lyricOffset'),
+        },
+        {
+            component: (
                 <ListConfigBooleanControl
                     onChange={(value) => updateLyricsSetting({ preferLocalLyrics: value })}
                     value={lyricsSettings.preferLocalLyrics}

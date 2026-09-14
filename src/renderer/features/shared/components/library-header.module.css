@@ -181,6 +181,25 @@
     align-items: center;
     justify-content: center;
     width: 100%;
+    min-width: 0;
+
+    > * {
+        min-width: 0;
+    }
+
+    > :nth-child(2) {
+        flex-shrink: 0;
+    }
+
+    button {
+        min-width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    button * {
+        min-width: 0;
+    }
 
     @container (min-width: $mantine-breakpoint-sm) {
         display: flex;

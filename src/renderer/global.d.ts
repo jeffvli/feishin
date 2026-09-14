@@ -35,6 +35,7 @@ declare global {
         FS_GENERAL_FOLLOW_SYSTEM_THEME?: string;
         FS_GENERAL_HOME_FEATURE?: string;
         FS_GENERAL_HOME_FEATURE_STYLE?: string;
+        FS_GENERAL_IMAGE_PLACEHOLDER_PRIORITY?: string;
         FS_GENERAL_LANGUAGE?: string;
         FS_GENERAL_LAST_FM?: string;
         FS_GENERAL_LASTFM_API_KEY?: string;

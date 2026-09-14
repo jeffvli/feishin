@@ -30,11 +30,9 @@ import {
     useFullScreenPlayerStoreActions,
     usePlayerData,
     usePlayerSong,
-    useWindowSettings,
 } from '/@/renderer/store';
 import { Group } from '/@/shared/components/group/group';
 import { LibraryItem } from '/@/shared/types/domain-types';
-import { Platform } from '/@/shared/types/types';
 
 const mainBackground = 'var(--theme-colors-background)';
 
@@ -237,40 +235,22 @@ const BackgroundOverlay = memo(({ dynamicBackground, opacity }: BackgroundOverla
 BackgroundOverlay.displayName = 'BackgroundOverlay';
 
 const containerVariants: Variants = {
-    closed: (custom) => {
-        const { windowBarStyle } = custom;
-        return {
-            height:
-                windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS
-                    ? 'calc(100vh - 120px)'
-                    : 'calc(100vh - 90px)',
-            position: 'absolute',
-            top: '100vh',
-            transition: {
-                duration: 0.5,
-                ease: 'easeOut',
-            },
-            width: '100vw',
-            y: 0,
-        };
+    closed: {
+        transition: {
+            duration: 0.5,
+            ease: 'easeOut',
+        },
+        y: '100%',
     },
     open: (custom) => {
-        const { background, dynamicBackground, windowBarStyle } = custom;
+        const { background, dynamicBackground } = custom;
         return {
             backgroundColor: dynamicBackground ? background : mainBackground,
-            height:
-                windowBarStyle === Platform.WINDOWS || windowBarStyle === Platform.MACOS
-                    ? 'calc(100vh - 120px)'
-                    : 'calc(100vh - 90px)',
-            left: 0,
-            position: 'absolute',
-            top: 0,
             transition: {
                 delay: 0.1,
                 duration: 0.5,
                 ease: 'easeOut',
             },
-            width: '100vw',
             y: 0,
         };
     },
@@ -281,21 +261,22 @@ interface PlayerContainerProps {
     dynamicBackground: boolean | undefined;
     dynamicIsImage: boolean | undefined;
     opacity: number;
-    windowBarStyle: Platform;
 }
 
 const PlayerContainer = memo(
-    ({
-        children,
-        dynamicBackground,
-        dynamicIsImage,
-        opacity,
-        windowBarStyle,
-    }: PlayerContainerProps) => {
+    ({ children, dynamicBackground, dynamicIsImage, opacity }: PlayerContainerProps) => {
         const currentSong = usePlayerSong();
+        const isRadioActive = useIsRadioActive();
+        const { currentStationArt: currentRadioStationArt } = useRadioPlayer();
+
+        const imageId = isRadioActive ? currentRadioStationArt?.imageId : currentSong?.imageId;
+        const currentImageUrl = isRadioActive
+            ? currentRadioStationArt?.imageUrl
+            : currentSong?.imageUrl;
+
         const imageUrl = useItemImageUrl({
-            id: currentSong?.imageId || undefined,
-            imageUrl: currentSong?.imageUrl,
+            id: imageId || undefined,
+            imageUrl: currentImageUrl,
             itemType: LibraryItem.SONG,
             type: 'itemCard',
         });
@@ -309,7 +290,7 @@ const PlayerContainer = memo(
             <motion.div
                 animate="open"
                 className={styles.container}
-                custom={{ background, dynamicBackground, windowBarStyle }}
+                custom={{ background, dynamicBackground }}
                 exit="closed"
                 initial="closed"
                 transition={{ duration: 2 }}
@@ -332,8 +313,12 @@ export const FullScreenPlayer = () => {
     const { activeTab, dynamicBackground, dynamicImageBlur, dynamicIsImage, opacity } =
         useFullScreenPlayerStore();
     const { setStore } = useFullScreenPlayerStoreActions();
-    const hasActiveModule = Boolean(activeTab);
-    const { windowBarStyle } = useWindowSettings();
+    const hasActiveModule =
+        activeTab === 'queue' ||
+        activeTab === 'related' ||
+        activeTab === 'lyrics' ||
+        activeTab === 'visualizer';
+
     const isRadioActive = useIsRadioActive();
     const { isPlaying: isRadioPlaying } = useRadioPlayer();
 
@@ -356,7 +341,6 @@ export const FullScreenPlayer = () => {
             dynamicBackground={effectiveDynamicBackground}
             dynamicIsImage={dynamicIsImage}
             opacity={opacity}
-            windowBarStyle={windowBarStyle}
         >
             <Group
                 className="full-screen-player-controls-container"

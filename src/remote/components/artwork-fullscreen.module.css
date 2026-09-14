@@ -1,0 +1,45 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-spacing-lg);
+    align-items: center;
+    justify-content: center;
+    padding: var(--theme-spacing-md);
+    background: var(--theme-colors-background);
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+    width: min(90vw, 420px);
+    text-align: center;
+}
+
+.info-line {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.close-button {
+    position: absolute;
+    top: calc(var(--theme-spacing-md) + env(safe-area-inset-top, 0px));
+    right: var(--theme-spacing-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    color: var(--theme-colors-foreground);
+    cursor: pointer;
+    background: var(--theme-colors-surface);
+    border: none;
+    border-radius: 999px;
+    -webkit-tap-highlight-color: transparent;
+}

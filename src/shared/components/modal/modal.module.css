@@ -2,6 +2,7 @@
     display: flex;
     justify-content: center;
     margin-bottom: var(--theme-spacing-md);
+    margin-bottom: 0;
     background: var(--theme-colors-background);
     border-radius: 0;
 }
@@ -14,7 +15,6 @@
 }
 
 .content {
-    padding: var(--theme-spacing-sm);
     overflow: hidden;
     background: var(--theme-colors-background);
     border: 2px solid var(--theme-colors-border);
@@ -26,4 +26,8 @@
 .close {
     position: absolute;
     right: var(--theme-spacing-md);
+}
+
+.body {
+    padding: var(--theme-spacing-md);
 }

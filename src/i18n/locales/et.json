@@ -593,7 +593,10 @@
                 "lyricOpacityNonActive_description": "Mitteaktiivsete ridade läbipaistmatus",
                 "lyricScaleNonActive_description": "Mitteaktiivsete ridade suurus suhtarvuna",
                 "showLyricMatch_description": "Kuva leitud laulusõnade pealkiri ja esitaja",
-                "showLyricProvider_description": "Kuva praeguste laulusõnade allikas"
+                "showLyricProvider_description": "Kuva praeguste laulusõnade allikas",
+                "coverArtSize": "Kaanepildi suurus",
+                "playerItemAlignment": "Pleieri elementide paigutus",
+                "titleDisplayType_optionMultiLine": "Mitu rida"
             },
             "lyrics": "Laulusõnad",
             "related": "Seotud",

@@ -6,6 +6,7 @@ import { useSendScrobble } from '/@/renderer/features/player/mutations/scrobble-
 import {
     getServerById,
     publishScrobbleDebug,
+    ScrobbleMinimumMode,
     useAppStore,
     usePlaybackSettings,
     usePlayerSong,
@@ -88,13 +89,19 @@ const SCROBBLE_RESTART_PREVIOUS_MIN_SEC = 10;
 const MAX_LISTEN_DELTA_SEC = 5;
 
 const checkScrobbleConditions = (args: {
+    minimumMode: 'both' | 'percentage' | 'seconds';
     scrobbleAtDurationMs: number;
     scrobbleAtPercentage: number;
     songCompletedDurationMs: number;
     songDurationMs: number;
 }) => {
-    const { scrobbleAtDurationMs, scrobbleAtPercentage, songCompletedDurationMs, songDurationMs } =
-        args;
+    const {
+        minimumMode,
+        scrobbleAtDurationMs,
+        scrobbleAtPercentage,
+        songCompletedDurationMs,
+        songDurationMs,
+    } = args;
     const percentageOfSongCompleted = songDurationMs
         ? (songCompletedDurationMs / songDurationMs) * 100
         : 0;
@@ -102,7 +109,16 @@ const checkScrobbleConditions = (args: {
     const shouldScrobbleBasedOnPercentage = percentageOfSongCompleted >= scrobbleAtPercentage;
     const shouldScrobbleBasedOnDuration = songCompletedDurationMs >= scrobbleAtDurationMs;
 
-    return shouldScrobbleBasedOnPercentage || shouldScrobbleBasedOnDuration;
+    switch (minimumMode) {
+        case ScrobbleMinimumMode.BOTH:
+            return shouldScrobbleBasedOnPercentage || shouldScrobbleBasedOnDuration;
+        case ScrobbleMinimumMode.PERCENTAGE:
+            return shouldScrobbleBasedOnPercentage;
+        case ScrobbleMinimumMode.SECONDS:
+            return shouldScrobbleBasedOnDuration;
+        default:
+            return shouldScrobbleBasedOnPercentage || shouldScrobbleBasedOnDuration;
+    }
 };
 
 export const useScrobble = () => {
@@ -126,6 +142,7 @@ export const useScrobble = () => {
     const lastListenSampleTimeRef = useRef<null | number>(null);
     const scrobbleAtDurationMsRef = useRef(0);
     const scrobbleAtPercentageRef = useRef(75);
+    const minimumModeRef = useRef<ScrobbleMinimumMode>(ScrobbleMinimumMode.BOTH);
 
     const previousSongRef = useRef<QueueSong | undefined>(undefined);
     const previousTimestampRef = useRef<number>(0);
@@ -143,7 +160,12 @@ export const useScrobble = () => {
     useEffect(() => {
         scrobbleAtDurationMsRef.current = (scrobbleSettings?.scrobbleAtDuration ?? 0) * 1000;
         scrobbleAtPercentageRef.current = scrobbleSettings?.scrobbleAtPercentage ?? 75;
-    }, [scrobbleSettings?.scrobbleAtDuration, scrobbleSettings?.scrobbleAtPercentage]);
+        minimumModeRef.current = scrobbleSettings?.minimumMode;
+    }, [
+        scrobbleSettings?.minimumMode,
+        scrobbleSettings?.scrobbleAtDuration,
+        scrobbleSettings?.scrobbleAtPercentage,
+    ]);
 
     const flushScrobbleDebug = useCallback(() => {
         const song = usePlayerStore.getState().getCurrentSong();
@@ -154,6 +176,7 @@ export const useScrobble = () => {
         const eligibilityMet = Boolean(
             song?.id &&
             checkScrobbleConditions({
+                minimumMode: minimumModeRef.current,
                 scrobbleAtDurationMs: scrobbleAtDurationMsRef.current,
                 scrobbleAtPercentage: scrobbleAtPercentageRef.current,
                 songCompletedDurationMs: listenedMsRef.current,
@@ -316,6 +339,7 @@ export const useScrobble = () => {
             // Check if we should submit scrobble based on listened time
             if (!isCurrentSongScrobbledRef.current) {
                 const shouldSubmitScrobble = checkScrobbleConditions({
+                    minimumMode: minimumModeRef.current,
                     scrobbleAtDurationMs: scrobbleAtDurationMsRef.current,
                     scrobbleAtPercentage: scrobbleAtPercentageRef.current,
                     songCompletedDurationMs: listenedMsRef.current,

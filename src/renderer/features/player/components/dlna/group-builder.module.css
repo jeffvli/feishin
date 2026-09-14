@@ -1,0 +1,8 @@
+.device {
+    padding: var(--theme-spacing-xs) var(--theme-spacing-sm);
+    border-radius: var(--theme-radius-sm);
+
+    &:has(input:checked) {
+        background: alpha(var(--theme-colors-primary), 0.15);
+    }
+}

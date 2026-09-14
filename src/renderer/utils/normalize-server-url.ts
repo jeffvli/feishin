@@ -1,8 +1,9 @@
 import { ServerListItem } from '/@/shared/types/domain-types';
 
 export const normalizeServerUrl = (url: string) => {
+    const trimmed = url.trim();
     // Remove trailing slash
-    return url.endsWith('/') ? url.slice(0, -1) : url;
+    return trimmed.endsWith('/') ? trimmed.slice(0, -1) : trimmed;
 };
 
 export const getServerUrl = (

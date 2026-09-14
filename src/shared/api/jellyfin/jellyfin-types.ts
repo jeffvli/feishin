@@ -349,6 +349,21 @@ const authenticate = z.object({
     User: user,
 });
 
+const quickConnectResult = z.object({
+    AppName: z.string().optional(),
+    AppVersion: z.string().optional(),
+    Authenticated: z.boolean().optional(),
+    Code: z.string().optional(),
+    DateAdded: z.string().optional(),
+    DeviceId: z.string().optional(),
+    DeviceName: z.string().optional(),
+    Secret: z.string().optional(),
+});
+
+const quickConnectAuthenticateParameters = z.object({
+    Secret: z.string(),
+});
+
 const genreItem = z.object({
     Id: z.string(),
     Name: z.string(),
@@ -722,6 +737,14 @@ const scrobbleParameters = z.object({
     EventName: z.string().optional(),
     IsPaused: z.boolean().optional(),
     ItemId: z.string(),
+    NowPlayingQueue: z
+        .array(
+            z.object({
+                Id: z.string(),
+                PlaylistItemId: z.string().optional(),
+            }),
+        )
+        .optional(),
     PositionTicks: z.number().optional(),
 });
 
@@ -910,6 +933,7 @@ export const jfType = {
         musicFolderList: musicFolderListParameters,
         playlistDetail: playlistDetailParameters,
         playlistList: playlistListParameters,
+        quickConnectAuthenticate: quickConnectAuthenticateParameters,
         removeFromPlaylist: removeFromPlaylistParameters,
         saveQueue: saveQueueParameters,
         scrobble: scrobbleParameters,
@@ -947,6 +971,7 @@ export const jfType = {
         playlist,
         playlistList,
         playlistSongList,
+        quickConnectResult,
         removeFromPlaylist,
         scheduledTasks,
         scrobble,

@@ -45,12 +45,14 @@ export const ImageColumn = ({
             onMouseLeave={() => setIsHovered(false)}
         >
             <ItemImage
+                blurHash={song.blurHash}
                 className={styles.compactImage}
                 containerClassName={styles.compactContainer}
                 explicitStatus={song.explicitStatus}
                 id={song.imageId}
                 itemType={LibraryItem.SONG}
                 serverId={song._serverId}
+                thumbHash={song.thumbHash}
                 type="table"
             />
             {isHovered && (

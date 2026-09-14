@@ -1,7 +1,28 @@
 .container {
-    width: 100%;
+    /* `width: 100%` alongside a fixed `height` made `aspect-ratio` a no-op —
+       both dimensions were already pinned, to whatever the surrounding row
+       happened to be wide, not to a square. object-fit: cover then cropped
+       the top/bottom of the (actually square) source art to fill that
+       mismatched box. Leaving width auto lets aspect-ratio derive it from
+       the height instead, so the box is always a true square. */
+    width: auto;
+    max-width: 100%;
     height: 40vh;
     aspect-ratio: 1/1;
     object-fit: var(--theme-image-fit);
     border-radius: var(--theme-radius-md);
+}
+
+.fullscreen {
+    width: min(90vw, 90dvh);
+    max-width: none;
+    height: auto;
+}
+
+/* For a flex-grown parent slot instead of a fixed 40vh — lets the artwork
+   take up whatever space is actually left over after the rest of a page's
+   content (text, buttons, sliders) instead of a fixed size that can push
+   that content off-screen on shorter viewports. */
+.hero {
+    height: 100%;
 }

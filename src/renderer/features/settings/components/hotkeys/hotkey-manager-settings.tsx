@@ -11,7 +11,7 @@ import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { useSettingSearchContext } from '/@/renderer/features/settings/context/search-context';
+import { useSettingSearchStore } from '/@/renderer/features/settings/store/search.store';
 import { BindingActions, useHotkeySettings, useSettingsStoreActions } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
@@ -113,7 +113,7 @@ export const HotkeyManagerSettings = memo(() => {
     const { bindings } = useHotkeySettings();
     const { setSettings } = useSettingsStoreActions();
     const [selected, setSelected] = useState<BindingActions | null>(null);
-    const keyword = useSettingSearchContext();
+    const { search: keyword } = useSettingSearchStore();
 
     const debouncedSetHotkey = debounce(
         (binding: BindingActions, e: KeyboardEvent<HTMLInputElement>) => {

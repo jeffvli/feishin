@@ -377,7 +377,12 @@
                 "lyricOpacityNonActive_description": "Opacité des lignes de paroles qui ne sont pas actuellement actives",
                 "lyricScaleNonActive_description": "Échelle des lignes de paroles qui ne sont pas actuellement actives",
                 "showLyricMatch_description": "Afficher le nom du titre et l'artiste dont les paroles correspondent",
-                "showLyricProvider_description": "Afficher le fournisseur des paroles actuelles"
+                "showLyricProvider_description": "Afficher le fournisseur des paroles actuelles",
+                "coverArtSize": "Taille de la pochette d'album",
+                "playerItemAlignment": "Alignement des éléments du lecteur",
+                "titleDisplayType": "Style d'affichage du titre",
+                "titleDisplayType_optionMultiLine": "Multi-ligne",
+                "titleLineCount": "Nombre de lignes du titre"
             },
             "upNext": "À suivre",
             "lyrics": "Paroles",
@@ -1042,7 +1047,9 @@
         "customThemeWarnings_description": "Ces thèmes ont été chargés, mais quelques valeurs invalides ont été ignorées.",
         "customThemeWarnings": "Avertissements",
         "customThemes_description": "Déposez vos fichiers de thème .json dans ce dossier pour ajouter des thèmes personnalisés. Ils seront automatiquement pris en compte lors de l'ajout, de la modification ou de la suppression d'un fichier.",
-        "customThemes": "Thèmes Personnalisé"
+        "customThemes": "Thèmes Personnalisé",
+        "fullscreenAutoOpenTimeout_description": "Ouvrir automatiquement le lecteur plein écran après ce temps d'inactivité pendant la lecture d'un titre. Mettre à 0 pour désactiver",
+        "fullscreenAutoOpenTimeout": "Délai d'ouverture automatique du lecteur plein écran (minutes)"
     },
     "form": {
         "deletePlaylist": {

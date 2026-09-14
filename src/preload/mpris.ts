@@ -27,6 +27,10 @@ const updateShuffle = (shuffle: boolean) => {
     ipcRenderer.send('update-shuffle', shuffle);
 };
 
+const updateLyrics = (lyrics: string) => {
+    ipcRenderer.send('update-lyrics', lyrics);
+};
+
 const updateSong = (song: QueueSong | undefined, imageUrl?: null | string) => {
     ipcRenderer.send('update-song', song, imageUrl);
 };
@@ -57,6 +61,7 @@ export const mpris = {
     requestToggleRepeat,
     requestToggleShuffle,
     requestVolume,
+    updateLyrics,
     updatePosition,
     updateRepeat,
     updateSeek,

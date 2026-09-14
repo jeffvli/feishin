@@ -314,6 +314,14 @@ export const SubsonicController: InternalControllerEndpoint = {
         return null;
     },
     authenticate: async (url, body) => {
+        if (body.action && body.action !== 'password') {
+            throw new Error('Subsonic does not support this authentication method');
+        }
+
+        if (typeof body.password !== 'string' || typeof body.username !== 'string') {
+            throw new Error('Subsonic authentication requires a username and password');
+        }
+
         let credential: string;
         let credentialParams: {
             p?: string;
@@ -1468,6 +1476,10 @@ export const SubsonicController: InternalControllerEndpoint = {
         if (subsonicFeatures[SubsonicExtensions.PLAYBACK_REPORT]) {
             features.reportPlayback = [1];
         }
+
+        if (subsonicFeatures[SubsonicExtensions.TOP_SONGS_BY_ARTIST_ID]) {
+            features.topSongsByArtistId = [1];
+        }
         try {
             const jukeboxStatus = await ssApiClient(apiClientProps).jukeboxControl({
                 query: { action: 'status' },
@@ -2080,7 +2092,9 @@ export const SubsonicController: InternalControllerEndpoint = {
         if (type === 'community') {
             const res = await ssApiClient(apiClientProps).getTopSongsList({
                 query: {
-                    artist: query.artist,
+                    ...(hasFeature(apiClientProps.server, ServerFeature.TOP_SONGS_BY_ARTIST_ID)
+                        ? { id: query.artistId }
+                        : { artist: query.artist }),
                     count: query.limit,
                 },
             });

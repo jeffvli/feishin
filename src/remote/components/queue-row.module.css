@@ -1,0 +1,108 @@
+.wrapper {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+
+    /* Bakes in the 4px gap the rows used to get for free from
+       `Reorder.Group`'s flex `gap` — react-window's absolutely positioned
+       row slots (see `ROW_HEIGHT` in queue-page.tsx) don't have that, so
+       every row reserves it as its own top inset instead. The first row
+       ends up with a few extra px of space above it that didn't exist
+       before; that's an acceptable trade for not special-casing index 0. */
+    padding-top: 4px;
+}
+
+.dragging {
+    z-index: 2;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 25%);
+}
+
+.drop-indicator {
+    position: absolute;
+    right: 16px;
+    left: 16px;
+    height: 2px;
+    pointer-events: none;
+    background-color: var(--theme-colors-primary);
+    border-radius: 1px;
+}
+
+.drop-indicator-top {
+    top: 0;
+}
+
+.drop-indicator-bottom {
+    bottom: 0;
+}
+
+.delete-background {
+    position: absolute;
+
+    /* Not `inset: 0` — absolutely positioned elements ignore the parent's
+       own padding, but `.foreground` (the card this sits behind) is normal
+       flow and gets pushed down by `.wrapper`'s `padding-top`. Matching that
+       offset here keeps the two the same size instead of the red background
+       poking out above the card. */
+    top: 4px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 20px;
+    color: var(--theme-colors-white);
+    background-color: var(--theme-colors-state-error);
+
+    /* iOS Safari only, not reproducible in desktop devtools mobile emulation:
+       during fast scroll it can briefly paint this absolutely-positioned
+       layer before the opaque foreground sibling composites on top of it,
+       flashing red for a frame despite the z-index. Forcing both onto their
+       own GPU compositing layer makes their stacking order stable instead
+       of depending on scroll-triggered repaint timing. */
+    transform: translateZ(0);
+    backface-visibility: hidden;
+}
+
+.foreground {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    background-color: var(--theme-colors-background);
+
+    /* Not `transform: translateZ(0)` here — motion sets `transform`
+       imperatively on this element for the drag `x` value, which would
+       just overwrite a CSS-declared transform. `will-change` still hints
+       the browser to give it its own compositing layer without touching
+       the property motion owns. */
+    backface-visibility: hidden;
+    will-change: transform;
+}
+
+.drag-handle {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 40px;
+    margin-right: -4px;
+    color: var(--theme-colors-text-secondary);
+    touch-action: none;
+}
+
+.index {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+}
+
+.duration {
+    flex-shrink: 0;
+    min-width: 38px;
+    text-align: right;
+}

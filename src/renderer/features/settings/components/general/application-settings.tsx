@@ -1,3 +1,5 @@
+import type { ImagePlaceholderPriority } from '/@/shared/utils/image-hash';
+
 import { t } from 'i18next';
 import isElectron from 'is-electron';
 import { memo, useCallback, useEffect, useState } from 'react';
@@ -82,6 +84,33 @@ const SIDE_QUEUE_LAYOUT_OPTIONS = [
             context: 'optionVertical',
         }),
         value: 'vertical',
+    },
+];
+
+const IMAGE_PLACEHOLDER_PRIORITY_OPTIONS = [
+    {
+        label: t('setting.imagePlaceholderPriority', {
+            context: 'optionThumbhash',
+        }),
+        value: 'thumbhash',
+    },
+    {
+        label: t('setting.imagePlaceholderPriority', {
+            context: 'optionBlurhash',
+        }),
+        value: 'blurhash',
+    },
+    {
+        label: t('setting.imagePlaceholderPriority', {
+            context: 'optionDominantColor',
+        }),
+        value: 'dominantColor',
+    },
+    {
+        label: t('setting.imagePlaceholderPriority', {
+            context: 'optionOff',
+        }),
+        value: 'off',
     },
 ];
 
@@ -640,6 +669,28 @@ export const ApplicationSettings = memo(() => {
             }),
             isHidden: false,
             title: t('setting.blurExplicitImages'),
+        },
+        {
+            control: (
+                <Select
+                    data={IMAGE_PLACEHOLDER_PRIORITY_OPTIONS}
+                    defaultValue={settings.imagePlaceholderPriority}
+                    onChange={(e) => {
+                        if (!e) return;
+                        setSettings({
+                            general: {
+                                ...settings,
+                                imagePlaceholderPriority: e as ImagePlaceholderPriority,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.imagePlaceholderPriority', {
+                context: 'description',
+            }),
+            isHidden: false,
+            title: t('setting.imagePlaceholderPriority'),
         },
         {
             control: (

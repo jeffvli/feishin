@@ -32,7 +32,6 @@ import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/ac
 import { Badge } from '/@/shared/components/badge/badge';
 import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
-import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
@@ -59,6 +58,7 @@ interface TableConfigProps {
             hidden?: boolean;
         };
     };
+    section: 'columns' | 'general';
     tableColumnsData: { label: string; value: string }[];
     tableKey?: 'detail' | 'main';
 }
@@ -68,6 +68,7 @@ export const TableConfig = ({
     extraOptions,
     listKey,
     optionsConfig,
+    section,
     tableColumnsData,
     tableKey = 'main',
 }: TableConfigProps) => {
@@ -397,17 +398,22 @@ export const TableConfig = ({
 
     return (
         <>
-            <ListConfigTable options={advancedSettings} />
-            {hasAlbumGroupColumn && tableKey === 'main' && albumGroupOpen && (
-                <AlbumGroupMetadataConfig />
+            {section === 'general' && (
+                <>
+                    <ListConfigTable options={advancedSettings} />
+                    {hasAlbumGroupColumn && tableKey === 'main' && albumGroupOpen && (
+                        <AlbumGroupMetadataConfig />
+                    )}
+                </>
             )}
-            <Divider />
-            <TableColumnConfig
-                data={tableColumnsData}
-                enablePinColumnButtons={enablePinColumnButtons}
-                onChange={(columns) => setTableUpdate({ columns })}
-                value={table.columns}
-            />
+            {section === 'columns' && (
+                <TableColumnConfig
+                    data={tableColumnsData}
+                    enablePinColumnButtons={enablePinColumnButtons}
+                    onChange={(columns) => setTableUpdate({ columns })}
+                    value={table.columns}
+                />
+            )}
         </>
     );
 };

@@ -564,11 +564,15 @@ const MetadataSection = memo(
                         })}
                     >
                         <ItemImage
+                            blurHash={item.blurHash}
                             className={styles.image}
+                            dominantColor={item.dominantColor}
                             explicitStatus={item.explicitStatus}
                             id={item.imageId}
                             itemType={item._itemType}
                             serverId={item._serverId}
+                            src={item.imageUrl}
+                            thumbHash={item.thumbHash}
                             type="itemCard"
                         />
                         {showFavorites && isFavorite && <div className={styles.favoriteBadge} />}

@@ -31,7 +31,7 @@ export const useSidebarPlaylistFolderMove = () => {
                         comment: playlist.description || '',
                         name: newName,
                         ownerId: playlist.ownerId || '',
-                        public: playlist.public || false,
+                        ...(playlist.public !== null ? { public: playlist.public } : {}),
                         queryBuilderRules: playlist.rules ?? undefined,
                         sync: playlist.sync ?? undefined,
                     },

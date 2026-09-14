@@ -25,8 +25,11 @@ export function ArtistMultiSelectRow({
     onToggle: (value: string) => void;
     options: VirtualMultiSelectOption<{
         albumCount: null | number;
+        blurHash?: null | string;
+        dominantColor?: null | string;
         imageUrl: string | undefined;
         songCount: null | number;
+        thumbHash?: null | string;
     }>[];
     value: string[];
 }>) {
@@ -50,11 +53,14 @@ export function ArtistMultiSelectRow({
             {...(isFocused && !disabled && { 'data-focused': true })}
         >
             <ItemImage
+                blurHash={options[index].blurHash}
                 containerClassName={styles.rowImage}
+                dominantColor={options[index].dominantColor}
                 enableDebounce={true}
                 enableViewport={false}
                 itemType={LibraryItem.ARTIST}
                 src={options[index].imageUrl}
+                thumbHash={options[index].thumbHash}
                 type="table"
             />
             <div className={styles.rowContent}>

@@ -160,7 +160,9 @@
         "noNetworkDescription": "無法連線至此伺服器",
         "invalidJson": "無效的 JSON",
         "serverLockSingleServer": "當伺服器鎖定時只允許一個伺服器",
-        "playbackPausedDueToError": "播放因錯誤而暫停"
+        "playbackPausedDueToError": "播放因錯誤而暫停",
+        "jellyfinQuickConnectDeactivated": "快速連線請求已過期",
+        "jellyfinQuickConnectNotActive": "此伺服器未啟用快速連線"
     },
     "page": {
         "contextMenu": {
@@ -207,7 +209,8 @@
             "mostPlayed": "最多播放",
             "newlyAdded": "最近新增的發行",
             "recentlyReleased": "最近發行",
-            "genres": "$t(entity.genre, {\"count\": 2})"
+            "genres": "$t(entity.genre, {\"count\": 2})",
+            "playlists": "播放清單"
         },
         "appMenu": {
             "openBrowserDevtools": "開啟瀏覽器開發者工具",
@@ -959,7 +962,15 @@
         "fullscreenAutoOpenTimeout_description": "播放歌曲期間，閒置達指定時間後自動開啟全螢幕播放器。設定至0來停用此功能",
         "fullscreenAutoOpenTimeout": "全螢幕播放器自動開啟時間 (分鐘)",
         "sidebarImageEnabled": "展開專輯封面按鈕",
-        "sidebarImageEnabled_description": "在播放器欄的專輯封面上顯示按鈕，可將專輯封面展開至側邊欄。停用此選項會隱藏按鈕，且若專輯封面處於展開狀態會將其收合"
+        "sidebarImageEnabled_description": "在播放器欄的專輯封面上顯示按鈕，可將專輯封面展開至側邊欄。停用此選項會隱藏按鈕，且若專輯封面處於展開狀態會將其收合",
+        "scrobbleMinimumMode_description": "在播放達特定歌曲百分比、指定秒數，或兩者其一滿足後記錄",
+        "scrobbleMinimumMode_optionBoth": "兩者",
+        "scrobbleMinimumMode_optionSeconds": "秒",
+        "scrobbleMinimumMode_optionPercentage": "百分比",
+        "scrobbleMinimumMode": "設定記錄觸發條件模式",
+        "transcodeNote": "轉碼由伺服器端執行，下一首曲目開始套用",
+        "transcodeSampleRate_description": "轉碼音訊的最高取樣率（以 Hz 為單位，例如 192000）。留空則保留原始取樣率。僅適用於 Jellyfin",
+        "transcodeSampleRate": "轉碼最高取樣率"
     },
     "table": {
         "config": {
@@ -1216,7 +1227,17 @@
             "input_preferRemoteUrl": "偏好公開 URL",
             "input_remoteUrl": "公開 URL",
             "input_remoteUrlPlaceholder": "選用：外部功能的公開 URL",
-            "input_passwordNoSSO": "不支援反向代理 (SSO) 驗證。僅支援使用者名稱/密碼驗證及 Subsonic 驗證"
+            "input_passwordNoSSO": "不支援反向代理 (SSO) 驗證。僅支援使用者名稱/密碼驗證及 Subsonic 驗證",
+            "input_jellyfinQuickConnect": "快速連線",
+            "input_jellyfinQuickConnectCode": "請在 Jellyfin 網頁介面輸入此代碼以進行授權",
+            "input_jellyfinQuickConnectCodeCopied": "已複製",
+            "input_jellyfinQuickConnectCodeCopy": "複製代碼",
+            "input_jellyfinQuickConnectOpen": "開啟快速連線",
+            "input_jellyfinQuickConnectWaiting": "正在等待 Jellyfin 伺服器核准…",
+            "input_jellyfinSignInMethod": "登入方式",
+            "input_jellyfinSignInMethodPassword": "密碼",
+            "input_jellyfinSignInMethodQuickConnect": "快速連線",
+            "input_remoteUrlDescription": "取代原本的 URL 用於外部功能（例如分享連結）。除非您的伺服器可從外部網路透過不同的位址連線，否則請保持留空。"
         },
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
@@ -1549,5 +1570,53 @@
         "systemAudioConsentDecline": "拒絕",
         "systemAudioConsentTitle": "允許存取系統音訊？",
         "systemAudioExclusiveModeNotSupported": "啟用音訊獨佔模式時，視覺化不可用。 在MPV設定中停用音訊獨佔模式，然後再試一次。"
+    },
+    "dlna": {
+        "castToDevice": "投放至 DLNA 裝置",
+        "castingToDevice": "正在投放至 {{name}}",
+        "castingToGroup": "正在投放至群組 ({{count}})",
+        "connected": "已連線",
+        "connecting": "連線中…",
+        "createGroup": "建立群組",
+        "devices": "DLNA 裝置",
+        "disconnect": "中斷連線",
+        "disconnectAndContinue": "中斷連線並繼續",
+        "noDevicesFound": "未找到 DLNA 裝置",
+        "nowCasting": "正在投放",
+        "searching": "正在搜尋裝置…",
+        "shiftDisconnectHint": "按住 Shift 鍵並點擊「中斷連線」以讓揚聲器繼續播放",
+        "group": {
+            "add": "新增",
+            "addSpeaker": "新增揚聲器",
+            "addSpeakers": "新增揚聲器",
+            "addToGroup": "加入群組",
+            "cancel": "取消",
+            "connect": "連線",
+            "coordinator": "協調裝置",
+            "failedToAddMessage": "無法新增 {{name}}。該裝置可能不在同一個 Sonos 系統中。",
+            "failedToAddTitle": "揚聲器新增失敗",
+            "firstSelectedIsCoordinator": "第一個選擇的裝置 = 協調裝置",
+            "noSonosFound": "未找到 Sonos 裝置",
+            "refresh": "重新整理",
+            "remove": "移除",
+            "searching": "搜尋中…",
+            "selectSpeakers": "選取群組揚聲器",
+            "title": "群組（{{count}} 個揚聲器）"
+        },
+        "speakerProperties": {
+            "bass": "低音",
+            "crossfade": "淡入淡出",
+            "ledState": "狀態指示燈",
+            "loadFailed": "無法載入內容",
+            "loading": "載入中…",
+            "longPressHint": "長按可查看揚聲器內容",
+            "loudness": "響度",
+            "touchControls": "觸控控制",
+            "treble": "高音"
+        },
+        "volume": {
+            "groupControl": "按住 Shift 鍵可個別調整各揚聲器音量",
+            "individualControl": "放開 Shift 鍵可統一調整所有揚聲器音量"
+        }
     }
 }

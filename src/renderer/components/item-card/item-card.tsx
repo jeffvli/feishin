@@ -255,7 +255,9 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
                 />
             ) : (
                 <ItemImage
+                    blurHash={(data as Album | AlbumArtist | Playlist | Song)?.blurHash}
                     className={clsx(styles.image, { [styles.isRound]: isRound })}
+                    dominantColor={(data as Album | AlbumArtist | Playlist)?.dominantColor}
                     enableDebounce={false}
                     {...(variant === 'poster' ? { enableViewport: enableImageViewport } : {})}
                     explicitStatus={'explicitStatus' in data && data ? data.explicitStatus : null}
@@ -263,6 +265,7 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
                     id={(data as { imageId?: string })?.imageId}
                     itemType={itemType}
                     src={(data as { imageUrl?: string })?.imageUrl}
+                    thumbHash={(data as Album | AlbumArtist | Playlist | Song)?.thumbHash}
                     type="itemCard"
                 />
             )}
@@ -391,15 +394,18 @@ const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
                 />
             ) : (
                 <ItemImage
+                    blurHash={(data as Album | AlbumArtist | Playlist | Song)?.blurHash}
                     className={clsx(styles.image, {
                         [styles.isRound]: isRound,
                     })}
+                    dominantColor={(data as Album | AlbumArtist | Playlist)?.dominantColor}
                     enableDebounce={false}
                     explicitStatus={'explicitStatus' in data && data ? data.explicitStatus : null}
                     fetchPriority={imageFetchPriority}
                     id={data?.imageId}
                     itemType={itemType}
                     src={(data as Album | AlbumArtist | Playlist | Song)?.imageUrl}
+                    thumbHash={(data as Album | AlbumArtist | Playlist | Song)?.thumbHash}
                     type="itemCard"
                 />
             )}
@@ -1220,7 +1226,9 @@ export const getDataRows = (type?: 'compact' | 'default' | 'poster'): DataRow[] 
                 if ('releaseYear' in data && data.releaseYear != null) {
                     const releaseYear = data.releaseYear;
                     const originalYear =
-                        'originalYear' in data && data.originalYear > 0 ? data.originalYear : null;
+                        'originalYear' in data && data.originalYear != null && data.originalYear > 0
+                            ? data.originalYear
+                            : null;
 
                     if (originalYear !== null && originalYear !== releaseYear) {
                         return `${originalYear}${SEPARATOR_STRING}${releaseYear}`;

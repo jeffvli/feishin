@@ -30,6 +30,12 @@ const ButterchurnVisualizer = lazy(() =>
     })),
 );
 
+const isDesktopPanelOpen = (activeTab: string, webAudio: boolean) =>
+    activeTab === 'queue' ||
+    activeTab === 'related' ||
+    activeTab === 'lyrics' ||
+    (activeTab === 'visualizer' && webAudio);
+
 const moduleContentVariants: Variants = {
     animate: {
         opacity: 1,
@@ -140,14 +146,16 @@ export const FullScreenPlayerQueue = () => {
     const queueContainerClassName = clsx(styles.queueContainer, {
         [styles.queueContainerFadeTopBottom]: !table?.enableHeader,
     });
+    const isPanelOpen = isDesktopPanelOpen(activeTab, webAudio);
+    const isCollapsed = !isPanelOpen;
 
     return (
         <div
             className={clsx(styles.gridContainer, 'full-screen-player-queue-container', {
-                [styles.gridContainerCollapsed]: !activeTab,
+                [styles.gridContainerCollapsed]: isCollapsed,
             })}
         >
-            <AnimatePresence mode="wait">
+            <AnimatePresence initial={false} mode="wait">
                 {activeTab === 'queue' ? (
                     <motion.div
                         animate="animate"

@@ -7,6 +7,7 @@ import { AlbumInfiniteCarousel } from '/@/renderer/features/albums/components/al
 import { AlbumInfiniteFeatureCarousel } from '/@/renderer/features/home/components/album-infinite-feature-carousel';
 import { AlbumInfiniteSingleFeatureCarousel } from '/@/renderer/features/home/components/album-infinite-single-feature-carousel';
 import { FeaturedGenres } from '/@/renderer/features/home/components/featured-genres';
+import { PlaylistInfiniteCarousel } from '/@/renderer/features/home/components/playlist-infinite-carousel';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { LibraryContainer } from '/@/renderer/features/shared/components/library-container';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
@@ -52,6 +53,10 @@ const HomeRoute = () => {
             sortOrder: SortOrder.DESC,
             title: t('page.home.mostPlayed'),
         },
+        [HomeItem.PLAYLISTS]: {
+            enableRefresh: true,
+            title: t('page.home.playlists'),
+        },
         [HomeItem.RANDOM]: {
             enableRefresh: true,
             itemType: LibraryItem.ALBUM,
@@ -85,7 +90,7 @@ const HomeRoute = () => {
     const sortedItems = homeItems.filter((item) => !item.disabled);
 
     const sortedCarousel = sortedItems
-        .filter((item) => item.id !== HomeItem.GENRES)
+        .filter((item) => item.id !== HomeItem.GENRES && item.id !== HomeItem.PLAYLISTS)
         .map((item) => ({
             ...carousels[item.id],
             uniqueId: item.id,
@@ -122,6 +127,17 @@ const HomeRoute = () => {
                         {sortedItems.map((item) => {
                             if (item.id === HomeItem.GENRES) {
                                 return <FeaturedGenres key="featured-genres" />;
+                            }
+
+                            if (item.id === HomeItem.PLAYLISTS) {
+                                return (
+                                    <PlaylistInfiniteCarousel
+                                        containerQuery={containerQuery}
+                                        enableRefresh={carousels[item.id].enableRefresh}
+                                        key="home-playlists"
+                                        title={t('page.home.playlists')}
+                                    />
+                                );
                             }
 
                             const carousel = sortedCarousel.find((c) => c.uniqueId === item.id);

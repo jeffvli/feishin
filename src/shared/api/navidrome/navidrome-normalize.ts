@@ -101,7 +101,7 @@ const getArtists = (
     includeRemixers = true,
 ) => {
     let albumArtists: RelatedArtist[] | undefined;
-    let artists: RelatedArtist[] | undefined;
+    let artists: RelatedArtist[] = [];
     let remixers: RelatedArtist[] | undefined;
     let participants: null | Record<string, RelatedArtist[]> = null;
 
@@ -170,7 +170,7 @@ const getArtists = (
         ];
     }
 
-    if (artists === undefined) {
+    if (artists.length === 0 && item.artistId && item.artist) {
         artists = [
             {
                 id: item.artistId,
@@ -210,15 +210,30 @@ const normalizeSong = (
         id = item.id;
     }
 
-    const fromSongRelease = parsePartialIsoDate(item.releaseDate);
-    const songApiYear = coerceYear(item.year);
     const fromSongDate = parsePartialIsoDate(item.date);
-    const releaseYear: null | number =
-        fromSongRelease.year > 0 ? fromSongRelease.year : songApiYear > 0 ? songApiYear : null;
+    const fromSongRelease = parsePartialIsoDate(item.releaseDate);
+    const fromSongOriginal = parsePartialIsoDate(item.originalDate);
+    const songYear = coerceYear(item.year);
+    const songReleaseYear = coerceYear(item.releaseYear);
+    const songOriginalYear = coerceYear(item.originalYear);
+    const releaseYear =
+        songReleaseYear > 0
+            ? songReleaseYear
+            : fromSongRelease.year > 0
+              ? fromSongRelease.year
+              : null;
     const releaseDate =
-        fromSongRelease.date ?? fromSongDate.date ?? (songApiYear > 0 ? String(songApiYear) : null);
-    const date = fromSongDate.date ?? (songApiYear > 0 ? String(songApiYear) : null);
-    const year = fromSongDate.year > 0 ? fromSongDate.year : releaseYear;
+        fromSongRelease.date ?? (songReleaseYear > 0 ? String(songReleaseYear) : null);
+    const date = fromSongDate.date ?? (songYear > 0 ? String(songYear) : null);
+    const year = songYear > 0 ? songYear : fromSongDate.year > 0 ? fromSongDate.year : null;
+    const originalDate =
+        fromSongOriginal.date ?? (songOriginalYear > 0 ? String(songOriginalYear) : null);
+    const originalYear =
+        songOriginalYear > 0
+            ? songOriginalYear
+            : fromSongOriginal.year > 0
+              ? fromSongOriginal.year
+              : null;
 
     return {
         album: item.album,
@@ -231,8 +246,10 @@ const normalizeSong = (
         artistName: item.artist,
         bitDepth: item.bitDepth || null,
         bitRate: item.bitRate,
+        blurHash: null,
         bpm: item.bpm ? item.bpm : null,
         channels: item.channels ? item.channels : null,
+        codec: item.codec || null,
         comment: item.comment ? item.comment : null,
         compilation: item.compilation,
         container: item.suffix,
@@ -247,9 +264,10 @@ const normalizeSong = (
                 : item.explicitStatus === 'c'
                   ? ExplicitStatus.CLEAN
                   : null,
+        folderId: item.folderId || null,
         gain:
             item.rgAlbumGain || item.rgTrackGain
-                ? { album: item.rgAlbumGain, track: item.rgTrackGain }
+                ? { album: item.rgAlbumGain ?? undefined, track: item.rgTrackGain }
                 : null,
         genres: (item.genres || []).map((genre) => ({
             _itemType: LibraryItem.GENRE,
@@ -266,17 +284,24 @@ const normalizeSong = (
         imageId: id,
         imageUrl: null,
         lastPlayedAt: normalizePlayDate(item),
+        libraryId: item.libraryId ?? null,
+        libraryName: item.libraryName || null,
         lyrics: item.lyrics ? item.lyrics : null,
         mbzAlbumId: item.mbzAlbumId || null,
-        mbzRecordingId: item.mbzReleaseTrackId || null,
+        mbzAlbumType: item.mbzAlbumType || null,
+        mbzRecordingId: item.mbzRecordingID || null,
+        mbzReleaseGroupId: item.mbzReleaseGroupId || null,
         mbzTrackId: item.mbzReleaseTrackId || null,
+        missing: item.missing || null,
         name: item.title,
+        originalDate,
+        originalYear,
         // Thankfully, Windows is merciful and allows a mix of separators. So, we can use the
         // POSIX separator here instead
         path: item.path ? `${item.libraryPath}/${item.path}` : null,
         peak:
             item.rgAlbumPeak || item.rgTrackPeak
-                ? { album: item.rgAlbumPeak, track: item.rgTrackPeak }
+                ? { album: item.rgAlbumPeak ?? undefined, track: item.rgTrackPeak }
                 : null,
         playCount: item.playCount || 0,
         playlistItemId,
@@ -286,6 +311,7 @@ const normalizeSong = (
         size: item.size,
         sortName: item.orderTitle,
         tags: item.tags || null,
+        thumbHash: item.thumbHash || null,
         trackNumber: item.trackNumber,
         trackSubtitle: item.tags?.subtitle ? item.tags.subtitle.join(' · ') : null,
         updatedAt: item.updatedAt,
@@ -353,8 +379,11 @@ const normalizeAlbum = (
         _serverId: server?.id || 'unknown',
         _serverType: ServerType.NAVIDROME,
         albumArtistName: item.albumArtist,
+        blurHash: null,
         comment: item.comment || null,
         createdAt: item.createdAt,
+        discs: item.discs || null,
+        dominantColor: item.dominantColor || null,
         duration: item.duration !== undefined ? item.duration * 1000 : null,
         explicitStatus:
             item.explicitStatus === 'e'
@@ -362,6 +391,7 @@ const normalizeAlbum = (
                 : item.explicitStatus === 'c'
                   ? ExplicitStatus.CLEAN
                   : null,
+        gain: item.rgAlbumGain !== undefined ? { album: item.rgAlbumGain, track: undefined } : null,
         genres: (item.genres || []).map((genre) => ({
             _itemType: LibraryItem.GENRE,
             _serverId: server?.id || 'unknown',
@@ -380,10 +410,13 @@ const normalizeAlbum = (
         lastPlayedAt: normalizePlayDate(item),
         mbzId: item.mbzAlbumId || null,
         mbzReleaseGroupId: item.mbzReleaseGroupId || null,
+        missing: item.missing || null,
         name: item.name,
         originalDate: originalDate.date,
         originalYear: originalDate.year,
+        peak: item.rgAlbumPeak !== undefined ? { album: item.rgAlbumPeak, track: undefined } : null,
         playCount: item.playCount || 0,
+        ratedAt: item.ratedAt || null,
         releaseDate: releaseDate.date,
         releaseType: item.mbzAlbumType || null,
         releaseYear: releaseDate.year > 0 ? releaseDate.year : null,
@@ -391,7 +424,9 @@ const normalizeAlbum = (
         songCount: item.songCount,
         songs: item.songs ? item.songs.map((song) => normalizeSong(song, server)) : undefined,
         sortName: item.orderAlbumName,
+        starredAt: item.starredAt || null,
         tags: item.tags || null,
+        thumbHash: item.thumbHash || null,
         trackYearRange,
         updatedAt: item.updatedAt,
         userFavorite: item.starred || false,
@@ -438,6 +473,8 @@ const normalizeAlbumArtist = (
         _serverType: ServerType.NAVIDROME,
         albumCount,
         biography: item.biography || null,
+        blurHash: null,
+        dominantColor: item.dominantColor || null,
         duration: null,
         genres: (item.genres || []).map((genre) => ({
             _itemType: LibraryItem.GENRE,
@@ -455,8 +492,10 @@ const normalizeAlbumArtist = (
         imageUrl: null,
         lastPlayedAt: normalizePlayDate(item),
         mbz: item.mbzArtistId || null,
+        missing: item.missing || null,
         name: item.name,
         playCount: item.playCount || 0,
+        ratedAt: item.ratedAt || null,
         similarArtists:
             item.similarArtists?.map((artist) => ({
                 id: String(artist.id),
@@ -467,6 +506,8 @@ const normalizeAlbumArtist = (
                 userRating: artist.userRating || null,
             })) || [],
         songCount,
+        starredAt: item.starredAt || null,
+        thumbHash: item.thumbHash || null,
         uploadedImage: item.uploadedImage,
         userFavorite: item.starred || false,
         userRating: item.rating || null,
@@ -485,8 +526,11 @@ const normalizePlaylist = (
         _itemType: LibraryItem.PLAYLIST,
         _serverId: server?.id || 'unknown',
         _serverType: ServerType.NAVIDROME,
+        blurHash: null,
         description: item.comment,
+        dominantColor: item.dominantColor || null,
         duration: item.duration * 1000,
+        evaluatedAt: item.evaluatedAt || null,
         genres: [],
         id: item.id,
         imageId,
@@ -499,6 +543,7 @@ const normalizePlaylist = (
         size: item.size,
         songCount: item.songCount,
         sync: item.sync,
+        thumbHash: item.thumbHash || null,
         uploadedImage: item.uploadedImage,
     };
 };
@@ -545,6 +590,7 @@ const normalizeInternetRadioStation = (
         imageUrl: null,
         name: item.name,
         streamUrl: item.streamUrl,
+        thumbHash: item.thumbHash || null,
         uploadedImage: item.uploadedImage || null,
     };
 };

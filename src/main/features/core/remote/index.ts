@@ -13,7 +13,16 @@ import { isLinux } from '/@/main/env';
 import { getMainWindow } from '/@/main/index';
 import log from '/@/main/logger';
 import { QueueSong } from '/@/shared/types/domain-types';
-import { ClientEvent, ServerEvent } from '/@/shared/types/remote-types';
+import {
+    ClientEvent,
+    RemoteAlbumItem,
+    RemotePlaylistItem,
+    RemoteQueueItem,
+    RemoteRadioItem,
+    RemoteTrackItem,
+    ServerEvent,
+    ServerRadioStatus,
+} from '/@/shared/types/remote-types';
 import { PlayerRepeat, PlayerStatus, SongState } from '/@/shared/types/types';
 
 let mprisPlayer: any | undefined;
@@ -61,9 +70,15 @@ type SendData = ServerEvent & {
 };
 
 function broadcast(message: ServerEvent): void {
-    if (wsServer) {
-        for (const client of wsServer.clients) {
-            send({ client, ...message });
+    if (!wsServer) return;
+
+    // Serialize once for every client instead of once per client — the
+    // queue-state payload alone can carry hundreds of songs, and this fires
+    // on every queue mutation.
+    const payload = JSON.stringify(message);
+    for (const client of wsServer.clients) {
+        if (client.readyState === WebSocket.OPEN && client.alive && client.auth) {
+            client.send(payload);
         }
     }
 }
@@ -76,13 +91,28 @@ function send({ client, data, event }: SendData): void {
     }
 }
 
-export const shutdownServer = () => {
+// `closeCode` defaults to 4000 ("server is down", no client auto-retry) for
+// a genuine shutdown. enableServer() below passes 4002 instead ("settings
+// changed", the client already reloads and reconnects on that code) — it's
+// not really shutting down, just replacing the running server with a fresh
+// one, and reusing this function is what actually tears down the *previous*
+// wsServer/heartBeat interval before that happens. Without this,
+// re-enabling (or re-applying settings) left the old wsServer's clients set
+// and its heartBeat `setInterval` running forever alongside the new one —
+// `server.close()` alone stops new connections but never touches an
+// already-upgraded WebSocket, and wsServer's own 'close' handler (which
+// clears heartBeat) only fires from an explicit wsServer.close() call, which
+// nothing here was ever making. Every re-enable leaked one more zombie
+// heartbeat interval, each still ping/terminating whatever client it still
+// held a reference to — indistinguishable, from the client's side, from the
+// connection simply dying on its own every so often.
+export const shutdownServer = (closeCode = 4000) => {
     if (wsServer || server) {
         log.info('Remote server shutting down');
     }
 
     if (wsServer) {
-        wsServer.clients.forEach((client) => client.close(4000));
+        wsServer.clients.forEach((client) => client.close(closeCode));
         wsServer.close();
         wsServer = undefined;
     }
@@ -113,6 +143,73 @@ const GZIP_REGEX = /\bgzip\b/;
 const ZLIB_REGEX = /bdeflate\b/;
 
 const currentState: SongState = {};
+let currentQueueState: { currentUniqueId: null | string; items: RemoteQueueItem[] } = {
+    currentUniqueId: null,
+    items: [],
+};
+let currentRadioStatus: ServerRadioStatus['data'] = { isActive: false };
+// Mirrors the desktop's own confirmQueueChanges setting — safe default (ask)
+// until the renderer's first push arrives, since assuming "don't ask" would
+// be the wrong direction to fail in.
+let confirmQueueChanges = true;
+// Null until the renderer's first push (use-remote-settings-push.tsx)
+// arrives — that computation needs generateColors() (@mantine/colors-
+// generator), which is a browser-context-only dependency this main process
+// can't safely run itself, so there's no meaningful default to fall back to
+// here. Until then, the phone just keeps whatever primary color its own
+// static theme CSS already set — close enough for the brief window before
+// this lands, and the effective color only actually diverges from that for
+// a desktop install that has customized its accent/shade settings anyway.
+let currentAccentColor: null | { dark: string; light: string } = null;
+
+// Only ever called once `client.auth` is true (either immediately, for an
+// unprotected server, or from the `authenticate` message handler) — sending
+// this unconditionally on every connection would leak playback state, the
+// full queue, and radio status to a client that hadn't authenticated yet.
+function sendInitialState(client: StatefulWebSocket): void {
+    if (client.readyState !== WebSocket.OPEN) return;
+
+    client.send(JSON.stringify({ data: currentState, event: 'state' }));
+    client.send(JSON.stringify({ data: currentQueueState, event: 'queue-state' }));
+    client.send(JSON.stringify({ data: currentRadioStatus, event: 'radio-status' }));
+    client.send(
+        JSON.stringify({ data: confirmQueueChanges, event: 'confirm-queue-changes-setting' }),
+    );
+    if (currentAccentColor) {
+        client.send(JSON.stringify({ data: currentAccentColor, event: 'accent-color' }));
+    }
+}
+
+// Tracks/playlists/radio browsing is request/response, not broadcast — the
+// desktop renderer answers asynchronously over a separate IPC channel with no
+// `ws` in scope, so the requesting client is remembered here by requestId
+// until the matching `respond-*` IPC message arrives (or the timeout fires,
+// as a leak guard if the renderer never responds).
+const REQUEST_TIMEOUT_MS = 15000;
+const requestClientMap = new Map<string, StatefulWebSocket>();
+
+function rememberRequestClient(requestId: string, client: StatefulWebSocket): void {
+    requestClientMap.set(requestId, client);
+    setTimeout(() => {
+        // Map.delete() returns false if a respond-* handler already resolved
+        // (and removed) this request — only a genuinely unanswered request
+        // reaches here, so the client isn't left waiting with no feedback at
+        // all (e.g. the main window closed on macOS and silently dropped
+        // the webContents.send that would have produced a response).
+        if (requestClientMap.delete(requestId)) {
+            send({ client, data: 'Request timed out', event: 'error' });
+        }
+    }, REQUEST_TIMEOUT_MS);
+}
+
+// Shared by every respond-* IPC handler below — looks up and consumes the
+// client remembered for a request, so a bugfix here (or to the timeout in
+// rememberRequestClient) only has to happen in one place.
+function resolveRequestClient(requestId: string): StatefulWebSocket | undefined {
+    const client = requestClientMap.get(requestId);
+    requestClientMap.delete(requestId);
+    return client;
+}
 
 const getEncoding = (encoding: string | string[]): Encoding => {
     const encodingArray = Array.isArray(encoding) ? encoding : [encoding];
@@ -278,9 +375,12 @@ function setOk(
 const enableServer = (config: RemoteConfig): Promise<void> => {
     return new Promise<void>((resolve, reject) => {
         try {
-            if (server) {
-                server.close();
-            }
+            // 4002, not the shutdownServer() default of 4000 — this is a
+            // restart (re-enable, or a settings change re-applying), not a
+            // real shutdown, and the client already knows how to handle
+            // 4002 cleanly (reload and reconnect) from the existing
+            // remote-username/remote-password flows.
+            shutdownServer(4002);
 
             server = createServer({}, async (req, res) => {
                 if (!authorize(req)) {
@@ -323,6 +423,21 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                         default: {
                             if (req.url?.startsWith('/worker.js')) {
                                 await serveFile(req, 'worker', 'js', res);
+                            } else if (req.method === 'GET' || req.method === 'HEAD') {
+                                // SPA fallback, not a 404 — HashRouter keeps
+                                // every route in the URL *fragment*
+                                // (`#/library`), which never reaches this
+                                // server on a normal reload, so in practice
+                                // this only matters when a client sends
+                                // something else entirely (a stray query
+                                // string, or a mobile browser/WebView that
+                                // — unlike the spec — includes the fragment
+                                // in the request). Either way, index.html is
+                                // the right response: the client-side router
+                                // reads the real route from location.hash
+                                // itself once it mounts, same as it does for
+                                // "/" today.
+                                await serveFile(req, 'index', 'html', res);
                             } else {
                                 res.statusCode = 404;
                                 res.setHeader('Content-Type', 'text/plain');
@@ -361,11 +476,15 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
 
                 if (!settings.username && !settings.password) {
                     ws.auth = true;
+                    sendInitialState(ws);
                 } else {
                     authFail = setTimeout(() => {
                         if (!ws.auth) {
                             log.warn('Remote client auth timeout');
-                            ws.close();
+                            // Distinct code so the client can tell this apart
+                            // from a transient network drop and not retry
+                            // automatically forever.
+                            ws.close(4004, 'Authentication timed out');
                         }
                     }, 10000) as unknown as number;
                 }
@@ -391,9 +510,10 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                                 if (login === settings.username && password === settings.password) {
                                     ws.auth = true;
                                     log.info('Remote client authenticated');
+                                    sendInitialState(ws);
                                 } else {
                                     log.warn('Remote client auth failed');
-                                    ws.close();
+                                    ws.close(4004, 'Invalid credentials');
                                 }
 
                                 clearTimeout(authFail);
@@ -403,6 +523,35 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                         }
 
                         switch (event) {
+                            case 'add-to-playlist': {
+                                const { playlistId, requestId, songId } = json;
+                                if (requestId) rememberRequestClient(requestId, ws);
+                                getMainWindow()?.webContents.send('request-add-to-playlist', {
+                                    playlistId,
+                                    requestId,
+                                    songId,
+                                });
+                                break;
+                            }
+                            case 'albums-request': {
+                                const { limit, requestId, searchTerm, startIndex } = json;
+                                rememberRequestClient(requestId, ws);
+                                getMainWindow()?.webContents.send('request-albums', {
+                                    limit,
+                                    requestId,
+                                    searchTerm,
+                                    startIndex,
+                                });
+                                break;
+                            }
+                            case 'clear-queue': {
+                                const { requestId } = json;
+                                if (requestId) rememberRequestClient(requestId, ws);
+                                getMainWindow()?.webContents.send('request-clear-queue', {
+                                    requestId,
+                                });
+                                break;
+                            }
                             case 'favorite': {
                                 const { favorite, id } = json;
                                 if (id && id === currentState.song?.id) {
@@ -424,6 +573,59 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                             }
                             case 'play': {
                                 getMainWindow()?.webContents.send('renderer-player-play');
+                                break;
+                            }
+                            case 'play-album': {
+                                if (json.requestId) rememberRequestClient(json.requestId, ws);
+                                getMainWindow()?.webContents.send('request-play-album', {
+                                    id: json.id,
+                                    playType: json.playType,
+                                    requestId: json.requestId,
+                                });
+                                break;
+                            }
+                            case 'play-playlist': {
+                                if (json.requestId) rememberRequestClient(json.requestId, ws);
+                                getMainWindow()?.webContents.send('request-play-playlist', {
+                                    id: json.id,
+                                    playType: json.playType,
+                                    requestId: json.requestId,
+                                });
+                                break;
+                            }
+                            case 'play-radio': {
+                                getMainWindow()?.webContents.send('request-play-radio', {
+                                    id: json.id,
+                                });
+                                break;
+                            }
+                            case 'play-track': {
+                                if (json.requestId) rememberRequestClient(json.requestId, ws);
+                                getMainWindow()?.webContents.send('request-play-track', {
+                                    id: json.id,
+                                    playType: json.playType,
+                                    requestId: json.requestId,
+                                });
+                                break;
+                            }
+                            case 'play-track-radio': {
+                                if (json.requestId) rememberRequestClient(json.requestId, ws);
+                                getMainWindow()?.webContents.send('request-play-track-radio', {
+                                    id: json.id,
+                                    playType: json.playType,
+                                    requestId: json.requestId,
+                                });
+                                break;
+                            }
+                            case 'playlists-request': {
+                                const { limit, requestId, searchTerm, startIndex } = json;
+                                rememberRequestClient(requestId, ws);
+                                getMainWindow()?.webContents.send('request-playlists', {
+                                    limit,
+                                    requestId,
+                                    searchTerm,
+                                    startIndex,
+                                });
                                 break;
                             }
                             case 'previous': {
@@ -464,6 +666,23 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
 
                                 break;
                             }
+                            case 'queue-jump': {
+                                getMainWindow()?.webContents.send('request-queue-jump', {
+                                    uniqueId: json.uniqueId,
+                                });
+                                break;
+                            }
+                            case 'radio-request': {
+                                const { limit, requestId, searchTerm, startIndex } = json;
+                                rememberRequestClient(requestId, ws);
+                                getMainWindow()?.webContents.send('request-radio', {
+                                    limit,
+                                    requestId,
+                                    searchTerm,
+                                    startIndex,
+                                });
+                                break;
+                            }
                             case 'rating': {
                                 const { id, rating } = json;
                                 if (id && id === currentState.song?.id) {
@@ -475,12 +694,39 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                                 }
                                 break;
                             }
+                            case 'remove-from-queue': {
+                                const { uniqueId } = json;
+                                getMainWindow()?.webContents.send('request-remove-from-queue', {
+                                    uniqueId,
+                                });
+                                break;
+                            }
+                            case 'reorder-queue': {
+                                const { edge, targetUniqueId, uniqueId } = json;
+                                getMainWindow()?.webContents.send('request-reorder-queue', {
+                                    edge,
+                                    targetUniqueId,
+                                    uniqueId,
+                                });
+                                break;
+                            }
                             case 'repeat': {
                                 getMainWindow()?.webContents.send('renderer-player-toggle-repeat');
                                 break;
                             }
                             case 'shuffle': {
                                 getMainWindow()?.webContents.send('renderer-player-toggle-shuffle');
+                                break;
+                            }
+                            case 'tracks-request': {
+                                const { limit, requestId, searchTerm, startIndex } = json;
+                                rememberRequestClient(requestId, ws);
+                                getMainWindow()?.webContents.send('request-tracks', {
+                                    limit,
+                                    requestId,
+                                    searchTerm,
+                                    startIndex,
+                                });
                                 break;
                             }
                             case 'volume': {
@@ -520,20 +766,23 @@ const enableServer = (config: RemoteConfig): Promise<void> => {
                 });
 
                 ws.on('pong', () => {
+                    log.debug('Remote heartbeat pong received');
                     ws.alive = true;
                 });
-
-                ws.send(JSON.stringify({ data: currentState, event: 'state' }));
             });
 
             const heartBeat = setInterval(() => {
                 wsServer?.clients.forEach((ws) => {
                     if (!ws.alive) {
+                        log.warn('Remote heartbeat missed - terminating client', {
+                            readyState: ws.readyState,
+                        });
                         ws.terminate();
                         return;
                     }
 
                     ws.alive = false;
+                    log.debug('Remote heartbeat ping sent');
                     ws.ping();
                 });
             }, PING_TIMEOUT_MS);
@@ -662,6 +911,65 @@ ipcMain.on('update-song', (_event, song: QueueSong | undefined, imageUrl?: null 
 ipcMain.on('update-volume', (_event, volume: number) => {
     currentState.volume = volume;
     broadcast({ data: volume, event: 'volume' });
+});
+
+ipcMain.on(
+    'respond-tracks',
+    (_event, requestId: string, hasMore: boolean, items: RemoteTrackItem[]) => {
+        const client = resolveRequestClient(requestId);
+        if (client) send({ client, data: { hasMore, items, requestId }, event: 'tracks-response' });
+    },
+);
+
+ipcMain.on(
+    'respond-albums',
+    (_event, requestId: string, hasMore: boolean, items: RemoteAlbumItem[]) => {
+        const client = resolveRequestClient(requestId);
+        if (client) send({ client, data: { hasMore, items, requestId }, event: 'albums-response' });
+    },
+);
+
+ipcMain.on(
+    'respond-playlists',
+    (_event, requestId: string, hasMore: boolean, items: RemotePlaylistItem[]) => {
+        const client = resolveRequestClient(requestId);
+        if (client) {
+            send({ client, data: { hasMore, items, requestId }, event: 'playlists-response' });
+        }
+    },
+);
+
+ipcMain.on(
+    'respond-radio',
+    (_event, requestId: string, hasMore: boolean, items: RemoteRadioItem[]) => {
+        const client = resolveRequestClient(requestId);
+        if (client) send({ client, data: { hasMore, items, requestId }, event: 'radio-response' });
+    },
+);
+
+ipcMain.on('respond-operation', (_event, requestId: string, error?: string) => {
+    const client = resolveRequestClient(requestId);
+    if (client) send({ client, data: { error, requestId }, event: 'operation-ack' });
+});
+
+ipcMain.on('update-queue', (_event, currentUniqueId: null | string, items: RemoteQueueItem[]) => {
+    currentQueueState = { currentUniqueId, items };
+    broadcast({ data: currentQueueState, event: 'queue-state' });
+});
+
+ipcMain.on('update-radio-status', (_event, status: ServerRadioStatus['data']) => {
+    currentRadioStatus = status;
+    broadcast({ data: status, event: 'radio-status' });
+});
+
+ipcMain.on('update-confirm-queue-changes-setting', (_event, enabled: boolean) => {
+    confirmQueueChanges = enabled;
+    broadcast({ data: enabled, event: 'confirm-queue-changes-setting' });
+});
+
+ipcMain.on('update-accent-color', (_event, color: { dark: string; light: string }) => {
+    currentAccentColor = color;
+    broadcast({ data: color, event: 'accent-color' });
 });
 
 if (mprisPlayer) {

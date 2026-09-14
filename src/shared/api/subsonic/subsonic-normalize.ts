@@ -5,6 +5,7 @@ import { ssType } from '/@/shared/api/subsonic/subsonic-types';
 import {
     Album,
     AlbumArtist,
+    Disc,
     ExplicitStatus,
     Folder,
     Genre,
@@ -197,8 +198,10 @@ const normalizeSong = (
         artists: getArtistList(item.artists, item.artistId, item.artist, participants),
         bitDepth: item.bitDepth || null,
         bitRate: item.bitRate || 0,
+        blurHash: null,
         bpm: item.bpm || null,
         channels: item.channelCount || null,
+        codec: null,
         comment: null,
         compilation: null,
         container: item.contentType.startsWith('audio/') ? item.contentType.split('/')[1] : null,
@@ -213,6 +216,7 @@ const normalizeSong = (
                 : item.explicitStatus === 'clean'
                   ? ExplicitStatus.CLEAN
                   : null,
+        folderId: null,
         gain:
             item.replayGain && (item.replayGain.albumGain || item.replayGain.trackGain)
                 ? {
@@ -225,11 +229,18 @@ const normalizeSong = (
         imageId: item.coverArt?.toString() || null,
         imageUrl: null,
         lastPlayedAt: null,
+        libraryId: null,
+        libraryName: null,
         lyrics: null,
         mbzAlbumId: null,
+        mbzAlbumType: null,
         mbzRecordingId: item.musicBrainzId || null,
+        mbzReleaseGroupId: null,
         mbzTrackId: null,
+        missing: null,
         name: item.title,
+        originalDate: date,
+        originalYear: year,
         participants,
         path: item.path || '',
         peak:
@@ -247,6 +258,7 @@ const normalizeSong = (
         size: item.size,
         sortName: item.title,
         tags: null,
+        thumbHash: null,
         trackNumber: item.track || 1,
         trackSubtitle: null,
         updatedAt: '',
@@ -276,6 +288,8 @@ const normalizeAlbumArtist = (
         _serverType: ServerType.SUBSONIC,
         albumCount: item.albumCount ? Number(item.albumCount) : 0,
         biography: null,
+        blurHash: null,
+        dominantColor: null,
         duration: null,
         genres: [],
         id: item.id.toString(),
@@ -283,8 +297,10 @@ const normalizeAlbumArtist = (
         imageUrl: null,
         lastPlayedAt: null,
         mbz: null,
+        missing: null,
         name: item.name,
         playCount: null,
+        ratedAt: null,
         similarArtists:
             item.similarArtists?.map((artist) => ({
                 id: String(artist.id),
@@ -295,6 +311,8 @@ const normalizeAlbumArtist = (
                 userRating: artist.userRating || null,
             })) || [],
         songCount: null,
+        starredAt: item.starred || null,
+        thumbHash: null,
         userFavorite: Boolean(item.starred) || false,
         userRating: null,
     };
@@ -324,6 +342,8 @@ const normalizeAlbum = (
     });
 
     const { releaseDate, releaseYear } = subsonicReleaseFields(item);
+    const discs: Disc | null =
+        discTitleMap.size > 0 ? (Object.fromEntries(discTitleMap) as Disc) : null;
 
     return {
         _itemType: LibraryItem.ALBUM,
@@ -332,8 +352,11 @@ const normalizeAlbum = (
         albumArtistName: item.artist,
         albumArtists: getArtistList(item.artists, item.artistId, item.artist),
         artists: [],
+        blurHash: null,
         comment: null,
         createdAt: item.created,
+        discs,
+        dominantColor: null,
         duration: item.duration * 1000,
         explicitStatus:
             item.explicitStatus === 'explicit'
@@ -341,6 +364,7 @@ const normalizeAlbum = (
                 : item.explicitStatus === 'clean'
                   ? ExplicitStatus.CLEAN
                   : null,
+        gain: null,
         genres: getGenres(item, server),
         id: item.id.toString(),
         imageId: item.coverArt?.toString() || null,
@@ -349,11 +373,14 @@ const normalizeAlbum = (
         lastPlayedAt: null,
         mbzId: null,
         mbzReleaseGroupId: null,
+        missing: null,
         name: item.name,
         originalDate: releaseDate,
         originalYear: releaseYear ?? 0,
         participants: getParticipants(item),
+        peak: null,
         playCount: null,
+        ratedAt: null,
         recordLabels: item.recordLabels?.map((item) => item.name) || [],
         releaseDate,
         releaseType: getReleaseType(item),
@@ -366,7 +393,9 @@ const normalizeAlbum = (
                 normalizeSong(song, server, undefined, discTitleMap),
             ) || [],
         sortName: item.title,
+        starredAt: null,
         tags: null,
+        thumbHash: null,
         trackYearRange: null,
         updatedAt: item.created,
         userFavorite: Boolean(item.starred) || false,
@@ -387,8 +416,11 @@ const normalizePlaylist = (
         _itemType: LibraryItem.PLAYLIST,
         _serverId: server?.id || 'unknown',
         _serverType: ServerType.SUBSONIC,
+        blurHash: null,
         description: item.comment || null,
+        dominantColor: null,
         duration: item.duration * 1000,
+        evaluatedAt: null,
         genres: [],
         id: item.id.toString(),
         // Bust the browser image cache when the playlist changes, since the
@@ -401,6 +433,7 @@ const normalizePlaylist = (
         public: item.public,
         size: null,
         songCount: item.songCount,
+        thumbHash: null,
     };
 };
 

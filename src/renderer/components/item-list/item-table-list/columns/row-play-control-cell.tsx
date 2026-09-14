@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { ReactNode, useCallback } from 'react';
+import { ReactNode, useCallback, useState } from 'react';
 
 import styles from './row-index-column.module.css';
 
@@ -12,7 +12,7 @@ import { ItemListItem } from '/@/renderer/components/item-list/types';
 import { ItemRowPlayControls } from '/@/renderer/features/shared/components/item-row-play-controls';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
-import { HoverCard } from '/@/shared/components/hover-card/hover-card';
+import { Popover } from '/@/shared/components/popover/popover';
 import { Text } from '/@/shared/components/text/text';
 import { Play } from '/@/shared/types/types';
 
@@ -35,6 +35,15 @@ export const RowPlayControlCell = (
         rowIndex,
         showPlayControls,
     } = props;
+    const [playControlsOpened, setPlayControlsOpened] = useState(false);
+
+    const openPlayControls = useCallback(() => {
+        setPlayControlsOpened(true);
+    }, []);
+
+    const closePlayControls = useCallback(() => {
+        setPlayControlsOpened(false);
+    }, []);
 
     const handleExpand = useCallback(
         (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -72,14 +81,15 @@ export const RowPlayControlCell = (
     const expansionTarget = (
         <div className={styles.playTarget}>
             {getIndexDisplay(true)}
-            <ActionIcon
-                className={clsx(styles.expand, 'hover-only')}
-                icon="arrowDownS"
-                iconProps={{ color: 'muted', size: 'md' }}
-                onClick={handleExpand}
-                size="xs"
-                variant="subtle"
-            />
+            <div className={clsx(styles.expand, 'hover-only')}>
+                <ActionIcon
+                    icon="arrowDownS"
+                    iconProps={{ color: 'muted', size: 'md' }}
+                    onClick={handleExpand}
+                    size="xs"
+                    variant="subtle"
+                />
+            </div>
         </div>
     );
 
@@ -88,12 +98,36 @@ export const RowPlayControlCell = (
             <TableColumnContainer {...props} className={styles.expansionCell}>
                 <div className={styles.expansionInner}>
                     {showPlayControls ? (
-                        <HoverCard openDelay={300} position="top" withArrow withinPortal={false}>
-                            <HoverCard.Target>{expansionTarget}</HoverCard.Target>
-                            <HoverCard.Dropdown onClick={(e) => e.stopPropagation()}>
+                        <Popover
+                            onChange={setPlayControlsOpened}
+                            opened={playControlsOpened}
+                            position="top"
+                            transitionProps={{
+                                enterDelay: 150,
+                                exitDelay: 150,
+                                transition: 'fade',
+                            }}
+                            withArrow
+                            withinPortal
+                        >
+                            <Popover.Target>
+                                <div
+                                    className={styles.playControlTarget}
+                                    onFocus={openPlayControls}
+                                    onMouseEnter={openPlayControls}
+                                    onMouseLeave={closePlayControls}
+                                >
+                                    {expansionTarget}
+                                </div>
+                            </Popover.Target>
+                            <Popover.Dropdown
+                                onClick={(e) => e.stopPropagation()}
+                                onMouseEnter={openPlayControls}
+                                onMouseLeave={closePlayControls}
+                            >
                                 <ItemRowPlayControls onPlay={onPlay} />
-                            </HoverCard.Dropdown>
-                        </HoverCard>
+                            </Popover.Dropdown>
+                        </Popover>
                     ) : (
                         expansionTarget
                     )}
@@ -110,16 +144,34 @@ export const RowPlayControlCell = (
 
     return (
         <TableColumnTextContainer {...props} className={styles.fullSizeContent}>
-            <HoverCard openDelay={300} position="top" withArrow withinPortal={false}>
-                <HoverCard.Target>
-                    <Flex className={styles.indexContent} justify="center" w="100%">
-                        {getIndexDisplay(false)}
-                    </Flex>
-                </HoverCard.Target>
-                <HoverCard.Dropdown onClick={(e) => e.stopPropagation()}>
+            <Popover
+                onChange={setPlayControlsOpened}
+                opened={playControlsOpened}
+                position="top"
+                transitionProps={{ enterDelay: 150, exitDelay: 150, transition: 'fade' }}
+                withArrow
+                withinPortal
+            >
+                <Popover.Target>
+                    <div
+                        className={styles.playControlTarget}
+                        onFocus={openPlayControls}
+                        onMouseEnter={openPlayControls}
+                        onMouseLeave={closePlayControls}
+                    >
+                        <Flex className={styles.indexContent} justify="center" w="100%">
+                            {getIndexDisplay(false)}
+                        </Flex>
+                    </div>
+                </Popover.Target>
+                <Popover.Dropdown
+                    onClick={(e) => e.stopPropagation()}
+                    onMouseEnter={openPlayControls}
+                    onMouseLeave={closePlayControls}
+                >
                     <ItemRowPlayControls onPlay={onPlay} />
-                </HoverCard.Dropdown>
-            </HoverCard>
+                </Popover.Dropdown>
+            </Popover>
         </TableColumnTextContainer>
     );
 };

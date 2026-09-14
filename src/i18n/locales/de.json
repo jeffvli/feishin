@@ -581,7 +581,8 @@
                 "playerItemAlignment": "Anordnung der Wiedergabeelemente",
                 "titleDisplayType": "Aussehen des Titelbildschirms",
                 "titleDisplayType_optionMultiLine": "Mehrzeilig",
-                "titleLineCount": "Anzahl der Titellinien"
+                "titleLineCount": "Anzahl der Titellinien",
+                "lyricFollowScrollAlignment": "Ausrichtung der Liedtexte"
             },
             "upNext": "Als nächstes",
             "lyrics": "Songtexte",

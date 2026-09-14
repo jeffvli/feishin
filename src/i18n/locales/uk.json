@@ -275,7 +275,9 @@
         "settingsSyncError": "Виявлено розбіжності між налаштуваннями рендерера та основного процесу. Перезапустіть програму, щоб застосувати зміни",
         "invalidJson": "Недійсний JSON",
         "playbackPausedDueToError": "Відтворення призупинено через помилку",
-        "serverLockSingleServer": "Коли сервер заблоковано, дозволено лише один сервер"
+        "serverLockSingleServer": "Коли сервер заблоковано, дозволено лише один сервер",
+        "jellyfinQuickConnectDeactivated": "Термін дії запиту на швидке підключення минув",
+        "jellyfinQuickConnectNotActive": "Швидке підключення неактивне на цьому сервері"
     },
     "filter": {
         "album": "$t(entity.album, {\"count\": 1})",
@@ -381,7 +383,17 @@
             "input_username": "Ім’я користувача",
             "success": "Сервер успішно додано",
             "title": "Додати сервер",
-            "input_passwordNoSSO": "Автентифікація через зворотний проксі (SSO) не підтримується. Підтримуються лише автентифікація за іменем користувача й паролем та автентифікація Subsonic"
+            "input_passwordNoSSO": "Автентифікація через зворотний проксі (SSO) не підтримується. Підтримуються лише автентифікація за іменем користувача й паролем та автентифікація Subsonic",
+            "input_jellyfinQuickConnect": "Швидке підключення",
+            "input_jellyfinQuickConnectCode": "Введіть цей код у вебінтерфейсі Jellyfin для авторизації",
+            "input_jellyfinQuickConnectCodeCopied": "Скопійовано",
+            "input_jellyfinQuickConnectCodeCopy": "Копіювати код",
+            "input_jellyfinQuickConnectOpen": "Відкрити швидке підключення",
+            "input_jellyfinQuickConnectWaiting": "Очікування підтвердження на вашому сервері Jellyfin…",
+            "input_jellyfinSignInMethod": "Увійти за допомогою",
+            "input_jellyfinSignInMethodPassword": "Пароль",
+            "input_jellyfinSignInMethodQuickConnect": "Швидке підключення",
+            "input_remoteUrlDescription": "Використовується замість URL-адреси для зовнішніх функцій, таких як спільні посилання. Залиште це поле порожнім, якщо ваш сервер не доступний за іншою адресою за межами вашої мережі."
         },
         "largeFetchConfirmation": {
             "title": "Додати елементи до черги",
@@ -725,7 +737,8 @@
             "newlyAdded": "Нещодавно додані релізи",
             "recentlyPlayed": "Нещодавно відтворені",
             "recentlyReleased": "Нещодавні релізи",
-            "title": "$t(common.home)"
+            "title": "$t(common.home)",
+            "playlists": "Плейлисти"
         },
         "itemDetail": {
             "copyPath": "Скопіювати шлях у буфер обміну",
@@ -1315,7 +1328,15 @@
         "microtonalPitchControls": "Керування мікротональною висотою",
         "microtonalPitchControls_description": "Додати більше елементів керування висотою тону для проміжних значень між півтонами",
         "sidebarImageEnabled": "Кнопка розгортання обкладинки альбому",
-        "sidebarImageEnabled_description": "Показувати на обкладинці альбому в панелі плеєра кнопку для розгортання в бічній панелі. Якщо вимкнути цей параметр, кнопку також буде приховано, а вже розгорнуту обкладинку — згорнуто"
+        "sidebarImageEnabled_description": "Показувати на обкладинці альбому в панелі плеєра кнопку для розгортання в бічній панелі. Якщо вимкнути цей параметр, кнопку також буде приховано, а вже розгорнуту обкладинку — згорнуто",
+        "scrobbleMinimumMode_description": "Зберігати прослуховування після досягнення певного відсотка композиції, певної кількості секунд або настання будь-якої з цих умов",
+        "scrobbleMinimumMode_optionBoth": "Обидва",
+        "scrobbleMinimumMode_optionSeconds": "Секунди",
+        "scrobbleMinimumMode_optionPercentage": "Відсоток",
+        "scrobbleMinimumMode": "Мінімальний режим скроблінгу",
+        "transcodeNote": "Транскодування виконується сервером і застосовується з наступного треку",
+        "transcodeSampleRate_description": "Максимальна частота дискретизації в Гц для транскодованого аудіо, наприклад 192000. Залиште порожнім, щоб зберегти вихідну частоту. Лише для Jellyfin",
+        "transcodeSampleRate": "Макс. частота дискретизації для транскодування"
     },
     "table": {
         "column": {
@@ -1594,6 +1615,54 @@
                 "d": "D",
                 "z": "Z"
             }
+        }
+    },
+    "dlna": {
+        "castToDevice": "Транслювати на пристрій DLNA",
+        "castingToDevice": "Транслювання на {{name}}",
+        "castingToGroup": "Транслювання на групу ({{count}})",
+        "connected": "підключено",
+        "connecting": "Підключення…",
+        "createGroup": "Створити групу",
+        "devices": "Пристрої DLNA",
+        "disconnect": "Відключити",
+        "disconnectAndContinue": "Відключити і продовжити",
+        "noDevicesFound": "Пристроїв DLNA не знайдено",
+        "nowCasting": "Зараз транслюється",
+        "searching": "Пошук пристроїв…",
+        "shiftDisconnectHint": "Утримуйте Shift і натисніть «Відключити», щоб продовжити відтворення на динаміку",
+        "group": {
+            "add": "Додати",
+            "addSpeaker": "Додати динамік",
+            "addSpeakers": "Додати динаміки",
+            "addToGroup": "Додати до групи",
+            "cancel": "Скасувати",
+            "connect": "Підключити",
+            "coordinator": "координатор",
+            "failedToAddMessage": "Не вдалося додати {{name}}. Можливо, він не в тій самій системі Sonos.",
+            "failedToAddTitle": "Не вдалося додати динамік",
+            "firstSelectedIsCoordinator": "Перший вибраний = координатор",
+            "noSonosFound": "Пристроїв Sonos не знайдено",
+            "refresh": "Оновити",
+            "remove": "Видалити",
+            "searching": "Пошук…",
+            "selectSpeakers": "Виберіть динаміки групи",
+            "title": "Група (К-сть динаміків: {{count}})"
+        },
+        "speakerProperties": {
+            "bass": "Баси",
+            "crossfade": "Плавний перехід",
+            "ledState": "Індикатор стану",
+            "loadFailed": "Не вдалося завантажити властивості",
+            "loading": "Завантаження…",
+            "longPressHint": "Довге натискання для відкриття властивостей динаміка",
+            "loudness": "Тонкомпенсація",
+            "touchControls": "Сенсорне керування",
+            "treble": "Високі частоти"
+        },
+        "volume": {
+            "groupControl": "Утримуйте Shift, щоб змінити гучність окремих динаміків",
+            "individualControl": "Відпустіть Shift, щоб змінити гучність усіх динаміків"
         }
     }
 }
