@@ -4,7 +4,6 @@
     align-items: center;
     justify-content: center;
     padding: var(--theme-spacing-md) var(--theme-spacing-md) var(--theme-spacing-md) 0;
-
 }
 
 .metadata-stack {
@@ -40,6 +39,14 @@
     &:hover button {
         display: block;
     }
+}
+
+.toggle-button {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    z-index: 10;
+    cursor: default;
 }
 
 .playerbar-image {
