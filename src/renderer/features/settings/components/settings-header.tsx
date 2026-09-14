@@ -1,6 +1,7 @@
 import { closeAllModals, openModal } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
 
+import { PageHeader } from '/@/renderer/components/page-header/page-header';
 import { UpdateAvailableButton } from '/@/renderer/features/settings/components/update-available-button';
 import { useSettingSearchStore } from '/@/renderer/features/settings/store/search.store';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
@@ -38,20 +39,24 @@ export const SettingsHeader = ({ showUpdateAvailable }: SettingsHeaderProps) => 
     };
 
     return (
-        <LibraryHeaderBar>
-            <Flex align="center" justify="space-between" w="100%">
-                <LibraryHeaderBar.Title>{t('common.setting', { count: 2 })}</LibraryHeaderBar.Title>
-                <Group pr="2rem">
-                    {showUpdateAvailable && <UpdateAvailableButton />}
-                    <SearchInput
-                        defaultValue={search}
-                        onChange={(event) => setSearch(event.target.value.toLocaleLowerCase())}
-                    />
-                    <Button onClick={openResetConfirmModal} variant="default">
-                        {t('common.resetToDefault')}
-                    </Button>
-                </Group>
-            </Flex>
-        </LibraryHeaderBar>
+        <PageHeader>
+            <LibraryHeaderBar>
+                <Flex align="center" justify="space-between" w="100%">
+                    <LibraryHeaderBar.Title>
+                        {t('common.setting', { count: 2 })}
+                    </LibraryHeaderBar.Title>
+                    <Group pr="2rem">
+                        {showUpdateAvailable && <UpdateAvailableButton />}
+                        <SearchInput
+                            defaultValue={search}
+                            onChange={(event) => setSearch(event.target.value.toLocaleLowerCase())}
+                        />
+                        <Button onClick={openResetConfirmModal} variant="default">
+                            {t('common.resetToDefault')}
+                        </Button>
+                    </Group>
+                </Flex>
+            </LibraryHeaderBar>
+        </PageHeader>
     );
 };
