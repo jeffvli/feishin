@@ -204,6 +204,7 @@
     position: absolute;
     bottom: 0;
     left: 0;
+    z-index: 10;
     gap: 0;
     width: 100%;
     padding: var(--theme-spacing-xs);
