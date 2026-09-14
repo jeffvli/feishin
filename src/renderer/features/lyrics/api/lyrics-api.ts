@@ -81,10 +81,6 @@ const formatLyrics = (lyrics: string) => {
 
 export const formatLyricsForDisplay = formatLyrics;
 
-export function clearRemoteLyricsCache(songId: string): void {
-    lyricsIpc?.clearCache(songId);
-}
-
 export function computeSelectedFromResult(
     result: Pick<
         LyricsQueryResult,

@@ -26,10 +26,6 @@ const getRemoteLyricsByRemoteId = (id: LyricGetQuery) => {
     return result;
 };
 
-const clearCache = (songId: string): Promise<void> => {
-    return ipcRenderer.invoke('lyric-clear-cache', songId);
-};
-
 const convertFurigana = (text: string): Promise<string> => {
     return ipcRenderer.invoke('lyric-convert-furigana', text);
 };
@@ -51,7 +47,6 @@ const convertRomajiTokens = (text: string) => {
 };
 
 export const lyrics = {
-    clearCache,
     convertFurigana,
     convertFuriganaFragment,
     convertRomaji,

@@ -10,7 +10,6 @@ import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { PlayerLyricsFetchedEventPayload } from '/@/renderer/events/events';
 import { translateLyrics } from '/@/renderer/features/lyrics/api/lyric-translate';
 import {
-    clearRemoteLyricsCache,
     computeSelectedFromResult,
     getDisplayOffset,
     lyricsQueries,
@@ -393,8 +392,6 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
 
     const handleOnRefreshLyric = useCallback(async () => {
         if (!currentSong || !lyricsKey) return;
-
-        clearRemoteLyricsCache(currentSong.id);
 
         queryClient.setQueryData<LyricsQueryResult>(lyricsKey, (prev) =>
             prev
