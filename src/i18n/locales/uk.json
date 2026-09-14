@@ -1336,7 +1336,13 @@
         "scrobbleMinimumMode": "Мінімальний режим скроблінгу",
         "transcodeNote": "Транскодування виконується сервером і застосовується з наступного треку",
         "transcodeSampleRate_description": "Максимальна частота дискретизації в Гц для транскодованого аудіо, наприклад 192000. Залиште порожнім, щоб зберегти вихідну частоту. Лише для Jellyfin",
-        "transcodeSampleRate": "Макс. частота дискретизації для транскодування"
+        "transcodeSampleRate": "Макс. частота дискретизації для транскодування",
+        "imagePlaceholderPriority": "Пріоритет заповнювача зображення",
+        "imagePlaceholderPriority_description": "Визначає тип заповнювача зображення, який буде використовуватися під час завантаження (якщо доступний)",
+        "imagePlaceholderPriority_optionBlurhash": "BlurHash",
+        "imagePlaceholderPriority_optionDominantColor": "Домінувальний колір",
+        "imagePlaceholderPriority_optionOff": "Вимкнено",
+        "imagePlaceholderPriority_optionThumbhash": "ThumbHash"
     },
     "table": {
         "column": {

@@ -1273,7 +1273,13 @@
         "scrobbleMinimumMode": "Ustaw tryb minimalnego scrobblowania",
         "transcodeNote": "Transkodowanie jest wykonywane przez serwer i jest stosowane od następnego utworu",
         "transcodeSampleRate_description": "Maksymalna częstotliwość próbkowania w Hz dla transkodowanego audio, np. 192000. Pozostaw puste, aby pozostawić jakość źródłową. Tylko Jellyfin",
-        "transcodeSampleRate": "Maksymalna częstotliwość próbkowania do transkodowania"
+        "transcodeSampleRate": "Maksymalna częstotliwość próbkowania do transkodowania",
+        "imagePlaceholderPriority_description": "Ustawia typ obrazu zastępczego używanego podczas ładowania jeśli dostępny",
+        "imagePlaceholderPriority": "Priorytet obrazu zastępczego",
+        "imagePlaceholderPriority_optionDominantColor": "Kolor dominujący",
+        "imagePlaceholderPriority_optionOff": "Wyłączony",
+        "imagePlaceholderPriority_optionBlurhash": "BlurHash",
+        "imagePlaceholderPriority_optionThumbhash": "ThumbHash"
     },
     "table": {
         "config": {

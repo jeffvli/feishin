@@ -1132,7 +1132,13 @@
         "sidebarImageEnabled_description": "Mostra un botó a la caràtula de l'àlbum de la barra del reproductor per expandir-lo a la barra lateral. Desactivar això, també amaga el botó i col·lapsa l'art de l'àlbum si es troba expandit actualment",
         "transcodeNote": "La transcodificació la realitza el servidor i s'aplica des de la pista següent",
         "transcodeSampleRate_description": "Freqüència de mostreig màxima en Hz per a àudio transcodificat, p. ex. 192000. Deixeu-ho buit per a mantenir la freqüència original. Només Jellyfin",
-        "transcodeSampleRate": "Taxa de mostreig màxima a transcodificar"
+        "transcodeSampleRate": "Taxa de mostreig màxima a transcodificar",
+        "imagePlaceholderPriority_description": "Estableix el tipus de marcador de posició de la imatge a usar mentre es carrega si està disponible",
+        "imagePlaceholderPriority": "Prioritat del marcador de posició de la imatge",
+        "imagePlaceholderPriority_optionBlurhash": "BlurHash",
+        "imagePlaceholderPriority_optionDominantColor": "Color dominant",
+        "imagePlaceholderPriority_optionOff": "Desactivat",
+        "imagePlaceholderPriority_optionThumbhash": "ThumbHash"
     },
     "table": {
         "column": {

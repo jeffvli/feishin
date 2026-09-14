@@ -537,7 +537,13 @@
         "scrobbleMinimumMode_description": "Scrobblea después de un porcentaje de la canción, un número determinado de segundos, o cualquiera de los dos",
         "transcodeNote": "La transcodificación se hace a nivel de servidor y se aplica en la siguiente pista",
         "transcodeSampleRate_description": "Frecuencia de muestreo máxima en Hz para audio transcodificado, p. ej. 192000. Dejar vacío para mantener la frecuencia origen. Solo en Jellyfin",
-        "transcodeSampleRate": "Máxima frecuencia de muestreo a transcodificar"
+        "transcodeSampleRate": "Máxima frecuencia de muestreo a transcodificar",
+        "imagePlaceholderPriority_optionDominantColor": "Color dominante",
+        "imagePlaceholderPriority_optionOff": "Apagado",
+        "imagePlaceholderPriority": "Prioridad del marcador de posición de la imagen",
+        "imagePlaceholderPriority_description": "Establece el tipo de marcador de posición de imagen a usar mientras se carga si está disponible",
+        "imagePlaceholderPriority_optionBlurhash": "BlurHash",
+        "imagePlaceholderPriority_optionThumbhash": "ThumbHash"
     },
     "action": {
         "editPlaylist": "Editar $t(entity.playlist, {\"count\": 1})",
@@ -755,7 +761,9 @@
         "noNetworkDescription": "No se pudo conectar a este servidor",
         "invalidJson": "JSON inválido",
         "serverLockSingleServer": "Solo se permite un servidor cuando el servidor está bloqueado",
-        "playbackPausedDueToError": "La reproducción fue pausada debido a un error"
+        "playbackPausedDueToError": "La reproducción fue pausada debido a un error",
+        "jellyfinQuickConnectDeactivated": "Petición de Conexión rápida expirada",
+        "jellyfinQuickConnectNotActive": "Conexión rápida no está activa en este servidor"
     },
     "filter": {
         "mostPlayed": "Más reproducidos",
@@ -1106,7 +1114,17 @@
             "input_remoteUrl": "URL Pública",
             "input_preferRemoteUrl": "Preferir URL Pública",
             "input_remoteUrlPlaceholder": "Opcional: URL pública para características externas",
-            "input_passwordNoSSO": "La autenticación de proxy inverso (SSO) no está soportada. Solo está soportada la autenticación por usuario/contraseña y la autenticación de Subsonic"
+            "input_passwordNoSSO": "La autenticación de proxy inverso (SSO) no está soportada. Solo está soportada la autenticación por usuario/contraseña y la autenticación de Subsonic",
+            "input_jellyfinQuickConnect": "Conexión rápida",
+            "input_jellyfinQuickConnectCode": "Introduce este código en tu interfaz de usuario web de Jellyfin para autorizar",
+            "input_jellyfinQuickConnectCodeCopied": "Copiado",
+            "input_jellyfinQuickConnectCodeCopy": "Copiar código",
+            "input_jellyfinQuickConnectOpen": "Abrir Conexión rápida",
+            "input_jellyfinQuickConnectWaiting": "Esperando aprobación en tu servidor Jellyfin…",
+            "input_jellyfinSignInMethod": "Iniciar sesión con",
+            "input_jellyfinSignInMethodPassword": "Contraseña",
+            "input_jellyfinSignInMethodQuickConnect": "Conexión rápida",
+            "input_remoteUrlDescription": "Usado en lugar de la URL para características externas, como enlaces compartidos. Dejar esto en blanco a menos que tu servidor sea alcanzable a través de una dirección diferente desde fuera de tu red."
         },
         "addToPlaylist": {
             "success": "Añadido $t(entity.trackWithCount, {\"count\": {{message}} }) a $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
