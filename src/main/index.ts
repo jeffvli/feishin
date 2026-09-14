@@ -372,9 +372,7 @@ let currentSidebarCollapsed = false;
 let currentShuffleEnabled = false;
 
 app.on('before-quit', () => {
-    if (isMacOS()) {
-        forceQuit = true;
-    }
+    forceQuit = true;
     log.info('App quitting', { reason: exitFromTray ? 'tray' : 'before-quit' });
 });
 let playbackMenuAccelerators: MenuPlaybackState['accelerators'] = {};
