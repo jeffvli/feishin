@@ -1578,7 +1578,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 },
                 setVolume: (volume: number) => {
                     set((state) => {
-                        state.player.volume = volume;
+                        state.player.volume = Math.min(100, Math.max(0, volume));
                     });
                 },
                 shuffle: () => {
@@ -1731,7 +1731,13 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
         ),
         {
             merge: (persistedState: any, currentState: any) => {
-                return merge(currentState, persistedState);
+                const merged = merge(currentState, persistedState);
+
+                if (merged.player) {
+                    merged.player.volume = Math.min(100, Math.max(0, merged.player.volume));
+                }
+
+                return merged;
             },
             migrate: async (persistedState, oldVersion) => {
                 if (oldVersion < 3) {
@@ -1750,7 +1756,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 if (!state) return;
                 const playback = useSettingsStore.getState().playback;
                 if (playback.previousLocalVolume !== undefined) {
-                    state.player.volume = playback.previousLocalVolume;
+                    state.player.volume = Math.min(100, Math.max(0, playback.previousLocalVolume));
                 }
                 usePlayerStoreBase.setState({ hydrated: true });
             },

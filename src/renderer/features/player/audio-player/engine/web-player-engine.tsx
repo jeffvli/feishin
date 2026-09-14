@@ -44,6 +44,12 @@ interface WebPlayerEngineProps {
 const MAX_NETWORK_RETRIES = 5;
 const NETWORK_RETRY_DELAY_MS = 2000;
 
+// Store volume is 0-100; clamp the normalized result so HTMLMediaElement.volume
+// never receives a value outside [0, 1] (throws IndexSizeError in some engines)
+const normalizeVolume = (volume: number) => {
+    return Math.min(1, Math.max(0, volume / 100 || 0));
+};
+
 // Credits: https://gist.github.com/novwhisky/8a1a0168b94f3b6abfaa?permalink_comment_id=1551393#gistcomment-1551393
 // This is used so that the player will always have an <audio> element. This means that
 // player1Source and player2Source are connected BEFORE the user presses play for
@@ -105,8 +111,8 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
         };
     }, []);
 
-    const [internalVolume1, setInternalVolume1] = useState(volume / 100 || 0);
-    const [internalVolume2, setInternalVolume2] = useState(volume / 100 || 0);
+    const [internalVolume1, setInternalVolume1] = useState(() => normalizeVolume(volume));
+    const [internalVolume2, setInternalVolume2] = useState(() => normalizeVolume(volume));
 
     useImperativeHandle<WebPlayerEngineHandle, WebPlayerEngineHandle>(playerRef, () => ({
         decreaseVolume(by: number) {
@@ -133,13 +139,13 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
         player1() {
             return {
                 ref: player1Ref?.current,
-                setVolume: (volume: number) => setInternalVolume1(volume / 100 || 0),
+                setVolume: (volume: number) => setInternalVolume1(normalizeVolume(volume)),
             };
         },
         player2() {
             return {
                 ref: player2Ref?.current,
-                setVolume: (volume: number) => setInternalVolume2(volume / 100 || 0),
+                setVolume: (volume: number) => setInternalVolume2(normalizeVolume(volume)),
             };
         },
         seekTo(seekTo: number) {
@@ -154,14 +160,14 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                 : player2Ref.current?.seekTo(seekTo, type);
         },
         setVolume(volume: number) {
-            setInternalVolume1(volume / 100 || 0);
-            setInternalVolume2(volume / 100 || 0);
+            setInternalVolume1(normalizeVolume(volume));
+            setInternalVolume2(normalizeVolume(volume));
         },
         setVolume1(volume: number) {
-            setInternalVolume1(volume / 100 || 0);
+            setInternalVolume1(normalizeVolume(volume));
         },
         setVolume2(volume: number) {
-            setInternalVolume2(volume / 100 || 0);
+            setInternalVolume2(normalizeVolume(volume));
         },
     }));
 
