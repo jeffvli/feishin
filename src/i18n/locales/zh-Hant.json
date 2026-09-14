@@ -970,7 +970,13 @@
         "scrobbleMinimumMode": "設定記錄觸發條件模式",
         "transcodeNote": "轉碼由伺服器端執行，下一首曲目開始套用",
         "transcodeSampleRate_description": "轉碼音訊的最高取樣率（以 Hz 為單位，例如 192000）。留空則保留原始取樣率。僅適用於 Jellyfin",
-        "transcodeSampleRate": "轉碼最高取樣率"
+        "transcodeSampleRate": "轉碼最高取樣率",
+        "imagePlaceholderPriority_description": "設定載入圖片時優先使用的預留位置類型（若可用）",
+        "imagePlaceholderPriority": "圖片預留位置優先順序",
+        "imagePlaceholderPriority_optionBlurhash": "BlurHash",
+        "imagePlaceholderPriority_optionDominantColor": "主要顏色",
+        "imagePlaceholderPriority_optionOff": "關閉",
+        "imagePlaceholderPriority_optionThumbhash": "ThumbHash"
     },
     "table": {
         "config": {
