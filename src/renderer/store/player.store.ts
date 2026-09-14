@@ -208,7 +208,6 @@ function calculateNextIndex(
     currentIndex: number,
     queueLength: number,
     repeat: PlayerRepeat,
-    restartOnEnd: boolean,
 ): { nextIndex: number; shouldStop: boolean } {
     const isLastTrack = currentIndex === queueLength - 1;
 
@@ -223,9 +222,9 @@ function calculateNextIndex(
             return { nextIndex: currentIndex + 1, shouldStop: false };
         }
     } else {
-        // Repeat none: move to next track, or stop if at the end
+        // Repeat none: move to next track, or loop back and stop if at the end
         if (isLastTrack) {
-            return { nextIndex: restartOnEnd ? 0 : currentIndex, shouldStop: true };
+            return { nextIndex: 0, shouldStop: true };
         } else {
             return { nextIndex: currentIndex + 1, shouldStop: false };
         }
@@ -944,13 +943,11 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     const playbackLength = isShuffle
                         ? stateSnapshot.queue.shuffled.length
                         : queue.items.length;
-                    const restartOnEnd = useSettingsStore.getState().playback.restartQueueOnEnd;
 
                     const { nextIndex: nextPlaybackIndex, shouldStop } = calculateNextIndex(
                         currentIndex,
                         playbackLength,
                         repeat,
-                        restartOnEnd,
                     );
 
                     const isRepeatOneSameTrack =
@@ -1091,13 +1088,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         return;
                     }
 
-                    const restartOnEnd = useSettingsStore.getState().playback.restartQueueOnEnd;
-                    const nextIndexProps = calculateNextIndex(
-                        currentIndex,
-                        playbackLength,
-                        repeat,
-                        restartOnEnd,
-                    );
+                    const nextIndexProps = calculateNextIndex(currentIndex, playbackLength, repeat);
                     let { nextIndex } = nextIndexProps;
                     const { shouldStop } = nextIndexProps;
 
