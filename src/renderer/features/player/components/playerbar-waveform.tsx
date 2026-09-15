@@ -1,13 +1,11 @@
-import { useWavesurfer } from '@wavesurfer/react';
 import formatDuration from 'format-duration';
-import { AnimatePresence, motion } from 'motion/react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { motion } from 'motion/react';
+import { KeyboardEvent, PointerEvent, useEffect, useRef, useState } from 'react';
 
-import { CustomPlayerbarSlider } from './playerbar-slider';
 import styles from './playerbar-waveform.module.css';
+import { RgbWaveformData } from './rgb-waveform';
+import { getCachedRgbWaveform, loadRgbWaveform } from './rgb-waveform-cache';
 
-import { useSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
-import { PlayerbarSeekSlider } from '/@/renderer/features/player/components/playerbar-seek-slider';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     BarAlign,
@@ -16,402 +14,262 @@ import {
     usePlayerSong,
     usePlayerTimestamp,
 } from '/@/renderer/store';
-import { useAppThemeColors, useColorScheme } from '/@/renderer/themes/use-app-theme';
+import { logger } from '/@/renderer/utils/logger';
+import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Text } from '/@/shared/components/text/text';
 
 export const PlayerbarWaveform = () => {
     const currentSong = usePlayerSong();
     const playerbarSlider = usePlayerbarSlider();
     const currentTime = usePlayerTimestamp();
-    const containerRef = useRef<HTMLDivElement>(null);
-    const audioElementRef = useRef<HTMLAudioElement>(document.createElement('audio'));
-    const { mediaSeekToTimestamp } = usePlayer();
-    const [isLoading, setIsLoading] = useState(true);
-    const [hasError, setHasError] = useState(false);
-    const [isDragging, setIsDragging] = useState(false);
-    const [tooltipPosition, setTooltipPosition] = useState<null | { x: number; y: number }>(null);
-    const [tooltipValue, setTooltipValue] = useState(0);
+    const { transcode } = usePlaybackSettings();
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const currentSongRef = useRef(currentSong);
     const seekTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const lastSeekValueRef = useRef<null | number>(null);
-    const containerPositionRef = useRef<DOMRect | null>(null);
+    const transcodeRef = useRef(transcode);
+    const { mediaSeekToTimestamp } = usePlayer();
+    const [isDragging, setIsDragging] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [previewTime, setPreviewTime] = useState<null | number>(null);
+    const [tooltipPosition, setTooltipPosition] = useState<null | { x: number; y: number }>(null);
+    const [waveform, setWaveform] = useState<null | RgbWaveformData>(null);
 
     const songDuration = currentSong?.duration ? currentSong.duration / 1000 : 0;
+    const displayTime = previewTime ?? currentTime;
+    const progress = songDuration ? Math.max(0, Math.min(1, displayTime / songDuration)) : 0;
 
-    const { transcode } = usePlaybackSettings();
-    const streamUrl = useSongUrl(currentSong, true, {
-        bitrate: 64,
-        enabled: transcode.enabled,
-        format: 'mp3',
-    });
+    currentSongRef.current = currentSong;
+    transcodeRef.current = transcode;
 
-    const { color } = useAppThemeColors();
-    const primaryColor = (color['--theme-colors-primary'] as string) || 'rgb(53, 116, 252)';
-
-    const colorScheme = useColorScheme();
-
-    const waveColor = useMemo(() => {
-        return colorScheme === 'dark' ? 'rgba(96, 96, 96, 1)' : 'rgba(96, 96, 96, 1)';
-    }, [colorScheme]);
-
-    const cursorColor = useMemo(() => {
-        return colorScheme === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)';
-    }, [colorScheme]);
-
-    const { wavesurfer } = useWavesurfer({
-        barAlign:
-            playerbarSlider?.barAlign === BarAlign.CENTER ? undefined : playerbarSlider?.barAlign,
-        barGap: playerbarSlider?.barGap,
-        barRadius: playerbarSlider?.barRadius,
-        barWidth: playerbarSlider?.barWidth,
-        container: containerRef,
-        cursorColor,
-        cursorWidth: 2,
-        fillParent: true,
-        height: 18,
-        interact: false,
-        media: audioElementRef.current,
-        normalize: playerbarSlider?.stretched ?? false,
-        progressColor: primaryColor,
-        waveColor,
-    });
-
-    // Reset loading state when stream URL changes and ensure media is muted
     useEffect(() => {
-        setIsLoading(true);
-        setHasError(false);
-    }, [streamUrl]);
-
-    // Handle waveform ready state
-    useEffect(() => {
-        if (!wavesurfer || !streamUrl) return;
-
-        // The wavesurfer instance is shared across stream URLs, and this
-        // effect subscribes before its (delayed) load actually starts. Guard
-        // against events that do not belong to this effect's own load:
-        // `cancelled` rejects events after the URL has moved on, and
-        // `loadStarted` rejects a still-in-flight previous load's `ready`
-        // (which would otherwise clear the loading state for the wrong
-        // track and hide the seek bar over an empty/stale waveform).
         let cancelled = false;
-        let loadStarted = false;
+        const song = currentSongRef.current;
+        const cachedWaveform = getCachedRgbWaveform(song);
+        setIsLoading(!cachedWaveform);
+        setWaveform(null);
 
-        const handleReady = () => {
-            if (cancelled || !loadStarted) return;
-            setIsLoading(false);
-            setHasError(false);
-            const mediaElement = wavesurfer.getMediaElement();
-            if (mediaElement) {
-                mediaElement.muted = true;
-                mediaElement.volume = 0;
+        const showWaveform = (analysis: RgbWaveformData) => {
+            window.requestAnimationFrame(() => {
+                if (cancelled) return;
+                setWaveform(analysis);
+                setIsLoading(false);
+            });
+        };
+
+        const loadWaveform = async () => {
+            if (!song) return;
+
+            if (cachedWaveform) {
+                showWaveform(cachedWaveform);
+                return;
+            }
+
+            await new Promise<void>((resolve) => {
+                window.setTimeout(
+                    resolve,
+                    playerbarSlider?.loadingDelay ? playerbarSlider.loadingDelay * 1000 : 2000,
+                );
+            });
+            if (cancelled) return;
+
+            try {
+                showWaveform(await loadRgbWaveform(song, transcodeRef.current));
+            } catch (error) {
+                if (cancelled) return;
+                logger.warn('RGB waveform analysis failed', { error: String(error) });
+                setIsLoading(false);
             }
         };
 
-        // A load failure previously left the waveform canvas empty with no
-        // seek control (the fallback slider only showed while loading), so
-        // the progress bar disappeared until the app was restarted. Surface
-        // real failures so the fallback slider is rendered again. AbortError
-        // is the expected outcome of a superseded load and is ignored.
-        const handleError = (error?: unknown) => {
-            if (cancelled || !loadStarted) return;
-            if (error instanceof Error && error.name === 'AbortError') return;
-            setIsLoading(false);
-            setHasError(true);
-        };
-
-        wavesurfer.on('ready', handleReady);
-        wavesurfer.on('error', handleError);
-
-        const waveformTimeout = setTimeout(
-            () => {
-                if (cancelled) return;
-                loadStarted = true;
-                wavesurfer.load(streamUrl).catch((error: unknown) => {
-                    if (cancelled || (error instanceof Error && error.name === 'AbortError')) {
-                        return;
-                    }
-                    setIsLoading(false);
-                    setHasError(true);
-                });
-            },
-            playerbarSlider?.loadingDelay ? playerbarSlider.loadingDelay * 1000 : 2000,
-        );
+        void loadWaveform();
 
         return () => {
             cancelled = true;
-            wavesurfer.un('ready', handleReady);
-            wavesurfer.un('error', handleError);
-            clearTimeout(waveformTimeout);
         };
-    }, [wavesurfer, streamUrl, playerbarSlider.loadingDelay]);
+    }, [currentSong?._uniqueId, playerbarSlider?.loadingDelay, transcode.enabled]);
 
     useEffect(() => {
-        if (!wavesurfer) return;
+        const canvas = canvasRef.current;
+        if (!canvas || !waveform) return;
 
-        // Ensure waveform never plays - it's just for visualization
-        wavesurfer.setVolume(0);
+        const draw = () => {
+            const { height, width } = canvas.getBoundingClientRect();
+            if (!height || !width) return;
 
-        const muteMediaElement = () => {
-            const mediaElement = wavesurfer.getMediaElement();
-            if (mediaElement) {
-                mediaElement.muted = true;
-                mediaElement.volume = 0;
-            }
-        };
+            const pixelRatio = window.devicePixelRatio || 1;
+            canvas.height = Math.round(height * pixelRatio);
+            canvas.width = Math.round(width * pixelRatio);
 
-        muteMediaElement();
+            const context = canvas.getContext('2d');
+            if (!context) return;
+            context.scale(pixelRatio, pixelRatio);
 
-        const preventPlay = () => {
-            wavesurfer.pause();
-            muteMediaElement(); // Ensure it stays muted
-        };
+            const barWidth = Math.max(1, playerbarSlider.barWidth || 1);
+            const barGap = Math.max(0, playerbarSlider.barGap || 0);
+            const barStep = barWidth + barGap;
+            const barCount = Math.max(1, Math.ceil(width / barStep));
+            const pointsPerBar = waveform.amplitude.length / barCount;
+            const amplitudeScale = playerbarSlider.stretched
+                ? Math.max(waveform.maxAmplitude, 0.001)
+                : 1;
 
-        wavesurfer.on('play', preventPlay);
+            for (let bar = 0; bar < barCount; bar += 1) {
+                const start = Math.floor(bar * pointsPerBar);
+                const end = Math.max(start + 1, Math.ceil((bar + 1) * pointsPerBar));
+                let amplitude = 0;
+                let low = 0;
+                let mid = 0;
+                let high = 0;
 
-        return () => {
-            wavesurfer.un('play', preventPlay);
-        };
-    }, [wavesurfer]);
-
-    // Handle drag start on waveform
-    useEffect(() => {
-        if (!wavesurfer || !songDuration || !containerRef.current) return;
-
-        const container = containerRef.current;
-        let isDraggingLocal = false;
-
-        const handleMouseDown = (e: MouseEvent) => {
-            if (!wavesurfer) return;
-            const duration = wavesurfer.getDuration();
-            if (duration <= 0) return;
-
-            isDraggingLocal = true;
-            setIsDragging(true);
-
-            // Cancel any pending timeout
-            if (seekTimeoutRef.current) {
-                clearTimeout(seekTimeoutRef.current);
-                seekTimeoutRef.current = null;
-            }
-
-            const rect = container.getBoundingClientRect();
-            containerPositionRef.current = rect;
-            const clickX = e.clientX - rect.left;
-            const ratio = Math.max(0, Math.min(1, clickX / rect.width));
-            const seekTime = ratio * duration;
-            lastSeekValueRef.current = seekTime;
-            setTooltipPosition({ x: rect.left + clickX, y: rect.top });
-            setTooltipValue(seekTime);
-            wavesurfer.seekTo(ratio);
-        };
-
-        const handleMouseMove = (e: MouseEvent) => {
-            if (!isDraggingLocal || !wavesurfer) return;
-
-            const duration = wavesurfer.getDuration();
-            if (duration <= 0) return;
-
-            const rect = container.getBoundingClientRect();
-            containerPositionRef.current = rect;
-            const clickX = e.clientX - rect.left;
-            const ratio = Math.max(0, Math.min(1, clickX / rect.width));
-            const seekTime = ratio * duration;
-            lastSeekValueRef.current = seekTime;
-            setTooltipPosition({ x: rect.left + clickX, y: rect.top });
-            setTooltipValue(seekTime);
-            wavesurfer.seekTo(ratio);
-        };
-
-        const handleMouseUp = () => {
-            if (!isDraggingLocal || !wavesurfer) return;
-
-            isDraggingLocal = false;
-            const duration = wavesurfer.getDuration();
-            const seekTime = wavesurfer.getCurrentTime();
-
-            setTooltipPosition(null);
-
-            if (duration > 0 && seekTime >= 0) {
-                mediaSeekToTimestamp(seekTime);
-                lastSeekValueRef.current = seekTime;
-
-                // Set a fallback timeout to clear dragging state
-                seekTimeoutRef.current = setTimeout(() => {
-                    setIsDragging(false);
-                    lastSeekValueRef.current = null;
-                    seekTimeoutRef.current = null;
-                }, 1000);
-            } else {
-                setIsDragging(false);
-            }
-        };
-
-        // Handle touch events for mobile
-        const handleTouchStart = (e: TouchEvent) => {
-            if (!wavesurfer) return;
-            const duration = wavesurfer.getDuration();
-            if (duration <= 0) return;
-
-            isDraggingLocal = true;
-            setIsDragging(true);
-
-            if (seekTimeoutRef.current) {
-                clearTimeout(seekTimeoutRef.current);
-                seekTimeoutRef.current = null;
-            }
-
-            const touch = e.touches[0];
-            const rect = container.getBoundingClientRect();
-            containerPositionRef.current = rect;
-            const clickX = touch.clientX - rect.left;
-            const ratio = Math.max(0, Math.min(1, clickX / rect.width));
-            const seekTime = ratio * duration;
-            lastSeekValueRef.current = seekTime;
-            setTooltipPosition({ x: rect.left + clickX, y: rect.top });
-            setTooltipValue(seekTime);
-            wavesurfer.seekTo(ratio);
-        };
-
-        const handleTouchMove = (e: TouchEvent) => {
-            if (!isDraggingLocal || !wavesurfer) return;
-            e.preventDefault();
-
-            const duration = wavesurfer.getDuration();
-            if (duration <= 0) return;
-
-            const touch = e.touches[0];
-            const rect = container.getBoundingClientRect();
-            containerPositionRef.current = rect;
-            const clickX = touch.clientX - rect.left;
-            const ratio = Math.max(0, Math.min(1, clickX / rect.width));
-            const seekTime = ratio * duration;
-            lastSeekValueRef.current = seekTime;
-            setTooltipPosition({ x: rect.left + clickX, y: rect.top });
-            setTooltipValue(seekTime);
-            wavesurfer.seekTo(ratio);
-        };
-
-        const handleTouchEnd = () => {
-            if (!isDraggingLocal || !wavesurfer) return;
-
-            isDraggingLocal = false;
-            const duration = wavesurfer.getDuration();
-            const seekTime = wavesurfer.getCurrentTime();
-
-            setTooltipPosition(null);
-
-            if (duration > 0 && seekTime >= 0) {
-                mediaSeekToTimestamp(seekTime);
-                lastSeekValueRef.current = seekTime;
-
-                seekTimeoutRef.current = setTimeout(() => {
-                    setIsDragging(false);
-                    lastSeekValueRef.current = null;
-                    seekTimeoutRef.current = null;
-                }, 1000);
-            } else {
-                setIsDragging(false);
-            }
-        };
-
-        container.addEventListener('mousedown', handleMouseDown);
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
-        container.addEventListener('touchstart', handleTouchStart, { passive: false });
-        container.addEventListener('touchmove', handleTouchMove, { passive: false });
-        container.addEventListener('touchend', handleTouchEnd);
-
-        return () => {
-            container.removeEventListener('mousedown', handleMouseDown);
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-            container.removeEventListener('touchstart', handleTouchStart);
-            container.removeEventListener('touchmove', handleTouchMove);
-            container.removeEventListener('touchend', handleTouchEnd);
-            if (seekTimeoutRef.current) {
-                clearTimeout(seekTimeoutRef.current);
-            }
-        };
-    }, [wavesurfer, songDuration, mediaSeekToTimestamp]);
-
-    // Sync dragging state when currentTime catches up to seek value
-    useEffect(() => {
-        if (isDragging && lastSeekValueRef.current !== null) {
-            const timeDiff = Math.abs(currentTime - lastSeekValueRef.current);
-            if (timeDiff < 0.5) {
-                setIsDragging(false);
-                setTooltipPosition(null);
-                lastSeekValueRef.current = null;
-                if (seekTimeoutRef.current) {
-                    clearTimeout(seekTimeoutRef.current);
-                    seekTimeoutRef.current = null;
+                for (
+                    let point = start;
+                    point < end && point < waveform.amplitude.length;
+                    point += 1
+                ) {
+                    amplitude = Math.max(amplitude, waveform.amplitude[point]);
+                    low = Math.max(low, waveform.low[point]);
+                    mid = Math.max(mid, waveform.mid[point]);
+                    high = Math.max(high, waveform.high[point]);
                 }
+
+                const dominantBand = Math.max(low, mid, high, 0.001);
+                const red = Math.round(255 * Math.sqrt(low / dominantBand));
+                const green = Math.round(255 * Math.sqrt(mid / dominantBand));
+                const blue = Math.round(255 * Math.sqrt(high / dominantBand));
+                const renderedHeight = Math.max(
+                    1,
+                    Math.min(height, (amplitude / amplitudeScale) * height),
+                );
+                const y =
+                    playerbarSlider.barAlign === BarAlign.TOP
+                        ? 0
+                        : playerbarSlider.barAlign === BarAlign.BOTTOM
+                          ? height - renderedHeight
+                          : (height - renderedHeight) / 2;
+
+                context.fillStyle = `rgb(${red} ${green} ${blue})`;
+                context.beginPath();
+                context.roundRect(
+                    bar * barStep,
+                    y,
+                    barWidth,
+                    renderedHeight,
+                    Math.min(playerbarSlider.barRadius, barWidth / 2, renderedHeight / 2),
+                );
+                context.fill();
+            }
+        };
+
+        draw();
+        const resizeObserver = new ResizeObserver(draw);
+        resizeObserver.observe(canvas);
+        return () => resizeObserver.disconnect();
+    }, [playerbarSlider, waveform]);
+
+    useEffect(() => {
+        if (isDragging || previewTime === null) return;
+        if (Math.abs(currentTime - previewTime) < 0.5) {
+            setPreviewTime(null);
+            if (seekTimeoutRef.current) {
+                clearTimeout(seekTimeoutRef.current);
+                seekTimeoutRef.current = null;
             }
         }
-    }, [currentTime, isDragging]);
+    }, [currentTime, isDragging, previewTime]);
 
-    // Update waveform progress based on player current time (only when not dragging)
     useEffect(() => {
-        if (!wavesurfer || !songDuration || isDragging) return;
+        return () => {
+            if (seekTimeoutRef.current) clearTimeout(seekTimeoutRef.current);
+        };
+    }, []);
 
-        const duration = wavesurfer.getDuration();
-        if (duration > 0 && currentTime >= 0) {
-            const ratio = currentTime / duration;
-            wavesurfer.seekTo(ratio);
-        }
-    }, [wavesurfer, currentTime, songDuration, isDragging]);
+    const getPointerTime = (event: PointerEvent<HTMLDivElement>) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const offset = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
+        setTooltipPosition({ x: rect.left + offset, y: rect.top });
+        return rect.width ? (offset / rect.width) * songDuration : 0;
+    };
 
-    // Show disabled slider when there's no current song
-    if (!currentSong) {
-        return (
-            <CustomPlayerbarSlider
-                disabled
-                max={100}
-                min={0}
-                onClick={(e) => {
-                    e?.stopPropagation();
-                }}
-                size={6}
-                value={0}
-                w="100%"
-            />
-        );
-    }
+    const commitSeek = (time: number) => {
+        const clampedTime = Math.max(0, Math.min(songDuration, time));
+        setPreviewTime(clampedTime);
+        mediaSeekToTimestamp(clampedTime);
+        if (seekTimeoutRef.current) clearTimeout(seekTimeoutRef.current);
+        seekTimeoutRef.current = setTimeout(() => {
+            setPreviewTime(null);
+            seekTimeoutRef.current = null;
+        }, 1000);
+    };
+
+    const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+        const keyTargets: Record<string, number> = {
+            ArrowLeft: displayTime - 5,
+            ArrowRight: displayTime + 5,
+            End: songDuration,
+            Home: 0,
+        };
+        const target = keyTargets[event.key];
+        if (target === undefined) return;
+        event.preventDefault();
+        event.stopPropagation();
+        commitSeek(target);
+    };
+
+    if (!currentSong) return null;
 
     return (
-        <div
-            className={styles.wavesurferContainer}
-            onClick={(e) => {
-                e?.stopPropagation();
-            }}
-            style={{ position: 'relative' }}
-        >
+        <div className={styles.wavesurferContainer}>
+            {isLoading && !waveform && (
+                <div aria-label="Loading waveform" className={styles.loadingSpinner} role="status">
+                    <Spinner size="sm" />
+                </div>
+            )}
             <motion.div
-                animate={{ opacity: isLoading || hasError ? 0 : 1 }}
+                animate={{ opacity: waveform ? 1 : 0 }}
+                aria-busy={isLoading}
+                aria-label="Track waveform"
+                aria-valuemax={songDuration}
+                aria-valuemin={0}
+                aria-valuenow={displayTime}
+                aria-valuetext={formatDuration(displayTime * 1000)}
                 className={styles.waveform}
                 initial={{ opacity: 0 }}
-                ref={containerRef}
-                transition={{ duration: 0.2 }}
-            />
-            <AnimatePresence>
-                {(isLoading || hasError) && (
-                    <motion.div
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        initial={{ opacity: 0 }}
-                        style={{
-                            height: '100%',
-                            left: 0,
-                            position: 'absolute',
-                            top: 3,
-                            width: '100%',
-                        }}
-                        transition={{ duration: 0.2 }}
-                    >
-                        <PlayerbarSeekSlider max={songDuration} min={0} />
-                    </motion.div>
+                onClick={(event) => event.stopPropagation()}
+                onKeyDown={handleKeyDown}
+                onPointerCancel={() => {
+                    setIsDragging(false);
+                    setTooltipPosition(null);
+                }}
+                onPointerDown={(event) => {
+                    if (!waveform || !songDuration) return;
+                    event.stopPropagation();
+                    event.currentTarget.setPointerCapture(event.pointerId);
+                    const time = getPointerTime(event);
+                    setIsDragging(true);
+                    setPreviewTime(time);
+                }}
+                onPointerMove={(event) => {
+                    if (!isDragging) return;
+                    setPreviewTime(getPointerTime(event));
+                }}
+                onPointerUp={(event) => {
+                    if (!isDragging) return;
+                    event.currentTarget.releasePointerCapture(event.pointerId);
+                    const time = getPointerTime(event);
+                    setIsDragging(false);
+                    setTooltipPosition(null);
+                    commitSeek(time);
+                }}
+                role="slider"
+                tabIndex={waveform ? 0 : -1}
+                transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+                <canvas className={styles.canvas} ref={canvasRef} />
+                {waveform && (
+                    <div className={styles.cursor} style={{ left: `${progress * 100}%` }} />
                 )}
-            </AnimatePresence>
-            {tooltipPosition && isDragging && (
+            </motion.div>
+            {tooltipPosition && isDragging && previewTime !== null && (
                 <motion.div
                     animate={{ opacity: 1, scale: 1, x: '-50%' }}
                     className={styles.tooltip}
@@ -425,7 +283,7 @@ export const PlayerbarWaveform = () => {
                     transition={{ duration: 0.15 }}
                 >
                     <Text isNoSelect size="md">
-                        {formatDuration(tooltipValue * 1000)}
+                        {formatDuration(previewTime * 1000)}
                     </Text>
                 </motion.div>
             )}

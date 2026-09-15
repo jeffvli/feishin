@@ -55,7 +55,7 @@
     gap: var(--slider-value-gap);
     align-items: center;
     width: 95%;
-    height: 20px;
+    min-height: 20px;
 }
 
 .slider-value-wrapper {
@@ -86,5 +86,23 @@
     align-items: center;
     width: 100%;
     min-width: 0;
-    height: 100%;
+    min-height: 20px;
+}
+
+.waveform-slider-wrapper {
+    flex-direction: column;
+    gap: 2px;
+    justify-content: center;
+    min-height: 34px;
+    padding-bottom: 4px;
+}
+
+.waveform-slider-container {
+    .slider-value-wrapper {
+        display: flex;
+        align-items: center;
+        align-self: end;
+        height: 20px;
+        padding-bottom: 4px;
+    }
 }

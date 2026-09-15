@@ -49,13 +49,12 @@ export const MobileFullscreenPlayerProgress = memo(
                     </Text>
                 </div>
                 <div className={styles.sliderWrapper}>
-                    {isWaveform ? (
+                    {isWaveform && (
                         <Suspense fallback={<Spinner />}>
                             <PlayerbarWaveform />
                         </Suspense>
-                    ) : (
-                        <PlayerbarSeekSlider max={songDuration} min={0} />
                     )}
+                    <PlayerbarSeekSlider max={songDuration} min={0} />
                 </div>
                 <div className={styles.timeContainer}>
                     <Text
