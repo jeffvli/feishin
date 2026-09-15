@@ -20,6 +20,7 @@ import {
     usePlayerStore,
     useSettingsStore,
 } from '/@/renderer/store';
+import { logger } from '/@/renderer/utils/logger';
 import { PlayerStatus } from '/@/shared/types/types';
 
 export interface MpvPlayerEngineHandle extends AudioPlayer {}
@@ -150,12 +151,20 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
 
             if (!radioState.currentStreamUrl) {
                 const playerData = usePlayerStore.getState().getPlayerData();
-                const currentSongUrl = playerData.currentSong
-                    ? await getSongUrl(playerData.currentSong, transcode, true)
-                    : undefined;
-                const nextSongUrl = playerData.nextSong
-                    ? await getSongUrl(playerData.nextSong, transcode, true)
-                    : undefined;
+                let currentSongUrl: string | undefined;
+                let nextSongUrl: string | undefined;
+                try {
+                    currentSongUrl = playerData.currentSong
+                        ? await getSongUrl(playerData.currentSong, transcode, true)
+                        : undefined;
+                    nextSongUrl = playerData.nextSong
+                        ? await getSongUrl(playerData.nextSong, transcode, true)
+                        : undefined;
+                } catch (err) {
+                    logger.error('mpv re-init: getSongUrl failed, queue left unpopulated', {
+                        error: err,
+                    });
+                }
 
                 if (currentSongUrl && !hasPopulatedQueueRef.current && mpvPlayer) {
                     const isDifferentNextSong =
@@ -188,7 +197,9 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
             }
         };
 
-        initializeMpv();
+        // Guard against an unhandled rejection (e.g. a failed getSongUrl / initialize
+        // call); the player simply stays uninitialized and a reload can retry.
+        initializeMpv().catch(() => undefined);
 
         return () => {
             isCancelled = true;
