@@ -130,7 +130,7 @@ export const WindowSettings = memo(() => {
             control: (
                 <Switch
                     aria-label="Toggle minimize to tray"
-                    defaultChecked={settings.tray}
+                    defaultChecked={settings.minimizeToTray}
                     disabled={!isElectron()}
                     onChange={(e) => {
                         if (!e) return;
