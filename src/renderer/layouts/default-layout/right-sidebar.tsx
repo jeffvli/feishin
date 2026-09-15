@@ -3,7 +3,10 @@ import { forwardRef, Ref } from 'react';
 
 import styles from './right-sidebar.module.css';
 
-import { SidebarPlayQueue } from '/@/renderer/features/now-playing/components/sidebar-play-queue';
+import {
+    SidebarPlayQueue,
+    useSidebarPanels,
+} from '/@/renderer/features/now-playing/components/sidebar-play-queue';
 import { ResizeHandle } from '/@/renderer/features/shared/components/resize-handle';
 import { useAppStore, useSideQueueLayout, useSideQueueType } from '/@/renderer/store';
 
@@ -58,11 +61,15 @@ export const RightSidebar = forwardRef(
         const rightExpanded = useAppStore((state) => state.sidebar.rightExpanded);
         const sideQueueType = useSideQueueType();
         const sideQueueLayout = useSideQueueLayout();
+        const sidebarPanels = useSidebarPanels();
         const isVerticalLayout = sideQueueLayout === 'vertical';
+
+        const showRightSidebar =
+            rightExpanded && sideQueueType === 'sideQueue' && sidebarPanels.length > 0;
 
         return (
             <>
-                {rightExpanded && sideQueueType === 'sideQueue' && (
+                {showRightSidebar && (
                     <aside
                         className={clsx(styles.rightSidebarContainer, {
                             [styles.verticalLayout]: isVerticalLayout,

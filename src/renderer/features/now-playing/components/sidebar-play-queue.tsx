@@ -46,6 +46,46 @@ const ButterchurnVisualizer = lazy(() =>
     })),
 );
 
+export function useSidebarPanels(): SidebarPanelType[] {
+    const location = useLocation();
+    const combinedLyricsAndVisualizer = useCombinedLyricsAndVisualizer();
+    const showLyricsInSidebar = useShowLyricsInSidebar();
+    const showQueueInSidebar = useShowQueueInSidebar();
+    const showVisualizerInSidebar = useShowVisualizerInSidebar();
+    const sidebarPanelOrder = useSidebarPanelOrder();
+    const { webAudio } = usePlaybackSettings();
+
+    // Filter and order panels based on what's enabled
+    return useMemo(() => {
+        const showVisualizer = showVisualizerInSidebar && webAudio;
+        const showQueue = showQueueInSidebar && location.pathname !== AppRoute.NOW_PLAYING;
+
+        if (combinedLyricsAndVisualizer) {
+            // When combined, use the order from settings but filter to only show queue and lyrics (combined)
+            return sidebarPanelOrder.filter((panel) => {
+                if (panel === 'queue') return showQueue;
+                if (panel === 'lyrics') return showLyricsInSidebar || showVisualizer;
+                return false;
+            });
+        }
+
+        return sidebarPanelOrder.filter((panel) => {
+            if (panel === 'queue') return showQueue;
+            if (panel === 'lyrics') return showLyricsInSidebar;
+            if (panel === 'visualizer') return showVisualizer;
+            return false;
+        });
+    }, [
+        combinedLyricsAndVisualizer,
+        location.pathname,
+        showLyricsInSidebar,
+        showQueueInSidebar,
+        showVisualizerInSidebar,
+        sidebarPanelOrder,
+        webAudio,
+    ]);
+}
+
 export const SidebarPlayQueue = () => {
     const tableRef = useRef<ItemListHandle | null>(null);
     const [search, setSearch] = useState<string | undefined>(undefined);
@@ -59,12 +99,12 @@ export const SidebarPlayQueue = () => {
     const showLyricsInSidebar = useShowLyricsInSidebar();
     const showQueueInSidebar = useShowQueueInSidebar();
     const showVisualizerInSidebar = useShowVisualizerInSidebar();
-    const sidebarPanelOrder = useSidebarPanelOrder();
     const { webAudio } = usePlaybackSettings();
     const { windowBarStyle } = useWindowSettings();
     const showVisualizer = showVisualizerInSidebar && webAudio;
     const showPanel = showLyricsInSidebar || showVisualizer;
     const showQueue = showQueueInSidebar && location.pathname !== AppRoute.NOW_PLAYING;
+    const orderedPanels = useSidebarPanels();
 
     const shouldAddTopMargin = isElectron() && windowBarStyle === Platform.WEB;
 
@@ -90,34 +130,6 @@ export const SidebarPlayQueue = () => {
         key: 'sidebar-play-queue-container',
         storage: localStorage,
     });
-
-    // Filter and order panels based on what's enabled
-    const orderedPanels = useMemo(() => {
-        if (combinedLyricsAndVisualizer) {
-            // When combined, use the order from settings but filter to only show queue and lyrics (combined)
-            const visiblePanels = sidebarPanelOrder.filter((panel) => {
-                if (panel === 'queue') return showQueue;
-                if (panel === 'lyrics') return showLyricsInSidebar || showVisualizer;
-                return false;
-            });
-            return visiblePanels;
-        }
-
-        const visiblePanels = sidebarPanelOrder.filter((panel) => {
-            if (panel === 'queue') return showQueue;
-            if (panel === 'lyrics') return showLyricsInSidebar;
-            if (panel === 'visualizer') return showVisualizer;
-            return false;
-        });
-
-        return visiblePanels;
-    }, [
-        combinedLyricsAndVisualizer,
-        showLyricsInSidebar,
-        showQueue,
-        showVisualizer,
-        sidebarPanelOrder,
-    ]);
 
     const renderPanel = (panelType: SidebarPanelType) => {
         if (panelType === 'queue') {
