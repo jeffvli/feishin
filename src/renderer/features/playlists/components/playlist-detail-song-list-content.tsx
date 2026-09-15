@@ -302,9 +302,9 @@ const PlaylistDetailTrackViewContent = ({ data }: { data: PlaylistSongListRespon
 };
 
 const PlaylistDetailSongList = ({ data }: { data: PlaylistSongListResponse }) => {
-    const { displayMode, mode } = useListContext();
+    const { displayMode, isSmartPlaylist, mode } = useListContext();
 
-    if (mode !== 'edit' && displayMode === LibraryItem.ALBUM) {
+    if ((mode !== 'edit' || isSmartPlaylist) && displayMode === LibraryItem.ALBUM) {
         return <PlaylistDetailAlbumView data={data} />;
     }
 

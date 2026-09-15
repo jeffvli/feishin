@@ -1,14 +1,13 @@
 import type { UseSuspenseQueryResult } from '@tanstack/react-query';
 
-import { closeAllModals, openModal } from '@mantine/modals';
-import { useCallback, useMemo, useState } from 'react';
+import { openModal } from '@mantine/modals';
+import { forwardRef, useCallback, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
     PlaylistQueryBuilder,
     PlaylistQueryBuilderRef,
 } from '/@/renderer/features/playlists/components/playlist-query-builder';
-import { useUpdatePlaylist } from '/@/renderer/features/playlists/mutations/update-playlist-mutation';
 import { convertQueryGroupToNDQuery } from '/@/renderer/features/playlists/utils';
 import { JsonPreview } from '/@/renderer/features/shared/components/json-preview';
 import { Box } from '/@/shared/components/box/box';
@@ -17,7 +16,6 @@ import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { JsonInput } from '/@/shared/components/json-input/json-input';
-import { ConfirmModal } from '/@/shared/components/modal/modal';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Stack } from '/@/shared/components/stack/stack';
@@ -27,30 +25,20 @@ import { SongListSort } from '/@/shared/types/domain-types';
 
 export interface PlaylistQueryEditorProps {
     detailQuery: UseSuspenseQueryResult<any, Error>;
-    handleSave: (
-        filter: Record<string, any>,
-        extraFilters: {
-            limit?: number;
-            limitPercent?: number;
-            sortBy?: string[];
-            sortOrder?: string;
-        },
-    ) => void;
-    handleSaveAs: (
-        filter: Record<string, any>,
-        extraFilters: {
-            limit?: number;
-            limitPercent?: number;
-            sortBy?: string[];
-            sortOrder?: string;
-        },
-    ) => void;
-    isQueryBuilderExpanded: boolean;
-    onToggleExpand: () => void;
     playlistId: string;
-    queryBuilderRef: React.RefObject<null | PlaylistQueryBuilderRef>;
-    updatePlaylistMutation: ReturnType<typeof useUpdatePlaylist>;
 }
+
+export type PlaylistQueryEditorRef = {
+    getFiltersForSave: () => null | {
+        extraFilters: {
+            limit?: number;
+            limitPercent?: number;
+            sortBy?: string[];
+            sortOrder?: string;
+        };
+        filter: Record<string, any>;
+    };
+};
 
 type AppliedJsonState = {
     limit?: number;
@@ -95,239 +83,187 @@ const parseRulesJsonToSaveArgs = (
     };
 };
 
-export const PlaylistQueryEditor = ({
-    detailQuery,
-    handleSave,
-    handleSaveAs,
-    isQueryBuilderExpanded,
-    onToggleExpand,
-    playlistId,
-    queryBuilderRef,
-    updatePlaylistMutation,
-}: PlaylistQueryEditorProps) => {
-    const { t } = useTranslation();
+export const PlaylistQueryEditor = forwardRef<PlaylistQueryEditorRef, PlaylistQueryEditorProps>(
+    ({ detailQuery, playlistId }, ref) => {
+        const { t } = useTranslation();
+        const queryBuilderRef = useRef<PlaylistQueryBuilderRef>(null);
 
-    const [editorMode, setEditorMode] = useState<EditorMode>('builder');
-    const [jsonText, setJsonText] = useState('');
-    const [appliedJsonState, setAppliedJsonState] = useState<AppliedJsonState | null>(null);
+        const [editorMode, setEditorMode] = useState<EditorMode>('builder');
+        const [jsonText, setJsonText] = useState('');
+        const [appliedJsonState, setAppliedJsonState] = useState<AppliedJsonState | null>(null);
 
-    const getFiltersForSave = useCallback((): null | {
-        extraFilters: {
-            limit?: number;
-            limitPercent?: number;
-            sortBy?: string[];
-            sortOrder?: string;
-        };
-        filter: Record<string, any>;
-    } => {
-        if (editorMode === 'json') {
-            try {
-                const parsed = JSON.parse(jsonText) as Record<string, any>;
-                const { extraFilters, filter } = parseRulesJsonToSaveArgs(parsed);
-                return { extraFilters, filter };
-            } catch {
-                return null;
-            }
-        }
-        const filters = queryBuilderRef.current?.getFilters();
-        if (!filters) return null;
-        return {
-            extraFilters: filters.extraFilters,
-            filter: convertQueryGroupToNDQuery(filters.filters),
-        };
-    }, [editorMode, jsonText, queryBuilderRef]);
-
-    const openPreviewModal = useCallback(() => {
-        const payload = getFiltersForSave();
-        if (!payload) {
+        const getFiltersForSave = useCallback((): ReturnType<
+            PlaylistQueryEditorRef['getFiltersForSave']
+        > => {
             if (editorMode === 'json') {
-                toast.error({ message: t('error.invalidJson') });
-            }
-            return;
-        }
-        const previewValue = {
-            ...payload.filter,
-            ...(payload.extraFilters.limit != null && { limit: payload.extraFilters.limit }),
-            ...(payload.extraFilters.limitPercent != null && {
-                limitPercent: payload.extraFilters.limitPercent,
-            }),
-            ...(payload.extraFilters.sortBy?.[0] && { sort: payload.extraFilters.sortBy[0] }),
-        };
-        openModal({
-            children: <JsonPreview value={previewValue} />,
-            size: 'xl',
-            title: t('common.preview'),
-        });
-    }, [editorMode, getFiltersForSave, t]);
-
-    const openSaveAndReplaceModal = useCallback(() => {
-        if (!isQueryBuilderExpanded) return;
-        const payload = getFiltersForSave();
-        if (!payload) {
-            if (editorMode === 'json') {
-                toast.error({ message: t('error.invalidJson') });
-            }
-            return;
-        }
-        openModal({
-            children: (
-                <ConfirmModal
-                    onConfirm={() => {
-                        handleSave(payload.filter, payload.extraFilters);
-                        closeAllModals();
-                    }}
-                >
-                    <Text>{t('common.areYouSure')}</Text>
-                </ConfirmModal>
-            ),
-            title: t('common.saveAndReplace'),
-        });
-    }, [editorMode, getFiltersForSave, handleSave, isQueryBuilderExpanded, t]);
-
-    const parseSortBy = useCallback((): string[] => {
-        const sort = detailQuery?.data?.rules?.sort;
-        // Handle new syntax: comma-separated with +/- prefix
-        // e.g., "+album,-year" -> return as single string in array
-        if (typeof sort === 'string') {
-            // Check if it's new syntax (has +/- prefix or commas)
-            if (sort.includes(',') || sort.startsWith('+') || sort.startsWith('-')) {
-                return [sort];
-            }
-            // Old syntax: single field, convert to new format with default order
-            const order = detailQuery?.data?.rules?.order || 'asc';
-            const prefix = order === 'desc' ? '-' : '+';
-            return [`${prefix}${sort}`];
-        }
-        if (Array.isArray(sort)) {
-            // If array, check if first item has +/- prefix
-            if (
-                sort.length > 0 &&
-                typeof sort[0] === 'string' &&
-                (sort[0].startsWith('+') || sort[0].startsWith('-'))
-            ) {
-                return sort;
-            }
-            // Old array format, convert to new format
-            const order = detailQuery?.data?.rules?.order || 'asc';
-            const prefix = order === 'desc' ? '-' : '+';
-            return sort.map((s) => `${prefix}${s}`);
-        }
-        return ['+dateAdded'];
-    }, [detailQuery?.data?.rules?.order, detailQuery?.data?.rules?.sort]);
-
-    const parseSortOrder = useCallback((): 'asc' | 'desc' => {
-        const sort = detailQuery?.data?.rules?.sort;
-        if (typeof sort === 'string' && sort.startsWith('-')) {
-            return 'desc';
-        }
-        // Fall back to old order field or default
-        return detailQuery?.data?.rules?.order || 'asc';
-    }, [detailQuery?.data?.rules?.order, detailQuery?.data?.rules?.sort]);
-
-    const appliedQuery = appliedJsonState?.query;
-    const detailQueryRules = detailQuery?.data?.rules;
-    const effectiveQuery = useMemo(
-        () =>
-            appliedQuery ??
-            (detailQueryRules?.all
-                ? { all: detailQueryRules.all }
-                : detailQueryRules?.any
-                  ? { any: detailQueryRules.any }
-                  : detailQueryRules),
-        [appliedQuery, detailQueryRules],
-    );
-    const effectiveLimit = appliedJsonState?.limit ?? detailQuery?.data?.rules?.limit;
-    const effectiveLimitPercent =
-        appliedJsonState?.limitPercent ?? detailQuery?.data?.rules?.limitPercent;
-
-    const appliedSort = appliedJsonState?.sort;
-    const effectiveSortBy = useMemo(
-        () => (appliedSort ? [appliedSort] : parseSortBy()) as SongListSort | SongListSort[],
-        [appliedSort, parseSortBy],
-    );
-    const effectiveSortOrder = appliedJsonState?.sort
-        ? appliedJsonState.sort.startsWith('-')
-            ? 'desc'
-            : 'asc'
-        : parseSortOrder();
-
-    const handleEditorModeChange = useCallback(
-        (value: string) => {
-            const nextMode = value as EditorMode;
-            if (nextMode === 'json') {
-                const filters = queryBuilderRef.current?.getFilters();
-                if (filters) {
-                    setJsonText(JSON.stringify(serializeFiltersToRulesJson(filters), null, 2));
-                } else {
-                    const fallback: Record<string, any> = effectiveQuery
-                        ? { ...effectiveQuery }
-                        : { all: [] };
-                    if (effectiveLimit != null) fallback.limit = effectiveLimit;
-                    if (effectiveLimitPercent != null)
-                        fallback.limitPercent = effectiveLimitPercent;
-                    if (effectiveSortBy?.[0]) fallback.sort = effectiveSortBy[0];
-                    if (!fallback.sort) fallback.sort = '+dateAdded';
-                    setJsonText(JSON.stringify(fallback, null, 2));
+                try {
+                    const parsed = JSON.parse(jsonText) as Record<string, any>;
+                    const { extraFilters, filter } = parseRulesJsonToSaveArgs(parsed);
+                    return { extraFilters, filter };
+                } catch {
+                    toast.error({ message: t('error.invalidJson') });
+                    return null;
                 }
-                setEditorMode('json');
-            } else {
-                if (editorMode === 'json') {
-                    try {
-                        const parsed = JSON.parse(jsonText) as Record<string, any>;
-                        const rootKey = parsed.all ? 'all' : 'any';
-                        if (!parsed[rootKey] || !Array.isArray(parsed[rootKey])) {
-                            throw new Error('Invalid rules structure');
-                        }
-                        setAppliedJsonState({
-                            limit: parsed.limit,
-                            limitPercent: parsed.limitPercent,
-                            query: { [rootKey]: parsed[rootKey] },
-                            sort: parsed.sort,
-                        });
-                    } catch {
-                        toast.error({
-                            message: t('error.invalidJson'),
-                        });
-                        return;
+            }
+            const filters = queryBuilderRef.current?.getFilters();
+            if (!filters) return null;
+            return {
+                extraFilters: filters.extraFilters,
+                filter: convertQueryGroupToNDQuery(filters.filters),
+            };
+        }, [editorMode, jsonText, t]);
+
+        useImperativeHandle(ref, () => ({ getFiltersForSave }), [getFiltersForSave]);
+
+        const openPreviewModal = useCallback(() => {
+            const payload = getFiltersForSave();
+            if (!payload) return;
+            const previewValue = {
+                ...payload.filter,
+                ...(payload.extraFilters.limit != null && { limit: payload.extraFilters.limit }),
+                ...(payload.extraFilters.limitPercent != null && {
+                    limitPercent: payload.extraFilters.limitPercent,
+                }),
+                ...(payload.extraFilters.sortBy?.[0] && { sort: payload.extraFilters.sortBy[0] }),
+            };
+            openModal({
+                children: <JsonPreview value={previewValue} />,
+                size: 'xl',
+                title: t('common.preview'),
+            });
+        }, [getFiltersForSave, t]);
+
+        const parseSortBy = useCallback((): string[] => {
+            const sort = detailQuery?.data?.rules?.sort;
+            // Handle new syntax: comma-separated with +/- prefix
+            // e.g., "+album,-year" -> return as single string in array
+            if (typeof sort === 'string') {
+                // Check if it's new syntax (has +/- prefix or commas)
+                if (sort.includes(',') || sort.startsWith('+') || sort.startsWith('-')) {
+                    return [sort];
+                }
+                // Old syntax: single field, convert to new format with default order
+                const order = detailQuery?.data?.rules?.order || 'asc';
+                const prefix = order === 'desc' ? '-' : '+';
+                return [`${prefix}${sort}`];
+            }
+            if (Array.isArray(sort)) {
+                // If array, check if first item has +/- prefix
+                if (
+                    sort.length > 0 &&
+                    typeof sort[0] === 'string' &&
+                    (sort[0].startsWith('+') || sort[0].startsWith('-'))
+                ) {
+                    return sort;
+                }
+                // Old array format, convert to new format
+                const order = detailQuery?.data?.rules?.order || 'asc';
+                const prefix = order === 'desc' ? '-' : '+';
+                return sort.map((s) => `${prefix}${s}`);
+            }
+            return ['+dateAdded'];
+        }, [detailQuery?.data?.rules?.order, detailQuery?.data?.rules?.sort]);
+
+        const parseSortOrder = useCallback((): 'asc' | 'desc' => {
+            const sort = detailQuery?.data?.rules?.sort;
+            if (typeof sort === 'string' && sort.startsWith('-')) {
+                return 'desc';
+            }
+            // Fall back to old order field or default
+            return detailQuery?.data?.rules?.order || 'asc';
+        }, [detailQuery?.data?.rules?.order, detailQuery?.data?.rules?.sort]);
+
+        const appliedQuery = appliedJsonState?.query;
+        const detailQueryRules = detailQuery?.data?.rules;
+        const effectiveQuery = useMemo(
+            () =>
+                appliedQuery ??
+                (detailQueryRules?.all
+                    ? { all: detailQueryRules.all }
+                    : detailQueryRules?.any
+                      ? { any: detailQueryRules.any }
+                      : detailQueryRules),
+            [appliedQuery, detailQueryRules],
+        );
+        const effectiveLimit = appliedJsonState?.limit ?? detailQuery?.data?.rules?.limit;
+        const effectiveLimitPercent =
+            appliedJsonState?.limitPercent ?? detailQuery?.data?.rules?.limitPercent;
+
+        const appliedSort = appliedJsonState?.sort;
+        const effectiveSortBy = useMemo(
+            () => (appliedSort ? [appliedSort] : parseSortBy()) as SongListSort | SongListSort[],
+            [appliedSort, parseSortBy],
+        );
+        const effectiveSortOrder = appliedJsonState?.sort
+            ? appliedJsonState.sort.startsWith('-')
+                ? 'desc'
+                : 'asc'
+            : parseSortOrder();
+
+        const handleEditorModeChange = useCallback(
+            (value: string) => {
+                const nextMode = value as EditorMode;
+                if (nextMode === 'json') {
+                    const filters = queryBuilderRef.current?.getFilters();
+                    if (filters) {
+                        setJsonText(JSON.stringify(serializeFiltersToRulesJson(filters), null, 2));
+                    } else {
+                        const fallback: Record<string, any> = effectiveQuery
+                            ? { ...effectiveQuery }
+                            : { all: [] };
+                        if (effectiveLimit != null) fallback.limit = effectiveLimit;
+                        if (effectiveLimitPercent != null)
+                            fallback.limitPercent = effectiveLimitPercent;
+                        if (effectiveSortBy?.[0]) fallback.sort = effectiveSortBy[0];
+                        if (!fallback.sort) fallback.sort = '+dateAdded';
+                        setJsonText(JSON.stringify(fallback, null, 2));
                     }
-                }
-                setEditorMode('builder');
-            }
-        },
-        [
-            editorMode,
-            effectiveLimit,
-            effectiveLimitPercent,
-            effectiveQuery,
-            effectiveSortBy,
-            jsonText,
-            queryBuilderRef,
-            t,
-        ],
-    );
-
-    return (
-        <div
-            className="query-editor-container"
-            style={{ borderTop: '1px solid var(--theme-colors-border)' }}
-        >
-            <Stack gap={0} h="100%" mah="30dvh" p="sm" w="100%">
-                <Group justify="space-between" wrap="nowrap">
-                    <Group gap="sm" wrap="nowrap">
-                        <Button
-                            leftSection={
-                                <Icon
-                                    icon={isQueryBuilderExpanded ? 'arrowDownS' : 'arrowUpS'}
-                                    size="lg"
-                                />
+                    setEditorMode('json');
+                } else {
+                    if (editorMode === 'json') {
+                        try {
+                            const parsed = JSON.parse(jsonText) as Record<string, any>;
+                            const rootKey = parsed.all ? 'all' : 'any';
+                            if (!parsed[rootKey] || !Array.isArray(parsed[rootKey])) {
+                                throw new Error('Invalid rules structure');
                             }
-                            onClick={onToggleExpand}
-                            size="sm"
-                            variant="subtle"
-                        >
-                            {t('form.queryEditor.title')}
-                        </Button>
-                        {isQueryBuilderExpanded && (
+                            setAppliedJsonState({
+                                limit: parsed.limit,
+                                limitPercent: parsed.limitPercent,
+                                query: { [rootKey]: parsed[rootKey] },
+                                sort: parsed.sort,
+                            });
+                        } catch {
+                            toast.error({
+                                message: t('error.invalidJson'),
+                            });
+                            return;
+                        }
+                    }
+                    setEditorMode('builder');
+                }
+            },
+            [
+                editorMode,
+                effectiveLimit,
+                effectiveLimitPercent,
+                effectiveQuery,
+                effectiveSortBy,
+                jsonText,
+                queryBuilderRef,
+                t,
+            ],
+        );
+
+        return (
+            <div
+                className="query-editor-container"
+                style={{ borderTop: '1px solid var(--theme-colors-border)' }}
+            >
+                <Stack gap={0} h="100%" mah="30dvh" p="sm" w="100%">
+                    <Group justify="space-between" wrap="nowrap">
+                        <Group gap="sm" wrap="nowrap">
+                            <Text fw={500}>{t('form.queryEditor.title')}</Text>
                             <SegmentedControl
                                 data={[
                                     {
@@ -351,82 +287,53 @@ export const PlaylistQueryEditor = ({
                                 size="xs"
                                 value={editorMode}
                             />
-                        )}
-                    </Group>
-                    <Group gap="xs">
+                        </Group>
                         <Button onClick={openPreviewModal} size="sm" variant="subtle">
                             {t('common.preview')}
                         </Button>
-                        <Button
-                            disabled={!isQueryBuilderExpanded}
-                            leftSection={<Icon icon="save" />}
-                            loading={updatePlaylistMutation?.isPending}
-                            onClick={() => {
-                                if (!isQueryBuilderExpanded) return;
-                                const payload = getFiltersForSave();
-                                if (payload) {
-                                    handleSaveAs(payload.filter, payload.extraFilters);
-                                } else if (editorMode === 'json') {
-                                    toast.error({
-                                        message: t('error.invalidJson'),
-                                    });
-                                }
-                            }}
-                            size="sm"
-                            variant="subtle"
-                        >
-                            {t('common.saveAs')}
-                        </Button>
-                        <Button
-                            disabled={!isQueryBuilderExpanded}
-                            leftSection={<Icon color="error" icon="save" />}
-                            onClick={openSaveAndReplaceModal}
-                            size="sm"
-                            variant="subtle"
-                        >
-                            {t('common.saveAndReplace')}
-                        </Button>
                     </Group>
-                </Group>
-                <Box
-                    py="md"
-                    style={{
-                        display: isQueryBuilderExpanded ? 'flex' : 'none',
-                        flex: 1,
-                        minHeight: 0,
-                        overflow: 'hidden',
-                    }}
-                >
-                    {editorMode === 'builder' ? (
-                        <PlaylistQueryBuilder
-                            key={JSON.stringify(appliedJsonState ?? detailQuery?.data?.rules)}
-                            limit={effectiveLimit}
-                            limitPercent={effectiveLimitPercent}
-                            playlistId={playlistId}
-                            query={effectiveQuery}
-                            ref={queryBuilderRef}
-                            sortBy={effectiveSortBy}
-                            sortOrder={effectiveSortOrder}
-                        />
-                    ) : (
-                        <ScrollArea style={{ flex: 1, minHeight: 0 }}>
-                            <JsonInput
-                                autosize
-                                minRows={8}
-                                onChange={(value) => setJsonText(value)}
-                                placeholder='{ "all": [], "limit": 100, "sort": "+dateAdded" }'
-                                size="lg"
-                                spellCheck={false}
-                                style={{
-                                    flex: 1,
-                                    minHeight: 0,
-                                }}
-                                value={jsonText}
+                    <Box
+                        py="md"
+                        style={{
+                            display: 'flex',
+                            flex: 1,
+                            minHeight: 0,
+                            overflow: 'hidden',
+                        }}
+                    >
+                        {editorMode === 'builder' ? (
+                            <PlaylistQueryBuilder
+                                key={JSON.stringify(appliedJsonState ?? detailQuery?.data?.rules)}
+                                limit={effectiveLimit}
+                                limitPercent={effectiveLimitPercent}
+                                playlistId={playlistId}
+                                query={effectiveQuery}
+                                ref={queryBuilderRef}
+                                sortBy={effectiveSortBy}
+                                sortOrder={effectiveSortOrder}
                             />
-                        </ScrollArea>
-                    )}
-                </Box>
-            </Stack>
-        </div>
-    );
-};
+                        ) : (
+                            <ScrollArea style={{ flex: 1, minHeight: 0 }}>
+                                <JsonInput
+                                    autosize
+                                    minRows={8}
+                                    onChange={(value) => setJsonText(value)}
+                                    placeholder='{ "all": [], "limit": 100, "sort": "+dateAdded" }'
+                                    size="lg"
+                                    spellCheck={false}
+                                    style={{
+                                        flex: 1,
+                                        minHeight: 0,
+                                    }}
+                                    value={jsonText}
+                                />
+                            </ScrollArea>
+                        )}
+                    </Box>
+                </Stack>
+            </div>
+        );
+    },
+);
+
+PlaylistQueryEditor.displayName = 'PlaylistQueryEditor';
