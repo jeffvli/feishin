@@ -19,6 +19,12 @@ import {
 import { useAppThemeColors, useColorScheme } from '/@/renderer/themes/use-app-theme';
 import { Text } from '/@/shared/components/text/text';
 
+// streams without Content-Length report "Infinity" until decoded; seeking then sets a NaN currentTime
+const getFiniteDuration = (wavesurfer: { getDuration: () => number }) => {
+    const duration = wavesurfer.getDuration();
+    return Number.isFinite(duration) ? duration : 0;
+};
+
 export const PlayerbarWaveform = () => {
     const currentSong = usePlayerSong();
     const playerbarSlider = usePlayerbarSlider();
@@ -181,7 +187,7 @@ export const PlayerbarWaveform = () => {
 
         const handleMouseDown = (e: MouseEvent) => {
             if (!wavesurfer) return;
-            const duration = wavesurfer.getDuration();
+            const duration = getFiniteDuration(wavesurfer);
             if (duration <= 0) return;
 
             isDraggingLocal = true;
@@ -207,7 +213,7 @@ export const PlayerbarWaveform = () => {
         const handleMouseMove = (e: MouseEvent) => {
             if (!isDraggingLocal || !wavesurfer) return;
 
-            const duration = wavesurfer.getDuration();
+            const duration = getFiniteDuration(wavesurfer);
             if (duration <= 0) return;
 
             const rect = container.getBoundingClientRect();
@@ -225,7 +231,7 @@ export const PlayerbarWaveform = () => {
             if (!isDraggingLocal || !wavesurfer) return;
 
             isDraggingLocal = false;
-            const duration = wavesurfer.getDuration();
+            const duration = getFiniteDuration(wavesurfer);
             const seekTime = wavesurfer.getCurrentTime();
 
             setTooltipPosition(null);
@@ -248,7 +254,7 @@ export const PlayerbarWaveform = () => {
         // Handle touch events for mobile
         const handleTouchStart = (e: TouchEvent) => {
             if (!wavesurfer) return;
-            const duration = wavesurfer.getDuration();
+            const duration = getFiniteDuration(wavesurfer);
             if (duration <= 0) return;
 
             isDraggingLocal = true;
@@ -275,7 +281,7 @@ export const PlayerbarWaveform = () => {
             if (!isDraggingLocal || !wavesurfer) return;
             e.preventDefault();
 
-            const duration = wavesurfer.getDuration();
+            const duration = getFiniteDuration(wavesurfer);
             if (duration <= 0) return;
 
             const touch = e.touches[0];
@@ -294,7 +300,7 @@ export const PlayerbarWaveform = () => {
             if (!isDraggingLocal || !wavesurfer) return;
 
             isDraggingLocal = false;
-            const duration = wavesurfer.getDuration();
+            const duration = getFiniteDuration(wavesurfer);
             const seekTime = wavesurfer.getCurrentTime();
 
             setTooltipPosition(null);
@@ -353,7 +359,7 @@ export const PlayerbarWaveform = () => {
     useEffect(() => {
         if (!wavesurfer || !songDuration || isDragging) return;
 
-        const duration = wavesurfer.getDuration();
+        const duration = getFiniteDuration(wavesurfer);
         if (duration > 0 && currentTime >= 0) {
             const ratio = currentTime / duration;
             wavesurfer.seekTo(ratio);
