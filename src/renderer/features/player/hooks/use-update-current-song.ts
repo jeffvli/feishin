@@ -8,10 +8,12 @@ import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/
 import {
     uniqueSeekToTimestamp,
     updateQueueSong,
+    usePlayerProperties,
     usePlayerStoreBase,
 } from '/@/renderer/store/player.store';
 import { logger } from '/@/renderer/utils/logger';
 import { QueueSong, SongDetailQuery } from '/@/shared/types/domain-types';
+import { PlayerStyle } from '/@/shared/types/types';
 
 export const useUpdateCurrentSong = () => {
     const queryClient = useQueryClient();
@@ -69,6 +71,8 @@ export const useUpdateCurrentSong = () => {
         });
     }, []);
 
+    const { transitionType } = usePlayerProperties();
+
     usePlayerEvents(
         {
             onCurrentSongChange: (properties, prev) => {
@@ -79,11 +83,13 @@ export const useUpdateCurrentSong = () => {
                 ) {
                     handleSongChange(properties);
                     // Prevents issues with lingering seekToTimestamp on song autonext
-                    resetSeekToTimestamp();
+                    if (transitionType !== PlayerStyle.CROSSFADE) {
+                        resetSeekToTimestamp();
+                    }
                 }
             },
         },
-        [handleSongChange, resetSeekToTimestamp],
+        [handleSongChange, resetSeekToTimestamp, transitionType],
     );
 };
 
