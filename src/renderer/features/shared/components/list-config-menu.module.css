@@ -6,7 +6,7 @@
     width: 50%;
     padding: var(--theme-spacing-md) var(--theme-spacing-md) var(--theme-spacing-md) 0;
     font-weight: 500;
-    vertical-align: top;
+    vertical-align: center;
     background-color: initial;
 }
 
