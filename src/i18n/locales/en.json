@@ -347,6 +347,8 @@
             "error_savePassword": "An error occurred when trying to save the password",
             "ignoreCors": "Ignore CORS ($t(common.restartRequired))",
             "ignoreSsl": "Ignore SSL ($t(common.restartRequired))",
+            "input_enableAudiobooks": "Enable Audiobooks",
+            "input_enableAudiobooksDescription": "Show audiobook content from \"Books\" libraries",
             "input_jellyfinQuickConnect": "Quick Connect",
             "input_jellyfinQuickConnectCode": "Enter this code in your Jellyfin web UI to authorize",
             "input_jellyfinQuickConnectCodeCopied": "Copied",
