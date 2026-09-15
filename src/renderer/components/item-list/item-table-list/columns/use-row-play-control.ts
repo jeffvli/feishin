@@ -3,17 +3,19 @@ import { useCallback } from 'react';
 import {
     playAlbumFromItemListControl,
     playArtistFromItemListControl,
+    playPlaylistFromItemListControl,
     playSongFromItemListControl,
 } from '/@/renderer/components/item-list/helpers/play-row-from-list';
 import { ItemTableListInnerColumn } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { useIsActiveRow } from '/@/renderer/components/item-list/item-table-list/item-table-list-context';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
-import { usePlayerSong, usePlayerStatus } from '/@/renderer/store';
+import { useCurrentPlaylistContextId, usePlayerSong, usePlayerStatus } from '/@/renderer/store';
 import {
     Album,
     AlbumArtist,
     Artist,
     LibraryItem,
+    Playlist,
     QueueSong,
     Song,
 } from '/@/shared/types/domain-types';
@@ -24,6 +26,7 @@ export const supportsRowPlayControls = (itemType: LibraryItem) =>
     itemType === LibraryItem.ALBUM_ARTIST ||
     itemType === LibraryItem.ARTIST ||
     itemType === LibraryItem.PLAYLIST_SONG ||
+    itemType === LibraryItem.PLAYLIST ||
     itemType === LibraryItem.SONG;
 
 export const supportsTrackNumberRowPlayControls = (itemType: LibraryItem) =>
@@ -49,11 +52,13 @@ export const hasPlayableRowItem = (
 export const useRowPlayControl = (props: ItemTableListInnerColumn) => {
     const status = usePlayerStatus();
     const currentSong = usePlayerSong();
+    const activePlaylistId = useCurrentPlaylistContextId();
     const player = usePlayer();
     const rowItem = props.getRowItem?.(props.rowIndex) ?? props.data[props.rowIndex];
     const song = rowItem as QueueSong;
     const album = rowItem as Album;
     const artist = rowItem as AlbumArtist | Artist;
+    const playlist = rowItem as Playlist;
 
     const isActiveFromRow = useIsActiveRow(song?.id, song?._uniqueId);
     const isActive = (() => {
@@ -72,6 +77,8 @@ export const useRowPlayControl = (props: ItemTableListInnerColumn) => {
                     !!artist?.id &&
                     !!currentSong?.artists?.some((relatedArtist) => relatedArtist.id === artist.id)
                 );
+            case LibraryItem.PLAYLIST:
+                return !!playlist?.id && activePlaylistId === playlist.id;
             default:
                 return isActiveFromRow;
         }
@@ -115,6 +122,19 @@ export const useRowPlayControl = (props: ItemTableListInnerColumn) => {
                 return;
             }
 
+            if (props.itemType === LibraryItem.PLAYLIST) {
+                if (!playlist?.id) {
+                    return;
+                }
+
+                playPlaylistFromItemListControl({
+                    meta: { playType },
+                    player,
+                    playlist,
+                });
+                return;
+            }
+
             if (!song) {
                 return;
             }
@@ -125,7 +145,7 @@ export const useRowPlayControl = (props: ItemTableListInnerColumn) => {
                 player,
             });
         },
-        [album, artist, player, props.itemType, song],
+        [album, artist, player, playlist, props.itemType, song],
     );
 
     return {
