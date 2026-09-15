@@ -421,7 +421,7 @@ const CrossfadeDurationConfig = () => {
                 { label: '18', value: 18 },
                 { label: '21', value: 21 },
             ]}
-            max={20}
+            max={21}
             min={3}
             onChangeEnd={setCrossfadeDuration}
             styles={{
