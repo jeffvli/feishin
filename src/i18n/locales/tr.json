@@ -24,7 +24,6 @@
         "goToPage": "Sayfaya git",
         "moveToNext": "Sonrakine geç",
         "refresh": "$t(common.refresh)",
-        "toggleSmartPlaylistEditor": "$t(entity.smartPlaylist) düzenleyiciye geç",
         "addOrRemoveFromSelection": "Seçime ekle veya seçimi kaldır",
         "selectRangeOfItems": "Bir dizi öğe seçin",
         "createRadioStation": "$t(entity.radioStation, {\"count\": 1}) oluştur",

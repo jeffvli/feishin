@@ -9,7 +9,6 @@
         "refresh": "$t(common.refresh)",
         "removeFromQueue": "Usuń z kolejki",
         "deselectAll": "Odznacz wszystko",
-        "toggleSmartPlaylistEditor": "Przełącz edytor $t(entity.smartPlaylist)",
         "removeFromFavorites": "Usuń z $t(entity.favorite, {\"count\": 2})",
         "moveToTop": "Przesuń na górę",
         "addToPlaylist": "Dodaj do $t(entity.playlist, {\"count\": 1})",

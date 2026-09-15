@@ -34,7 +34,6 @@
         "removeFromPlaylist": "Noņemt no $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "Noņemt no rindas",
         "setRating": "Iestatiet vērtējumu",
-        "toggleSmartPlaylistEditor": "Pārslēgt $t(entity.smartPlaylist) redaktoru",
         "viewPlaylists": "Skats $t(entity.playlist, {\"count\": 2})",
         "viewMore": "Skatīt vairāk",
         "openApplicationDirectory": "Atvērt lietojumprogrammas mapi",

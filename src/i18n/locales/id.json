@@ -1,7 +1,6 @@
 {
     "action": {
         "createPlaylist": "Buat $t(entity.playlist, {\"count\": 1})",
-        "toggleSmartPlaylistEditor": "Ubah editor $t(entity.smartPlaylist)",
         "goToPage": "Pergi ke halaman",
         "moveToTop": "Pindah ke atas",
         "addToPlaylist": "Tambahkan ke $t(entity.playlist, {\"count\": 1})",

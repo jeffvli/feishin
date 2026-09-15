@@ -1112,7 +1112,6 @@
         "removeFromPlaylist": "從$t(entity.playlist, {\"count\": 1})移除",
         "removeFromQueue": "從佇列中移除",
         "setRating": "評分",
-        "toggleSmartPlaylistEditor": "切換 $t(entity.smartPlaylist) 編輯器",
         "viewPlaylists": "查看$t(entity.playlist, {\"count\": 2})",
         "moveToNext": "移至下一項",
         "openIn": {

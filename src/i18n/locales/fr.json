@@ -70,7 +70,6 @@
         "deselectAll": "Désélectionner tout",
         "moveToBottom": "Déplacer en bas",
         "setRating": "Noter",
-        "toggleSmartPlaylistEditor": "Basculer l'éditeur de $t(entity.smartPlaylist)",
         "removeFromFavorites": "Retirer des $t(entity.favorite, {\"count\": 2})",
         "openIn": {
             "lastfm": "Ouvrir dans Last.fm",

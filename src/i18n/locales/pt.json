@@ -16,7 +16,6 @@
         "removeFromPlaylist": "Remover da $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "Remover da fila",
         "setRating": "Definir classificação",
-        "toggleSmartPlaylistEditor": "Alternar editor $t(entity.smartPlaylist)",
         "viewPlaylists": "Ver $t(entity.playlist, {\"count\": 2})",
         "openIn": {
             "lastfm": "Abrir em Last.fm",

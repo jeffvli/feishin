@@ -550,7 +550,6 @@
         "deselectAll": "すべて選択解除",
         "moveToBottom": "一番下へ移動",
         "setRating": "評価を設定",
-        "toggleSmartPlaylistEditor": "$t(entity.smartPlaylist)エディターを切り替え",
         "removeFromFavorites": "$t(entity.favorite, {\"count\": 2})から削除",
         "openIn": {
             "lastfm": "Last.fm で開く",

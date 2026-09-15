@@ -16,7 +16,6 @@
         "removeFromPlaylist": "Odstrani iz $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "Odstrani iz čakalne vrste",
         "setRating": "Nastavi oceno",
-        "toggleSmartPlaylistEditor": "Preklopi urejevalnik $t(entity.smartPlaylist)",
         "viewPlaylists": "Poglej $t(entity.playlist, {\"count\": 2})",
         "openIn": {
             "lastfm": "Odpri v Last.fm",

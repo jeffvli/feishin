@@ -10,7 +10,6 @@
         "removeFromPlaylist": "$t(entity.playlist, {\"count\": 1}) இலிருந்து அகற்று",
         "removeFromQueue": "வரிசையிலிருந்து அகற்று",
         "setRating": "மதிப்பீட்டை அமைக்கவும்",
-        "toggleSmartPlaylistEditor": "மாற்று $t(entity.smartPlaylist) ஆசிரியர்",
         "viewPlaylists": "$t(entity.playlist, {\"count\": 2}) காண்க",
         "addToPlaylist": "$t(entity.playlist, {\"count\": 1})இல் சேர்க்கவும்",
         "createPlaylist": "$t(entity.playlist, {\"count\": 1})ஐ உருவாக்கவும்",

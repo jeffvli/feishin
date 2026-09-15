@@ -27,7 +27,6 @@
         "shuffleAll": "Bland alle",
         "removeFromFavorites": "Fjern fra $t(entity.favorite, {\"count\": 2})",
         "setRating": "Sæt bedømmelse",
-        "toggleSmartPlaylistEditor": "Vis/skjul $t(entity.smartPlaylist)-editor",
         "removeFromQueue": "Fjern fra kø",
         "refresh": "$t(common.refresh)",
         "removeFromPlaylist": "Fjern fra $t(entity.playlist, {\"count\": 1})",

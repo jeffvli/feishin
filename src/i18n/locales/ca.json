@@ -627,7 +627,6 @@
         "moveToBottom": "Anar al final",
         "moveToTop": "Anar al principi",
         "setRating": "Qualifica",
-        "toggleSmartPlaylistEditor": "Canvia l'editor $t(entity.smartPlaylist)",
         "downloadStarted": "S'ha iniciat la descàrrega de {{count}} elements",
         "moveUp": "Mou amunt",
         "moveDown": "Mou avall",

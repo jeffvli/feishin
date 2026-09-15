@@ -24,7 +24,6 @@
         },
         "viewPlaylists": "$t(entity.playlist, {\"count\": 2}) 보기",
         "setRating": "평점 지정",
-        "toggleSmartPlaylistEditor": "$t(entity.smartPlaylist) 편집기 펼치기",
         "addOrRemoveFromSelection": "선택항목에서 추가 또는 제거",
         "selectRangeOfItems": "항목의 범위 선택",
         "createRadioStation": "$t(entity.radioStation, {\"count\": 1}) 생성",

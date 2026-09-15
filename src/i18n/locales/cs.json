@@ -552,7 +552,6 @@
         "deselectAll": "Zrušit výběr všeho",
         "moveToBottom": "Přesunout dolů",
         "setRating": "Nastavit hodnocení",
-        "toggleSmartPlaylistEditor": "Přepnout editor $t(entity.smartPlaylist)",
         "removeFromFavorites": "Odebrat z $t(entity.favorite, {\"count\": 2})",
         "openIn": {
             "lastfm": "Otevřít v Last.fm",

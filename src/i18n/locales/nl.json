@@ -14,7 +14,6 @@
         "deselectAll": "Deselecteer alles",
         "moveToBottom": "Verplaats naar einde",
         "setRating": "Kies beoordeling",
-        "toggleSmartPlaylistEditor": "Editor $t(entity.smartPlaylist) schakelen",
         "removeFromFavorites": "Verwijder uit $t(entity.favorite, {\"count\": 2})",
         "clearQueue": "Verwijder lijst",
         "openIn": {

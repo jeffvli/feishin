@@ -24,7 +24,6 @@
         "removeFromQueue": "Fjern fra kø",
         "removeFromPlaylist": "Fjern fra $t(entity.playlist, {\"count\": 1})",
         "viewPlaylists": "Vise $t(entity.playlist, {\"count\": 2})",
-        "toggleSmartPlaylistEditor": "Bytt $t(entity.smartPlaylist) editor",
         "selectAll": "Marker alle",
         "downloadStarted": "Startet nedlasting av {{count}} elementer",
         "selectRangeOfItems": "Velg en rekke elementer",

@@ -33,7 +33,6 @@
         "removeFromPlaylist": "Eemalda üksusest $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "Eemalda järjekorrast",
         "setRating": "Hinda",
-        "toggleSmartPlaylistEditor": "Lülita $t(entity.smartPlaylist) redaktor sisse/välja",
         "viewPlaylists": "Vaata $t(entity.playlist, {\"count\": 2})",
         "viewMore": "Vaata rohkem",
         "openApplicationDirectory": "Ava rakenduste kataloog",

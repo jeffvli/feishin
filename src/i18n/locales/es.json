@@ -561,7 +561,6 @@
         "deselectAll": "Desmarcar todo",
         "moveToBottom": "Mover al final",
         "setRating": "Establecer calificación",
-        "toggleSmartPlaylistEditor": "Cambiar editor $t(entity.smartPlaylist)",
         "removeFromFavorites": "Eliminar de $t(entity.favorite, {\"count\": 2})",
         "openIn": {
             "lastfm": "Abrir en Last.fm",

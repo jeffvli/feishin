@@ -180,7 +180,6 @@
         "addToPlaylist": "Lisää kohteeseen $t(entity.playlist, {\"count\": 1})",
         "refresh": "$t(common.refresh)",
         "removeFromFavorites": "Poista kohteesta $t(entity.favorite, {\"count\": 2})",
-        "toggleSmartPlaylistEditor": "Kytke $t(entity.smartPlaylist) editori",
         "deletePlaylist": "Poista $t(entity.playlist, {\"count\": 1})",
         "removeFromPlaylist": "Poista kohteesta $t(entity.playlist, {\"count\": 1})",
         "setRating": "Aseta arvostelu",

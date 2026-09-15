@@ -14,7 +14,6 @@
         "deselectAll": "取消全选",
         "moveToBottom": "移至底部",
         "setRating": "设置评分",
-        "toggleSmartPlaylistEditor": "切换 $t(entity.smartPlaylist) 编辑器",
         "removeFromFavorites": "从 $t(entity.favorite, {\"count\": 2}) 移除",
         "goToPage": "转到页面",
         "openIn": {

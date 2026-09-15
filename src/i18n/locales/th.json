@@ -32,7 +32,6 @@
         "removeFromPlaylist": "ลบออกจาก $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "ลบออกจากคิว",
         "setRating": "ให้คะแนน",
-        "toggleSmartPlaylistEditor": "เปิด/ปิดตัวแก้ไข $t(entity.smartPlaylist)",
         "viewPlaylists": "ดู $t(entity.playlist, {\"count\": 2})",
         "viewMore": "ดูเพิ่มเติม",
         "openApplicationDirectory": "เปิดโฟลเดอร์โปรแกรม",

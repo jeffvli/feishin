@@ -11,7 +11,6 @@
         "removeFromPlaylist": "Kendu $t(entity.playlist, {\"count\": 1})-(e)tik",
         "removeFromQueue": "Kendu ilaratik",
         "setRating": "Ezarri balorazioa",
-        "toggleSmartPlaylistEditor": "Txandakatu $t(entity.smartPlaylist) editorea",
         "viewPlaylists": "Ikusi $t(entity.playlist, {\"count\": 2})",
         "openIn": {
             "lastfm": "Ireki Last.fm-n",

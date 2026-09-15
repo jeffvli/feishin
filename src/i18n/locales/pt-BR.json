@@ -154,7 +154,6 @@
             "qobuz": "Abrir no Qobuz",
             "spotify": "Abrir no Spotify"
         },
-        "toggleSmartPlaylistEditor": "Alternar editor $t(entity.smartPlaylist)",
         "moveToNext": "Mover para o próximo",
         "addOrRemoveFromSelection": "Adicionar ou remover da seleção",
         "goToCurrent": "Ir para o item atual",

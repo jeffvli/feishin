@@ -21,7 +21,6 @@
         "moveToTop": "Ugrás a tetejére",
         "removeFromPlaylist": "Eltávolítás innen $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "Eltávolítás a műsorlistáról",
-        "toggleSmartPlaylistEditor": "$t(entity.smartPlaylist) szerkesztője",
         "addToFavorites": "$t(entity.favorite, {\"count\": 2}) kedvelése",
         "addToPlaylist": "Hozzáadás lejátszási listához: $t(entity.playlist, {\"count\": 1})",
         "refresh": "$t(common.refresh)",

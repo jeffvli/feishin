@@ -33,7 +33,6 @@
         "removeFromPlaylist": "Fjern frå $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "Fjern frå kø",
         "setRating": "Set vurdering",
-        "toggleSmartPlaylistEditor": "Slå $t(entity.smartPlaylist) editor av/på",
         "viewPlaylists": "Vis $t(entity.playlist, {\"count\": 2})",
         "viewMore": "Vis fleire",
         "openApplicationDirectory": "Opne applikasjonsmappa",

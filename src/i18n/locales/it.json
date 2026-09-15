@@ -13,7 +13,6 @@
         "removeFromQueue": "Rimuovi dalla coda",
         "deselectAll": "Deseleziona tutto",
         "setRating": "Valuta",
-        "toggleSmartPlaylistEditor": "Attiva/disattiva editor $t(entity.smartPlaylist)",
         "removeFromFavorites": "Rimuovi dai $t(entity.favorite, {\"count\": 2})",
         "moveToTop": "Sposta in cima",
         "moveToBottom": "Sposta in fondo",

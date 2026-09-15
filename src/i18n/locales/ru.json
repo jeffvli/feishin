@@ -15,7 +15,6 @@
         "deselectAll": "Снять выделение со всех",
         "moveToBottom": "Переместить в конец",
         "setRating": "Установить оценку",
-        "toggleSmartPlaylistEditor": "Переключить редактор $t(entity.smartPlaylist)",
         "removeFromFavorites": "Удалить из $t(entity.favorite, {\"count\": 2})",
         "openIn": {
             "lastfm": "Открыть в Last.fm",

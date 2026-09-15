@@ -48,7 +48,6 @@
         "deselectAll": "لغو انتخاب همه",
         "moveToBottom": "انتقال به پایین",
         "setRating": "تعیین امتیاز",
-        "toggleSmartPlaylistEditor": "تغییر ویرایشگر $t(entity.smartPlaylist)",
         "removeFromFavorites": "حذف از $t(entity.favorite, {\"count\": 2})",
         "openIn": {
             "lastfm": "باز کردن در Last.fm",

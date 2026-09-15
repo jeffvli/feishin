@@ -15,7 +15,6 @@
         "refresh": "$t(common.refresh)",
         "removeFromQueue": "Aus Wiedergabeliste entfernen",
         "setRating": "Bewertung setzen",
-        "toggleSmartPlaylistEditor": "Editor für $t(entity.smartPlaylist) ein-/ausblenden",
         "removeFromFavorites": "Aus $t(entity.favorite, {\"count\": 2}) entfernen",
         "openIn": {
             "lastfm": "Auf Last.fm öffnen",

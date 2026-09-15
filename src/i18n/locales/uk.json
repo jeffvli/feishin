@@ -30,7 +30,6 @@
         "removeFromPlaylist": "Вилучити з $t(entity.playlist, {\"count\": 1})",
         "removeFromQueue": "Вилучити з черги",
         "setRating": "Установити оцінку",
-        "toggleSmartPlaylistEditor": "Показати або приховати редактор: $t(entity.smartPlaylist)",
         "viewPlaylists": "Переглянути $t(entity.playlist, {\"count\": 2})",
         "viewMore": "Показати більше",
         "openApplicationDirectory": "Відкрити папку програми",

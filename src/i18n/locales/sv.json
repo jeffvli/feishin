@@ -15,7 +15,6 @@
         "deselectAll": "Avmarkera alla",
         "moveToBottom": "Flytta längst ned",
         "setRating": "Ange betyg",
-        "toggleSmartPlaylistEditor": "Visa eller dölj redigeraren för $t(entity.smartPlaylist)",
         "removeFromFavorites": "Ta bort från $t(entity.favorite, {\"count\": 2})",
         "downloadStarted": "Nedladdning av {{count}} objekt har startats",
         "moveToNext": "Flytta till nästa",
