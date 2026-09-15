@@ -1506,7 +1506,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 ...initialState,
                 setCrossfadeDuration: (duration: number) => {
                     set((state) => {
-                        const normalizedDuration = Math.max(0, Math.min(10, duration));
+                        const normalizedDuration = Math.max(3, Math.min(21, duration));
                         state.player.crossfadeDuration = normalizedDuration;
                     });
                 },
