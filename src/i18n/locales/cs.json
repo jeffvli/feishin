@@ -534,7 +534,16 @@
         "scrobbleMinimumMode_optionBoth": "Oba",
         "scrobbleMinimumMode_optionSeconds": "Sekundy",
         "scrobbleMinimumMode_optionPercentage": "Procento",
-        "scrobbleMinimumMode": "Nastavit režim minimálního scrobblování"
+        "scrobbleMinimumMode": "Nastavit režim minimálního scrobblování",
+        "imagePlaceholderPriority_description": "Nastaví typ zástupce obrázku při načítání, pokud je dostupný",
+        "imagePlaceholderPriority": "Priorita zástupce obrázku",
+        "imagePlaceholderPriority_optionBlurhash": "BlurHash",
+        "imagePlaceholderPriority_optionDominantColor": "Dominantní barva",
+        "imagePlaceholderPriority_optionOff": "Vypnuto",
+        "imagePlaceholderPriority_optionThumbhash": "ThumbHash",
+        "transcodeNote": "Překódování je provedeno serverem a použije se od další skladby",
+        "transcodeSampleRate_description": "Maximální vzorkovací frekvence překódovaného zvuku v Hz, např. 192000. Ponechte prázdné pro zachování zdrojové frekvence. Platí pouze pro Jellyfin",
+        "transcodeSampleRate": "Maximální vzorkovací frekvence k překódování"
     },
     "action": {
         "editPlaylist": "Upravit $t(entity.playlist, {\"count\": 1})",
@@ -869,7 +878,9 @@
         "noNetworkDescription": "K tomuto serveru se nepodařilo připojit",
         "invalidJson": "Neplatný JSON",
         "serverLockSingleServer": "Při uzamčení serveru je povolen pouze jeden server",
-        "playbackPausedDueToError": "Přehrávání bylo pozastaveno z důvodu chyby"
+        "playbackPausedDueToError": "Přehrávání bylo pozastaveno z důvodu chyby",
+        "jellyfinQuickConnectDeactivated": "Požadavek na Rychlé připojení vypršel",
+        "jellyfinQuickConnectNotActive": "Rychlé připojení není na tomto serveru aktivní"
     },
     "filter": {
         "mostPlayed": "Nejvíce přehráváno",
@@ -1220,7 +1231,17 @@
             "input_preferRemoteUrl": "Preferovat veřejnou adresu url",
             "input_remoteUrl": "Veřejná adresa url",
             "input_remoteUrlPlaceholder": "Volitelné: veřejná adresa url pro externí funkce",
-            "input_passwordNoSSO": "Autentifikace skrze reverzní proxy (SSO) není podporována. Podporována je pouze autentifikace pomocí uživatelského jména a hesla s Subsonic"
+            "input_passwordNoSSO": "Autentifikace skrze reverzní proxy (SSO) není podporována. Podporována je pouze autentifikace pomocí uživatelského jména a hesla s Subsonic",
+            "input_jellyfinQuickConnect": "Rychlé připojení",
+            "input_jellyfinQuickConnectCode": "Pro přihlášení zadejte tento kód do webového rozhraní vašeho Jellyfinu",
+            "input_jellyfinQuickConnectCodeCopied": "Zkopírováno",
+            "input_jellyfinQuickConnectCodeCopy": "Kopírovat kód",
+            "input_jellyfinQuickConnectOpen": "Otevřít Rychlé připojení",
+            "input_jellyfinQuickConnectWaiting": "Čekání na potvrzení na vašem serveru Jellyfin…",
+            "input_jellyfinSignInMethod": "Přihlásit se přes",
+            "input_jellyfinSignInMethodPassword": "Heslo",
+            "input_jellyfinSignInMethodQuickConnect": "Rychlé připojení",
+            "input_remoteUrlDescription": "Použito jako adresa URL pro externí funkce, jako jsou sdílené odkazy. Ponechte prázdné, pokud není váš server dosažitelný z jiné adresy mimo vaši síť."
         },
         "addToPlaylist": {
             "success": "$t(entity.trackWithCount, {\"count\": {{message}} }) přidáno do $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -1600,5 +1621,53 @@
         "systemAudioNoAudioTrack": "Nebyla zachycena žádná zvuková stopa. Ujistěte se, že jste při výzvě povolili zachytávání zvuku.",
         "systemAudioConsentDecline": "Zamítnout",
         "systemAudioExclusiveModeNotSupported": "Vizualizér není dostupný při zapnutém režimu výhradního výstupu zvuku. Zakažte Režim výhradního výstupu zvuku v nastavení MPV a zkuste to znovu."
+    },
+    "dlna": {
+        "castToDevice": "Vysílat do zařízení DLNA",
+        "castingToDevice": "Vysílání do zařízení {{name}}",
+        "castingToGroup": "Vysílání do skupiny ({{count}})",
+        "connected": "připojeno",
+        "connecting": "Připojování…",
+        "createGroup": "Vytvořit skupinu",
+        "devices": "Zařízení DLNA",
+        "disconnect": "Odpojit",
+        "disconnectAndContinue": "Odpojit a pokračovat",
+        "noDevicesFound": "Nenalezena žádná zařízení DLNA",
+        "nowCasting": "Probíhá vysílání",
+        "searching": "Hledání zařízení…",
+        "shiftDisconnectHint": "Podržte Shift a klikněte na Odpojit pro pokračování v přehrávání v reproduktoru",
+        "group": {
+            "add": "Přidat",
+            "addSpeaker": "Přidat reproduktor",
+            "addSpeakers": "Přidat reproduktory",
+            "addToGroup": "Přidat do skupiny",
+            "cancel": "Zrušit",
+            "connect": "Připojit se",
+            "coordinator": "koordinátor",
+            "failedToAddMessage": "Nepodařilo se přidat zařízení {{name}}. Možná není ve stejném systému Sonos.",
+            "failedToAddTitle": "Nepodařilo se přidat reproduktor",
+            "firstSelectedIsCoordinator": "První vybrané = koordinátor",
+            "noSonosFound": "Nenalezena žádná zařízení Sonos",
+            "refresh": "Obnovit",
+            "remove": "Odstranit",
+            "searching": "Hledání…",
+            "selectSpeakers": "Vyberte skupinové reproduktory",
+            "title": "Skupina ({{count}} reproduktorů)"
+        },
+        "speakerProperties": {
+            "bass": "Basy",
+            "crossfade": "Prolínání",
+            "ledState": "Stavová dioda",
+            "loadFailed": "Nepodařilo se načíst vlastnosti",
+            "loading": "Načítání…",
+            "longPressHint": "Podržte pro vlastnosti reproduktoru",
+            "loudness": "Hlasitost",
+            "touchControls": "Dotykové ovládání",
+            "treble": "Výšky"
+        },
+        "volume": {
+            "groupControl": "Podržte Shift pro úpravu hlasitosti jednotlivých reproduktorů",
+            "individualControl": "Pusťte Shift pro úpravu hlasitosti všech reproduktorů"
+        }
     }
 }

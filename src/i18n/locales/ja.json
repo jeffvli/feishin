@@ -1126,7 +1126,7 @@
             "url": "URL",
             "username": "ユーザー名",
             "editServerDetailsTooltip": "サーバーの詳細を編集",
-            "removeServer": "リモート サーバー"
+            "removeServer": "サーバーを削除"
         },
         "itemDetail": {
             "openFile": "ファイル マネージャーで曲を表示",
