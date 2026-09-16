@@ -1,3 +1,4 @@
+import isElectron from 'is-electron';
 import merge from 'lodash/merge';
 import { nanoid } from 'nanoid/non-secure';
 import { devtools, persist } from 'zustand/middleware';
@@ -51,12 +52,12 @@ export const useAuthStore = createWithEqualityFn<AuthSlice>()(
                     },
                     logout: () => {
                         set((state) => {
-                            const currentServer = state.currentServer;
-                            if (!currentServer) {
+                            const activeServer = state.currentServer;
+                            if (!activeServer) {
                                 return;
                             }
 
-                            const server = state.serverList[currentServer.id];
+                            const server = state.serverList[activeServer.id];
                             if (server) {
                                 server.credential = '';
                                 server.ndCredential = undefined;
@@ -136,6 +137,7 @@ export const useCurrentServer = () =>
         }
 
         return {
+            customHeaders: state.currentServer?.customHeaders,
             features: state.currentServer?.features,
             id: state.currentServer?.id,
             isAdmin: state.currentServer?.isAdmin,
@@ -192,3 +194,30 @@ export const usePermissions = () => {
         userId: userId,
     };
 };
+
+if (isElectron() && window.api?.serverHeaders) {
+    const syncServerHeaders = (serverList: Record<string, ServerListItemWithCredential>) => {
+        const rules: { baseUrl: string; headers: Record<string, string> }[] = [];
+        for (const server of Object.values(serverList || {})) {
+            if (server.customHeaders && Object.keys(server.customHeaders).length > 0) {
+                if (server.url) {
+                    rules.push({ baseUrl: server.url, headers: server.customHeaders });
+                }
+                if (server.remoteUrl) {
+                    rules.push({ baseUrl: server.remoteUrl, headers: server.customHeaders });
+                }
+            }
+        }
+        window.api.serverHeaders.sync(rules).catch(() => {});
+    };
+
+    // Initial sync
+    syncServerHeaders(useAuthStore.getState().serverList);
+
+    // Subscribe to state changes
+    useAuthStore.subscribe((state, prevState) => {
+        if (state.serverList !== prevState.serverList) {
+            syncServerHeaders(state.serverList);
+        }
+    });
+}

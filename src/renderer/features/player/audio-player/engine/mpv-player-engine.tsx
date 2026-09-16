@@ -12,6 +12,7 @@ import { AudioPlayer, PlayerOnProgressProps } from '/@/renderer/features/player/
 import { useRadioStore } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { getMpvProperties } from '/@/renderer/features/settings/components/playback/mpv-properties';
 import {
+    getServerById,
     setMpvInitialized,
     useMpvInitialized,
     usePlaybackSettings,
@@ -122,6 +123,9 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
             const properties: Record<string, any> = {
                 ...getMpvProperties(mpvProperties),
                 'audio-pitch-correction': preservePitch === false ? 'no' : 'yes',
+                'http-header-fields': getMpvHeaderFields(
+                    usePlayerStore.getState().getPlayerData().currentSong?._serverId,
+                ),
                 speed: speed,
                 volume: volume,
             };
@@ -173,6 +177,9 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
                     const safeNextSongUrl = isDifferentNextSong ? nextSongUrl : undefined;
                     const shouldPause =
                         usePlayerStore.getState().player.status !== PlayerStatus.PLAYING;
+                    mpvPlayer.setProperties({
+                        'http-header-fields': getMpvHeaderFields(playerData.currentSong?._serverId),
+                    });
                     mpvPlayer.setQueue(currentSongUrl, safeNextSongUrl, shouldPause);
                     hasPopulatedQueueRef.current = true;
                     let seekToAfterInit = -1;
@@ -264,6 +271,23 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
             mpvPlayer.setProperties({ 'audio-pitch-correction': 'yes' });
         }
     }, [isInitialized, preservePitch]);
+
+    // Update custom HTTP headers for MPV
+    useEffect(() => {
+        if (!mpvPlayer || !isInitialized) {
+            return;
+        }
+
+        const radioState = useRadioStore.getState();
+        if (radioState.currentStreamUrl) {
+            mpvPlayer.setProperties({ 'http-header-fields': [] });
+            return;
+        }
+
+        mpvPlayer.setProperties({
+            'http-header-fields': getMpvHeaderFields(currentSong?._serverId),
+        });
+    }, [currentSong?.id, currentSong?._serverId, isInitialized]);
 
     // Handle play/pause status
     useEffect(() => {
@@ -427,6 +451,13 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
 
 MpvPlayerEngine.displayName = 'MpvPlayerEngine';
 
+function getMpvHeaderFields(serverId?: string): string[] {
+    if (!serverId) return [];
+    const server = getServerById(serverId);
+    if (!server?.customHeaders) return [];
+    return Object.entries(server.customHeaders).map(([key, value]) => `${key}: ${value}`);
+}
+
 async function handleMpvAutoNext(transcode: {
     bitrate?: number | undefined;
     enabled: boolean;
@@ -440,6 +471,9 @@ async function handleMpvAutoNext(transcode: {
     const nextSongUrl = playerData.nextSong
         ? await getSongUrl(playerData.nextSong, transcode, true)
         : undefined;
+    mpvPlayer?.setProperties({
+        'http-header-fields': getMpvHeaderFields(playerData.nextSong?._serverId),
+    });
     mpvPlayer?.autoNext(nextSongUrl);
 }
 
@@ -464,5 +498,8 @@ async function replaceMpvQueue(transcode: {
     const nextSongUrl = isDifferentNextSong
         ? await getSongUrl(playerData.nextSong!, transcode, true)
         : undefined;
+    mpvPlayer?.setProperties({
+        'http-header-fields': getMpvHeaderFields(playerData.currentSong?._serverId),
+    });
     mpvPlayer?.setQueue(currentSongUrl, nextSongUrl, false);
 }

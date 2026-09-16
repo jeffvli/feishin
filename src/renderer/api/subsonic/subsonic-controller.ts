@@ -7,6 +7,7 @@ import orderBy from 'lodash/orderBy';
 import md5 from 'md5';
 import { z } from 'zod';
 
+import { mergeDesktopHeaders } from '/@/renderer/api/server-headers';
 import { contract, ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
 import { mapStructuredLyric } from '/@/renderer/api/subsonic/subsonic-structured-lyrics';
 import {
@@ -65,6 +66,7 @@ const getSubsonicImageRequest = ({
 
     return {
         cacheKey: ['subsonic', server.id, baseUrl || '', id, imageSize || ''].join(':'),
+        headers: mergeDesktopHeaders(server.customHeaders),
         url:
             `${url}/rest/getCoverArt.view` +
             `?id=${id}` +
@@ -313,7 +315,7 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         return null;
     },
-    authenticate: async (url, body) => {
+    authenticate: async (url, body, customHeaders) => {
         if (body.action && body.action !== 'password') {
             throw new Error('Subsonic does not support this authentication method');
         }
@@ -350,7 +352,11 @@ export const SubsonicController: InternalControllerEndpoint = {
             };
         }
 
-        const resp = await ssApiClient({ server: null, url: cleanServerUrl }).authenticate({
+        const resp = await ssApiClient({
+            customHeaders,
+            server: null,
+            url: cleanServerUrl,
+        }).authenticate({
             query: {
                 c: 'Feishin',
                 f: 'json',
