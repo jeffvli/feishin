@@ -37,6 +37,18 @@ export const useAuthStore = createWithEqualityFn<AuthSlice>()(
                         });
                     },
                     deleteServer: (id) => {
+                        const server = get().serverList[id];
+                        if (isElectron() && window.api?.serverHeaders && server) {
+                            if (server.url) {
+                                window.api.serverHeaders.clearCookies(server.url).catch(() => {});
+                            }
+                            if (server.remoteUrl) {
+                                window.api.serverHeaders
+                                    .clearCookies(server.remoteUrl)
+                                    .catch(() => {});
+                            }
+                        }
+
                         set((state) => {
                             delete state.serverList[id];
 
@@ -51,6 +63,20 @@ export const useAuthStore = createWithEqualityFn<AuthSlice>()(
                         return null;
                     },
                     logout: () => {
+                        const currentServer = get().currentServer;
+                        if (isElectron() && window.api?.serverHeaders && currentServer) {
+                            if (currentServer.url) {
+                                window.api.serverHeaders
+                                    .clearCookies(currentServer.url)
+                                    .catch(() => {});
+                            }
+                            if (currentServer.remoteUrl) {
+                                window.api.serverHeaders
+                                    .clearCookies(currentServer.remoteUrl)
+                                    .catch(() => {});
+                            }
+                        }
+
                         set((state) => {
                             const activeServer = state.currentServer;
                             if (!activeServer) {
@@ -84,6 +110,25 @@ export const useAuthStore = createWithEqualityFn<AuthSlice>()(
                         });
                     },
                     updateServer: (id: string, args: Partial<ServerListItemWithCredential>) => {
+                        const existingServer = get().serverList[id];
+                        if (
+                            isElectron() &&
+                            window.api?.serverHeaders &&
+                            existingServer &&
+                            args.customHeaders !== undefined
+                        ) {
+                            if (existingServer.url) {
+                                window.api.serverHeaders
+                                    .clearCookies(existingServer.url)
+                                    .catch(() => {});
+                            }
+                            if (existingServer.remoteUrl) {
+                                window.api.serverHeaders
+                                    .clearCookies(existingServer.remoteUrl)
+                                    .catch(() => {});
+                            }
+                        }
+
                         set((state) => {
                             const updatedServer = {
                                 ...state.serverList[id],

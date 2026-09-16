@@ -72,6 +72,29 @@ ipcMain.handle('server-headers-sync', (_event, rules: ServerHeaderRule[]) => {
     setServerHeaderRules(rules);
 });
 
+ipcMain.handle('session-clear-server-cookies', async (_event, serverUrl: string) => {
+    if (!serverUrl) return false;
+    try {
+        const parsed = new URL(serverUrl);
+        const cookies = await session.defaultSession.cookies.get({ domain: parsed.hostname });
+        for (const cookie of cookies) {
+            const domain = (cookie.domain || parsed.hostname).replace(/^\./, '');
+            const protocol = cookie.secure ? 'https://' : 'http://';
+            const path = cookie.path || '/';
+            const cookieUrl = `${protocol}${domain}${path}`;
+            await session.defaultSession.cookies.remove(cookieUrl, cookie.name);
+        }
+        log.info('Cleared session cookies for server', {
+            count: cookies.length,
+            hostname: parsed.hostname,
+        });
+        return true;
+    } catch (error) {
+        log.error('Failed to clear server cookies', error);
+        return false;
+    }
+});
+
 app.whenReady()
     .then(() => registerNetworkInterceptor())
     .catch((error) => log.error('Failed to register server headers interceptor', error));
