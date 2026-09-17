@@ -256,9 +256,9 @@ export const SidebarNowPlaying = () => {
                     />
                     {song.album && (
                         <Text
-                            component={song.albumId ? Link : 'span'}
+                            component={Link}
                             fw={500}
-                            isLink={Boolean(song.albumId)}
+                            isLink
                             isMuted
                             overflow="hidden"
                             size="md"
@@ -267,7 +267,7 @@ export const SidebarNowPlaying = () => {
                                     ? generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
                                           albumId: song.albumId,
                                       })
-                                    : undefined
+                                    : ''
                             }
                         >
                             {song.album}
