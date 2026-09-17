@@ -13,8 +13,10 @@ import { lyricsQueries } from '/@/renderer/features/lyrics/api/lyrics-api';
 import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { PlayQueueListControls } from '/@/renderer/features/now-playing/components/play-queue-list-controls';
+import { SidebarNowPlaying } from '/@/renderer/features/now-playing/components/sidebar-now-playing';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
+    useAppStoreActions,
     useCombinedLyricsAndVisualizer,
     useFullScreenPlayerStore,
     usePlaybackSettings,
@@ -24,12 +26,15 @@ import {
     useShowLyricsInSidebar,
     useShowQueueInSidebar,
     useShowVisualizerInSidebar,
+    useSidebarNowPlaying,
     useSidebarPanelOrder,
     useWindowSettings,
 } from '/@/renderer/store';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
+import { Group } from '/@/shared/components/group/group';
 import { Stack } from '/@/shared/components/stack/stack';
+import { TextTitle } from '/@/shared/components/text-title/text-title';
 import { ItemListKey, Platform } from '/@/shared/types/types';
 
 type SidebarPanelType = 'lyrics' | 'queue' | 'visualizer';
@@ -99,6 +104,7 @@ export const SidebarPlayQueue = () => {
     const showLyricsInSidebar = useShowLyricsInSidebar();
     const showQueueInSidebar = useShowQueueInSidebar();
     const showVisualizerInSidebar = useShowVisualizerInSidebar();
+    const nowPlayingOpen = useSidebarNowPlaying();
     const { webAudio } = usePlaybackSettings();
     const { windowBarStyle } = useWindowSettings();
     const showVisualizer = showVisualizerInSidebar && webAudio;
@@ -237,7 +243,9 @@ export const SidebarPlayQueue = () => {
     return (
         <Stack gap={0} h="100%" id="sidebar-play-queue-container" pos="relative" w="100%">
             {shouldAddTopMargin && <div className={styles.draggableRegion} />}
-            {showPanel ? (
+            {nowPlayingOpen ? (
+                <NowPlayingPanel />
+            ) : showPanel ? (
                 orderedPanels.length === 1 ? (
                     <div className={styles.panelsContainer}>{renderPanel(orderedPanels[0])}</div>
                 ) : (
@@ -391,6 +399,32 @@ const LyricsPanel = () => {
         <div className={styles.lyricsSection}>
             <PanelReorderControls panelType="lyrics" />
             <Lyrics fadeOutNoLyricsMessage={false} settingsKey="sidebar" />
+        </div>
+    );
+};
+
+const NowPlayingPanel = () => {
+    const { t } = useTranslation();
+    const { setSideBar } = useAppStoreActions();
+
+    return (
+        <div className={styles.nowPlayingSection}>
+            <Group className={styles.nowPlayingHeader} justify="space-between" wrap="nowrap">
+                <TextTitle fw={700} order={4} overflow="hidden">
+                    {t('page.sidebar.nowPlaying')}
+                </TextTitle>
+                <ActionIcon
+                    icon="x"
+                    iconProps={{ size: 'sm' }}
+                    onClick={() => setSideBar({ nowPlaying: false })}
+                    size="xs"
+                    tooltip={{
+                        label: t('common.close'),
+                    }}
+                    variant="subtle"
+                />
+            </Group>
+            <SidebarNowPlaying />
         </div>
     );
 };

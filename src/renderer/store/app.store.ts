@@ -83,6 +83,7 @@ type SidebarProps = {
     expanded: string[];
     image: boolean;
     leftWidth: string;
+    nowPlaying: boolean;
     rightExpanded: boolean;
     rightHeight: string;
     rightWidth: string;
@@ -186,6 +187,9 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                     setSideBar: (options) => {
                         set((state) => {
                             state.sidebar = { ...state.sidebar, ...options };
+                            if (options.rightExpanded === false) {
+                                state.sidebar.nowPlaying = false;
+                            }
                         });
                     },
                     setTitleBar: (options) => {
@@ -243,6 +247,7 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                     expanded: [],
                     image: false,
                     leftWidth: '400px',
+                    nowPlaying: false,
                     rightExpanded: false,
                     rightHeight: '320px',
                     rightWidth: '600px',
@@ -268,6 +273,10 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                     state.sidebar.rightHeight = '320px';
                 }
 
+                if (version < 6 && state.sidebar.nowPlaying === undefined) {
+                    state.sidebar.nowPlaying = false;
+                }
+
                 return state;
             },
             name: 'store_app',
@@ -276,7 +285,7 @@ export const useAppStore = createWithEqualityFn<AppSlice>()(
                 const { globalExpanded: _, latestVersion: __, ...rest } = state;
                 return rest;
             },
-            version: 5,
+            version: 6,
         },
     ),
 );
@@ -286,6 +295,8 @@ export const useAppStoreActions = () => useAppStore((state) => state.actions);
 export const useSidebarStore = () => useAppStore((state) => state.sidebar);
 
 export const useSidebarRightExpanded = () => useAppStore((state) => state.sidebar.rightExpanded);
+
+export const useSidebarNowPlaying = () => useAppStore((state) => state.sidebar.nowPlaying);
 
 export const useSetTitlebar = () => useAppStore((state) => state.actions.setTitleBar);
 

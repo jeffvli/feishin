@@ -497,6 +497,13 @@
             "viewAll": "View all",
             "viewAllTracks": "View all $t(entity.track, {\"count\": 2})"
         },
+        "nowPlaying": {
+            "empty": "Nothing playing",
+            "plays_one": "{{count}} play",
+            "plays_other": "{{count}} plays",
+            "showLess": "Show less",
+            "showMore": "Show more"
+        },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
@@ -1145,6 +1152,8 @@
         "preferLocalLyrics": "Prefer local lyrics",
         "showLyricsInSidebar_description": "A panel will be added to the attached play queue that displays the lyrics",
         "showLyricsInSidebar": "Show lyrics in player sidebar",
+        "showNowPlayingInSidebar_description": "Click the player bar album art to open a now playing view over the side queue",
+        "showNowPlayingInSidebar": "Enable now playing view in player sidebar",
         "showFavorites": "Show favorites",
         "showFavorites_description": "Controls if the favorite (heart) buttons show up in the interface",
         "showQueueInSidebar_description": "A panel will be added to the player sidebar that displays the play queue",
