@@ -28,6 +28,8 @@ import {
     usePlayerSong,
     useSetFullScreenPlayerStore,
     useSidebarImageEnabled,
+    useSidebarNowPlaying,
+    useSideQueueType,
 } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Center } from '/@/shared/components/center/center';
@@ -60,6 +62,8 @@ export const LeftControls = () => {
     const { currentStationArt } = useRadioPlayer();
     const { bindings } = useHotkeySettings();
     const sidebarImageEnabled = useSidebarImageEnabled();
+    const nowPlayingOpen = useSidebarNowPlaying();
+    const sideQueueType = useSideQueueType();
 
     const isRadioMode = isRadioActive;
     const hasRadioStationImage = Boolean(currentStationArt?.imageId || currentStationArt?.imageUrl);
@@ -87,6 +91,36 @@ export const LeftControls = () => {
         } else {
             setFullScreenPlayerStore({ expanded: true });
         }
+    };
+
+    // Tiny Spotify-style tweak: with the side queue, album art opens Now Playing instead of fullscreen
+    const handleAlbumArtClick = (e?: MouseEvent<HTMLDivElement>) => {
+        if (e && e.button === 2) {
+            return;
+        }
+
+        e?.stopPropagation();
+
+        const shouldCloseFullscreen = isFullScreenPlayerExpanded || isFullScreenVisualizerExpanded;
+        if (shouldCloseFullscreen) {
+            setFullScreenPlayerStore({
+                expanded: false,
+                visualizerExpanded: false,
+                visualizerReturnToPlayer: false,
+            });
+            return;
+        }
+
+        if (sideQueueType === 'sideQueue' && !isRadioMode) {
+            if (nowPlayingOpen) {
+                setSideBar({ nowPlaying: false });
+            } else {
+                setSideBar({ nowPlaying: true, rightExpanded: true });
+            }
+            return;
+        }
+
+        setFullScreenPlayerStore({ expanded: true });
     };
 
     const handleToggleSidebarImage = (e?: MouseEvent<HTMLButtonElement>) => {
@@ -131,13 +165,19 @@ export const LeftControls = () => {
                                 exit={{ opacity: 0, x: -50 }}
                                 initial={{ opacity: 0, x: -50 }}
                                 key="playerbar-image"
-                                onClick={handleToggleFullScreenPlayer}
+                                onClick={handleAlbumArtClick}
                                 onContextMenu={handleToggleContextMenu}
                                 role="button"
                                 transition={{ duration: 0.2, ease: 'easeOut' }}
                                 whileHover={{ scale: 1.1 }}
                             >
-                                <Tooltip label={t('player.toggleFullscreenPlayer')}>
+                                <Tooltip
+                                    label={
+                                        sideQueueType === 'sideQueue' && !isRadioMode
+                                            ? t('page.sidebar.nowPlaying')
+                                            : t('player.toggleFullscreenPlayer')
+                                    }
+                                >
                                     {isRadioMode && hasRadioStationImage ? (
                                         <ItemImage
                                             className={clsx(

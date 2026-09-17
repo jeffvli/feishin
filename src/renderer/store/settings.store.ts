@@ -568,6 +568,7 @@ export const GeneralSettingsSchema = z.object({
     shareExpiration: ShareExpirationSchema,
     showFavorites: z.boolean(),
     showLyricsInSidebar: z.boolean(),
+    showNowPlayingInSidebar: z.boolean(),
     showQueueInSidebar: z.boolean(),
     showRatings: z.boolean(),
     showVisualizerInSidebar: z.boolean(),
@@ -1404,6 +1405,7 @@ const initialState: SettingsState = {
         },
         showFavorites: true,
         showLyricsInSidebar: true,
+        showNowPlayingInSidebar: true,
         showQueueInSidebar: true,
         showRatings: true,
         showVisualizerInSidebar: true,
@@ -2931,10 +2933,25 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     });
                 }
 
+                if (version < 35) {
+                    if (state.general.showNowPlayingInSidebar === undefined) {
+                        state.general.showNowPlayingInSidebar = true;
+                    }
+                }
+
+                if (version < 36) {
+                    // Now Playing is a sidebar mode (not a split panel) - drop any leftover panel id
+                    state.general.sidebarPanelOrder = (
+                        state.general.sidebarPanelOrder as string[]
+                    ).filter(
+                        (panel) => panel !== 'nowPlaying',
+                    ) as typeof state.general.sidebarPanelOrder;
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 34,
+            version: 36,
         },
     ),
 );
@@ -3213,6 +3230,9 @@ export const useCombinedLyricsAndVisualizer = () =>
 
 export const useShowLyricsInSidebar = () =>
     useSettingsStore((state) => state.general.showLyricsInSidebar, shallow);
+
+export const useShowNowPlayingInSidebar = () =>
+    useSettingsStore((state) => state.general.showNowPlayingInSidebar, shallow);
 
 export const useShowQueueInSidebar = () =>
     useSettingsStore((state) => state.general.showQueueInSidebar, shallow);

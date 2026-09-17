@@ -37,6 +37,7 @@ import {
     useSettingsStoreActions,
     useShowFavorites,
     useShowRatings,
+    useSidebarNowPlaying,
     useSidebarRightExpanded,
     useSideQueueType,
     useVolumeWheelStep,
@@ -343,13 +344,19 @@ const AutoDJButton = () => {
 const QueueButton = () => {
     const { t } = useTranslation();
     const isSidebarRightExpanded = useSidebarRightExpanded();
+    const nowPlayingOpen = useSidebarNowPlaying();
     const { setSideBar } = useAppStoreActions();
     const sideQueueType = useSideQueueType();
     const { bindings } = useHotkeySettings();
     const [popoverOpened, setPopoverOpened] = useState(false);
     const handleToggleQueue = () => {
-        if (sideQueueType === 'sideQueue') setSideBar({ rightExpanded: !isSidebarRightExpanded });
-        else setPopoverOpened((prev) => !prev);
+        if (sideQueueType === 'sideQueue') {
+            if (nowPlayingOpen) {
+                setSideBar({ nowPlaying: false, rightExpanded: true });
+                return;
+            }
+            setSideBar({ rightExpanded: !isSidebarRightExpanded });
+        } else setPopoverOpened((prev) => !prev);
     };
     useHotkeys([
         [bindings.toggleQueue.isGlobal ? '' : bindings.toggleQueue.hotkey, handleToggleQueue],
