@@ -13,13 +13,12 @@ export const useItemListColumnResize = ({
     tableKey = 'main',
 }: UseItemListColumnResizeProps) => {
     const { setList } = useSettingsStoreActions();
-    const columns = useSettingsStore((state) => {
-        const list = state.lists[itemListKey];
-        return tableKey === 'detail' ? list?.detail?.columns : list?.table?.columns;
-    });
 
     const handleColumnResized = useCallback(
         (columnId: TableColumn, width: number) => {
+            // fresh read so multi-column persists don't stomp each other
+            const list = useSettingsStore.getState().lists[itemListKey];
+            const columns = tableKey === 'detail' ? list?.detail?.columns : list?.table?.columns;
             if (!columns) return;
 
             const updatedColumns = columns.map((column) =>
@@ -39,7 +38,7 @@ export const useItemListColumnResize = ({
                 });
             }
         },
-        [columns, itemListKey, setList, tableKey],
+        [itemListKey, setList, tableKey],
     );
 
     return { handleColumnResized };

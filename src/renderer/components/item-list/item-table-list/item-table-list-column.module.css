@@ -3,7 +3,13 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    min-width: 0;
     height: 100%;
+    overflow: hidden;
+}
+
+.container.allow-overflow {
+    overflow: visible;
 }
 
 .container.padding-xs {
@@ -202,6 +208,7 @@
 
 .header-container {
     position: relative;
+    overflow: visible;
     background: none;
 }
 
@@ -379,6 +386,10 @@
 
 .resize-handle-dragging {
     opacity: 1;
+}
+
+.resize-handle-dragging::before {
+    background-color: var(--theme-colors-border);
 }
 
 .resize-handle.resize-handle-disabled {

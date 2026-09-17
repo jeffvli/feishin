@@ -24,6 +24,7 @@ import { CellComponentProps } from 'react-window-v2';
 import styles from './item-table-list-column.module.css';
 
 import i18n from '/@/i18n/i18n';
+import { getColumnMinWidth } from '/@/renderer/components/item-list/helpers/apply-column-resize';
 import { useItemSelectionState } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { isNoHorizontalPaddingColumn } from '/@/renderer/components/item-list/item-detail-list/utils';
 import { ActionsColumn } from '/@/renderer/components/item-list/item-table-list/columns/actions-column';
@@ -773,6 +774,7 @@ export const TableColumnTextContainer = (
     const cell = (
         <div
             className={clsx(styles.container, props.containerClassName, {
+                [styles.allowOverflow]: props.type === TableColumn.ALBUM_GROUP,
                 [styles.alternateRowEven]:
                     props.enableAlternateRowColors && isDataRow && dataIndex % 2 === 0,
                 [styles.alternateRowOdd]:
@@ -940,6 +942,7 @@ export const TableColumnContainer = (
     const cell = (
         <div
             className={clsx(styles.container, props.className, {
+                [styles.allowOverflow]: props.type === TableColumn.ALBUM_GROUP,
                 [styles.alternateRowEven]:
                     props.enableAlternateRowColors && isDataRow && dataIndex % 2 === 0,
                 [styles.alternateRowOdd]:
@@ -1041,7 +1044,10 @@ const ColumnResizeHandle = ({
 
         const handleMouseMove = (event: MouseEvent) => {
             const deltaX = event.clientX - startXRef.current;
-            const newWidth = Math.min(Math.max(10, startWidthRef.current + deltaX), 1000);
+            const minWidth = getColumnMinWidth(columnId);
+            // left handle grows when dragged left; right handle grows when dragged right
+            const signed = side === 'left' ? -deltaX : deltaX;
+            const newWidth = Math.min(Math.max(minWidth, startWidthRef.current + signed), 1000);
             finalWidthRef.current = newWidth;
             columnResizeLiveRef.current?.scheduleColumnResizePreview(columnIndex, newWidth);
         };
@@ -1066,7 +1072,7 @@ const ColumnResizeHandle = ({
             document.body.style.userSelect = '';
             columnResizeLiveRef.current?.clearColumnResizePreview();
         };
-    }, [isDragging, columnId, columnIndex]);
+    }, [isDragging, columnId, columnIndex, side]);
 
     const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
         if (disabled) {
@@ -1108,6 +1114,12 @@ export const TableColumnHeaderContainer = (
     const columnConfig = props.columns[props.columnIndex];
     // Use the actual rendered width from style if available, otherwise fall back to config width
     const currentWidth = (props.style?.width as number | undefined) || columnConfig.width;
+
+    // last col's right edge is stuck to the table edge, so put its handle on the left instead
+    const hasColToTheRight = props.columns
+        .slice(props.columnIndex + 1)
+        .some((column) => column.id !== TableColumn.LAYOUT_FILL);
+    const resizeSide = hasColToTheRight ? 'right' : 'left';
 
     const handleResize = (columnId: TableColumn, width: number) => {
         props.controls.onColumnResized?.({ columnId, width });
@@ -1237,14 +1249,13 @@ export const TableColumnHeaderContainer = (
             >
                 {columnLabelMap[props.type]}
             </Text>
-            {props.enableColumnResize && (
+            {props.enableColumnResize && props.type !== TableColumn.LAYOUT_FILL && (
                 <ColumnResizeHandle
                     columnId={props.type}
                     columnIndex={props.columnIndex}
-                    disabled={!!columnConfig.autoSize}
                     initialWidth={currentWidth}
                     onResize={handleResize}
-                    side="right"
+                    side={resizeSide}
                 />
             )}
         </Flex>

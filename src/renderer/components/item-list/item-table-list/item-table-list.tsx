@@ -22,6 +22,7 @@ import { type CellComponentProps, Grid } from 'react-window-v2';
 import styles from './item-table-list.module.css';
 
 import { appendLayoutFillColumn } from '/@/renderer/components/item-list/helpers/append-layout-fill-column';
+import { applyColumnResize } from '/@/renderer/components/item-list/helpers/apply-column-resize';
 import { createExtractRowId } from '/@/renderer/components/item-list/helpers/extract-row-id';
 import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
@@ -1350,13 +1351,14 @@ const BaseItemTableList = ({
         if (!columnResizePreview) {
             return calculatedColumnWidths;
         }
-        const next = calculatedColumnWidths.slice();
+
         const { columnIndex, width } = columnResizePreview;
-        if (columnIndex >= 0 && columnIndex < next.length) {
-            next[columnIndex] = width;
+        if (columnIndex < 0 || columnIndex >= calculatedColumnWidths.length) {
+            return calculatedColumnWidths;
         }
-        return next;
-    }, [calculatedColumnWidths, columnResizePreview]);
+
+        return applyColumnResize(parsedColumns, calculatedColumnWidths, columnIndex, width);
+    }, [calculatedColumnWidths, columnResizePreview, parsedColumns]);
 
     const playerContext = usePlayer();
 
@@ -1697,9 +1699,34 @@ const BaseItemTableList = ({
         scrollToTableOffset,
     });
 
+    const persistColumnResize = useCallback(
+        (columnId: TableColumn, width: number) => {
+            if (!onColumnResized) return;
+
+            const resizedIndex = parsedColumns.findIndex((column) => column.id === columnId);
+            if (resizedIndex < 0) {
+                onColumnResized(columnId, width);
+                return;
+            }
+
+            const nextWidths = applyColumnResize(
+                parsedColumns,
+                calculatedColumnWidths,
+                resizedIndex,
+                width,
+            );
+
+            parsedColumns.forEach((column, index) => {
+                if (nextWidths[index] === calculatedColumnWidths[index]) return;
+                onColumnResized(column.id, nextWidths[index]);
+            });
+        },
+        [calculatedColumnWidths, onColumnResized, parsedColumns],
+    );
+
     const controls = useDefaultItemListControls({
         onColumnReordered,
-        onColumnResized,
+        onColumnResized: persistColumnResize,
         overrides: overrideControls,
     });
 
