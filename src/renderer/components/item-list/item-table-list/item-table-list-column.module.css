@@ -51,12 +51,12 @@
     align-self: center;
 }
 
-.container.start {
+.container.left {
     align-items: flex-start;
     text-align: left;
 }
 
-.container.start > * {
+.container.left > * {
     align-self: flex-start;
 }
 
@@ -296,9 +296,21 @@
     line-height: 1;
 }
 
+/* same box + glyph size as ActionIcon xs with icon md */
+.header-icon-wrapper.action-match {
+    justify-content: center;
+    width: calc(1.875rem * var(--mantine-scale, 1));
+    height: calc(1.875rem * var(--mantine-scale, 1));
+}
+
 .header-icon-wrapper :global(svg) {
     width: var(--theme-font-size-sm);
     height: var(--theme-font-size-sm);
+}
+
+.header-icon-wrapper.action-match :global(svg) {
+    width: var(--theme-font-size-md);
+    height: var(--theme-font-size-md);
 }
 
 .header-content.center .header-icon-wrapper {
@@ -311,6 +323,12 @@
 
 .header-content.right .header-icon-wrapper {
     justify-content: flex-end;
+}
+
+/* beat the left/right rules so the glyph stays centered in the action box */
+.header-content.left .header-icon-wrapper.action-match,
+.header-content.right .header-icon-wrapper.action-match {
+    justify-content: center;
 }
 
 .container :global(.hover-only),
