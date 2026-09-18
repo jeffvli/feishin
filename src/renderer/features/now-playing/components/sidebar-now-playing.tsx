@@ -15,6 +15,7 @@ import {
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { AlbumArtistGridCarousel } from '/@/renderer/features/artists/components/album-artist-grid-carousel';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
+import { calculateTitleSize } from '/@/renderer/features/shared/components/library-header';
 import { useSetFavorite } from '/@/renderer/features/shared/hooks/use-set-favorite';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -223,10 +224,13 @@ export const SidebarNowPlaying = () => {
                 </div>
 
                 <Stack gap="xs">
-                    <Group align="center" gap="xs" justify="space-between" wrap="nowrap">
-                        <Text className={styles.trackTitle} fw={500} overflow="hidden">
+                    <Group align="flex-start" gap="xs" justify="space-between" wrap="nowrap">
+                        <h1
+                            className={styles.trackTitle}
+                            style={{ fontSize: calculateTitleSize(song.name) }}
+                        >
                             {song.name}
-                        </Text>
+                        </h1>
                         <ActionIconGroup>
                             {showFavorites && (
                                 <ActionIcon
@@ -257,14 +261,8 @@ export const SidebarNowPlaying = () => {
                     <JoinedArtists
                         artistName={song.artistName || ''}
                         artists={song.artists || []}
-                        linkProps={{
-                            ...JOINED_ARTISTS_MUTED_PROPS.linkProps,
-                            size: 'md',
-                        }}
-                        rootTextProps={{
-                            ...JOINED_ARTISTS_MUTED_PROPS.rootTextProps,
-                            size: 'md',
-                        }}
+                        linkProps={JOINED_ARTISTS_MUTED_PROPS.linkProps}
+                        rootTextProps={JOINED_ARTISTS_MUTED_PROPS.rootTextProps}
                     />
                     {song.album && (
                         <Text
