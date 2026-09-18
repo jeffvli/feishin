@@ -412,7 +412,7 @@ const NowPlayingButton = () => {
             onClick={(e) => {
                 e.stopPropagation();
                 if (nowPlayingOpen) {
-                    setSideBar({ nowPlaying: false });
+                    setSideBar({ nowPlaying: false, rightExpanded: false });
                 } else {
                     setSideBar({ nowPlaying: true, rightExpanded: true });
                 }

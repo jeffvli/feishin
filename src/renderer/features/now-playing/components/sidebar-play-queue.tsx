@@ -416,7 +416,7 @@ const NowPlayingPanel = () => {
                 <ActionIcon
                     icon="x"
                     iconProps={{ size: 'sm' }}
-                    onClick={() => setSideBar({ nowPlaying: false })}
+                    onClick={() => setSideBar({ nowPlaying: false, rightExpanded: false })}
                     size="xs"
                     tooltip={{
                         label: t('common.close'),
