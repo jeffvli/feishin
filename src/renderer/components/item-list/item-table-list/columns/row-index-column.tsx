@@ -30,6 +30,7 @@ const RowIndexColumnBase = (props: ItemTableListInnerColumn) => {
         case LibraryItem.ALBUM_ARTIST:
         case LibraryItem.ARTIST:
         case LibraryItem.FOLDER:
+        case LibraryItem.PLAYLIST:
         case LibraryItem.PLAYLIST_SONG:
         case LibraryItem.QUEUE_SONG:
         case LibraryItem.SONG:

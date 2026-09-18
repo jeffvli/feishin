@@ -1,5 +1,12 @@
 import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/item-list-state';
-import { Album, AlbumArtist, Artist, LibraryItem, Song } from '/@/shared/types/domain-types';
+import {
+    Album,
+    AlbumArtist,
+    Artist,
+    LibraryItem,
+    Playlist,
+    Song,
+} from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 type PlayableArtistItem = AlbumArtist | Artist;
@@ -71,4 +78,17 @@ export const playArtistFromItemListControl = ({
 }) => {
     const playType = (meta?.playType as Play) || Play.NOW;
     player.addToQueueByFetch(artist._serverId, [artist.id], itemType, playType);
+};
+
+export const playPlaylistFromItemListControl = ({
+    meta,
+    player,
+    playlist,
+}: {
+    meta?: Record<string, unknown>;
+    player: PlayerQueueByFetchActions;
+    playlist: Playlist;
+}) => {
+    const playType = (meta?.playType as Play) || Play.NOW;
+    player.addToQueueByFetch(playlist._serverId, [playlist.id], LibraryItem.PLAYLIST, playType);
 };
