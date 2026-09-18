@@ -102,6 +102,7 @@ export const RightControls = () => {
                 <PlayerConfig />
                 <LyricsButton />
                 {showFavorites && <FavoriteButton />}
+                <NowPlayingButton />
                 <QueueButton />
                 {playbackType === PlayerType.DLNA ? <DlnaVolumeButton /> : <VolumeButton />}
             </Group>
@@ -387,6 +388,41 @@ const QueueButton = () => {
                 handleToggleQueue();
             }}
             opened={popoverOpened}
+        />
+    );
+};
+
+const NowPlayingButton = () => {
+    const { t } = useTranslation();
+    const nowPlayingOpen = useSidebarNowPlaying();
+    const { setSideBar } = useAppStoreActions();
+    const sideQueueType = useSideQueueType();
+
+    if (sideQueueType !== 'sideQueue') {
+        return null;
+    }
+
+    return (
+        <ActionIcon
+            icon="itemSong"
+            iconProps={{
+                color: nowPlayingOpen ? 'primary' : undefined,
+                size: 'lg',
+            }}
+            onClick={(e) => {
+                e.stopPropagation();
+                if (nowPlayingOpen) {
+                    setSideBar({ nowPlaying: false });
+                } else {
+                    setSideBar({ nowPlaying: true, rightExpanded: true });
+                }
+            }}
+            size="sm"
+            tooltip={{
+                label: t('page.sidebar.nowPlaying'),
+                openDelay: 0,
+            }}
+            variant="subtle"
         />
     );
 };

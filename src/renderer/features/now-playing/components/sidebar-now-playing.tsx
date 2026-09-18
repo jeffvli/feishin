@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { MouseEvent, useCallback, useMemo } from 'react';
+import clsx from 'clsx';
+import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router';
 
@@ -29,9 +30,7 @@ import { SEPARATOR_STRING } from '/@/shared/api/utils';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
-import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
-import { TextTitle } from '/@/shared/components/text-title/text-title';
 import { Text } from '/@/shared/components/text/text';
 import { AlbumArtist, LibraryItem, ServerType } from '/@/shared/types/domain-types';
 
@@ -67,9 +66,14 @@ export const SidebarNowPlaying = () => {
     const genrePath = useGenreRoute();
     const { externalLinks, lastFM, listenBrainz, musicBrainz, nativeSpotify, qobuz, spotify } =
         useExternalLinks();
+    const [bioExpanded, setBioExpanded] = useState(false);
 
     const artist = song?.albumArtists?.[0] ?? song?.artists?.[0];
     const artistId = artist?.id;
+
+    useEffect(() => {
+        setBioExpanded(false);
+    }, [artistId, song?.id]);
 
     const detailQuery = useQuery({
         ...artistsQueries.albumArtistDetail({
@@ -268,8 +272,8 @@ export const SidebarNowPlaying = () => {
                 </Stack>
 
                 {artistId && artistRoute && (
-                    <Stack gap="xs">
-                        <div className={styles.image}>
+                    <div className={styles.artistCard}>
+                        <div className={styles.artistHero}>
                             <ItemImage
                                 blurHash={artistDetail?.blurHash}
                                 enableDebounce={false}
@@ -282,33 +286,54 @@ export const SidebarNowPlaying = () => {
                                 type="sidebar"
                             />
                             {showFavorites && artistIsFavorite && (
-                                <div className={cardStyles.favoriteBadge} />
+                                <div
+                                    className={clsx(
+                                        cardStyles.favoriteBadge,
+                                        styles.artistFavoriteBadge,
+                                    )}
+                                />
                             )}
-                        </div>
-                        <Text component={Link} fw={500} isLink overflow="hidden" to={artistRoute}>
-                            {artistName}
-                        </Text>
-                        {stats && (
-                            <Text isMuted size="md">
-                                {stats}
-                            </Text>
-                        )}
-                        {sanitizedBiography && (
-                            <>
-                                <TextTitle fw={700} order={3}>
-                                    {t('page.albumArtistDetail.about', {
-                                        artist: artistName,
-                                    })}
-                                </TextTitle>
-                                <Spoiler maxHeight={75}>
+                            <div className={styles.artistHeroDim} />
+                            <div className={styles.artistHeroOverlay}>
+                                {artistName && (
                                     <Text
-                                        className={styles.biography}
-                                        dangerouslySetInnerHTML={{ __html: sanitizedBiography }}
-                                    />
-                                </Spoiler>
-                            </>
-                        )}
-                    </Stack>
+                                        className={styles.artistHeroName}
+                                        component={Link}
+                                        fw={700}
+                                        to={artistRoute}
+                                    >
+                                        {artistName}
+                                    </Text>
+                                )}
+                                {stats && (
+                                    <Text className={styles.artistHeroStats} fw={700} size="sm">
+                                        {stats}
+                                    </Text>
+                                )}
+                                {sanitizedBiography && (
+                                    <>
+                                        <Text
+                                            className={clsx(styles.artistHeroBio, {
+                                                [styles.artistHeroBioExpanded]: bioExpanded,
+                                            })}
+                                            dangerouslySetInnerHTML={{ __html: sanitizedBiography }}
+                                            size="sm"
+                                        />
+                                        <Button
+                                            classNames={{ root: styles.artistHeroMore }}
+                                            onClick={() => setBioExpanded((open) => !open)}
+                                            size="compact-sm"
+                                            variant="transparent"
+                                        >
+                                            {bioExpanded
+                                                ? t('page.nowPlaying.showLess')
+                                                : t('page.nowPlaying.showMore')}
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                 )}
 
                 {genres.length > 0 && (
