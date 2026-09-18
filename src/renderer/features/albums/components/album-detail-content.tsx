@@ -3,7 +3,8 @@ import type {
     ItemListStateItemWithRequiredProperties,
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import isElectron from 'is-electron';
 import { ReactNode, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
@@ -501,11 +502,20 @@ export const AlbumDetailContent = () => {
     const detailQuery = useSuspenseQuery(
         albumQueries.detail({ query: { id: albumId }, serverId: server.id }),
     );
+    const showServerNotes = !isElectron() && server.type === ServerType.NAVIDROME;
+    const albumInfoQuery = useQuery(
+        albumQueries.info({
+            options: { enabled: showServerNotes },
+            query: { id: albumId },
+            serverId: server.id,
+        }),
+    );
 
     const { externalLinks, lastFM, listenBrainz, musicBrainz, nativeSpotify, qobuz, spotify } =
         useExternalLinks();
 
     const comment = detailQuery?.data?.comment;
+    const notes = albumInfoQuery.data?.notes;
 
     const releaseYear = detailQuery?.data?.releaseYear;
     const labels = detailQuery?.data?.recordLabels;
@@ -518,6 +528,11 @@ export const AlbumDetailContent = () => {
                 {comment && (
                     <Spoiler maxHeight={75}>
                         <Text pb="md">{replaceURLWithHTMLLinks(comment)}</Text>
+                    </Spoiler>
+                )}
+                {notes && (
+                    <Spoiler maxHeight={75}>
+                        <Text pb="md">{replaceURLWithHTMLLinks(notes)}</Text>
                     </Spoiler>
                 )}
                 <div className={styles.contentLayout}>

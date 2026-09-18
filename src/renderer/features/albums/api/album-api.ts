@@ -20,6 +20,19 @@ export const albumQueries = {
             ...args.options,
         });
     },
+    info: (args: QueryHookArgs<AlbumDetailQuery>) => {
+        return queryOptions({
+            enabled: Boolean(api.controller.getAlbumInfo),
+            queryFn: ({ signal }) => {
+                return api.controller.getAlbumInfo!({
+                    apiClientProps: { serverId: args.serverId, signal },
+                    query: args.query,
+                });
+            },
+            queryKey: queryKeys.albums.info(args.serverId, args.query),
+            ...args.options,
+        });
+    },
     list: (args: QueryHookArgs<AlbumListQuery>) => {
         return queryOptions({
             queryFn: ({ signal }) => {

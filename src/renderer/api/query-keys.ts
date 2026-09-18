@@ -170,6 +170,13 @@ export const queryKeys: Record<
 
             return [serverId, 'albums', 'infiniteList'] as const;
         },
+        info: (serverId: string, query?: AlbumDetailQuery) => {
+            if (query) {
+                return [serverId, 'albums', 'info', query] as const;
+            }
+
+            return [serverId, 'albums', 'info'] as const;
+        },
         list: (serverId: string, query?: AlbumListQuery, artistId?: string) => {
             const { filter, pagination } = splitPaginatedQuery(query);
 
