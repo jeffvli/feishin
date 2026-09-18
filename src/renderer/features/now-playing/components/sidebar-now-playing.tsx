@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
-import clsx from 'clsx';
-import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { MouseEvent, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router';
 
 import styles from './sidebar-now-playing.module.css';
 
+import cardStyles from '/@/renderer/components/item-card/item-card.module.css';
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import {
     JOINED_ARTISTS_MUTED_PROPS,
@@ -29,6 +29,7 @@ import { SEPARATOR_STRING } from '/@/shared/api/utils';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
+import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
 import { Text } from '/@/shared/components/text/text';
@@ -66,14 +67,9 @@ export const SidebarNowPlaying = () => {
     const genrePath = useGenreRoute();
     const { externalLinks, lastFM, listenBrainz, musicBrainz, nativeSpotify, qobuz, spotify } =
         useExternalLinks();
-    const [bioExpanded, setBioExpanded] = useState(false);
 
     const artist = song?.albumArtists?.[0] ?? song?.artists?.[0];
     const artistId = artist?.id;
-
-    useEffect(() => {
-        setBioExpanded(false);
-    }, [artistId, song?.id]);
 
     const detailQuery = useQuery({
         ...artistsQueries.albumArtistDetail({
@@ -131,6 +127,7 @@ export const SidebarNowPlaying = () => {
         Boolean(artistName) &&
         externalLinks &&
         (lastFM || listenBrainz || musicBrainz || qobuz || spotify);
+    const artistIsFavorite = Boolean(artistDetail?.userFavorite ?? artist?.userFavorite);
 
     const statsParts: string[] = [];
     if (artistDetail?.albumCount != null) {
@@ -188,8 +185,8 @@ export const SidebarNowPlaying = () => {
 
     return (
         <div className={styles.scroll}>
-            <div className={styles.stack}>
-                <div className={styles.trackArt}>
+            <Stack gap="md">
+                <div className={styles.image}>
                     <ItemImage
                         blurHash={song.blurHash}
                         enableDebounce={false}
@@ -206,15 +203,10 @@ export const SidebarNowPlaying = () => {
                 </div>
 
                 <Stack gap="xs">
-                    <Group align="flex-start" gap="xs" justify="space-between" wrap="nowrap">
-                        <TextTitle
-                            className={styles.trackTitle}
-                            fw={700}
-                            order={3}
-                            overflow="hidden"
-                        >
+                    <Group align="center" gap="xs" justify="space-between" wrap="nowrap">
+                        <Text className={styles.trackTitle} fw={500} overflow="hidden">
                             {song.name}
-                        </TextTitle>
+                        </Text>
                         <ActionIconGroup>
                             {showFavorites && (
                                 <ActionIcon
@@ -276,8 +268,8 @@ export const SidebarNowPlaying = () => {
                 </Stack>
 
                 {artistId && artistRoute && (
-                    <div className={styles.artistCard}>
-                        <div className={styles.artistHero}>
+                    <Stack gap="xs">
+                        <div className={styles.image}>
                             <ItemImage
                                 blurHash={artistDetail?.blurHash}
                                 enableDebounce={false}
@@ -289,51 +281,34 @@ export const SidebarNowPlaying = () => {
                                 thumbHash={artistDetail?.thumbHash}
                                 type="sidebar"
                             />
-                            {showFavorites &&
-                                (artistDetail?.userFavorite ?? artist?.userFavorite) && (
-                                    <div className={styles.artistFavoriteBadge} />
-                                )}
-                            <div className={styles.artistHeroDim} />
-                            <div className={styles.artistHeroOverlay}>
-                                {artistName && (
-                                    <Text
-                                        className={styles.artistHeroName}
-                                        component={Link}
-                                        fw={700}
-                                        to={artistRoute}
-                                    >
-                                        {artistName}
-                                    </Text>
-                                )}
-                                {stats && (
-                                    <Text className={styles.artistHeroStats} fw={700} size="sm">
-                                        {stats}
-                                    </Text>
-                                )}
-                                {sanitizedBiography && (
-                                    <>
-                                        <Text
-                                            className={clsx(styles.artistHeroBio, {
-                                                [styles.artistHeroBioExpanded]: bioExpanded,
-                                            })}
-                                            dangerouslySetInnerHTML={{ __html: sanitizedBiography }}
-                                            size="sm"
-                                        />
-                                        <Button
-                                            classNames={{ root: styles.artistHeroMore }}
-                                            onClick={() => setBioExpanded((open) => !open)}
-                                            size="compact-sm"
-                                            variant="transparent"
-                                        >
-                                            {bioExpanded
-                                                ? t('page.nowPlaying.showLess')
-                                                : t('page.nowPlaying.showMore')}
-                                        </Button>
-                                    </>
-                                )}
-                            </div>
+                            {showFavorites && artistIsFavorite && (
+                                <div className={cardStyles.favoriteBadge} />
+                            )}
                         </div>
-                    </div>
+                        <Text component={Link} fw={500} isLink overflow="hidden" to={artistRoute}>
+                            {artistName}
+                        </Text>
+                        {stats && (
+                            <Text isMuted size="md">
+                                {stats}
+                            </Text>
+                        )}
+                        {sanitizedBiography && (
+                            <>
+                                <TextTitle fw={700} order={3}>
+                                    {t('page.albumArtistDetail.about', {
+                                        artist: artistName,
+                                    })}
+                                </TextTitle>
+                                <Spoiler maxHeight={75}>
+                                    <Text
+                                        className={styles.biography}
+                                        dangerouslySetInnerHTML={{ __html: sanitizedBiography }}
+                                    />
+                                </Spoiler>
+                            </>
+                        )}
+                    </Stack>
                 )}
 
                 {genres.length > 0 && (
@@ -448,7 +423,7 @@ export const SidebarNowPlaying = () => {
                         title={t('page.albumArtistDetail.relatedArtists')}
                     />
                 )}
-            </div>
+            </Stack>
         </div>
     );
 };
