@@ -24,6 +24,7 @@ import { CellComponentProps } from 'react-window-v2';
 import styles from './item-table-list-column.module.css';
 
 import i18n from '/@/i18n/i18n';
+import { getColumnMinWidth } from '/@/renderer/components/item-list/helpers/apply-column-resize';
 import { useItemSelectionState } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { isNoHorizontalPaddingColumn } from '/@/renderer/components/item-list/item-detail-list/utils';
 import { ActionsColumn } from '/@/renderer/components/item-list/item-table-list/columns/actions-column';
@@ -769,27 +770,29 @@ export const TableColumnTextContainer = (
     const showHorizontalBorder = showHorizontalBorderFor(props, isLastRow);
     const showVerticalBorder =
         !!props.enableVerticalBorders && !isLastColumn && props.type !== TableColumn.ALBUM_GROUP;
+    const columnAlign = 'start' as 'center' | 'end' | 'start';
 
     const cell = (
         <div
             className={clsx(styles.container, props.containerClassName, {
+                [styles.allowOverflow]: props.type === TableColumn.ALBUM_GROUP,
                 [styles.alternateRowEven]:
                     props.enableAlternateRowColors && isDataRow && dataIndex % 2 === 0,
                 [styles.alternateRowOdd]:
                     props.enableAlternateRowColors && isDataRow && dataIndex % 2 === 1,
-                [styles.center]: props.columns[props.columnIndex].align === 'center',
+                [styles.center]: columnAlign === 'center',
                 [styles.compact]: props.size === 'compact',
                 [styles.dataRow]: isDataRow,
                 [styles.dragging]: isDataRow && isDragging,
                 [styles.large]: props.size === 'large',
-                [styles.left]: props.columns[props.columnIndex].align === 'start',
+                [styles.left]: columnAlign === 'start',
                 [styles.noHorizontalPadding]: isNoHorizontalPaddingColumn(props.type),
                 [styles.paddingLg]: props.cellPadding === 'lg',
                 [styles.paddingMd]: props.cellPadding === 'md',
                 [styles.paddingSm]: props.cellPadding === 'sm',
                 [styles.paddingXl]: props.cellPadding === 'xl',
                 [styles.paddingXs]: props.cellPadding === 'xs',
-                [styles.right]: props.columns[props.columnIndex].align === 'end',
+                [styles.right]: columnAlign === 'end',
                 [styles.rowHoverHighlightEnabled]: isDataRow && props.enableRowHoverHighlight,
                 [styles.rowSelected]: isDataRow && isSelected,
                 // When clamped, the bottom border is drawn on the spacer below
@@ -936,20 +939,22 @@ export const TableColumnContainer = (
     const showHorizontalBorder = showHorizontalBorderFor(props, isLastRow);
     const showVerticalBorder =
         !!props.enableVerticalBorders && !isLastColumn && props.type !== TableColumn.ALBUM_GROUP;
+    const columnAlign = 'start' as 'center' | 'end' | 'start';
 
     const cell = (
         <div
             className={clsx(styles.container, props.className, {
+                [styles.allowOverflow]: props.type === TableColumn.ALBUM_GROUP,
                 [styles.alternateRowEven]:
                     props.enableAlternateRowColors && isDataRow && dataIndex % 2 === 0,
                 [styles.alternateRowOdd]:
                     props.enableAlternateRowColors && isDataRow && dataIndex % 2 === 1,
-                [styles.center]: props.columns[props.columnIndex].align === 'center',
+                [styles.center]: columnAlign === 'center',
                 [styles.compact]: props.size === 'compact',
                 [styles.dataRow]: isDataRow,
                 [styles.dragging]: isDataRow && isDragging,
                 [styles.large]: props.size === 'large',
-                [styles.left]: props.columns[props.columnIndex].align === 'start',
+                [styles.left]: columnAlign === 'start',
                 [styles.noHorizontalPadding]: isNoHorizontalPaddingColumn(props.type),
                 [styles.noVerticalPadding]:
                     props.type === TableColumn.ALBUM_GROUP && (props.albumGroupImageSize ?? 0) > 0,
@@ -958,7 +963,7 @@ export const TableColumnContainer = (
                 [styles.paddingSm]: props.cellPadding === 'sm',
                 [styles.paddingXl]: props.cellPadding === 'xl',
                 [styles.paddingXs]: props.cellPadding === 'xs',
-                [styles.right]: props.columns[props.columnIndex].align === 'end',
+                [styles.right]: columnAlign === 'end',
                 [styles.rowHoverHighlightEnabled]:
                     isDataRow &&
                     props.enableRowHoverHighlight &&
@@ -1041,7 +1046,10 @@ const ColumnResizeHandle = ({
 
         const handleMouseMove = (event: MouseEvent) => {
             const deltaX = event.clientX - startXRef.current;
-            const newWidth = Math.min(Math.max(10, startWidthRef.current + deltaX), 1000);
+            const minWidth = getColumnMinWidth(columnId);
+            // left handle grows when dragged left; right handle grows when dragged right
+            const signed = side === 'left' ? -deltaX : deltaX;
+            const newWidth = Math.max(minWidth, startWidthRef.current + signed);
             finalWidthRef.current = newWidth;
             columnResizeLiveRef.current?.scheduleColumnResizePreview(columnIndex, newWidth);
         };
@@ -1066,7 +1074,7 @@ const ColumnResizeHandle = ({
             document.body.style.userSelect = '';
             columnResizeLiveRef.current?.clearColumnResizePreview();
         };
-    }, [isDragging, columnId, columnIndex]);
+    }, [isDragging, columnId, columnIndex, side]);
 
     const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
         if (disabled) {
@@ -1092,6 +1100,9 @@ const ColumnResizeHandle = ({
                 [styles.resizeHandleRight]: side === 'right',
             })}
             onMouseDown={handleMouseDown}
+            onPointerDown={(event) => {
+                event.stopPropagation();
+            }}
             ref={handleRef}
         />
     );
@@ -1108,6 +1119,13 @@ export const TableColumnHeaderContainer = (
     const columnConfig = props.columns[props.columnIndex];
     // Use the actual rendered width from style if available, otherwise fall back to config width
     const currentWidth = (props.style?.width as number | undefined) || columnConfig.width;
+
+    // last col's right edge is stuck to the table edge, so put its handle on the left instead
+    const hasColToTheRight = props.columns
+        .slice(props.columnIndex + 1)
+        .some((column) => column.id !== TableColumn.LAYOUT_FILL);
+    const resizeSide = hasColToTheRight ? 'right' : 'left';
+    const columnAlign = 'start' as 'center' | 'end' | 'start';
 
     const handleResize = (columnId: TableColumn, width: number) => {
         props.controls.onColumnResized?.({ columnId, width });
@@ -1150,9 +1168,11 @@ export const TableColumnHeaderContainer = (
                 },
                 onDragStart: () => {
                     setIsDragging(true);
+                    document.body.dataset.tableColumnDragging = '1';
                 },
                 onDrop: () => {
                     setIsDragging(false);
+                    delete document.body.dataset.tableColumnDragging;
                 },
                 onGenerateDragPreview: (data) => {
                     disableNativeDragPreview({ nativeSetDragImage: data.nativeSetDragImage });
@@ -1208,6 +1228,9 @@ export const TableColumnHeaderContainer = (
                     setIsDraggedOver(null);
                 },
             }),
+            () => {
+                delete document.body.dataset.tableColumnDragging;
+            },
         );
     }, [props.type, props.enableColumnReorder, props.controls, props.tableId]);
 
@@ -1229,22 +1252,21 @@ export const TableColumnHeaderContainer = (
         >
             <Text
                 className={clsx(styles.headerContent, props.className, {
-                    [styles.center]: props.columns[props.columnIndex].align === 'center',
-                    [styles.left]: props.columns[props.columnIndex].align === 'start',
-                    [styles.right]: props.columns[props.columnIndex].align === 'end',
+                    [styles.center]: columnAlign === 'center',
+                    [styles.left]: columnAlign === 'start',
+                    [styles.right]: columnAlign === 'end',
                 })}
                 isNoSelect
             >
                 {columnLabelMap[props.type]}
             </Text>
-            {props.enableColumnResize && (
+            {props.enableColumnResize && props.type !== TableColumn.LAYOUT_FILL && (
                 <ColumnResizeHandle
                     columnId={props.type}
                     columnIndex={props.columnIndex}
-                    disabled={!!columnConfig.autoSize}
                     initialWidth={currentWidth}
                     onResize={handleResize}
-                    side="right"
+                    side={resizeSide}
                 />
             )}
         </Flex>
@@ -1253,7 +1275,7 @@ export const TableColumnHeaderContainer = (
 
 export const columnLabelMap: Record<TableColumn, ReactNode | string> = {
     [TableColumn.ACTIONS]: (
-        <Flex className={styles.headerIconWrapper}>
+        <Flex className={clsx(styles.headerIconWrapper, styles.actionMatch)}>
             <Icon fill="default" icon="ellipsisHorizontal" />
         </Flex>
     ),
@@ -1348,12 +1370,12 @@ export const columnLabelMap: Record<TableColumn, ReactNode | string> = {
         </Flex>
     ),
     [TableColumn.USER_FAVORITE]: (
-        <Flex className={styles.headerIconWrapper}>
+        <Flex className={clsx(styles.headerIconWrapper, styles.actionMatch)}>
             <Icon icon="favorite" />
         </Flex>
     ),
     [TableColumn.USER_RATING]: (
-        <Flex className={styles.headerIconWrapper}>
+        <Flex className={clsx(styles.headerIconWrapper, styles.actionMatch)}>
             <Icon icon="star" />
         </Flex>
     ),

@@ -109,7 +109,7 @@ export const RowPlayControlCell = (
     return (
         <TableColumnTextContainer {...props} className={styles.fullSizeContent}>
             <RowPlayControlPopover content={<ItemRowPlayControls onPlay={onPlay} />}>
-                <Flex className={styles.indexContent} justify="center" w="100%">
+                <Flex className={styles.indexContent} justify="flex-start" w="100%">
                     {getIndexDisplay(false)}
                 </Flex>
             </RowPlayControlPopover>
