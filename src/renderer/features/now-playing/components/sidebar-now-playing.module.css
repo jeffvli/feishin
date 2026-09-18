@@ -104,6 +104,12 @@
     text-decoration: underline;
 }
 
+.artist-hero-stats-separator,
+.artist-hero-stats-secondary {
+    color: rgb(255 255 255 / 70%);
+    text-shadow: 0 1px 2px rgb(0 0 0 / 60%);
+}
+
 .artist-hero-bio {
     display: -webkit-box;
     overflow: hidden;

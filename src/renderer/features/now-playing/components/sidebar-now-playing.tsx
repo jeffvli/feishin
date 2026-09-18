@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import { Fragment, MouseEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router';
 
@@ -25,6 +25,7 @@ import {
     usePlayerSong,
     useShowFavorites,
 } from '/@/renderer/store';
+import { formatDurationString } from '/@/renderer/utils';
 import { sanitize } from '/@/renderer/utils/sanitize';
 import { SEPARATOR_STRING } from '/@/shared/api/utils';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
@@ -133,17 +134,32 @@ export const SidebarNowPlaying = () => {
         (lastFM || listenBrainz || musicBrainz || qobuz || spotify);
     const artistIsFavorite = Boolean(artistDetail?.userFavorite ?? artist?.userFavorite);
 
-    const statsParts: string[] = [];
-    if (artistDetail?.albumCount != null) {
-        statsParts.push(t('entity.albumWithCount', { count: artistDetail.albumCount }));
-    }
-    if (artistDetail?.songCount != null) {
-        statsParts.push(t('entity.trackWithCount', { count: artistDetail.songCount }));
-    }
-    if (artistDetail?.playCount != null) {
-        statsParts.push(t('page.nowPlaying.plays', { count: artistDetail.playCount }));
-    }
-    const stats = statsParts.join(SEPARATOR_STRING);
+    const albumCount = artistDetail?.albumCount;
+    const songCount = artistDetail?.songCount;
+    const duration = artistDetail?.duration;
+    const durationEnabled = duration !== null && duration !== undefined;
+
+    // Same metadata items / styling as album-artist-detail-header
+    const metadataItems = [
+        {
+            enabled: albumCount !== null && albumCount !== undefined,
+            id: 'albumCount',
+            secondary: false,
+            value: t('entity.albumWithCount', { count: albumCount || 0 }),
+        },
+        {
+            enabled: songCount !== null && songCount !== undefined,
+            id: 'songCount',
+            secondary: false,
+            value: t('entity.trackWithCount', { count: songCount || 0 }),
+        },
+        {
+            enabled: durationEnabled,
+            id: 'duration',
+            secondary: true,
+            value: durationEnabled ? formatDurationString(duration) : '',
+        },
+    ].filter((item) => item.enabled);
 
     const similarArtists = useMemo((): AlbumArtist[] => {
         const relatedArtists = artistInfo?.similarArtists ?? [];
@@ -305,10 +321,29 @@ export const SidebarNowPlaying = () => {
                                         {artistName}
                                     </Text>
                                 )}
-                                {stats && (
-                                    <Text className={styles.artistHeroStats} fw={700} size="sm">
-                                        {stats}
-                                    </Text>
+                                {metadataItems.length > 0 && (
+                                    <Group className={styles.artistHeroStats} gap="xs" wrap="wrap">
+                                        {metadataItems.map((item, index) => (
+                                            <Fragment key={`item-${item.id}-${index}`}>
+                                                {index > 0 && (
+                                                    <Text
+                                                        className={styles.artistHeroStatsSeparator}
+                                                        isNoSelect
+                                                    >
+                                                        {SEPARATOR_STRING}
+                                                    </Text>
+                                                )}
+                                                <Text
+                                                    className={clsx({
+                                                        [styles.artistHeroStatsSecondary]:
+                                                            item.secondary,
+                                                    })}
+                                                >
+                                                    {item.value}
+                                                </Text>
+                                            </Fragment>
+                                        ))}
+                                    </Group>
                                 )}
                                 {sanitizedBiography && (
                                     <>
