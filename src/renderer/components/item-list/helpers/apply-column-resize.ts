@@ -4,6 +4,7 @@ import { TableColumn } from '/@/shared/types/types';
 const MIN: Partial<Record<TableColumn, number>> = {
     [TableColumn.ACTIONS]: 24,
     [TableColumn.DURATION]: 52,
+    [TableColumn.LAYOUT_FILL]: 0,
     [TableColumn.ROW_INDEX]: 40,
     [TableColumn.TRACK_NUMBER]: 40,
     [TableColumn.USER_FAVORITE]: 24,
@@ -32,28 +33,43 @@ const steal = (
     return need;
 };
 
-// resize column i against its neighbors. keeps shoving the next col once
-// the current one is bottomed out. last col pushes left instead of right.
+const fillFirst = (columns: ItemTableListColumnConfig[], order: number[]) => {
+    const fill = order.find((j) => columns[j].id === TableColumn.LAYOUT_FILL);
+    if (fill === undefined) return order;
+    return [fill, ...order.filter((j) => j !== fill)];
+};
+
+// resize column i against its neighbors. last col pushes left instead of right.
+// growth keeps the requested width (the table can scroll past the pane).
 export const applyColumnResize = (
     columns: ItemTableListColumnConfig[],
     widths: number[],
     i: number,
     desired: number,
+    containerWidth?: number,
 ): number[] => {
     if (!isResizable(columns[i])) return widths;
 
     const toRight: number[] = [];
     for (let j = i + 1; j < columns.length; j += 1) {
-        if (isResizable(columns[j])) toRight.push(j);
+        if (isResizable(columns[j]) || columns[j]?.id === TableColumn.LAYOUT_FILL) {
+            toRight.push(j);
+        }
     }
 
     const toLeft: number[] = [];
     for (let j = i - 1; j >= 0; j -= 1) {
-        if (isResizable(columns[j])) toLeft.push(j);
+        if (isResizable(columns[j]) || columns[j]?.id === TableColumn.LAYOUT_FILL) {
+            toLeft.push(j);
+        }
     }
 
-    const push = toRight.length > 0 ? toRight : toLeft;
-    if (push.length === 0) return widths;
+    const push = fillFirst(columns, toRight.length > 0 ? toRight : toLeft);
+    if (push.length === 0) {
+        const next = widths.slice();
+        next[i] = Math.max(getColumnMinWidth(columns[i].id), Math.round(desired));
+        return fitUnpinned(columns, next, i, containerWidth);
+    }
 
     const delta = Math.round(desired) - widths[i];
     if (delta === 0) return widths;
@@ -63,22 +79,34 @@ export const applyColumnResize = (
     const sink = push[0];
 
     if (delta > 0) {
-        const leftover = steal(columns, next, push, delta);
-        next[i] = widths[i] + (delta - leftover);
+        steal(columns, next, push, delta);
+        next[i] = Math.max(minI, Math.round(desired));
+        return fitUnpinned(columns, next, i, containerWidth);
+    }
+
+    next[i] = Math.max(minI, Math.round(desired));
+    next[sink] += widths[i] - next[i];
+    return next;
+};
+
+const fitUnpinned = (
+    columns: ItemTableListColumnConfig[],
+    next: number[],
+    i: number,
+    containerWidth: number | undefined,
+) => {
+    if (!containerWidth || containerWidth <= 0 || (columns[i].pinned ?? null) !== null) {
         return next;
     }
 
-    let need = -delta;
-    const shrinkI = Math.min(need, widths[i] - minI);
-    next[i] = widths[i] - shrinkI;
-    next[sink] += shrinkI;
-    need -= shrinkI;
-
-    if (need > 0) {
-        const further = toRight.length > 0 ? toLeft : push.slice(1);
-        const leftover = steal(columns, next, further, need);
-        next[sink] += need - leftover;
+    let total = 0;
+    for (let j = 0; j < next.length; j += 1) {
+        if ((columns[j].pinned ?? null) === null) total += next[j];
     }
 
+    const overflow = Math.round(total - containerWidth);
+    if (overflow > 0) {
+        next[i] = Math.max(getColumnMinWidth(columns[i].id), next[i] - overflow);
+    }
     return next;
 };

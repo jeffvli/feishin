@@ -88,24 +88,6 @@ export interface ItemTableListInnerColumn extends ItemTableListColumn {
     type: TableColumn;
 }
 
-// narrow cols hug the drag bar instead of floating in center
-const getColumnAlign = (
-    type: TableColumn,
-    align: 'center' | 'end' | 'start' | undefined,
-): 'center' | 'end' | 'start' => {
-    if (
-        type === TableColumn.ACTIONS ||
-        type === TableColumn.DURATION ||
-        type === TableColumn.ROW_INDEX ||
-        type === TableColumn.TRACK_NUMBER ||
-        type === TableColumn.USER_FAVORITE ||
-        type === TableColumn.USER_RATING
-    ) {
-        return 'start';
-    }
-    return align ?? 'start';
-};
-
 const ItemTableListColumnBase = (props: ItemTableListColumn) => {
     const type = props.columnType ?? (props.columns[props.columnIndex].id as TableColumn);
 
@@ -788,7 +770,7 @@ export const TableColumnTextContainer = (
     const showHorizontalBorder = showHorizontalBorderFor(props, isLastRow);
     const showVerticalBorder =
         !!props.enableVerticalBorders && !isLastColumn && props.type !== TableColumn.ALBUM_GROUP;
-    const columnAlign = getColumnAlign(props.type, props.columns[props.columnIndex].align);
+    const columnAlign = 'start' as const;
 
     const cell = (
         <div
@@ -957,7 +939,7 @@ export const TableColumnContainer = (
     const showHorizontalBorder = showHorizontalBorderFor(props, isLastRow);
     const showVerticalBorder =
         !!props.enableVerticalBorders && !isLastColumn && props.type !== TableColumn.ALBUM_GROUP;
-    const columnAlign = getColumnAlign(props.type, props.columns[props.columnIndex].align);
+    const columnAlign = 'start' as const;
 
     const cell = (
         <div
@@ -1067,7 +1049,7 @@ const ColumnResizeHandle = ({
             const minWidth = getColumnMinWidth(columnId);
             // left handle grows when dragged left; right handle grows when dragged right
             const signed = side === 'left' ? -deltaX : deltaX;
-            const newWidth = Math.min(Math.max(minWidth, startWidthRef.current + signed), 1000);
+            const newWidth = Math.max(minWidth, startWidthRef.current + signed);
             finalWidthRef.current = newWidth;
             columnResizeLiveRef.current?.scheduleColumnResizePreview(columnIndex, newWidth);
         };
@@ -1118,6 +1100,9 @@ const ColumnResizeHandle = ({
                 [styles.resizeHandleRight]: side === 'right',
             })}
             onMouseDown={handleMouseDown}
+            onPointerDown={(event) => {
+                event.stopPropagation();
+            }}
             ref={handleRef}
         />
     );
@@ -1140,7 +1125,7 @@ export const TableColumnHeaderContainer = (
         .slice(props.columnIndex + 1)
         .some((column) => column.id !== TableColumn.LAYOUT_FILL);
     const resizeSide = hasColToTheRight ? 'right' : 'left';
-    const columnAlign = getColumnAlign(props.type, columnConfig.align);
+    const columnAlign = 'start' as const;
 
     const handleResize = (columnId: TableColumn, width: number) => {
         props.controls.onColumnResized?.({ columnId, width });
@@ -1183,9 +1168,11 @@ export const TableColumnHeaderContainer = (
                 },
                 onDragStart: () => {
                     setIsDragging(true);
+                    document.body.dataset.tableColumnDragging = '1';
                 },
                 onDrop: () => {
                     setIsDragging(false);
+                    delete document.body.dataset.tableColumnDragging;
                 },
                 onGenerateDragPreview: (data) => {
                     disableNativeDragPreview({ nativeSetDragImage: data.nativeSetDragImage });
@@ -1241,6 +1228,9 @@ export const TableColumnHeaderContainer = (
                     setIsDraggedOver(null);
                 },
             }),
+            () => {
+                delete document.body.dataset.tableColumnDragging;
+            },
         );
     }, [props.type, props.enableColumnReorder, props.controls, props.tableId]);
 

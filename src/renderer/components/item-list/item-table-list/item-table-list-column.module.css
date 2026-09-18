@@ -367,6 +367,11 @@
     transition: opacity 0.3s ease;
 }
 
+/* Resize grips sit on column edges and steal leftward reorder drops. */
+:global(body[data-table-column-dragging='1']) .resize-handle {
+    pointer-events: none;
+}
+
 .resize-handle::before {
     position: absolute;
     top: 0;

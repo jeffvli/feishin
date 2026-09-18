@@ -838,7 +838,11 @@ interface ItemTableListProps {
         columnIdTo: TableColumn,
         edge: 'bottom' | 'left' | 'right' | 'top' | null,
     ) => void;
-    onColumnResized?: (columnId: TableColumn, width: number) => void;
+    onColumnResized?: (
+        columnId: TableColumn,
+        width: number,
+        widths?: Partial<Record<TableColumn, number>>,
+    ) => void;
     onRangeChanged?: (range: { startIndex: number; stopIndex: number }) => void;
     onScrollEnd?: (offset: number, internalState: ItemListStateActions) => void;
     overrideControls?: Partial<ItemControls>;
@@ -1357,8 +1361,14 @@ const BaseItemTableList = ({
             return calculatedColumnWidths;
         }
 
-        return applyColumnResize(parsedColumns, calculatedColumnWidths, columnIndex, width);
-    }, [calculatedColumnWidths, columnResizePreview, parsedColumns]);
+        return applyColumnResize(
+            parsedColumns,
+            calculatedColumnWidths,
+            columnIndex,
+            width,
+            centerContainerWidth,
+        );
+    }, [calculatedColumnWidths, centerContainerWidth, columnResizePreview, parsedColumns]);
 
     const playerContext = usePlayer();
 
@@ -1714,14 +1724,17 @@ const BaseItemTableList = ({
                 calculatedColumnWidths,
                 resizedIndex,
                 width,
+                centerContainerWidth,
             );
 
+            const widths: Partial<Record<TableColumn, number>> = {};
             parsedColumns.forEach((column, index) => {
-                if (nextWidths[index] === calculatedColumnWidths[index]) return;
-                onColumnResized(column.id, nextWidths[index]);
+                if (column.id === TableColumn.LAYOUT_FILL) return;
+                widths[column.id] = nextWidths[index];
             });
+            onColumnResized(columnId, widths[columnId] ?? width, widths);
         },
-        [calculatedColumnWidths, onColumnResized, parsedColumns],
+        [calculatedColumnWidths, centerContainerWidth, onColumnResized, parsedColumns],
     );
 
     const controls = useDefaultItemListControls({
