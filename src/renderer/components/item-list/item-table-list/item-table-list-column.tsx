@@ -770,7 +770,7 @@ export const TableColumnTextContainer = (
     const showHorizontalBorder = showHorizontalBorderFor(props, isLastRow);
     const showVerticalBorder =
         !!props.enableVerticalBorders && !isLastColumn && props.type !== TableColumn.ALBUM_GROUP;
-    const columnAlign = 'start' as const;
+    const columnAlign = 'start' as 'center' | 'end' | 'start';
 
     const cell = (
         <div
@@ -939,7 +939,7 @@ export const TableColumnContainer = (
     const showHorizontalBorder = showHorizontalBorderFor(props, isLastRow);
     const showVerticalBorder =
         !!props.enableVerticalBorders && !isLastColumn && props.type !== TableColumn.ALBUM_GROUP;
-    const columnAlign = 'start' as const;
+    const columnAlign = 'start' as 'center' | 'end' | 'start';
 
     const cell = (
         <div
@@ -1125,7 +1125,7 @@ export const TableColumnHeaderContainer = (
         .slice(props.columnIndex + 1)
         .some((column) => column.id !== TableColumn.LAYOUT_FILL);
     const resizeSide = hasColToTheRight ? 'right' : 'left';
-    const columnAlign = 'start' as const;
+    const columnAlign = 'start' as 'center' | 'end' | 'start';
 
     const handleResize = (columnId: TableColumn, width: number) => {
         props.controls.onColumnResized?.({ columnId, width });
