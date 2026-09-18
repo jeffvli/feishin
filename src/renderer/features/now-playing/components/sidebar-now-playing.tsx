@@ -15,7 +15,6 @@ import {
 import { artistsQueries } from '/@/renderer/features/artists/api/artists-api';
 import { AlbumArtistGridCarousel } from '/@/renderer/features/artists/components/album-artist-grid-carousel';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
-import { calculateTitleSize } from '/@/renderer/features/shared/components/library-header';
 import { useSetFavorite } from '/@/renderer/features/shared/hooks/use-set-favorite';
 import { useGenreRoute } from '/@/renderer/hooks/use-genre-route';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -33,6 +32,7 @@ import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/ac
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Stack } from '/@/shared/components/stack/stack';
+import { TextTitle } from '/@/shared/components/text-title/text-title';
 import { Text } from '/@/shared/components/text/text';
 import { AlbumArtist, LibraryItem, ServerType } from '/@/shared/types/domain-types';
 
@@ -225,12 +225,14 @@ export const SidebarNowPlaying = () => {
 
                 <Stack gap="xs">
                     <Group align="flex-start" gap="xs" justify="space-between" wrap="nowrap">
-                        <h1
+                        <TextTitle
                             className={styles.trackTitle}
-                            style={{ fontSize: calculateTitleSize(song.name) }}
+                            fw={700}
+                            order={2}
+                            overflow="hidden"
                         >
                             {song.name}
-                        </h1>
+                        </TextTitle>
                         <ActionIconGroup>
                             {showFavorites && (
                                 <ActionIcon

@@ -38,13 +38,6 @@
 .track-title {
     flex: 1;
     min-width: 0;
-    margin: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: 800;
-    line-height: 1.2;
-    word-break: keep-all;
-    text-wrap: pretty;
 }
 
 .artist-card {
