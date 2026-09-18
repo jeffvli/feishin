@@ -1993,21 +1993,33 @@ export const SubsonicController: InternalControllerEndpoint = {
             const directPlayProfiles = getDirectPlayProfiles();
             const transcodingProfiles = getDefaultTranscodingProfiles();
 
-            const transcodeDecision = await ssApiClient(apiClientProps).getTranscodeDecision({
-                body: {
-                    codecProfiles: [],
-                    directPlayProfiles,
-                    maxAudioBitrate: 0,
-                    maxTranscodingAudioBitrate,
-                    name: 'Feishin',
-                    platform: navigator.userAgent,
-                    transcodingProfiles,
-                },
-                query: {
-                    mediaId: id,
-                    mediaType,
-                },
-            });
+            const transcodeDecision = await ssApiClient(apiClientProps)
+                .getTranscodeDecision({
+                    body: {
+                        codecProfiles: [],
+                        directPlayProfiles,
+                        maxAudioBitrate: 0,
+                        maxTranscodingAudioBitrate,
+                        name: 'Feishin',
+                        platform: navigator.userAgent,
+                        transcodingProfiles,
+                    },
+                    query: {
+                        mediaId: id,
+                        mediaType,
+                    },
+                })
+                .catch((error: unknown) => {
+                    logger.warn(
+                        `Failed to request a transcode decision for song ${id}, falling back to direct stream`,
+                        { error },
+                    );
+                    return null;
+                });
+
+            if (!transcodeDecision) {
+                return streamUrl;
+            }
 
             // If the server returns an error for transcodeDecision, fall back to direct stream so that we don't break the player
             if (transcodeDecision.status !== 200) {
