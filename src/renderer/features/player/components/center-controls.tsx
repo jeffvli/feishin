@@ -70,7 +70,7 @@ export const CenterControls = () => {
     );
 };
 
-const RadioCenterPlayButton = ({ disabled }: { disabled?: boolean }) => {
+export const RadioCenterPlayButton = ({ disabled }: { disabled?: boolean }) => {
     const { currentStreamUrl } = useRadioPlayer();
     const isPlayingRadio = useIsPlayingRadio();
     const { pause, play } = useRadioControls();
@@ -156,7 +156,7 @@ const ShuffleButton = ({ disabled }: { disabled?: boolean }) => {
     );
 };
 
-const PreviousButton = ({ disabled }: { disabled?: boolean }) => {
+export const PreviousButton = ({ disabled }: { disabled?: boolean }) => {
     const { t } = useTranslation();
     const buttonSize = useButtonSize();
     const { mediaPrevious } = usePlayer();
@@ -205,7 +205,7 @@ const SkipBackwardButton = ({ disabled }: { disabled?: boolean }) => {
     );
 };
 
-const CenterPlayButton = ({ disabled }: { disabled?: boolean }) => {
+export const CenterPlayButton = ({ disabled }: { disabled?: boolean }) => {
     const { id: currentSongId } = usePlayerSongProperties(['id']) ?? {};
 
     const status = usePlayerStatus();
@@ -241,7 +241,7 @@ const SkipForwardButton = ({ disabled }: { disabled?: boolean }) => {
     );
 };
 
-const NextButton = ({ disabled }: { disabled?: boolean }) => {
+export const NextButton = ({ disabled }: { disabled?: boolean }) => {
     const { t } = useTranslation();
     const buttonSize = useButtonSize();
     const { mediaNext } = usePlayer();

@@ -40,7 +40,10 @@ import { disableAutoUpdates, isLinux, isMacOS, isWindows } from '/@/main/env';
 import {
     clampWindowBoundsToDisplay,
     DEFAULT_WINDOW_BOUNDS,
+    MINI_PLAYER_MIN_SIZE,
+    resolveMiniPlayerBounds,
     resolveWindowBounds,
+    WINDOW_MIN_SIZE,
 } from '/@/main/utils/window-bounds';
 import { PlayerRepeat, PlayerStatus, PlayerType, TitleTheme } from '/@/shared/types/types';
 
@@ -377,6 +380,8 @@ app.on('before-quit', () => {
 });
 let playbackMenuAccelerators: MenuPlaybackState['accelerators'] = {};
 let inputFocused = false;
+// Full-mode window state saved while the mini player is active, null otherwise
+let miniPlayerRestore: null | { bounds: Rectangle; maximized: boolean } = null;
 
 ipcMain.on('input-focus-state', (_event, focused: boolean) => {
     const next = !!focused;
@@ -661,8 +666,8 @@ async function createWindow(first = true): Promise<void> {
         autoHideMenuBar: true,
         frame: false,
         icon: isWindows() ? getAssetPath('icons/icon.ico') : getAssetPath('icons/icon.png'),
-        minHeight: 120,
-        minWidth: 480,
+        minHeight: WINDOW_MIN_SIZE.height,
+        minWidth: WINDOW_MIN_SIZE.width,
         show: false,
         webPreferences: {
             allowRunningInsecureContent: !!store.get('ignore_ssl'),
@@ -715,6 +720,94 @@ async function createWindow(first = true): Promise<void> {
         shutdownServer();
         mainWindow?.close();
         app.exit();
+    });
+
+    const enterMiniPlayer = (alwaysOnTop: boolean) => {
+        if (!mainWindow || miniPlayerRestore) return;
+
+        if (mainWindow.isFullScreen()) {
+            mainWindow.once('leave-full-screen', () => enterMiniPlayer(alwaysOnTop));
+            mainWindow.setFullScreen(false);
+            return;
+        }
+
+        miniPlayerRestore = {
+            bounds: mainWindow.getNormalBounds(),
+            maximized: mainWindow.isMaximized(),
+        };
+
+        const savedMiniBounds = store.get('mini_player_bounds') as Rectangle | undefined;
+        const display =
+            savedMiniBounds &&
+            Number.isFinite(savedMiniBounds.x) &&
+            Number.isFinite(savedMiniBounds.y)
+                ? screen.getDisplayMatching(savedMiniBounds)
+                : screen.getDisplayMatching(miniPlayerRestore.bounds);
+
+        const applyMiniBounds = () => {
+            mainWindow?.setMinimumSize(MINI_PLAYER_MIN_SIZE.width, MINI_PLAYER_MIN_SIZE.height);
+            mainWindow?.setBounds(resolveMiniPlayerBounds(savedMiniBounds, display.workArea));
+            mainWindow?.setAlwaysOnTop(alwaysOnTop);
+            // Maximizing the mini player would clobber its saved size
+            mainWindow?.setMaximizable(false);
+            mainWindow?.setFullScreenable(false);
+        };
+
+        // Unmaximizing is animated on macOS and would override bounds set right away
+        if (miniPlayerRestore.maximized) {
+            mainWindow.once('unmaximize', applyMiniBounds);
+            mainWindow.unmaximize();
+        } else {
+            applyMiniBounds();
+        }
+    };
+
+    const saveMiniPlayerBounds = () => {
+        if (!mainWindow || !miniPlayerRestore) return;
+
+        const miniBounds = mainWindow.getNormalBounds();
+        store.set(
+            'mini_player_bounds',
+            clampWindowBoundsToDisplay(miniBounds, screen.getDisplayMatching(miniBounds).workArea),
+        );
+    };
+
+    const exitMiniPlayer = () => {
+        if (!mainWindow || !miniPlayerRestore) return;
+
+        saveMiniPlayerBounds();
+
+        const { bounds, maximized } = miniPlayerRestore;
+        miniPlayerRestore = null;
+
+        mainWindow.setAlwaysOnTop(false);
+        mainWindow.setMaximizable(true);
+        mainWindow.setFullScreenable(true);
+        mainWindow.setMinimumSize(WINDOW_MIN_SIZE.width, WINDOW_MIN_SIZE.height);
+
+        const restoreFullBounds = () => {
+            mainWindow?.setBounds(bounds);
+
+            if (maximized) {
+                mainWindow?.maximize();
+            }
+        };
+
+        // The window manager can still maximize the mini player (e.g. Win+Up)
+        if (mainWindow.isMaximized()) {
+            mainWindow.once('unmaximize', restoreFullBounds);
+            mainWindow.unmaximize();
+        } else {
+            restoreFullBounds();
+        }
+    };
+
+    ipcMain.on('window-mini-player', (_event, enabled: boolean, alwaysOnTop: boolean) => {
+        if (enabled) {
+            enterMiniPlayer(alwaysOnTop);
+        } else {
+            exitMiniPlayer();
+        }
     });
 
     ipcMain.handle('window-clear-cache', async () => {
@@ -817,6 +910,7 @@ async function createWindow(first = true): Promise<void> {
 
     mainWindow.on('closed', () => {
         log.info('Main window closed');
+        miniPlayerRestore = null;
         ipcMain.removeHandler('window-clear-cache');
         ipcMain.removeHandler('app-check-for-updates');
         mainWindow = null;
@@ -824,13 +918,16 @@ async function createWindow(first = true): Promise<void> {
 
     mainWindow.on('close', (event) => {
         if (mainWindow) {
-            const bounds = mainWindow.getNormalBounds();
+            // In mini player mode, persist the full-mode state so the next launch
+            // doesn't open as a tiny window
+            saveMiniPlayerBounds();
+            const bounds = miniPlayerRestore?.bounds ?? mainWindow.getNormalBounds();
             store.set(
                 'bounds',
                 clampWindowBoundsToDisplay(bounds, screen.getDisplayMatching(bounds).workArea),
             );
-            store.set('maximized', mainWindow.isMaximized());
-            store.set('fullscreen', mainWindow.isFullScreen());
+            store.set('maximized', miniPlayerRestore?.maximized ?? mainWindow.isMaximized());
+            store.set('fullscreen', !miniPlayerRestore && mainWindow.isFullScreen());
         }
 
         if (!exitFromTray && store.get('window_exit_to_tray')) {
