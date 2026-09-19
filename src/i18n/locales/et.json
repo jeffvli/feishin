@@ -52,7 +52,7 @@
         "action_other": "Toimingud",
         "add": "Lisa",
         "additionalParticipants": "Teised osalejad",
-        "newVersion": "Uus versioon on paigaldatud ({{version}})",
+        "newVersion": "Paigaldati uus versioon ({{version}})",
         "viewReleaseNotes": "Kuva väljalaskemärkmed",
         "albumGain": "Albumi võimendus",
         "albumPeak": "Albumi tippnivoo",
