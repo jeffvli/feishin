@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import styles from './play-queue.module.css';
 
@@ -26,9 +27,11 @@ import {
     usePlayerActions,
     usePlayerSong,
     usePlayerStore,
+    useSettingsStore,
 } from '/@/renderer/store';
 import { Flex } from '/@/shared/components/flex/flex';
 import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
+import { Text } from '/@/shared/components/text/text';
 import { useDebouncedValue } from '/@/shared/hooks/use-debounced-value';
 import { useFocusWithin } from '/@/shared/hooks/use-focus-within';
 import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
@@ -44,7 +47,9 @@ type QueueProps = {
 
 export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(
     ({ enableScrollShadow = true, listKey, searchTerm }, ref) => {
+        const { t } = useTranslation();
         const { table } = useListSettings(listKey) || {};
+        const upNextQueueEnabled = useSettingsStore((state) => state.general.upNextQueue);
 
         const isFetching = useIsPlayerFetching();
         const tableRef = useRef<ItemListHandle>(null);
@@ -55,7 +60,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(
         const [debouncedSearchTerm] = useDebouncedValue(searchTerm, 200);
 
         const [data, setData] = useState<QueueSong[]>([]);
-        const [groups, setGroups] = useState<TableGroupHeader[]>([]);
+        const [upNextIds, setUpNextIds] = useState<string[]>([]);
 
         useEffect(() => {
             const setQueue = () => {
@@ -63,7 +68,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(
 
                 setData(queue.items);
 
-                setGroups([]);
+                setUpNextIds(usePlayerStore.getState().queue.priority);
             };
 
             const unsub = subscribePlayerQueue(() => {
@@ -140,6 +145,43 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(
 
         const isEmpty = filteredData.length === 0;
 
+        // Label the Up Next songs, which always sit directly after the current song
+        const groups: TableGroupHeader[] | undefined = useMemo(() => {
+            if (!upNextQueueEnabled || debouncedSearchTerm || upNextIds.length === 0) {
+                return undefined;
+            }
+
+            const start = data.findIndex((item) => item._uniqueId === upNextIds[0]);
+            if (start === -1) return undefined;
+
+            const sections = [
+                { count: start, label: t('player.queueSection_queue') },
+                { count: upNextIds.length, label: t('player.queueSection_upNext') },
+                {
+                    count: data.length - start - upNextIds.length,
+                    label: t('player.queueSection_later'),
+                },
+            ].filter((section) => section.count > 0);
+
+            return sections.map(({ count, label }) => ({
+                itemCount: count,
+                render: () => (
+                    <div className={styles.groupRow}>
+                        <Text
+                            fw={600}
+                            isMuted
+                            isNoSelect
+                            overflow="visible"
+                            size="sm"
+                            style={{ whiteSpace: 'nowrap' }}
+                        >
+                            {label}
+                        </Text>
+                    </div>
+                ),
+            }));
+        }, [data, debouncedSearchTerm, t, upNextIds, upNextQueueEnabled]);
+
         const { handleColumnReordered } = useItemListColumnReorder({
             itemListKey: listKey,
         });
@@ -194,7 +236,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(
                     enableSelectionDialog={false}
                     enableVerticalBorders={table.enableVerticalBorders}
                     getRowId="_uniqueId"
-                    groups={groups.length > 0 ? groups : undefined}
+                    groups={groups}
                     initialTop={{
                         to: 0,
                         type: 'offset',
