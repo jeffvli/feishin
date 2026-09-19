@@ -213,14 +213,14 @@ export const ServerSelectorItems = () => {
                             {t('page.appMenu.rescanLibrary')}
                         </DropdownMenu.Item>
                     )}
-                    <DropdownMenu.Item
-                        leftSection={<Icon color="error" icon="signOut" />}
-                        onClick={handleLogout}
-                    >
-                        {t('page.appMenu.logout')}
-                    </DropdownMenu.Item>
                 </>
             )}
+            <DropdownMenu.Item
+                leftSection={<Icon color="error" icon="signOut" />}
+                onClick={handleLogout}
+            >
+                {t('page.appMenu.logout')}
+            </DropdownMenu.Item>
             {!isServerLock() && <></>}
             {musicFolders && musicFolders.items.length > 0 && (
                 <>
