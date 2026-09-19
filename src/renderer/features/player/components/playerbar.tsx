@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { lazy, MouseEvent, Suspense } from 'react';
+import { lazy, MouseEvent, Suspense, useRef } from 'react';
 
 import styles from './playerbar.module.css';
 
@@ -24,8 +24,11 @@ export const Playerbar = () => {
     const setFullScreenPlayerStore = useSetFullScreenPlayerStore();
     const isMobile = useIsMobile();
 
+    const mouseDownTarget = useRef<EventTarget | null>(null);
+
     const handleToggleFullScreenPlayer = (e?: KeyboardEvent | MouseEvent<HTMLDivElement>) => {
         e?.stopPropagation();
+        if (e && e.target !== mouseDownTarget.current) return;
         setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
     };
 
@@ -41,6 +44,9 @@ export const Playerbar = () => {
         <div
             className={clsx(styles.container, PlaybackSelectors.mediaPlayer)}
             onClick={playerbarOpenDrawer ? handleToggleFullScreenPlayer : undefined}
+            onMouseDownCapture={(e) => {
+                mouseDownTarget.current = e.target;
+            }}
         >
             <div className={styles.controlsGrid}>
                 <div className={styles.leftGridItem}>
