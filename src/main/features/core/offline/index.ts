@@ -2,6 +2,9 @@ import type {
     OfflineDownloadRequest,
     OfflineEntry,
     OfflinePlaybackSource,
+    OfflinePlaylist,
+    OfflinePlaylistSyncRequest,
+    OfflinePlaylistSyncResult,
 } from '/@/shared/types/offline';
 
 import { app, ipcMain, net } from 'electron';
@@ -16,16 +19,34 @@ import log from '/@/main/logger';
 
 type OfflineManifest = {
     entries: Record<string, OfflineEntry>;
+    playlists: Record<string, OfflinePlaylist>;
+    version: 2;
+};
+
+type OfflineManifestV1 = {
+    entries: Record<string, Omit<OfflineEntry, 'fingerprint' | 'manual' | 'playlistIds'>>;
     version: 1;
 };
 
-const EMPTY_MANIFEST: OfflineManifest = { entries: {}, version: 1 };
+const EMPTY_MANIFEST: OfflineManifest = { entries: {}, playlists: {}, version: 2 };
 let manifestUpdate = Promise.resolve();
 
 const getOfflineRoot = () => path.join(app.getPath('userData'), 'offline');
 const getManifestPath = () => path.join(getOfflineRoot(), 'manifest.json');
 const getEntryKey = (serverId: string, songId: string) => `${serverId}:${songId}`;
+const getPlaylistKey = (serverId: string, playlistId: string) => `${serverId}:${playlistId}`;
 const hashPart = (value: string) => createHash('sha256').update(value).digest('hex');
+
+const getFingerprint = (song: OfflineDownloadRequest['song']) =>
+    JSON.stringify([
+        song.updatedAt,
+        song.size,
+        song.duration,
+        song.bitRate,
+        song.codec,
+        song.container,
+        song.sampleRate,
+    ]);
 
 const resolveEntryPath = (fileName: string) => {
     const root = path.resolve(getOfflineRoot());
@@ -50,13 +71,31 @@ const getExtension = (request: OfflineDownloadRequest) => {
 const readManifest = async (): Promise<OfflineManifest> => {
     try {
         const contents = await fs.readFile(getManifestPath(), 'utf8');
-        const parsed = JSON.parse(contents) as OfflineManifest;
-        return parsed.version === 1 && parsed.entries ? parsed : EMPTY_MANIFEST;
+        const parsed = JSON.parse(contents) as OfflineManifest | OfflineManifestV1;
+        if (parsed.version === 2 && parsed.entries && parsed.playlists) return parsed;
+        if (parsed.version === 1 && parsed.entries) {
+            return {
+                entries: Object.fromEntries(
+                    Object.entries(parsed.entries).map(([key, entry]) => [
+                        key,
+                        {
+                            ...entry,
+                            fingerprint: getFingerprint(entry.song),
+                            manual: true,
+                            playlistIds: [],
+                        },
+                    ]),
+                ),
+                playlists: {},
+                version: 2,
+            };
+        }
+        return { ...EMPTY_MANIFEST, entries: {}, playlists: {} };
     } catch (error) {
         if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
             log.warn('Failed to read offline manifest; starting with an empty manifest', error);
         }
-        return { ...EMPTY_MANIFEST, entries: {} };
+        return { ...EMPTY_MANIFEST, entries: {}, playlists: {} };
     }
 };
 
@@ -105,7 +144,10 @@ export const resolveOfflineSource = async (
     return { filePath, url: url.toString() };
 };
 
-const download = async (request: OfflineDownloadRequest): Promise<OfflineEntry> => {
+const download = async (
+    request: OfflineDownloadRequest,
+    ownership: { manual?: boolean; playlistId?: string } = { manual: true },
+): Promise<OfflineEntry> => {
     const serverDirectory = hashPart(request.song._serverId);
     const relativeFileName = path.join(
         serverDirectory,
@@ -130,14 +172,27 @@ const download = async (request: OfflineDownloadRequest): Promise<OfflineEntry> 
         await fs.rename(temporaryPath, destinationPath);
 
         const stat = await fs.stat(destinationPath);
-        const entry: OfflineEntry = {
-            downloadedAt: new Date().toISOString(),
-            fileName: relativeFileName,
-            size: stat.size,
-            song: { ...request.song, imageUrl: null },
-        };
-        await updateManifest((manifest) => {
-            manifest.entries[getEntryKey(request.song._serverId, request.song.id)] = entry;
+        const entry = await updateManifest(async (manifest): Promise<OfflineEntry> => {
+            const key = getEntryKey(request.song._serverId, request.song.id);
+            const existing = manifest.entries[key];
+            if (existing && existing.fileName !== relativeFileName) {
+                const previousPath = resolveEntryPath(existing.fileName);
+                if (previousPath) await fs.rm(previousPath, { force: true });
+            }
+            const playlistIds = new Set(existing?.playlistIds ?? []);
+            if (ownership.playlistId) playlistIds.add(ownership.playlistId);
+
+            const nextEntry: OfflineEntry = {
+                downloadedAt: new Date().toISOString(),
+                fileName: relativeFileName,
+                fingerprint: getFingerprint(request.song),
+                manual: Boolean(ownership.manual || existing?.manual),
+                playlistIds: [...playlistIds],
+                size: stat.size,
+                song: { ...request.song, imageUrl: null },
+            };
+            manifest.entries[key] = nextEntry;
+            return nextEntry;
         });
         return entry;
     } catch (error) {
@@ -160,8 +215,105 @@ const remove = async (serverId: string, songId: string): Promise<boolean> => {
         const filePath = resolveEntryPath(entry.fileName);
         if (filePath) await fs.rm(filePath, { force: true });
         delete manifest.entries[key];
+        for (const playlist of Object.values(manifest.playlists)) {
+            if (playlist.serverId === serverId) {
+                playlist.songIds = playlist.songIds.filter((id) => id !== songId);
+            }
+        }
         return true;
     });
+};
+
+const removePlaylist = async (serverId: string, playlistId: string): Promise<number> => {
+    return updateManifest(async (manifest) => {
+        const key = getPlaylistKey(serverId, playlistId);
+        if (!manifest.playlists[key]) return 0;
+
+        let removed = 0;
+        for (const [entryKey, entry] of Object.entries(manifest.entries)) {
+            if (entry.song._serverId !== serverId || !entry.playlistIds.includes(playlistId)) {
+                continue;
+            }
+
+            entry.playlistIds = entry.playlistIds.filter((id) => id !== playlistId);
+            if (!entry.manual && entry.playlistIds.length === 0) {
+                const filePath = resolveEntryPath(entry.fileName);
+                if (filePath) await fs.rm(filePath, { force: true });
+                delete manifest.entries[entryKey];
+                removed += 1;
+            }
+        }
+        delete manifest.playlists[key];
+        return removed;
+    });
+};
+
+const syncPlaylist = async (
+    request: OfflinePlaylistSyncRequest,
+): Promise<OfflinePlaylistSyncResult> => {
+    const tracks = [...new Map(request.tracks.map((track) => [track.song.id, track])).values()];
+    let downloaded = 0;
+    let unchanged = 0;
+
+    for (const track of tracks) {
+        const manifest = await readManifest();
+        const entry = manifest.entries[getEntryKey(request.playlist.serverId, track.song.id)];
+        const filePath = entry && resolveEntryPath(entry.fileName);
+        const fileExists = filePath
+            ? await fs
+                  .access(filePath)
+                  .then(() => true)
+                  .catch(() => false)
+            : false;
+
+        if (!entry || !fileExists || entry.fingerprint !== getFingerprint(track.song)) {
+            await download(track, { manual: false, playlistId: request.playlist.id });
+            downloaded += 1;
+            continue;
+        }
+
+        await updateManifest((nextManifest) => {
+            const nextEntry =
+                nextManifest.entries[getEntryKey(request.playlist.serverId, track.song.id)];
+            if (!nextEntry) return;
+            nextEntry.playlistIds = [...new Set([request.playlist.id, ...nextEntry.playlistIds])];
+            nextEntry.song = { ...track.song, imageUrl: null };
+        });
+        unchanged += 1;
+    }
+
+    const songIds = tracks.map((track) => track.song.id);
+    let removed = 0;
+    const playlist = await updateManifest(async (manifest): Promise<OfflinePlaylist> => {
+        const key = getPlaylistKey(request.playlist.serverId, request.playlist.id);
+        const previousSongIds = new Set(manifest.playlists[key]?.songIds ?? []);
+        const currentSongIds = new Set(songIds);
+
+        for (const songId of previousSongIds) {
+            if (currentSongIds.has(songId)) continue;
+            const entryKey = getEntryKey(request.playlist.serverId, songId);
+            const entry = manifest.entries[entryKey];
+            if (!entry) continue;
+
+            entry.playlistIds = entry.playlistIds.filter((id) => id !== request.playlist.id);
+            if (!entry.manual && entry.playlistIds.length === 0) {
+                const filePath = resolveEntryPath(entry.fileName);
+                if (filePath) await fs.rm(filePath, { force: true });
+                delete manifest.entries[entryKey];
+                removed += 1;
+            }
+        }
+
+        const nextPlaylist: OfflinePlaylist = {
+            ...request.playlist,
+            songIds,
+            syncedAt: new Date().toISOString(),
+        };
+        manifest.playlists[key] = nextPlaylist;
+        return nextPlaylist;
+    });
+
+    return { downloaded, playlist, removed, unchanged };
 };
 
 ipcMain.handle('offline-download', (_event, request: OfflineDownloadRequest) => download(request));
@@ -169,6 +321,16 @@ ipcMain.handle('offline-list', async (): Promise<OfflineEntry[]> => {
     const manifest = await readManifest();
     return Object.values(manifest.entries);
 });
+ipcMain.handle('offline-playlist-list', async (): Promise<OfflinePlaylist[]> => {
+    const manifest = await readManifest();
+    return Object.values(manifest.playlists);
+});
+ipcMain.handle('offline-playlist-remove', (_event, serverId: string, playlistId: string) =>
+    removePlaylist(serverId, playlistId),
+);
+ipcMain.handle('offline-playlist-sync', (_event, request: OfflinePlaylistSyncRequest) =>
+    syncPlaylist(request),
+);
 ipcMain.handle('offline-remove', (_event, serverId: string, songId: string) =>
     remove(serverId, songId),
 );

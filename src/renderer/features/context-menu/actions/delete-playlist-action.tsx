@@ -1,4 +1,5 @@
 import { closeAllModals, openModal } from '@mantine/modals';
+import isElectron from 'is-electron';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -35,6 +36,13 @@ export const DeletePlaylistAction = ({ disabled, items }: DeletePlaylistActionPr
                     }),
                 ),
             );
+            if (isElectron()) {
+                await Promise.all(
+                    items.map((playlist) =>
+                        window.api.offline.removePlaylist(serverId, playlist.id),
+                    ),
+                );
+            }
 
             navigate(AppRoute.PLAYLISTS, { replace: true });
             toast.success({

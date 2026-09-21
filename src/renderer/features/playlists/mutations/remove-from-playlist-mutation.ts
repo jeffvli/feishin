@@ -3,6 +3,7 @@ import { AxiosError } from 'axios';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { syncManagedOfflinePlaylist } from '/@/renderer/features/playlists/hooks/use-offline-playlist-sync';
 import { MutationOptions } from '/@/renderer/lib/react-query';
 import { RemoveFromPlaylistArgs, RemoveFromPlaylistResponse } from '/@/shared/types/domain-types';
 
@@ -31,6 +32,7 @@ export const useRemoveFromPlaylist = (options?: MutationOptions) => {
             queryClient.invalidateQueries({
                 queryKey: queryKeys.playlists.songList(serverId, variables.query.id),
             });
+            void syncManagedOfflinePlaylist(serverId, variables.query.id);
         },
         ...options,
     });

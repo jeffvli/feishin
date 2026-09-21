@@ -3,6 +3,7 @@ import { AxiosError } from 'axios';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { syncManagedOfflinePlaylist } from '/@/renderer/features/playlists/hooks/use-offline-playlist-sync';
 import { useRecentPlaylists } from '/@/renderer/features/playlists/hooks/use-recent-playlists';
 import { MutationHookArgs } from '/@/renderer/lib/react-query';
 import { useCurrentServerId } from '/@/renderer/store';
@@ -40,6 +41,7 @@ export const useAddToPlaylist = (args: MutationHookArgs) => {
             });
 
             addRecentPlaylist(variables.query.id);
+            void syncManagedOfflinePlaylist(serverId, variables.query.id);
 
             options?.onSuccess?.(_data, variables, context);
         },

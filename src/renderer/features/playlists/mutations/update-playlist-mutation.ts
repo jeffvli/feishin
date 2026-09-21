@@ -3,6 +3,7 @@ import { AxiosError } from 'axios';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import { syncManagedOfflinePlaylist } from '/@/renderer/features/playlists/hooks/use-offline-playlist-sync';
 import { MutationHookArgs } from '/@/renderer/lib/react-query';
 import { UpdatePlaylistArgs, UpdatePlaylistResponse } from '/@/shared/types/domain-types';
 
@@ -34,6 +35,7 @@ export const useUpdatePlaylist = (args: MutationHookArgs) => {
                 queryClient.invalidateQueries({
                     queryKey: queryKeys.playlists.songList(serverId, query.id),
                 });
+                void syncManagedOfflinePlaylist(serverId, query.id);
             }
         },
         ...options,

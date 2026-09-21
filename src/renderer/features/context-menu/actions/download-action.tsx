@@ -14,7 +14,7 @@ import {
 import { useCurrentServer } from '/@/renderer/store';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { toast } from '/@/shared/components/toast/toast';
-import { LibraryItem, Song } from '/@/shared/types/domain-types';
+import { LibraryItem, Playlist, Song } from '/@/shared/types/domain-types';
 
 interface DownloadActionProps {
     items: { id: string }[];
@@ -32,6 +32,7 @@ export const DownloadAction = ({ items, itemType }: DownloadActionProps) => {
     const server = useCurrentServer();
     const queryClient = useQueryClient();
     const isSongSelection = songItemTypes.has(itemType);
+    const isPlaylistSelection = itemType === LibraryItem.PLAYLIST;
     const offlineStatusQuery = useQuery({
         enabled: isElectron() && isSongSelection && items.length > 0,
         queryFn: async () => {
@@ -41,6 +42,18 @@ export const DownloadAction = ({ items, itemType }: DownloadActionProps) => {
             return sources.every(Boolean);
         },
         queryKey: [server.id, 'offline-status', ...items.map((item) => item.id)],
+    });
+    const offlinePlaylistStatusQuery = useQuery({
+        enabled: isElectron() && isPlaylistSelection && items.length > 0,
+        queryFn: async () => {
+            const playlists = await window.api.offline.listPlaylists();
+            return items.every((item) =>
+                playlists.some(
+                    (playlist) => playlist.serverId === server.id && playlist.id === item.id,
+                ),
+            );
+        },
+        queryKey: [server.id, 'offline-playlist-status', ...items.map((item) => item.id)],
     });
 
     const resolveSongs = useCallback(async (): Promise<Song[]> => {
@@ -111,6 +124,53 @@ export const DownloadAction = ({ items, itemType }: DownloadActionProps) => {
                 return;
             }
 
+            if (isPlaylistSelection && offlinePlaylistStatusQuery.data) {
+                await Promise.all(
+                    items.map((item) => window.api.offline.removePlaylist(server.id, item.id)),
+                );
+                await offlinePlaylistStatusQuery.refetch();
+                toast.success({
+                    message: t('action.offlinePlaylistRemoveComplete', {
+                        defaultValue: 'Stopped keeping playlist offline',
+                    }),
+                });
+                return;
+            }
+
+            if (isPlaylistSelection) {
+                let songCount = 0;
+                for (const playlist of items as Playlist[]) {
+                    const songs =
+                        (
+                            await getPlaylistSongsById({
+                                id: playlist.id,
+                                queryClient,
+                                serverId: server.id,
+                            })
+                        )?.items ?? [];
+                    songCount += songs.length;
+                    toast.info({ message: t('action.downloadStarted', { count: songs.length }) });
+                    await window.api.offline.syncPlaylist({
+                        playlist: { id: playlist.id, name: playlist.name, serverId: server.id },
+                        tracks: songs.map((song) => ({
+                            song,
+                            url: api.controller.getDownloadUrl({
+                                apiClientProps: { serverId: server.id },
+                                query: { id: song.id },
+                            }),
+                        })),
+                    });
+                }
+                await offlinePlaylistStatusQuery.refetch();
+                toast.success({
+                    message: t('action.offlinePlaylistSyncComplete', {
+                        count: songCount,
+                        defaultValue: 'Playlist is available offline',
+                    }),
+                });
+                return;
+            }
+
             const songs = await resolveSongs();
             if (songs.length === 0) return;
 
@@ -136,21 +196,39 @@ export const DownloadAction = ({ items, itemType }: DownloadActionProps) => {
                 }),
             });
         }
-    }, [isSongSelection, items, offlineStatusQuery, resolveSongs, server.id, t]);
+    }, [
+        isPlaylistSelection,
+        isSongSelection,
+        items,
+        offlinePlaylistStatusQuery,
+        offlineStatusQuery,
+        queryClient,
+        resolveSongs,
+        server.id,
+        t,
+    ]);
 
     if (items.length === 0) return null;
 
     return (
         <ContextMenu.Item leftIcon="download" onSelect={onSelect}>
-            {isElectron() && offlineStatusQuery.data
-                ? t('page.contextMenu.removeOffline', {
-                      defaultValue: 'Remove offline download',
+            {isElectron() && isPlaylistSelection && offlinePlaylistStatusQuery.data
+                ? t('page.contextMenu.stopOfflinePlaylistSync', {
+                      defaultValue: 'Stop keeping playlist offline',
                   })
-                : isElectron()
-                  ? t('page.contextMenu.downloadOffline', {
-                        defaultValue: 'Download for offline use',
+                : isElectron() && isPlaylistSelection
+                  ? t('page.contextMenu.keepPlaylistOffline', {
+                        defaultValue: 'Keep playlist available offline',
                     })
-                  : t('page.contextMenu.download')}
+                  : isElectron() && offlineStatusQuery.data
+                    ? t('page.contextMenu.removeOffline', {
+                          defaultValue: 'Remove offline download',
+                      })
+                    : isElectron()
+                      ? t('page.contextMenu.downloadOffline', {
+                            defaultValue: 'Download for offline use',
+                        })
+                      : t('page.contextMenu.download')}
         </ContextMenu.Item>
     );
 };
