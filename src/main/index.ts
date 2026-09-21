@@ -22,11 +22,14 @@ import {
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
 import { AppImageUpdater, autoUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
-import { access, constants } from 'fs';
+import { access, constants, createReadStream } from 'fs';
+import { stat } from 'fs/promises';
 import path, { join } from 'path';
 import semver from 'semver';
+import { Readable } from 'stream';
 
 import packageJson from '../../package.json';
+import { resolveOfflineSource } from './features/core/offline';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { shutdownServer } from './features/core/remote';
 import { store } from './features/core/settings';
@@ -343,6 +346,16 @@ function createGithubUpdaterInstance(
 
 protocol.registerSchemesAsPrivileged([
     { privileges: { bypassCSP: true, corsEnabled: true }, scheme: 'feishin' },
+    {
+        privileges: {
+            bypassCSP: true,
+            corsEnabled: true,
+            secure: true,
+            standard: true,
+            supportFetchAPI: true,
+        },
+        scheme: 'feishin-offline',
+    },
 ]);
 
 process.on('uncaughtException', (error: any) => {
@@ -1150,6 +1163,82 @@ if (!singleInstance) {
                 ignoreSsl: !!store.get('ignore_ssl'),
                 platform: process.platform,
                 version: packageJson.version,
+            });
+
+            protocol.handle('feishin-offline', async (request) => {
+                try {
+                    const requestUrl = new URL(request.url);
+                    const serverId = requestUrl.searchParams.get('serverId');
+                    const songId = requestUrl.searchParams.get('songId');
+                    if (!serverId || !songId) {
+                        return new Response(null, { status: 400, statusText: 'Bad Request' });
+                    }
+
+                    const source = await resolveOfflineSource(serverId, songId);
+                    if (!source) {
+                        return new Response(null, { status: 404, statusText: 'Not Found' });
+                    }
+
+                    const fileStat = await stat(source.filePath);
+                    const range = request.headers.get('range');
+                    const rangeMatch = range?.match(/^bytes=(\d+)-(\d*)$/);
+                    const start = rangeMatch ? Number(rangeMatch[1]) : 0;
+                    const requestedEnd = rangeMatch?.[2]
+                        ? Number(rangeMatch[2])
+                        : fileStat.size - 1;
+                    const end = Math.min(requestedEnd, fileStat.size - 1);
+                    if (start < 0 || start > end || start >= fileStat.size) {
+                        return new Response(null, {
+                            headers: { 'Content-Range': `bytes */${fileStat.size}` },
+                            status: 416,
+                            statusText: 'Range Not Satisfiable',
+                        });
+                    }
+
+                    const mimeTypes: Record<string, string> = {
+                        '.aac': 'audio/aac',
+                        '.flac': 'audio/flac',
+                        '.m4a': 'audio/mp4',
+                        '.mp3': 'audio/mpeg',
+                        '.ogg': 'audio/ogg',
+                        '.opus': 'audio/ogg',
+                        '.wav': 'audio/wav',
+                        '.webm': 'audio/webm',
+                    };
+                    const contentLength = end - start + 1;
+                    const headers = new Headers({
+                        'Accept-Ranges': 'bytes',
+                        'Content-Length': String(contentLength),
+                        'Content-Type':
+                            mimeTypes[path.extname(source.filePath).toLowerCase()] ??
+                            'application/octet-stream',
+                    });
+                    if (rangeMatch) {
+                        headers.set('Content-Range', `bytes ${start}-${end}/${fileStat.size}`);
+                    }
+
+                    log.debug('Serving offline track', {
+                        contentLength,
+                        end,
+                        range,
+                        serverId,
+                        songId,
+                        start,
+                        status: rangeMatch ? 206 : 200,
+                    });
+
+                    const body = Readable.toWeb(createReadStream(source.filePath, { end, start }));
+                    return new Response(body as BodyInit, {
+                        headers,
+                        status: rangeMatch ? 206 : 200,
+                    });
+                } catch (error) {
+                    log.error('Failed to serve offline track', error);
+                    return new Response(null, {
+                        status: 500,
+                        statusText: 'Internal Server Error',
+                    });
+                }
             });
 
             protocol.handle('feishin', async () => {

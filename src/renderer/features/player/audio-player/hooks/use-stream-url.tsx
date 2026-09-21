@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import isElectron from 'is-electron';
 import { useEffect, useRef } from 'react';
 
 import { api } from '/@/renderer/api';
@@ -17,17 +18,7 @@ export function useSongUrl(
 
     const { data: queryStreamUrl } = useQuery({
         enabled: Boolean(song?._serverId) && !shouldReusePrior,
-        queryFn: () =>
-            api.controller.getStreamUrl({
-                apiClientProps: { serverId: song!._serverId },
-                query: {
-                    bitrate: transcode.bitrate,
-                    format: transcode.format,
-                    id: song!.id,
-                    maxSampleRate: transcode.maxSampleRate,
-                    transcode: transcode.enabled ?? false,
-                },
-            }),
+        queryFn: () => getSongUrl(song!, transcode, false, true),
         queryKey: [
             song?._serverId,
             'stream-url',
@@ -69,7 +60,13 @@ export const getSongUrl = async (
     skipAutoTranscode?: boolean,
     forRenderer?: boolean,
     startTime?: number,
+    allowOffline = true,
 ) => {
+    if (allowOffline && isElectron()) {
+        const source = await window.api.offline.resolve(song._serverId, song.id);
+        if (source) return forRenderer ? source.url : source.filePath;
+    }
+
     const url = await api.controller.getStreamUrl({
         apiClientProps: { serverId: song._serverId },
         query: {

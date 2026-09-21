@@ -83,7 +83,14 @@ async function findQueueMatchForUris(
     const urls = await Promise.all(
         items.map(async (song) => {
             try {
-                return await getSongUrl(song, { enabled: false }, true);
+                return await getSongUrl(
+                    song,
+                    { enabled: false },
+                    true,
+                    undefined,
+                    undefined,
+                    false,
+                );
             } catch {
                 return undefined;
             }
@@ -117,11 +124,19 @@ async function getDlnaUrl(
             undefined,
             true,
             startTime,
+            false,
         );
         return mp3Url;
     }
     // Detection falls back to a probe of the actual stream if there isn't a positive from the initial metadata/suffix test
-    const probeUrl = await getSongUrl(song, { ...transcode, enabled: false }, true);
+    const probeUrl = await getSongUrl(
+        song,
+        { ...transcode, enabled: false },
+        true,
+        undefined,
+        undefined,
+        false,
+    );
     if (probeUrl) {
         const isOpus = await probeIsOpusOgg(probeUrl);
         if (isOpus) {
@@ -131,6 +146,7 @@ async function getDlnaUrl(
                 undefined,
                 true,
                 startTime,
+                false,
             );
             return mp3Url ?? probeUrl;
         }
@@ -141,11 +157,12 @@ async function getDlnaUrl(
                 undefined,
                 true,
                 startTime,
+                false,
             );
             return mp3Url ?? probeUrl;
         }
     }
-    const playbackUrl = await getSongUrl(song, transcode, undefined, true, startTime);
+    const playbackUrl = await getSongUrl(song, transcode, undefined, true, startTime, false);
     return playbackUrl;
 }
 
