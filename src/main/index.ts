@@ -396,7 +396,7 @@ ipcMain.on('update-menu-language', (_event, language: unknown) => {
     }
 
     currentMenuLanguage = language;
-    store.set('language', language);
+    store.set('menu_language', language);
 
     menuRebuildPromise = menuRebuildPromise
         .then(() => rebuildMainMenu(language))
@@ -492,8 +492,8 @@ const getMainMenuState = (): MenuPlaybackState => ({
     sidebarCollapsed: currentSidebarCollapsed,
 });
 
-const rebuildMainMenu = async (language = currentMenuLanguage ?? 'en') => {
-    if (!menuBuilder || !mainWindow) return;
+const rebuildMainMenu = async (language = currentMenuLanguage) => {
+    if (!menuBuilder || !mainWindow || !language) return;
 
     await menuBuilder.buildMenu(getMainMenuState(), language);
 };
@@ -871,6 +871,11 @@ async function createWindow(first = true): Promise<void> {
     }
 
     menuBuilder = new MenuBuilder(mainWindow, showMainWindow);
+    const storedMenuLanguage = store.get('menu_language');
+    if (typeof storedMenuLanguage === 'string' && isMenuLanguage(storedMenuLanguage)) {
+        currentMenuLanguage = storedMenuLanguage;
+        await rebuildMainMenu(storedMenuLanguage);
+    }
 
     // Open URLs in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {
