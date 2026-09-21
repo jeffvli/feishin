@@ -146,3 +146,30 @@
     min-width: 3rem;
     height: 3rem;
 }
+
+.collapsed-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-spacing-xs);
+    padding: var(--theme-spacing-sm) 0;
+}
+
+.row-icon-only {
+    justify-content: center;
+    padding: var(--theme-spacing-xs) 0;
+}
+
+.icon-only-image {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--theme-radius-md);
+}
+
+.icon-only-image-active {
+    outline: 2px solid var(--theme-colors-primary);
+    outline-offset: 2px;
+}
+
+.collapsed-header:hover > * {
+    color: var(--theme-colors-foreground);
+}
