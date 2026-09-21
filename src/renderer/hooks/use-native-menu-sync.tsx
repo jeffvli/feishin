@@ -14,6 +14,7 @@ import {
     useAppStoreActions,
     useCommandPalette,
     useCurrentServer,
+    useLanguage,
     usePlayerHydrated,
     usePlayerRepeat,
     usePlayerShuffle,
@@ -34,6 +35,15 @@ export const useNativeMenuSync = () => {
     const playerRepeat = usePlayerRepeat();
     const playerShuffle = usePlayerShuffle();
     const playerStatus = usePlayerStatus();
+    const language = useLanguage();
+
+    useEffect(() => {
+        if (!isElectron()) {
+            return undefined;
+        }
+
+        ipc?.send('update-menu-language', language);
+    }, [language]);
 
     useEffect(() => {
         if (!isElectron()) {

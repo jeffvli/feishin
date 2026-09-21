@@ -4,6 +4,61 @@ import packageJson from '../../package.json';
 
 import { PlayerRepeat, PlayerStatus } from '/@/shared/types/types';
 
+type Locale = Record<string, unknown>;
+
+const localeModules = import.meta.glob('../i18n/locales/*.json', {
+    import: 'default',
+}) as Record<string, () => Promise<Locale>>;
+
+const loadLocale = async (language: string): Promise<Locale | undefined> => {
+    const loader = localeModules[`../i18n/locales/${language}.json`];
+    return loader ? loader() : undefined;
+};
+
+export const isMenuLanguage = (language: string): boolean =>
+    !!localeModules[`../i18n/locales/${language}.json`];
+
+const getMenuTranslations = async (language = 'en'): Promise<Record<string, string>> => {
+    const selectedLanguage = isMenuLanguage(language) ? language : 'en';
+    const [english, selected] = await Promise.all([
+        loadLocale('en'),
+        selectedLanguage === 'en' ? undefined : loadLocale(selectedLanguage),
+    ]);
+
+    return {
+        ...(english?.nativeMenu as Record<string, string>),
+        ...(selected?.nativeMenu as Record<string, string>),
+        version: (
+            (selected?.nativeMenu as Record<string, string> | undefined)?.version ??
+            (english?.nativeMenu as Record<string, string> | undefined)?.version ??
+            ''
+        ).replace('{{version}}', packageJson.version),
+    };
+};
+
+const getMenuTranslationKey = (id: string): string | undefined => {
+    if (!id.startsWith('menu-')) return undefined;
+
+    const key = id
+        .slice('menu-'.length)
+        .replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase());
+
+    return key.endsWith('Action') ? key.slice(0, -'Action'.length) : key;
+};
+
+const applyMenuTranslations = (menu: Menu, translations: Record<string, string>) => {
+    for (const item of menu.items) {
+        const key = item.id ? getMenuTranslationKey(item.id) : undefined;
+        if (key && translations[key]) {
+            item.label = translations[key];
+        }
+
+        if (item.submenu) {
+            applyMenuTranslations(item.submenu, translations);
+        }
+    }
+};
+
 export type MenuPlaybackState = {
     accelerators?: {
         globalSearch?: string;
@@ -29,19 +84,40 @@ export type MenuPlaybackState = {
 };
 
 const MENU_ITEM_IDS = {
+    about: 'menu-about',
+    aboutAction: 'menu-about-action',
+    close: 'menu-close',
+    copy: 'menu-copy',
+    cut: 'menu-cut',
+    edit: 'menu-edit',
+    file: 'menu-file',
+    help: 'menu-help',
+    hide: 'menu-hide',
+    hideOthers: 'menu-hide-others',
     next: 'playback-next',
+    paste: 'menu-paste',
     pause: 'playback-pause',
     play: 'playback-play',
     previous: 'playback-previous',
     privateMode: 'app-private-mode',
+    quit: 'menu-quit',
+    redo: 'menu-redo',
     repeat: 'playback-repeat',
     seekBackward: 'playback-seek-backward',
     seekForward: 'playback-seek-forward',
+    selectAll: 'menu-select-all',
+    services: 'menu-services',
     shuffle: 'playback-shuffle',
     sidebarCollapsed: 'view-sidebar-collapsed',
     stop: 'playback-stop',
+    toggleDevTools: 'menu-toggle-dev-tools',
+    toggleFullscreen: 'menu-toggle-fullscreen',
+    undo: 'menu-undo',
+    unhide: 'menu-unhide',
+    view: 'menu-view',
     volumeDown: 'playback-volume-down',
     volumeUp: 'playback-volume-up',
+    window: 'menu-window',
 } as const;
 
 const NON_TYPING_MODIFIERS = new Set([
@@ -92,28 +168,30 @@ export default class MenuBuilder {
         repeatMode = PlayerRepeat.NONE,
         shuffleEnabled = false,
         sidebarCollapsed = false,
-    }: MenuPlaybackState = {}): MenuItemConstructorOptions[] {
+        translations,
+    }: MenuPlaybackState & { translations: Record<string, string> }): MenuItemConstructorOptions[] {
         const isPlaying = playbackStatus === PlayerStatus.PLAYING;
         const isRepeatEnabled = repeatMode !== PlayerRepeat.NONE;
 
         const subMenuAbout: MenuItemConstructorOptions = {
-            label: 'Electron',
+            id: MENU_ITEM_IDS.about,
+            label: translations.about,
             submenu: [
-                { role: 'about' },
+                { id: MENU_ITEM_IDS.aboutAction, label: translations.about, role: 'about' },
                 { type: 'separator' },
                 {
                     accelerator: 'Command+,',
                     click: () => {
                         this.mainWindow.webContents.send('renderer-open-settings');
                     },
-                    label: 'Settings...',
+                    label: translations.settings,
                 },
                 { type: 'separator' },
                 {
                     click: () => {
                         this.mainWindow.webContents.send('renderer-open-manage-servers');
                     },
-                    label: 'Manage Servers...',
+                    label: translations.manageServers,
                 },
                 {
                     checked: privateMode,
@@ -121,42 +199,60 @@ export default class MenuBuilder {
                         this.mainWindow.webContents.send('renderer-toggle-private-mode');
                     },
                     id: MENU_ITEM_IDS.privateMode,
-                    label: 'Private Session',
+                    label: translations.privateMode,
                     type: 'checkbox',
                 },
                 { type: 'separator' },
-                { role: 'services' },
+                { id: MENU_ITEM_IDS.services, label: translations.services, role: 'services' },
                 { type: 'separator' },
-                { role: 'hide' },
-                { role: 'hideOthers' },
-                { role: 'unhide' },
+                { id: MENU_ITEM_IDS.hide, label: translations.hide, role: 'hide' },
+                {
+                    id: MENU_ITEM_IDS.hideOthers,
+                    label: translations.hideOthers,
+                    role: 'hideOthers',
+                },
+                { id: MENU_ITEM_IDS.unhide, label: translations.unhide, role: 'unhide' },
                 { type: 'separator' },
-                { role: 'quit' },
+                { id: MENU_ITEM_IDS.quit, label: translations.quit, role: 'quit' },
             ],
         };
         const subMenuFile: MenuItemConstructorOptions = {
-            label: 'File',
+            id: MENU_ITEM_IDS.file,
+            label: translations.file,
             submenu: [
                 {
                     click: () => {
                         this.mainWindow.webContents.send('renderer-open-create-playlist');
                     },
-                    label: 'Create Playlist...',
+                    label: translations.createPlaylist,
                 },
                 { type: 'separator' },
-                { role: 'close' },
+                { id: MENU_ITEM_IDS.close, label: translations.close, role: 'close' },
             ],
         };
-        const subMenuEdit: MenuItemConstructorOptions = { role: 'editMenu' };
+        const subMenuEdit: MenuItemConstructorOptions = {
+            id: MENU_ITEM_IDS.edit,
+            label: translations.edit,
+            submenu: [
+                { id: MENU_ITEM_IDS.undo, label: translations.undo, role: 'undo' },
+                { id: MENU_ITEM_IDS.redo, label: translations.redo, role: 'redo' },
+                { type: 'separator' },
+                { id: MENU_ITEM_IDS.cut, label: translations.cut, role: 'cut' },
+                { id: MENU_ITEM_IDS.copy, label: translations.copy, role: 'copy' },
+                { id: MENU_ITEM_IDS.paste, label: translations.paste, role: 'paste' },
+                { id: MENU_ITEM_IDS.selectAll, label: translations.selectAll, role: 'selectAll' },
+            ],
+        };
         const subMenuView: MenuItemConstructorOptions = {
-            label: 'View',
+            id: MENU_ITEM_IDS.view,
+            label: translations.view,
             submenu: [
                 {
                     accelerator: accelerators?.globalSearch,
                     click: () => {
                         this.mainWindow.webContents.send('renderer-open-command-palette');
                     },
-                    label: 'Command Palette...',
+                    label: translations.commandPalette,
                 },
                 {
                     checked: sidebarCollapsed,
@@ -164,28 +260,41 @@ export default class MenuBuilder {
                         this.mainWindow.webContents.send('renderer-toggle-sidebar');
                     },
                     id: MENU_ITEM_IDS.sidebarCollapsed,
-                    label: 'Collapse Sidebar',
+                    label: translations.sidebar,
                     type: 'checkbox',
                 },
                 { type: 'separator' },
-                { role: 'togglefullscreen' },
                 {
-                    label: 'Developer',
-                    submenu: [{ role: 'reload' }, { role: 'toggleDevTools' }],
+                    id: MENU_ITEM_IDS.toggleFullscreen,
+                    label: translations.toggleFullscreen,
+                    role: 'togglefullscreen',
+                },
+                {
+                    label: translations.developer,
+                    submenu: [
+                        { label: translations.reload, role: 'reload' },
+                        {
+                            id: MENU_ITEM_IDS.toggleDevTools,
+                            label: translations.toggleDevTools,
+                            role: 'toggleDevTools',
+                        },
+                    ],
                 },
             ],
         };
         const subMenuWindow: MenuItemConstructorOptions = {
+            id: MENU_ITEM_IDS.window,
+            label: translations.window,
             role: 'windowMenu',
             submenu: [
                 {
                     click: this.showMainWindow,
-                    label: 'Show Feishin',
+                    label: translations.showFeishin,
                 },
             ],
         };
         const subMenuPlayback: MenuItemConstructorOptions = {
-            label: 'Playback',
+            label: translations.playback,
             submenu: [
                 {
                     accelerator: accelerators?.play || accelerators?.playPause,
@@ -197,7 +306,7 @@ export default class MenuBuilder {
                         accelerators?.play || accelerators?.playPause,
                     ),
                     id: MENU_ITEM_IDS.play,
-                    label: 'Play',
+                    label: translations.play,
                     visible: !isPlaying,
                 },
                 {
@@ -210,7 +319,7 @@ export default class MenuBuilder {
                         accelerators?.pause || accelerators?.playPause,
                     ),
                     id: MENU_ITEM_IDS.pause,
-                    label: 'Pause',
+                    label: translations.pause,
                     visible: isPlaying,
                 },
                 { type: 'separator' },
@@ -221,7 +330,7 @@ export default class MenuBuilder {
                     },
                     enabled: isPlaybackItemEnabled(inputFocused, accelerators?.next),
                     id: MENU_ITEM_IDS.next,
-                    label: 'Next',
+                    label: translations.next,
                 },
                 {
                     accelerator: accelerators?.previous,
@@ -230,7 +339,7 @@ export default class MenuBuilder {
                     },
                     enabled: isPlaybackItemEnabled(inputFocused, accelerators?.previous),
                     id: MENU_ITEM_IDS.previous,
-                    label: 'Previous',
+                    label: translations.previous,
                 },
                 {
                     accelerator: accelerators?.seekForward,
@@ -239,7 +348,7 @@ export default class MenuBuilder {
                     },
                     enabled: isPlaybackItemEnabled(inputFocused, accelerators?.seekForward),
                     id: MENU_ITEM_IDS.seekForward,
-                    label: 'Seek Forward',
+                    label: translations.seekForward,
                 },
                 {
                     accelerator: accelerators?.seekBackward,
@@ -248,7 +357,7 @@ export default class MenuBuilder {
                     },
                     enabled: isPlaybackItemEnabled(inputFocused, accelerators?.seekBackward),
                     id: MENU_ITEM_IDS.seekBackward,
-                    label: 'Seek Backforward',
+                    label: translations.seekBackward,
                 },
                 { type: 'separator' },
                 {
@@ -259,7 +368,7 @@ export default class MenuBuilder {
                     },
                     enabled: isPlaybackItemEnabled(inputFocused, accelerators?.shuffle),
                     id: MENU_ITEM_IDS.shuffle,
-                    label: 'Shuffle',
+                    label: translations.shuffle,
                     type: 'checkbox',
                 },
                 {
@@ -270,7 +379,7 @@ export default class MenuBuilder {
                     },
                     enabled: isPlaybackItemEnabled(inputFocused, accelerators?.repeat),
                     id: MENU_ITEM_IDS.repeat,
-                    label: 'Repeat',
+                    label: translations.repeat,
                     type: 'checkbox',
                 },
                 { type: 'separator' },
@@ -281,7 +390,7 @@ export default class MenuBuilder {
                     },
                     enabled: isPlaybackItemEnabled(inputFocused, accelerators?.stop),
                     id: MENU_ITEM_IDS.stop,
-                    label: 'Stop',
+                    label: translations.stop,
                 },
                 { type: 'separator' },
                 {
@@ -291,7 +400,7 @@ export default class MenuBuilder {
                     },
                     enabled: isPlaybackItemEnabled(inputFocused, accelerators?.volumeUp),
                     id: MENU_ITEM_IDS.volumeUp,
-                    label: 'Volume Up',
+                    label: translations.volumeUp,
                 },
                 {
                     accelerator: accelerators?.volumeDown,
@@ -300,18 +409,19 @@ export default class MenuBuilder {
                     },
                     enabled: isPlaybackItemEnabled(inputFocused, accelerators?.volumeDown),
                     id: MENU_ITEM_IDS.volumeDown,
-                    label: 'Volume Down',
+                    label: translations.volumeDown,
                 },
             ],
         };
         const subMenuHelp: MenuItemConstructorOptions = {
-            role: 'help',
+            id: MENU_ITEM_IDS.help,
+            label: translations.help,
             submenu: [
                 {
                     click() {
                         shell.openExternal('https://github.com/jeffvli/feishin');
                     },
-                    label: 'Learn More',
+                    label: translations.learnMore,
                 },
                 {
                     click() {
@@ -319,26 +429,26 @@ export default class MenuBuilder {
                             'https://github.com/jeffvli/feishin?tab=readme-ov-file#getting-started',
                         );
                     },
-                    label: 'Documentation',
+                    label: translations.documentation,
                 },
                 {
                     click() {
                         shell.openExternal('https://github.com/jeffvli/feishin/discussions');
                     },
-                    label: 'Community Discussions',
+                    label: translations.communityDiscussions,
                 },
                 {
                     click() {
                         shell.openExternal('https://github.com/jeffvli/feishin/issues');
                     },
-                    label: 'Search Issues',
+                    label: translations.searchIssues,
                 },
                 { type: 'separator' },
                 {
                     click: () => {
                         this.mainWindow.webContents.send('renderer-open-release-notes');
                     },
-                    label: 'Version ' + packageJson.version,
+                    label: translations.version,
                 },
             ],
         };
@@ -354,21 +464,22 @@ export default class MenuBuilder {
         ];
     }
 
-    buildDefaultTemplate(): MenuItemConstructorOptions[] {
+    buildDefaultTemplate(translations: Record<string, string>): MenuItemConstructorOptions[] {
         const templateDefault: MenuItemConstructorOptions[] = [
             {
-                label: '&File',
+                id: MENU_ITEM_IDS.file,
+                label: translations.file,
                 submenu: [
                     {
                         accelerator: 'Ctrl+O',
-                        label: '&Open',
+                        label: translations.open,
                     },
                     {
                         accelerator: 'Ctrl+,',
                         click: () => {
                             this.mainWindow.webContents.send('renderer-open-settings');
                         },
-                        label: '&Settings...',
+                        label: translations.settings,
                     },
                     { type: 'separator' },
                     {
@@ -376,12 +487,26 @@ export default class MenuBuilder {
                         click: () => {
                             this.mainWindow.close();
                         },
-                        label: '&Close',
+                        label: translations.close,
                     },
                 ],
             },
             {
-                label: '&View',
+                id: MENU_ITEM_IDS.edit,
+                label: translations.edit,
+                submenu: [
+                    { label: translations.undo, role: 'undo' },
+                    { label: translations.redo, role: 'redo' },
+                    { type: 'separator' },
+                    { label: translations.cut, role: 'cut' },
+                    { label: translations.copy, role: 'copy' },
+                    { label: translations.paste, role: 'paste' },
+                    { label: translations.selectAll, role: 'selectAll' },
+                ],
+            },
+            {
+                id: MENU_ITEM_IDS.view,
+                label: translations.view,
                 submenu:
                     process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true'
                         ? [
@@ -390,7 +515,7 @@ export default class MenuBuilder {
                                   click: () => {
                                       this.mainWindow.webContents.reload();
                                   },
-                                  label: '&Reload',
+                                  label: translations.reload,
                               },
                               {
                                   accelerator: 'F11',
@@ -399,14 +524,14 @@ export default class MenuBuilder {
                                           !this.mainWindow.isFullScreen(),
                                       );
                                   },
-                                  label: 'Toggle &Full Screen',
+                                  label: translations.toggleFullscreen,
                               },
                               {
                                   accelerator: 'Alt+Ctrl+I',
                                   click: () => {
                                       this.mainWindow.webContents.toggleDevTools();
                                   },
-                                  label: 'Toggle &Developer Tools',
+                                  label: translations.toggleDevTools,
                               },
                           ]
                         : [
@@ -417,18 +542,25 @@ export default class MenuBuilder {
                                           !this.mainWindow.isFullScreen(),
                                       );
                                   },
-                                  label: 'Toggle &Full Screen',
+                                  label: translations.toggleFullscreen,
                               },
                           ],
             },
             {
-                label: 'Help',
+                id: MENU_ITEM_IDS.window,
+                label: translations.window,
+                role: 'windowMenu',
+                submenu: [{ click: this.showMainWindow, label: translations.showFeishin }],
+            },
+            {
+                id: MENU_ITEM_IDS.help,
+                label: translations.help,
                 submenu: [
                     {
                         click() {
                             shell.openExternal('https://github.com/jeffvli/feishin');
                         },
-                        label: 'Learn More',
+                        label: translations.learnMore,
                     },
                     {
                         click() {
@@ -436,19 +568,19 @@ export default class MenuBuilder {
                                 'https://github.com/jeffvli/feishin?tab=readme-ov-file#getting-started',
                             );
                         },
-                        label: 'Documentation',
+                        label: translations.documentation,
                     },
                     {
                         click() {
                             shell.openExternal('https://github.com/jeffvli/feishin/discussions');
                         },
-                        label: 'Community Discussions',
+                        label: translations.communityDiscussions,
                     },
                     {
                         click() {
                             shell.openExternal('https://github.com/jeffvli/feishin/issues');
                         },
-                        label: 'Search Issues',
+                        label: translations.searchIssues,
                     },
                 ],
             },
@@ -457,17 +589,20 @@ export default class MenuBuilder {
         return templateDefault;
     }
 
-    buildMenu(playbackState: MenuPlaybackState = {}): Menu {
+    async buildMenu(playbackState: MenuPlaybackState = {}, language = 'en'): Promise<Menu> {
         if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') {
             this.setupDevelopmentEnvironment();
         }
 
+        const translations = await getMenuTranslations(language);
         const template =
             process.platform === 'darwin'
-                ? this.buildDarwinTemplate(playbackState)
-                : this.buildDefaultTemplate();
+                ? this.buildDarwinTemplate({ ...playbackState, translations })
+                : this.buildDefaultTemplate(translations);
 
         const menu = Menu.buildFromTemplate(template);
+        applyMenuTranslations(menu, translations);
+
         this.applicationMenu = menu;
         Menu.setApplicationMenu(menu);
 
