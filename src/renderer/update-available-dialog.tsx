@@ -63,7 +63,7 @@ export const UpdateAvailableDialog = () => {
                     </Button>
                     <Button
                         component="a"
-                        href="https://github.com/jeffvli/feishin/releases/latest"
+                        href="https://github.com/kevlaws/feishin/releases/latest"
                         onClick={handleDismiss}
                         rightSection={<Icon icon="externalLink" size="sm" />}
                         size="xs"

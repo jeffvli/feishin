@@ -1331,7 +1331,7 @@ const initialState: SettingsState = {
         type: FontType.BUILT_IN,
     },
     general: {
-        accent: 'rgb(53, 116, 252)',
+        accent: 'rgb(134, 170, 155)',
         albumBackground: false,
         albumBackgroundBlur: 6,
         albumGroupImageSize: 0,
@@ -1432,7 +1432,7 @@ const initialState: SettingsState = {
         theme: AppTheme.DEFAULT_DARK,
         themeDark: AppTheme.DEFAULT_DARK,
         themeLight: AppTheme.DEFAULT_LIGHT,
-        useThemeAccentColor: false,
+        useThemeAccentColor: true,
         useThemePrimaryShade: true,
         volumeWheelStep: 5,
         volumeWidth: 70,
@@ -2140,7 +2140,7 @@ const initialState: SettingsState = {
         enabled: false,
         password: randomString(8),
         port: 4333,
-        username: 'feishin',
+        username: 'katiesamp',
     },
     tab: 'general',
     tagEditor: {

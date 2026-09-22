@@ -7,7 +7,7 @@ declare const self: ServiceWorkerGlobalScope;
 const url = new URL(location.toString());
 const version = url.searchParams.get('version');
 const prod = url.searchParams.get('prod') === 'true';
-const cacheName = `Feishin-remote-${version}`;
+const cacheName = `KatiesAmp-remote-${version}`;
 
 const resourcesToCache = ['./', './remote.js', './favicon.ico'];
 

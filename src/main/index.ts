@@ -60,7 +60,7 @@ const ALPHA_UPDATER_CONFIG: {
 };
 
 const GITHUB_UPDATER_CONFIG = {
-    owner: 'jeffvli',
+    owner: 'kevlaws',
     provider: 'github' as const,
     repo: 'feishin',
 };
@@ -612,7 +612,7 @@ const createTray = () => {
         });
     }
 
-    tray.setToolTip('Feishin');
+    tray.setToolTip('KatiesAmp');
     tray.setContextMenu(contextMenu);
 };
 
@@ -868,7 +868,7 @@ async function createWindow(first = true): Promise<void> {
     });
 
     if (isWindows()) {
-        app.setAppUserModelId('org.jeffvli.feishin');
+        app.setAppUserModelId('com.kevlaws.katiesamp');
     }
 
     menuBuilder = new MenuBuilder(mainWindow, showMainWindow);

@@ -385,7 +385,7 @@ export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
                                 } else if (reason.code === 4000) {
                                     logger.warn('Server is down');
                                     toast.warn({
-                                        message: 'Feishin remote server is down',
+                                        message: 'KatiesAmp remote server is down',
                                         title: 'Connection closed',
                                     });
                                 } else if (reason.code === 4004) {

@@ -1,7 +1,7 @@
 {
-    "name": "feishin",
-    "version": "1.17.0",
-    "description": "A modern self-hosted music player.",
+    "name": "katiesamp",
+    "version": "0.1.2-beta",
+    "description": "Katie O'Brien's modern self-hosted music player.",
     "keywords": [
         "subsonic",
         "navidrome",
@@ -9,15 +9,14 @@
         "react",
         "electron"
     ],
-    "homepage": "https://github.com/jeffvli/feishin",
+    "homepage": "https://github.com/kevlaws/feishin",
     "bugs": {
-        "url": "https://github.com/jeffvli/feishin/issues"
+        "url": "https://github.com/kevlaws/feishin/issues"
     },
     "license": "GPL-3.0",
     "author": {
-        "name": "jeffvli",
-        "email": "feishin@users.noreply.github.com",
-        "url": "https://github.com/jeffvli/"
+        "name": "Kev Laws",
+        "url": "https://github.com/kevlaws/"
     },
     "main": "./out/main/index.js",
     "scripts": {
@@ -203,5 +202,5 @@
         "vite-plugin-pwa": "^1.3.0"
     },
     "packageManager": "pnpm@11.5.2",
-    "productName": "feishin"
+    "productName": "KatiesAmp"
 }

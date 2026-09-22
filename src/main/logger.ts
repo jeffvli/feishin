@@ -100,7 +100,7 @@ const exportDiagnosticsArchive = async (payload: ExportDiagnosticsPayload = {}) 
     const parentWindow = BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0];
     const stamp = new Date().toISOString().slice(0, 10);
     const saveOptions = {
-        defaultPath: `feishin-diagnostics-${stamp}.zip`,
+        defaultPath: `katiesamp-diagnostics-${stamp}.zip`,
         filters: [{ extensions: ['zip'], name: 'Zip' }],
     };
     const result = parentWindow

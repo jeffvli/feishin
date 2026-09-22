@@ -79,7 +79,7 @@ export default defineConfig({
             filename: 'assets/sw.js',
             injectRegister: 'inline',
             manifest: {
-                background_color: '#FFDCB5',
+                background_color: '#04383B',
                 display: 'standalone',
                 icons: [
                     {
@@ -114,7 +114,7 @@ export default defineConfig({
                         type: 'image/png',
                     },
                 ],
-                name: 'Feishin',
+                name: 'KatiesAmp',
                 orientation: 'portrait',
                 screenshots: [
                     {
@@ -125,9 +125,9 @@ export default defineConfig({
                         type: 'image/webp',
                     },
                 ],
-                short_name: 'Feishin',
+                short_name: 'KatiesAmp',
                 start_url: '/',
-                theme_color: '#1E003D',
+                theme_color: '#04383B',
             },
             manifestFilename: 'assets/manifest.webmanifest',
             outDir: path.resolve(__dirname, './out/web/'),

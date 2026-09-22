@@ -100,7 +100,7 @@ export async function query(
     try {
         result = await axios.get<LrcLibTrackResponse>(FETCH_URL, {
             headers: {
-                'User-Agent': 'LRCGET v0.2.0 (https://github.com/jeffvli/feishin)',
+                'User-Agent': 'KatiesAmp (https://github.com/kevlaws/feishin)',
             },
             params: {
                 album_name: params.album,

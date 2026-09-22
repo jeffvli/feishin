@@ -1,18 +1,18 @@
-<img src="assets/icons/icon.png" alt="logo" title="feishin" align="right" height="60px" width="60px" />
+<img src="assets/icons/icon.png" alt="KatiesAmp logo" title="KatiesAmp" align="right" height="60px" width="60px" />
 
-# Feishin
+# KatiesAmp
 
   <p align="center">
-    <a href="https://github.com/jeffvli/feishin/blob/main/LICENSE">
-      <img src="https://img.shields.io/github/license/jeffvli/feishin?style=flat-square&color=brightgreen"
+    <a href="https://github.com/kevlaws/feishin/blob/development/LICENSE">
+      <img src="https://img.shields.io/github/license/kevlaws/feishin?style=flat-square&color=04383b"
       alt="License">
     </a>
-      <a href="https://github.com/jeffvli/feishin/releases">
-      <img src="https://img.shields.io/github/v/release/jeffvli/feishin?style=flat-square&color=blue"
+      <a href="https://github.com/kevlaws/feishin/releases">
+      <img src="https://img.shields.io/github/v/release/kevlaws/feishin?style=flat-square&color=86aa9b"
       alt="Release">
     </a>
-    <a href="https://github.com/jeffvli/feishin/releases">
-      <img src="https://img.shields.io/github/downloads/jeffvli/feishin/total?style=flat-square&color=orange"
+    <a href="https://github.com/kevlaws/feishin/releases">
+      <img src="https://img.shields.io/github/downloads/kevlaws/feishin/total?style=flat-square&color=04383b"
       alt="Downloads">
     </a>
   </p>
@@ -29,7 +29,7 @@
 
 ---
 
-Rewrite of [Sonixd](https://github.com/jeffvli/sonixd).
+KatiesAmp is a branded fork of [Feishin](https://github.com/jeffvli/feishin), built for Katie O'Brien's Irish Tavern.
 
 ## Features
 
