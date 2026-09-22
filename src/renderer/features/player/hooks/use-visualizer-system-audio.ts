@@ -81,7 +81,12 @@ export function useVisualizerSystemAudio(options: {
 
         try {
             const stream = await navigator.mediaDevices.getDisplayMedia({
-                audio: true,
+                audio: {
+                    autoGainControl: false,
+                    channelCount: 2,
+                    echoCancellation: false,
+                    noiseSuppression: false,
+                },
                 video: isMacOS, // On macOS, getDisplayMedia requires video to be requested in order to capture system audio
             });
 
