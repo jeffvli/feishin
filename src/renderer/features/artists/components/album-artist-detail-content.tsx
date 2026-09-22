@@ -66,6 +66,7 @@ import { sortAlbumList, sortSongList } from '/@/shared/api/utils';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Badge } from '/@/shared/components/badge/badge';
 import { Button } from '/@/shared/components/button/button';
+import { Center } from '/@/shared/components/center/center';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Grid } from '/@/shared/components/grid/grid';
 import { Group } from '/@/shared/components/group/group';
@@ -331,17 +332,32 @@ const AlbumArtistMetadataTopSongsContent = ({
 
     const canStartQuery = server?.type === ServerType.JELLYFIN || !!detailQuery.data?.name;
 
-    const topSongsQuery = useQuery({
+    const communityTopSongsQuery = useQuery({
         ...artistsQueries.topSongs({
             query: {
                 artist: detailQuery.data?.name || '',
                 artistId: routeId,
-                type: topSongsQueryType,
+                type: 'community',
             },
-            serverId: serverId,
+            serverId,
         }),
         enabled: canStartQuery,
     });
+
+    const personalTopSongsQuery = useQuery({
+        ...artistsQueries.topSongs({
+            query: {
+                artist: detailQuery.data?.name || '',
+                artistId: routeId,
+                type: 'personal',
+            },
+            serverId,
+        }),
+        enabled: canStartQuery,
+    });
+
+    const topSongsQuery =
+        topSongsQueryType === 'personal' ? personalTopSongsQuery : communityTopSongsQuery;
 
     const songs = useMemo(() => topSongsQuery.data?.items || [], [topSongsQuery.data?.items]);
 
@@ -400,10 +416,14 @@ const AlbumArtistMetadataTopSongsContent = ({
         onLongPress: () => handlePlay(LONG_PRESS_PLAY_BEHAVIOR[Play.LAST]),
     });
 
-    const isLoading = topSongsQuery.isLoading || !topSongsQuery.data;
+    const isChecking = communityTopSongsQuery.isLoading || personalTopSongsQuery.isLoading;
+    const isLoading = topSongsQuery.isLoading || (!topSongsQuery.data && !topSongsQuery.isError);
+    const hasAnyTopSongs =
+        (communityTopSongsQuery.data?.items?.length ?? 0) > 0 ||
+        (personalTopSongsQuery.data?.items?.length ?? 0) > 0;
 
     if (!isLoading && !tableConfig) return null;
-    if (!isLoading && songs.length === 0) return null;
+    if (!isChecking && !hasAnyTopSongs) return null;
 
     const currentSongId = currentSong?.id;
 
@@ -420,17 +440,22 @@ const AlbumArtistMetadataTopSongsContent = ({
                         </Group>
                         <div className={styles.albumSectionDividerContainer}>
                             <div className={styles.albumSectionDivider} />
-                            <Button
-                                component={Link}
-                                size="compact-md"
-                                to={generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_TOP_SONGS, {
-                                    albumArtistId: routeId,
-                                })}
-                                uppercase
-                                variant="subtle"
-                            >
-                                {t('page.albumArtistDetail.viewAll')}
-                            </Button>
+                            {songs.length > 0 && (
+                                <Button
+                                    component={Link}
+                                    size="compact-md"
+                                    to={generatePath(
+                                        AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL_TOP_SONGS,
+                                        {
+                                            albumArtistId: routeId,
+                                        },
+                                    )}
+                                    uppercase
+                                    variant="subtle"
+                                >
+                                    {t('page.albumArtistDetail.viewAll')}
+                                </Button>
+                            )}
                             {songs.length > 0 && (
                                 <ActionIconGroup>
                                     <PlayTooltip type={Play.NOW}>
@@ -533,35 +558,49 @@ const AlbumArtistMetadataTopSongsContent = ({
                                     tableColumnsData={SONG_TABLE_COLUMNS}
                                 />
                             </Group>
-                            <SongTableListContainer
-                                enableHeader={tableConfig.enableHeader}
-                                itemCount={filteredSongs.length}
-                                maxRows={5}
-                                tableSize={tableConfig.size}
-                            >
-                                <ItemTableList
-                                    activeRowId={currentSongId}
-                                    autoFitColumns={tableConfig.autoFitColumns}
-                                    CellComponent={ItemTableListColumn}
-                                    columns={columns}
-                                    data={filteredSongs}
-                                    enableAlternateRowColors={tableConfig.enableAlternateRowColors}
-                                    enableDrag
-                                    enableDragScroll={false}
-                                    enableExpansion={false}
+                            {filteredSongs.length > 0 ? (
+                                <SongTableListContainer
                                     enableHeader={tableConfig.enableHeader}
-                                    enableHorizontalBorders={tableConfig.enableHorizontalBorders}
-                                    enableRowHoverHighlight={tableConfig.enableRowHoverHighlight}
-                                    enableSelection
-                                    enableSelectionDialog={false}
-                                    enableVerticalBorders={tableConfig.enableVerticalBorders}
-                                    itemType={LibraryItem.SONG}
-                                    onColumnReordered={handleColumnReordered}
-                                    onColumnResized={handleColumnResized}
-                                    overrideControls={overrideControls}
-                                    size={tableConfig.size}
-                                />
-                            </SongTableListContainer>
+                                    itemCount={filteredSongs.length}
+                                    maxRows={5}
+                                    tableSize={tableConfig.size}
+                                >
+                                    <ItemTableList
+                                        activeRowId={currentSongId}
+                                        autoFitColumns={tableConfig.autoFitColumns}
+                                        CellComponent={ItemTableListColumn}
+                                        columns={columns}
+                                        data={filteredSongs}
+                                        enableAlternateRowColors={
+                                            tableConfig.enableAlternateRowColors
+                                        }
+                                        enableDrag
+                                        enableDragScroll={false}
+                                        enableExpansion={false}
+                                        enableHeader={tableConfig.enableHeader}
+                                        enableHorizontalBorders={
+                                            tableConfig.enableHorizontalBorders
+                                        }
+                                        enableRowHoverHighlight={
+                                            tableConfig.enableRowHoverHighlight
+                                        }
+                                        enableSelection
+                                        enableSelectionDialog={false}
+                                        enableVerticalBorders={tableConfig.enableVerticalBorders}
+                                        itemType={LibraryItem.SONG}
+                                        onColumnReordered={handleColumnReordered}
+                                        onColumnResized={handleColumnResized}
+                                        overrideControls={overrideControls}
+                                        size={tableConfig.size}
+                                    />
+                                </SongTableListContainer>
+                            ) : (
+                                <Center py="xl" w="100%">
+                                    <Text fw={500} isMuted isNoSelect size="sm">
+                                        {t('common.noResultsFromQuery')}
+                                    </Text>
+                                </Center>
+                            )}
                         </>
                     ) : null}
                 </Stack>
