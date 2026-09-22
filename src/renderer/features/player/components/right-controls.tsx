@@ -36,6 +36,7 @@ import {
     useSetFullScreenPlayerStore,
     useSettingsStoreActions,
     useShowFavorites,
+    useShowNowPlayingInSidebar,
     useShowRatings,
     useSidebarNowPlaying,
     useSidebarRightExpanded,
@@ -363,10 +364,15 @@ const QueueButton = () => {
         [bindings.toggleQueue.isGlobal ? '' : bindings.toggleQueue.hotkey, handleToggleQueue],
     ]);
     if (sideQueueType === 'sideQueue') {
+        const queueVisible = isSidebarRightExpanded && !nowPlayingOpen;
+
         return (
             <ActionIcon
                 icon={isSidebarRightExpanded ? 'panelRightClose' : 'panelRightOpen'}
-                iconProps={{ size: 'lg' }}
+                iconProps={{
+                    color: queueVisible ? 'primary' : undefined,
+                    size: 'lg',
+                }}
                 onClick={(e) => {
                     e.stopPropagation();
                     handleToggleQueue();
@@ -397,8 +403,9 @@ const NowPlayingButton = () => {
     const nowPlayingOpen = useSidebarNowPlaying();
     const { setSideBar } = useAppStoreActions();
     const sideQueueType = useSideQueueType();
+    const showNowPlaying = useShowNowPlayingInSidebar();
 
-    if (sideQueueType !== 'sideQueue') {
+    if (sideQueueType !== 'sideQueue' || !showNowPlaying) {
         return null;
     }
 

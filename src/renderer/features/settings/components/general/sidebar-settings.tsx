@@ -6,7 +6,7 @@ import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store';
+import { useAppStoreActions, useGeneralSettings, useSettingsStoreActions } from '/@/renderer/store';
 import { ColorInput } from '/@/shared/components/color-input/color-input';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { Select } from '/@/shared/components/select/select';
@@ -21,6 +21,7 @@ export const SidebarSettings = memo(() => {
     const { t } = useTranslation();
     const settings = useGeneralSettings();
     const { setSettings } = useSettingsStoreActions();
+    const { setSideBar } = useAppStoreActions();
 
     const handleSetSidebarPlaylistFolders = (e: ChangeEvent<HTMLInputElement>) => {
         setSettings({
@@ -327,6 +328,28 @@ export const SidebarSettings = memo(() => {
                 context: 'description',
             }),
             title: t('setting.showQueueInSidebar'),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label={t('setting.showNowPlayingInSidebar')}
+                    defaultChecked={settings.showNowPlayingInSidebar}
+                    onChange={(e) => {
+                        const enabled = e.currentTarget.checked;
+                        setSettings({
+                            general: {
+                                showNowPlayingInSidebar: enabled,
+                            },
+                        });
+                        if (!enabled) {
+                            setSideBar({ nowPlaying: false });
+                        }
+                    }}
+                />
+            ),
+            description: '',
+            showDescription: false,
+            title: t('setting.showNowPlayingInSidebar'),
         },
         {
             control: (

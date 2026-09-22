@@ -14,6 +14,7 @@ import { Lyrics } from '/@/renderer/features/lyrics/lyrics';
 import { PlayQueue } from '/@/renderer/features/now-playing/components/play-queue';
 import { PlayQueueListControls } from '/@/renderer/features/now-playing/components/play-queue-list-controls';
 import { SidebarNowPlaying } from '/@/renderer/features/now-playing/components/sidebar-now-playing';
+import { SidebarNowPlayingSettingsButton } from '/@/renderer/features/now-playing/components/sidebar-now-playing-settings';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     useAppStoreActions,
@@ -413,16 +414,19 @@ const NowPlayingPanel = () => {
                 <TextTitle fw={700} order={4} overflow="hidden">
                     {t('page.sidebar.nowPlaying')}
                 </TextTitle>
-                <ActionIcon
-                    icon="x"
-                    iconProps={{ size: 'sm' }}
-                    onClick={() => setSideBar({ nowPlaying: false, rightExpanded: false })}
-                    size="xs"
-                    tooltip={{
-                        label: t('common.close'),
-                    }}
-                    variant="subtle"
-                />
+                <ActionIconGroup>
+                    <SidebarNowPlayingSettingsButton />
+                    <ActionIcon
+                        icon="x"
+                        iconProps={{ size: 'lg' }}
+                        onClick={() => setSideBar({ nowPlaying: false, rightExpanded: false })}
+                        size="sm"
+                        tooltip={{
+                            label: t('common.close'),
+                        }}
+                        variant="subtle"
+                    />
+                </ActionIconGroup>
             </Group>
             <SidebarNowPlaying />
         </div>

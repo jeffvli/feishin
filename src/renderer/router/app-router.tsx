@@ -188,6 +188,20 @@ const SongEditContextModal = (props: any) => (
     </Suspense>
 );
 
+const LazySidebarNowPlayingSettingsContextModal = lazy(() =>
+    import('/@/renderer/features/now-playing/components/sidebar-now-playing-settings-modal').then(
+        (module) => ({
+            default: module.SidebarNowPlayingSettingsContextModal,
+        }),
+    ),
+);
+
+const SidebarNowPlayingSettingsContextModal = (props: any) => (
+    <Suspense fallback={<Spinner container />}>
+        <LazySidebarNowPlayingSettingsContextModal {...props} />
+    </Suspense>
+);
+
 const LazyFullScreenPlayerSettingsContextModal = lazy(() =>
     import('/@/renderer/features/player/components/full-screen-player-settings-modal').then(
         (module) => ({
@@ -213,6 +227,7 @@ const appRouterModals = {
     settings: SettingsContextModal,
     shareItem: ShareItemContextModal,
     shuffleAll: ShuffleAllContextModal,
+    sidebarNowPlayingSettings: SidebarNowPlayingSettingsContextModal,
     updatePlaylist: UpdatePlaylistContextModal,
     visualizerSettings: VisualizerSettingsContextModal,
 };

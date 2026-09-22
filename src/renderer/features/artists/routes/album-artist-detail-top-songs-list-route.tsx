@@ -32,6 +32,7 @@ const AlbumArtistDetailTopSongsListRoute = () => {
 
     const [topSongsQueryType] = useLocalStorage<'community' | 'personal'>({
         defaultValue: 'community',
+        getInitialValueInEffect: false,
         key: 'album-artist-top-songs-query-type',
     });
 

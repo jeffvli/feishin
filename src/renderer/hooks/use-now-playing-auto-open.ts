@@ -14,7 +14,11 @@ export const useNowPlayingAutoOpen = () => {
     useEffect(() => {
         const handlePlayerPlay = (payload: PlayerPlayEventPayload) => {
             if (!payload.openNowPlaying) return;
-            if (useSettingsStore.getState().general.sideQueueType !== 'sideQueue') return;
+
+            const settings = useSettingsStore.getState();
+            if (!settings.general.showNowPlayingInSidebar) return;
+            if (!settings.sidebarNowPlaying.autoOpenOnPlay) return;
+            if (settings.general.sideQueueType !== 'sideQueue') return;
 
             setSideBar({ nowPlaying: true, rightExpanded: true });
         };

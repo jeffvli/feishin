@@ -418,15 +418,17 @@ export const TableConfig = ({
     );
 };
 
-const TableColumnConfig = ({
+export const TableColumnConfig = ({
     data,
-    enablePinColumnButtons,
+    enablePinColumnButtons = false,
     onChange,
+    title,
     value,
 }: {
     data: { label: string; value: string }[];
-    enablePinColumnButtons: boolean;
+    enablePinColumnButtons?: boolean;
     onChange: (value: ItemTableListColumnConfig[]) => void;
+    title?: string;
     value: ItemTableListColumnConfig[];
 }) => {
     const { t } = useTranslation();
@@ -610,7 +612,7 @@ const TableColumnConfig = ({
     return (
         <Stack gap="xs">
             <Group justify="space-between" mb="md">
-                <Text size="sm">{t('common.tableColumns')}</Text>
+                <Text size="sm">{title ?? t('common.tableColumns')}</Text>
                 <TextInput
                     onChange={(e) => setSearchColumns(e.currentTarget.value)}
                     placeholder={t('common.search')}

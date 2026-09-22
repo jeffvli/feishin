@@ -651,6 +651,51 @@ const LyricsSettingsSchema = z.object({
     translationTargetLanguage: z.string().nullable(),
 });
 
+const SidebarNowPlayingItemSchema = z.enum([
+    'album',
+    'artistBio',
+    'artistCard',
+    'externalLinks',
+    'genres',
+    'artistActions',
+    'similarArtists',
+    'topSongs',
+    'trackArt',
+    'trackArtist',
+]);
+
+export enum SidebarNowPlayingItem {
+    ALBUM = 'album',
+    ARTIST_ACTIONS = 'artistActions',
+    ARTIST_BIO = 'artistBio',
+    ARTIST_CARD = 'artistCard',
+    EXTERNAL_LINKS = 'externalLinks',
+    GENRES = 'genres',
+    SIMILAR_ARTISTS = 'similarArtists',
+    TOP_SONGS = 'topSongs',
+    TRACK_ART = 'trackArt',
+    TRACK_ARTIST = 'trackArtist',
+}
+
+const SidebarNowPlayingSectionSchema = z.object({
+    align: z.enum(['center', 'end', 'start']),
+    autoSize: z.boolean().optional(),
+    id: SidebarNowPlayingItemSchema,
+    isEnabled: z.boolean(),
+    pinned: z.union([z.literal('left'), z.literal('right'), z.literal(null)]),
+    width: z.number(),
+});
+
+export type SidebarNowPlayingSection = z.infer<typeof SidebarNowPlayingSectionSchema>;
+
+const SidebarNowPlayingSettingsSchema = z.object({
+    autoOpenOnPlay: z.boolean(),
+    coverArtOpensPanel: z.boolean(),
+    items: z.array(SidebarNowPlayingSectionSchema),
+});
+
+export type SidebarNowPlayingSettings = z.infer<typeof SidebarNowPlayingSettingsSchema>;
+
 const ScrobbleSettingsSchema = z.object({
     enabled: z.boolean(),
     minimumMode: ScrobbleMinimumModeSchema,
@@ -845,6 +890,7 @@ export const ValidationSettingsStateSchema = z.object({
     playback: PlaybackSettingsSchema,
     queryBuilder: QueryBuilderSettingsSchema,
     remote: RemoteSettingsSchema,
+    sidebarNowPlaying: SidebarNowPlayingSettingsSchema,
     tab: z.union([
         z.literal('general'),
         z.literal('hotkeys'),
@@ -1073,6 +1119,7 @@ export interface SettingsSlice extends z.infer<typeof SettingsStateSchema> {
         setPlaylistBehavior: (target: PlaylistTarget) => void;
         setSettings: (data: DeepPartial<SettingsState>) => void;
         setSidebarItems: (items: SidebarItemType[]) => void;
+        setSidebarNowPlayingItems: (items: SidebarNowPlayingSection[]) => void;
         setTable: (type: ItemListKey, data: DataTableProps) => void;
         setTranscodingConfig: (config: TranscodingConfig) => void;
         toggleMediaSession: () => void;
@@ -1095,6 +1142,89 @@ export type SortableItem<T extends string> = {
 export type TranscodingConfig = z.infer<typeof TranscodingConfigSchema>;
 
 export type VersionedSettings = SettingsState & { version: number };
+
+export const sidebarNowPlayingItems: SidebarNowPlayingSection[] = [
+    {
+        align: 'start',
+        autoSize: true,
+        id: SidebarNowPlayingItem.TRACK_ART,
+        isEnabled: true,
+        pinned: null,
+        width: 300,
+    },
+    {
+        align: 'start',
+        autoSize: true,
+        id: SidebarNowPlayingItem.TRACK_ARTIST,
+        isEnabled: false,
+        pinned: null,
+        width: 300,
+    },
+    {
+        align: 'start',
+        autoSize: true,
+        id: SidebarNowPlayingItem.ALBUM,
+        isEnabled: true,
+        pinned: null,
+        width: 300,
+    },
+    {
+        align: 'start',
+        autoSize: true,
+        id: SidebarNowPlayingItem.ARTIST_ACTIONS,
+        isEnabled: true,
+        pinned: null,
+        width: 300,
+    },
+    {
+        align: 'start',
+        autoSize: true,
+        id: SidebarNowPlayingItem.ARTIST_CARD,
+        isEnabled: true,
+        pinned: null,
+        width: 300,
+    },
+    {
+        align: 'start',
+        autoSize: true,
+        id: SidebarNowPlayingItem.ARTIST_BIO,
+        isEnabled: true,
+        pinned: null,
+        width: 300,
+    },
+    {
+        align: 'start',
+        autoSize: true,
+        id: SidebarNowPlayingItem.GENRES,
+        isEnabled: true,
+        pinned: null,
+        width: 300,
+    },
+    {
+        align: 'start',
+        autoSize: true,
+        id: SidebarNowPlayingItem.EXTERNAL_LINKS,
+        isEnabled: true,
+        pinned: null,
+        width: 300,
+    },
+    {
+        align: 'start',
+        autoSize: true,
+        id: SidebarNowPlayingItem.TOP_SONGS,
+        isEnabled: true,
+        pinned: null,
+        width: 300,
+    },
+    {
+        align: 'start',
+        autoSize: true,
+        id: SidebarNowPlayingItem.SIMILAR_ARTISTS,
+        isEnabled: true,
+        pinned: null,
+        width: 300,
+    },
+];
 
 export const playerItems: SortableItem<PlayerItem>[] = [
     {
@@ -2144,6 +2274,11 @@ const initialState: SettingsState = {
         port: 4333,
         username: 'feishin',
     },
+    sidebarNowPlaying: {
+        autoOpenOnPlay: true,
+        coverArtOpensPanel: true,
+        items: sidebarNowPlayingItems,
+    },
     tab: 'general',
     tagEditor: {
         tagConfigs: {
@@ -2394,6 +2529,11 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                         setSidebarItems: (items: SidebarItemType[]) => {
                             set((state) => {
                                 state.general.sidebarItems = items;
+                            });
+                        },
+                        setSidebarNowPlayingItems: (items: SidebarNowPlayingSection[]) => {
+                            set((state) => {
+                                state.sidebarNowPlaying.items = items;
                             });
                         },
                         setTable: (type: ItemListKey, data: DataTableProps) => {
@@ -2948,10 +3088,226 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     ) as typeof state.general.sidebarPanelOrder;
                 }
 
+                if (version < 38) {
+                    if (state.sidebarNowPlaying === undefined) {
+                        state.sidebarNowPlaying = {
+                            autoOpenOnPlay: true,
+                            coverArtOpensPanel: true,
+                            items: sidebarNowPlayingItems,
+                        };
+                    }
+                }
+
+                if (version < 40) {
+                    const np = state.sidebarNowPlaying as
+                        | undefined
+                        | {
+                              autoOpenOnPlay?: boolean;
+                              coverArtOpensPanel?: boolean;
+                              items?: Array<{ disabled?: boolean; id: SidebarNowPlayingItem }>;
+                              showAlbum?: boolean;
+                              showArtistBio?: boolean;
+                              showArtistCard?: boolean;
+                              showExternalLinks?: boolean;
+                              showGenres?: boolean;
+                              showSimilarArtists?: boolean;
+                              showTrackArt?: boolean;
+                              showTrackArtist?: boolean;
+                          };
+
+                    if (!np || !np.items) {
+                        state.sidebarNowPlaying = {
+                            autoOpenOnPlay: np?.autoOpenOnPlay ?? true,
+                            coverArtOpensPanel: np?.coverArtOpensPanel ?? true,
+                            items: [
+                                {
+                                    align: 'start',
+                                    autoSize: true,
+                                    id: SidebarNowPlayingItem.TRACK_ART,
+                                    isEnabled: np?.showTrackArt ?? true,
+                                    pinned: null,
+                                    width: 300,
+                                },
+                                {
+                                    align: 'start',
+                                    autoSize: true,
+                                    id: SidebarNowPlayingItem.TRACK_ARTIST,
+                                    isEnabled: np?.showTrackArtist ?? false,
+                                    pinned: null,
+                                    width: 300,
+                                },
+                                {
+                                    align: 'start',
+                                    autoSize: true,
+                                    id: SidebarNowPlayingItem.ALBUM,
+                                    isEnabled: np?.showAlbum ?? true,
+                                    pinned: null,
+                                    width: 300,
+                                },
+                                {
+                                    align: 'start',
+                                    autoSize: true,
+                                    id: SidebarNowPlayingItem.ARTIST_CARD,
+                                    isEnabled: np?.showArtistCard ?? true,
+                                    pinned: null,
+                                    width: 300,
+                                },
+                                {
+                                    align: 'start',
+                                    autoSize: true,
+                                    id: SidebarNowPlayingItem.ARTIST_BIO,
+                                    isEnabled: np?.showArtistBio ?? true,
+                                    pinned: null,
+                                    width: 300,
+                                },
+                                {
+                                    align: 'start',
+                                    autoSize: true,
+                                    id: SidebarNowPlayingItem.GENRES,
+                                    isEnabled: np?.showGenres ?? true,
+                                    pinned: null,
+                                    width: 300,
+                                },
+                                {
+                                    align: 'start',
+                                    autoSize: true,
+                                    id: SidebarNowPlayingItem.EXTERNAL_LINKS,
+                                    isEnabled: np?.showExternalLinks ?? true,
+                                    pinned: null,
+                                    width: 300,
+                                },
+                                {
+                                    align: 'start',
+                                    autoSize: true,
+                                    id: SidebarNowPlayingItem.SIMILAR_ARTISTS,
+                                    isEnabled: np?.showSimilarArtists ?? true,
+                                    pinned: null,
+                                    width: 300,
+                                },
+                            ],
+                        };
+                    }
+                }
+
+                if (version < 41) {
+                    const items = state.sidebarNowPlaying?.items as
+                        | Array<
+                              | SidebarNowPlayingSection
+                              | {
+                                    disabled?: boolean;
+                                    id: SidebarNowPlayingItem;
+                                    isEnabled?: boolean;
+                                }
+                          >
+                        | undefined;
+
+                    if (items?.length && items.some((item) => !('align' in item))) {
+                        state.sidebarNowPlaying.items = items.map((item) => {
+                            if ('align' in item) {
+                                return item as SidebarNowPlayingSection;
+                            }
+
+                            return {
+                                align: 'start' as const,
+                                autoSize: true,
+                                id: item.id,
+                                isEnabled: item.isEnabled ?? !item.disabled,
+                                pinned: null,
+                                width: 300,
+                            };
+                        });
+                    }
+                }
+
+                if (version < 42) {
+                    const items = state.sidebarNowPlaying?.items;
+                    if (items?.length) {
+                        state.sidebarNowPlaying.items = items.map((item) => ({
+                            ...item,
+                            autoSize: item.autoSize ?? true,
+                            width: item.width === 100 ? 300 : item.width,
+                        }));
+                    }
+                }
+
+                if (version < 43) {
+                    const items = state.sidebarNowPlaying?.items;
+                    if (
+                        items &&
+                        !items.some((item) => item.id === SidebarNowPlayingItem.TOP_SONGS)
+                    ) {
+                        const section: SidebarNowPlayingSection = {
+                            align: 'start',
+                            autoSize: true,
+                            id: SidebarNowPlayingItem.TOP_SONGS,
+                            isEnabled: true,
+                            pinned: null,
+                            width: 300,
+                        };
+                        const similarIndex = items.findIndex(
+                            (item) => item.id === SidebarNowPlayingItem.SIMILAR_ARTISTS,
+                        );
+                        if (similarIndex === -1) {
+                            items.push(section);
+                        } else {
+                            items.splice(similarIndex, 0, section);
+                        }
+                    }
+                }
+
+                if (version < 44) {
+                    const items = state.sidebarNowPlaying?.items;
+                    if (
+                        items &&
+                        !items.some((item) => item.id === SidebarNowPlayingItem.ARTIST_ACTIONS)
+                    ) {
+                        const section: SidebarNowPlayingSection = {
+                            align: 'start',
+                            autoSize: true,
+                            id: SidebarNowPlayingItem.ARTIST_ACTIONS,
+                            isEnabled: true,
+                            pinned: null,
+                            width: 300,
+                        };
+                        const topSongsIndex = items.findIndex(
+                            (item) => item.id === SidebarNowPlayingItem.TOP_SONGS,
+                        );
+                        if (topSongsIndex === -1) {
+                            items.push(section);
+                        } else {
+                            items.splice(topSongsIndex, 0, section);
+                        }
+                    }
+                }
+
+                if (version < 45) {
+                    const items = state.sidebarNowPlaying?.items;
+                    if (items) {
+                        const existingIndex = items.findIndex(
+                            (item) => item.id === SidebarNowPlayingItem.ARTIST_ACTIONS,
+                        );
+                        const section: SidebarNowPlayingSection =
+                            existingIndex === -1
+                                ? {
+                                      align: 'start',
+                                      autoSize: true,
+                                      id: SidebarNowPlayingItem.ARTIST_ACTIONS,
+                                      isEnabled: true,
+                                      pinned: null,
+                                      width: 300,
+                                  }
+                                : items.splice(existingIndex, 1)[0];
+                        const artistIndex = items.findIndex(
+                            (item) => item.id === SidebarNowPlayingItem.ARTIST_CARD,
+                        );
+                        items.splice(artistIndex === -1 ? items.length : artistIndex, 0, section);
+                    }
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 36,
+            version: 45,
         },
     ),
 );
@@ -3004,6 +3360,9 @@ export const useLyricsDisplaySettings = (key: string = 'default') =>
     useSettingsStore((state) => state.lyricsDisplay[key] || state.lyricsDisplay.default, shallow);
 
 export const useRemoteSettings = () => useSettingsStore((state) => state.remote, shallow);
+
+export const useSidebarNowPlayingSettings = () =>
+    useSettingsStore((state) => state.sidebarNowPlaying, shallow);
 
 export const useFontSettings = () => useSettingsStore((state) => state.font, shallow);
 

@@ -13,11 +13,48 @@
     min-height: 8rem;
 }
 
+/* Align classes match item-table-list-column.module.css `.container.left/center/right` */
+.section {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.section.center {
+    align-items: center;
+    text-align: center;
+}
+
+.section.center > * {
+    align-self: center;
+}
+
+.section.left {
+    align-items: flex-start;
+    text-align: left;
+}
+
+.section.left > * {
+    align-self: flex-start;
+}
+
+.section.right {
+    align-items: flex-end;
+    text-align: right;
+}
+
+.section.right > * {
+    align-self: flex-end;
+}
+
 .image {
     position: relative;
     width: 100%;
     aspect-ratio: 1;
     overflow: hidden;
+    cursor: pointer;
     border-radius: var(--theme-radius-md);
 }
 
@@ -35,6 +72,10 @@
     object-fit: cover;
 }
 
+.track-favorite-badge {
+    z-index: 2;
+}
+
 .track-title {
     flex: 1;
     min-width: 0;
@@ -42,6 +83,7 @@
 
 .artist-card {
     position: relative;
+    width: 100%;
     overflow: hidden;
     border-radius: var(--theme-radius-md);
 }
@@ -117,8 +159,17 @@
     -webkit-line-clamp: 3;
 }
 
-.artist-hero-bio-expanded {
+.artist-bio-expanded {
+    display: flex;
+    flex-direction: column;
+    gap: var(--theme-spacing-xs);
+    padding: 0 var(--theme-spacing-md) var(--theme-spacing-md);
+    background: rgb(0 0 0 / 88%);
+}
+
+.artist-bio-expanded .artist-hero-bio {
     display: block;
+    overflow: visible;
     -webkit-line-clamp: unset;
 }
 
