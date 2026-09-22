@@ -5,9 +5,10 @@ import type {
     OfflinePlaylist,
     OfflinePlaylistSyncRequest,
     OfflinePlaylistSyncResult,
+    OfflineStorageInfo,
 } from '/@/shared/types/offline';
 
-import { app, ipcMain, net } from 'electron';
+import { app, dialog, ipcMain, net } from 'electron';
 import { createHash } from 'node:crypto';
 import { createWriteStream } from 'node:fs';
 import { promises as fs } from 'node:fs';
@@ -15,6 +16,7 @@ import path from 'node:path';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 
+import { store } from '/@/main/features/core/settings';
 import log from '/@/main/logger';
 
 type OfflineManifest = {
@@ -29,10 +31,17 @@ type OfflineManifestV1 = {
 };
 
 const EMPTY_MANIFEST: OfflineManifest = { entries: {}, playlists: {}, version: 2 };
+const OFFLINE_DIRECTORY_SETTING = 'offline_download_directory';
 let manifestUpdate = Promise.resolve();
 
-const getOfflineRoot = () => path.join(app.getPath('userData'), 'offline');
-const getManifestPath = () => path.join(getOfflineRoot(), 'manifest.json');
+const getDefaultOfflineRoot = () => path.join(app.getPath('userData'), 'offline');
+const getManifestPath = () => path.join(getDefaultOfflineRoot(), 'manifest.json');
+const getOfflineRoot = () => {
+    const configuredDirectory = store.get(OFFLINE_DIRECTORY_SETTING);
+    return typeof configuredDirectory === 'string' && path.isAbsolute(configuredDirectory)
+        ? path.resolve(configuredDirectory)
+        : getDefaultOfflineRoot();
+};
 const getEntryKey = (serverId: string, songId: string) => `${serverId}:${songId}`;
 const getPlaylistKey = (serverId: string, playlistId: string) => `${serverId}:${playlistId}`;
 const hashPart = (value: string) => createHash('sha256').update(value).digest('hex');
@@ -48,10 +57,26 @@ const getFingerprint = (song: OfflineDownloadRequest['song']) =>
         song.sampleRate,
     ]);
 
-const resolveEntryPath = (fileName: string) => {
-    const root = path.resolve(getOfflineRoot());
+const resolveEntryPath = (fileName: string, directory = getOfflineRoot()) => {
+    const root = path.resolve(directory);
     const filePath = path.resolve(root, fileName);
-    return filePath.startsWith(`${root}${path.sep}`) ? filePath : null;
+    const relativePath = path.relative(root, filePath);
+    return relativePath &&
+        relativePath !== '..' &&
+        !relativePath.startsWith(`..${path.sep}`) &&
+        !path.isAbsolute(relativePath)
+        ? filePath
+        : null;
+};
+
+const getStorageInfo = (): OfflineStorageInfo => {
+    const defaultDirectory = path.resolve(getDefaultOfflineRoot());
+    const directory = path.resolve(getOfflineRoot());
+    return {
+        custom: directory !== defaultDirectory,
+        defaultDirectory,
+        directory,
+    };
 };
 
 const getExtension = (request: OfflineDownloadRequest) => {
@@ -100,11 +125,102 @@ const readManifest = async (): Promise<OfflineManifest> => {
 };
 
 const writeManifest = async (manifest: OfflineManifest) => {
-    await fs.mkdir(getOfflineRoot(), { recursive: true });
+    await fs.mkdir(getDefaultOfflineRoot(), { recursive: true });
     const manifestPath = getManifestPath();
     const temporaryPath = `${manifestPath}.tmp`;
     await fs.writeFile(temporaryPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
     await fs.rename(temporaryPath, manifestPath);
+};
+
+const migrateStorage = async (directory: null | string): Promise<OfflineStorageInfo> => {
+    const sourceDirectory = path.resolve(getOfflineRoot());
+    const defaultDirectory = path.resolve(getDefaultOfflineRoot());
+    const targetDirectory = directory ? path.resolve(directory) : defaultDirectory;
+
+    if (directory && !path.isAbsolute(directory)) {
+        throw new Error('Offline download location must be an absolute path');
+    }
+
+    if (sourceDirectory === targetDirectory) {
+        if (targetDirectory === defaultDirectory) {
+            store.delete(OFFLINE_DIRECTORY_SETTING);
+        } else {
+            store.set(OFFLINE_DIRECTORY_SETTING, targetDirectory);
+        }
+        return getStorageInfo();
+    }
+
+    await fs.mkdir(targetDirectory, { recursive: true });
+    const writeTestPath = path.join(
+        targetDirectory,
+        `.katiesamp-write-test-${process.pid}-${Date.now()}`,
+    );
+    try {
+        await fs.writeFile(writeTestPath, '');
+    } finally {
+        await fs.rm(writeTestPath, { force: true });
+    }
+
+    const manifest = await readManifest();
+    const copiedFiles: Array<{ source: string; target: string }> = [];
+
+    for (const entry of Object.values(manifest.entries)) {
+        const sourcePath = resolveEntryPath(entry.fileName, sourceDirectory);
+        const targetPath = resolveEntryPath(entry.fileName, targetDirectory);
+        if (!sourcePath || !targetPath) continue;
+
+        const sourceExists = await fs
+            .access(sourcePath)
+            .then(() => true)
+            .catch(() => false);
+        if (!sourceExists) continue;
+
+        await fs.mkdir(path.dirname(targetPath), { recursive: true });
+        const temporaryPath = `${targetPath}.migrating`;
+        try {
+            await fs.rm(temporaryPath, { force: true });
+            await fs.copyFile(sourcePath, temporaryPath);
+            await fs.rm(targetPath, { force: true });
+            await fs.rename(temporaryPath, targetPath);
+            copiedFiles.push({ source: sourcePath, target: targetPath });
+        } catch (error) {
+            await fs.rm(temporaryPath, { force: true });
+            throw error;
+        }
+    }
+
+    if (targetDirectory === defaultDirectory) {
+        store.delete(OFFLINE_DIRECTORY_SETTING);
+    } else {
+        store.set(OFFLINE_DIRECTORY_SETTING, targetDirectory);
+    }
+
+    for (const file of copiedFiles) {
+        try {
+            await fs.rm(file.source, { force: true });
+            await fs.rmdir(path.dirname(file.source)).catch(() => undefined);
+        } catch (error) {
+            log.warn('Failed to remove an old offline track after migration', {
+                error,
+                filePath: file.source,
+            });
+        }
+    }
+
+    log.info('Offline download location changed', {
+        directory: targetDirectory,
+        movedFiles: copiedFiles.length,
+    });
+    return getStorageInfo();
+};
+
+const setStorageDirectory = (directory: null | string): Promise<OfflineStorageInfo> => {
+    const operation = manifestUpdate.then(() => migrateStorage(directory));
+    manifestUpdate = operation.then(
+        () => undefined,
+        () => undefined,
+    );
+    return operation;
 };
 
 const updateManifest = <T>(update: (manifest: OfflineManifest) => Promise<T> | T): Promise<T> => {
@@ -317,6 +433,18 @@ const syncPlaylist = async (
 };
 
 ipcMain.handle('offline-download', (_event, request: OfflineDownloadRequest) => download(request));
+ipcMain.handle('offline-storage-get', () => getStorageInfo());
+ipcMain.handle('offline-storage-select', async (): Promise<null | string> => {
+    const result = await dialog.showOpenDialog({
+        defaultPath: getOfflineRoot(),
+        properties: ['openDirectory', 'createDirectory'],
+        title: 'Choose offline download location',
+    });
+    return result.canceled ? null : result.filePaths[0] || null;
+});
+ipcMain.handle('offline-storage-set', (_event, directory: null | string) =>
+    setStorageDirectory(directory),
+);
 ipcMain.handle('offline-list', async (): Promise<OfflineEntry[]> => {
     const manifest = await readManifest();
     return Object.values(manifest.entries);

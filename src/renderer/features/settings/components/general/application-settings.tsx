@@ -13,6 +13,7 @@ import {
 } from '/@/renderer/features/settings/components/general/artist-settings';
 import { FullscreenPlayerSettings } from '/@/renderer/features/settings/components/general/fullscreen-player-settings';
 import { HomeSettings } from '/@/renderer/features/settings/components/general/home-settings';
+import { OfflineStorageSettings } from '/@/renderer/features/settings/components/general/offline-storage-settings';
 import { PathSettings } from '/@/renderer/features/settings/components/general/path-settings';
 import {
     SettingOption,
@@ -816,6 +817,7 @@ export const ApplicationSettings = memo(() => {
 
     return (
         <SettingsSection
+            beforeOptions={<OfflineStorageSettings />}
             extra={
                 <>
                     <ImageResolutionSettings />

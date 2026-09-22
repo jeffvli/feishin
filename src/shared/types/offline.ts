@@ -39,3 +39,9 @@ export type OfflinePlaylistSyncResult = {
     removed: number;
     unchanged: number;
 };
+
+export type OfflineStorageInfo = {
+    custom: boolean;
+    defaultDirectory: string;
+    directory: string;
+};

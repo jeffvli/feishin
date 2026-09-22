@@ -15,12 +15,13 @@ export type SettingOption = {
 };
 
 interface SettingsSectionProps {
+    beforeOptions?: ReactNode;
     extra?: ReactNode;
     options: SettingOption[];
     title?: ReactNode;
 }
 
-export const SettingsSection = ({ extra, options, title }: SettingsSectionProps) => {
+export const SettingsSection = ({ beforeOptions, extra, options, title }: SettingsSectionProps) => {
     const { search: keyword } = useSettingSearchStore();
     const hasKeyword = keyword !== '';
 
@@ -36,6 +37,7 @@ export const SettingsSection = ({ extra, options, title }: SettingsSectionProps)
                 </TextTitle>
             )}
             <Stack gap="xl" px="xl">
+                {beforeOptions}
                 {values.map((option) => (
                     <SettingsOptions key={`option-${option.title}`} {...option} />
                 ))}
