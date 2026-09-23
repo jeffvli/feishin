@@ -3,6 +3,7 @@ import isElectron from 'is-electron';
 
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
+import * as browserLyricsApi from '/@/renderer/features/lyrics/api/browser-lyrics-api';
 import { getDefaultStructuredIndex } from '/@/renderer/features/lyrics/api/lyrics-utils';
 import { queryClient, QueryHookArgs } from '/@/renderer/lib/react-query';
 import { getServerById, useSettingsStore } from '/@/renderer/store';
@@ -10,7 +11,6 @@ import { hasFeature } from '/@/shared/api/utils';
 import {
     FullLyricsMetadata,
     InternetProviderLyricResponse,
-    InternetProviderLyricSearchResponse,
     LyricGetQuery,
     LyricSearchQuery,
     LyricsOverride,
@@ -24,7 +24,7 @@ import { LyricSource } from '/@/shared/types/domain-types';
 import { LyricsResponse } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
 
-const lyricsIpc = isElectron() ? window.api.lyrics : null;
+const lyricsApi = isElectron() ? window.api.lyrics : browserLyricsApi;
 
 export type LyricsQueryResult = {
     local: FullLyricsMetadata | null | StructuredLyric[];
@@ -194,7 +194,7 @@ export async function fetchRemoteLyricsAuto(song: QueueSong): Promise<FullLyrics
     const { fetch } = useSettingsStore.getState().lyrics;
     if (!fetch) return null;
     const remoteLyricsResult: InternetProviderLyricResponse | null =
-        await lyricsIpc?.getRemoteLyricsBySong(song);
+        await lyricsApi.getRemoteLyricsBySong(song);
 
     if (remoteLyricsResult) {
         return {
@@ -211,7 +211,7 @@ export async function fetchRemoteLyricsById(params: {
     remoteSource: LyricSource;
     song?: QueueSong | Song;
 }): Promise<LyricsResponse | null> {
-    const result = await lyricsIpc?.getRemoteLyricsByRemoteId(params as LyricGetQuery);
+    const result = await lyricsApi.getRemoteLyricsByRemoteId(params as LyricGetQuery);
     if (result) return formatLyrics(result);
     return null;
 }
@@ -261,10 +261,7 @@ export const lyricsQueries = {
         return queryOptions({
             gcTime: 1000 * 60 * 1,
             queryFn: () => {
-                if (lyricsIpc) {
-                    return lyricsIpc.searchRemoteLyrics(args.query);
-                }
-                return {} as Record<LyricSource, InternetProviderLyricSearchResponse[]>;
+                return lyricsApi.searchRemoteLyrics(args.query);
             },
             queryKey: queryKeys.songs.lyricsSearch(args.query),
             staleTime: 1000 * 60 * 1,

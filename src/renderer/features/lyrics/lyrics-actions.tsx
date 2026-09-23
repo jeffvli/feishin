@@ -249,7 +249,7 @@ export const LyricsActions = ({
                 </Group>
             ) : null}
             <Group className={styles.controlsRow} gap="xs" justify="center">
-                {isDesktop && sources.length ? (
+                {sources.length ? (
                     <Button
                         disabled={isActionsDisabled}
                         onClick={() =>
