@@ -270,7 +270,9 @@
         "noNetworkDescription": "Impossible de se connecter à ce serveur",
         "invalidJson": "JSON invalide",
         "serverLockSingleServer": "Un seul serveur est autorisé quand le serveur est verrouillé",
-        "playbackPausedDueToError": "La lecture a été suspendue en raison d'une erreur"
+        "playbackPausedDueToError": "La lecture a été suspendue en raison d'une erreur",
+        "jellyfinQuickConnectDeactivated": "Demande Quick Connect expirée",
+        "jellyfinQuickConnectNotActive": "Quick Connect n'est pas actif sur ce serveur"
     },
     "filter": {
         "mostPlayed": "Les plus joués",
@@ -360,7 +362,7 @@
                 "lyricScaleNonActive": "Mise à l'échelle des paroles inactives",
                 "lyricOpacityNonActive": "Opacité des paroles inactive",
                 "lyricFollowScrollAlignment": "Les paroles suivent l'alignement",
-                "lyricLineLeadTime": "Temps d'avance de la ligne de paroles (ms)",
+                "lyricLineLeadTime": "Temps d'avance des paroles (ms)",
                 "lyricPaddingLeft": "Marge de gauche des paroles (%)",
                 "lyricPaddingRight": "Marge de droite des paroles (%)",
                 "followCurrentLyric_description": "Défilement automatique pour garder la ligne de paroles active visible",
@@ -381,7 +383,8 @@
                 "playerItemAlignment": "Alignement des éléments du lecteur",
                 "titleDisplayType": "Style d'affichage du titre",
                 "titleDisplayType_optionMultiLine": "Multi-ligne",
-                "titleLineCount": "Nombre de lignes du titre"
+                "titleLineCount": "Nombre de lignes du titre",
+                "titleDisplayType_optionScroll": "Scroll"
             },
             "upNext": "À suivre",
             "lyrics": "Paroles",
@@ -420,7 +423,8 @@
             "recentlyPlayed": "Joués récemment",
             "title": "$t(common.home)",
             "recentlyReleased": "Sortis récemment",
-            "genres": "$t(entity.genre, {\"count\": 2})"
+            "genres": "$t(entity.genre, {\"count\": 2})",
+            "playlists": "Listes de lecture"
         },
         "albumDetail": {
             "moreFromArtist": "Plus de $t(entity.artist, {\"count\": 1})",
@@ -1048,7 +1052,32 @@
         "customThemes_description": "Déposez vos fichiers de thème .json dans ce dossier pour ajouter des thèmes personnalisés. Ils seront automatiquement pris en compte lors de l'ajout, de la modification ou de la suppression d'un fichier.",
         "customThemes": "Thèmes Personnalisé",
         "fullscreenAutoOpenTimeout_description": "Ouvrir automatiquement le lecteur plein écran après ce temps d'inactivité pendant la lecture d'un titre. Mettre à 0 pour désactiver",
-        "fullscreenAutoOpenTimeout": "Délai d'ouverture automatique du lecteur plein écran (minutes)"
+        "fullscreenAutoOpenTimeout": "Délai d'ouverture automatique du lecteur plein écran (minutes)",
+        "imagePlaceholderPriority_description": "Définit le type d'image placeholder à utiliser pendant le chargement si disponible",
+        "imagePlaceholderPriority": "Priorité des images placeholder",
+        "imagePlaceholderPriority_optionBlurhash": "BlurHash",
+        "imagePlaceholderPriority_optionDominantColor": "Couleur dominante",
+        "imagePlaceholderPriority_optionOff": "Off",
+        "imagePlaceholderPriority_optionThumbhash": "ThumbHash",
+        "playerbarWaveformStretch_description": "Étire l'onde pour remplir l'espace disponible",
+        "compressor_descriptionMpv": "Plage dynamique du compresseur FFmpeg acompressor (MPV)",
+        "compressor_descriptionWebAudio": "Plage dynamique du compresseur Web Audio API",
+        "compressorAttack_description": "La rapidité à laquelle le compresseur s'engage après que le signal dépasse le seuil.",
+        "compressorKnee_description": "Largeur du Soft knee. Des valeurs élevées rendent la transition vers la compression plus progressive.",
+        "compressorMakeupGain_description": "Gain de sortie appliqué après la compression pour restaurer le volume sonore.",
+        "compressorMakeupGain": "Makeup Gain (compensation de gain)",
+        "compressorPreset_description": "Appliquer un réglage de compresseur intégré ou enregistrer un personnalisé",
+        "compressorRelease_description": "Vitesse à laquelle le compresseur se relâche après que le signal soit passé en dessous du seuil.",
+        "compressorThreshold_description": "Niveau du signal au-dessus duquel la compression commence.",
+        "scrobbleMinimumMode_description": "Scrobble après un pourcentage du titre, certains nombres de secondes, ou si l'un ou l'autre est passé",
+        "scrobbleMinimumMode_optionBoth": "Les deux",
+        "scrobbleMinimumMode_optionSeconds": "Secondes",
+        "scrobbleMinimumMode_optionPercentage": "Pourcentage",
+        "scrobbleMinimumMode": "Mode minimal de scrobble",
+        "transcodeNote": "Le transcodage est effectué par le serveur et s'applique à la prochaine piste",
+        "transcodeSampleRate_description": "Taux d'échantillonnage maximal en Hz pour l'audio transcodé, p.ex. 192000. Laisser vide pour garder le taux de la source. Jellyfin seulement",
+        "transcodeSampleRate": "Taux d'échantillon maximal pour le transcodage",
+        "sidebarImageEnabled": "Bouton pour développer l'illustration de l'album"
     },
     "form": {
         "deletePlaylist": {
@@ -1073,7 +1102,17 @@
             "input_preferRemoteUrl": "Préférer une URL publique",
             "input_remoteUrl": "URL publique",
             "input_remoteUrlPlaceholder": "Optionnel : URL publique pour les fonctionnalités externes",
-            "input_passwordNoSSO": "L'authentification par proxy inverse (SSO) n'est pas prise en charge. Seules l'authentification par nom d'utilisateur/mot de passe et l'authentification Subsonic sont prises en charge"
+            "input_passwordNoSSO": "L'authentification par proxy inverse (SSO) n'est pas prise en charge. Seules l'authentification par nom d'utilisateur/mot de passe et l'authentification Subsonic sont prises en charge",
+            "input_jellyfinQuickConnect": "Connexion rapide",
+            "input_jellyfinQuickConnectCode": "Entrez ce code dance l'interface web Jellyfin pour autoriser",
+            "input_jellyfinQuickConnectCodeCopied": "Copié",
+            "input_jellyfinQuickConnectCodeCopy": "Copier le code",
+            "input_jellyfinQuickConnectOpen": "Ouvrir connexion rapide",
+            "input_jellyfinQuickConnectWaiting": "En attente de l'approbation sur votre serveur Jellyfin…",
+            "input_jellyfinSignInMethod": "Connectez-vous avec",
+            "input_jellyfinSignInMethodPassword": "Mot de passe",
+            "input_jellyfinSignInMethodQuickConnect": "Connexion rapide",
+            "input_remoteUrlDescription": "Utilisé à la place de l'URL pour les fonctionnalités externes, comme les liens partagés. Laissez ce champ vide sauf si votre serveur est accessible à une autre adresse depuis l'extérieur de votre réseau."
         },
         "addToPlaylist": {
             "success": "$t(entity.trackWithCount, {\"count\": {{message}} }) ajouté à $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
