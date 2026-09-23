@@ -10,12 +10,18 @@ import collapsedSidebarItemStyles from './collapsed-sidebar-item.module.css';
 import styles from './sidebar-playlist-list.module.css';
 
 import { ItemImage, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import imageColumnStyles from '/@/renderer/components/item-list/item-table-list/columns/image-column.module.css';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { openCreatePlaylistModal } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { useIsMutatingSidebarPlaylistFolderMove } from '/@/renderer/features/playlists/mutations/sidebar-playlist-folder-move-mutation';
 import { ItemRowPlayControls } from '/@/renderer/features/shared/components/item-row-play-controls';
+import { PlayButton } from '/@/renderer/features/shared/components/play-button';
+import {
+    LONG_PRESS_PLAY_BEHAVIOR,
+    PlayTooltip,
+} from '/@/renderer/features/shared/components/play-button-group';
 import {
     collectFolderPaths,
     PlaylistFolderDragExpandProvider,
@@ -33,6 +39,7 @@ import {
     useCurrentServer,
     useCurrentServerId,
     usePermissions,
+    usePlayButtonBehavior,
     useSidebarPlaylistListFilterRegex,
     useSidebarPlaylistMode,
     useSidebarPlaylistSorting,
@@ -260,6 +267,7 @@ export const PlaylistRowButton = memo(
         const serverId = useCurrentServerId();
 
         const permissions = usePermissions();
+        const playButtonBehavior = usePlayButtonBehavior();
 
         const handlePlay = useCallback(
             (id: string, type: Play) => {
@@ -298,7 +306,7 @@ export const PlaylistRowButton = memo(
                 variants={playlistRowDimVariants}
             >
                 {iconOnly ? (
-                    <Tooltip label={name} position="right">
+                    <Tooltip label={name} openDelay={0} position="right">
                         <div
                             className={clsx(styles.iconOnlyImage, {
                                 [styles.iconOnlyImageActive]: isActive,
@@ -312,7 +320,24 @@ export const PlaylistRowButton = memo(
                                 itemType={LibraryItem.PLAYLIST}
                                 src={imageUrl}
                                 thumbHash={item.thumbHash}
+                                type="table"
                             />
+                            {isHovered && (
+                                <div className={imageColumnStyles.playButtonOverlay}>
+                                    <PlayTooltip type={playButtonBehavior}>
+                                        <PlayButton
+                                            fill
+                                            onClick={() => handlePlay(to, playButtonBehavior)}
+                                            onLongPress={() =>
+                                                handlePlay(
+                                                    to,
+                                                    LONG_PRESS_PLAY_BEHAVIOR[playButtonBehavior],
+                                                )
+                                            }
+                                        />
+                                    </PlayTooltip>
+                                </div>
+                            )}
                         </div>
                     </Tooltip>
                 ) : isCompact ? (

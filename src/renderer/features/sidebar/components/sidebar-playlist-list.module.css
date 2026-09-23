@@ -160,9 +160,15 @@
 }
 
 .icon-only-image {
+    position: relative;
     width: 3rem;
     height: 3rem;
     border-radius: var(--theme-radius-md);
+    transition: transform 0.2s ease;
+}
+
+.row-icon-only:hover .icon-only-image {
+    transform: scale(1.08);
 }
 
 .icon-only-image-active {
