@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useAppTracker } from '/@/renderer/features/analytics/hooks/use-app-tracker';
+import { useMiniPlayerStore } from '/@/renderer/features/player/store/mini-player.store';
 import { CommandPalette } from '/@/renderer/features/search/components/command-palette';
 import { useGarbageCollection } from '/@/renderer/hooks/use-garbage-collection';
 import { HotkeyItem, useHotkeys } from '/@/renderer/hooks/use-hotkeys';
@@ -23,8 +24,11 @@ interface ResponsiveLayoutProps {
 
 const ResponsiveLayoutBase = ({ shell }: ResponsiveLayoutProps) => {
     const isMobile = useIsMobile();
+    // The mini player window is narrow enough to trip the mobile breakpoint; keep the
+    // desktop layout mounted (hidden) instead so it comes back as it was
+    const isMiniPlayer = useMiniPlayerStore((state) => state.enabled);
 
-    if (isMobile) {
+    if (isMobile && !isMiniPlayer) {
         return <MobileLayout shell={shell} />;
     }
 
