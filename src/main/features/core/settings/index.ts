@@ -1,4 +1,3 @@
-import type { TitleTheme } from '/@/shared/types/types';
 import type { FSWatcher } from 'fs';
 
 import {
@@ -16,20 +15,21 @@ import { promises as fs, watch as fsWatch } from 'fs';
 import path from 'path';
 
 import log from '/@/main/logger';
+import { Platform, type TitleTheme } from '/@/shared/types/types';
 
 const getFrame = () => {
     const isWindows = process.platform === 'win32';
     const isMacOS = process.platform === 'darwin';
 
     if (isWindows) {
-        return 'windows';
+        return Platform.WINDOWS;
     }
 
     if (isMacOS) {
-        return 'macOS';
+        return Platform.MACOS;
     }
 
-    return 'linux';
+    return Platform.LINUX;
 };
 
 const isDevelopment = process.env.NODE_ENV === 'development';
