@@ -68,6 +68,8 @@ export interface PlayerData {
 
 export interface QueueData {
     default: string[];
+    // Up Next: _uniqueIds added with "Play next", kept in order directly after the current song
+    priority: string[];
     shuffled: number[];
     songs: Record<string, QueueSong>;
 }
