@@ -1077,7 +1077,9 @@
         "transcodeNote": "Le transcodage est effectué par le serveur et s'applique à la prochaine piste",
         "transcodeSampleRate_description": "Taux d'échantillonnage maximal en Hz pour l'audio transcodé, p.ex. 192000. Laisser vide pour garder le taux de la source. Jellyfin seulement",
         "transcodeSampleRate": "Taux d'échantillon maximal pour le transcodage",
-        "sidebarImageEnabled": "Bouton pour développer l'illustration de l'album"
+        "sidebarImageEnabled": "Bouton pour développer l'illustration de l'album",
+        "playerbarWaveformStretch": "Étirement de l'onde",
+        "sidebarImageEnabled_description": "Affiche un bouton sur la pochette d'album de la barre du lecteur pour l'agrandir dans la barre latérale. Désactiver cette option masque aussi le bouton et réduit la pochette si elle est actuellement agrandie"
     },
     "form": {
         "deletePlaylist": {
@@ -1617,5 +1619,53 @@
         "systemAudioConsentTitle": "Permettre l'accès au système audio ?",
         "systemAudioCaptureFailed": "Impossible de démarrer la capture : {{message}}",
         "systemAudioExclusiveModeNotSupported": "Le visualiseur est indisponible lorsque le mode audio exclusif est activé. Désactivez ce mode dans les paramètres MPV et réessayez."
+    },
+    "dlna": {
+        "group": {
+            "remove": "Supprimer",
+            "searching": "Recherche…",
+            "selectSpeakers": "Sélectionner un groupe d'enceintes",
+            "title": "Groupe ({{count}} enceinte)",
+            "add": "Ajouter",
+            "addSpeaker": "Ajouter une enceinte",
+            "addSpeakers": "Ajouter des enceintes",
+            "addToGroup": "Ajouter au group",
+            "cancel": "Annuler",
+            "connect": "Connecter",
+            "coordinator": "coordinateur",
+            "failedToAddMessage": "Impossible d'ajouter {{name}}. Cet appareil n'est peut-être pas dans le même système Sonos.",
+            "failedToAddTitle": "Échec de l'ajout de l'enceinte",
+            "firstSelectedIsCoordinator": "Premier sélectionné = coordinateur",
+            "noSonosFound": "Aucun appareil Sonos trouvé",
+            "refresh": "Rafraîchir"
+        },
+        "speakerProperties": {
+            "bass": "Basse",
+            "crossfade": "Fondu enchaîné",
+            "ledState": "Voyant d'état",
+            "loadFailed": "Impossible de charger les propriétés",
+            "loading": "Chargement…",
+            "longPressHint": "Appui long pour les propriétés des haut-parleurs",
+            "loudness": "Intensité",
+            "touchControls": "Commandes tactiles",
+            "treble": "Treble"
+        },
+        "volume": {
+            "groupControl": "Maintenez Maj pour modifier le volumes individuels des haut-parleur",
+            "individualControl": "Relâcher Maj pour modifier le volume de tous les haut-parleurs"
+        },
+        "castToDevice": "Diffuser sur un appareil DLNA",
+        "castingToDevice": "Diffuser sur {{name}}",
+        "castingToGroup": "Diffuser sur le groupe ({{count}})",
+        "connected": "connecté",
+        "connecting": "Connexion…",
+        "createGroup": "Créer un groupe",
+        "devices": "Appareils DLNA",
+        "disconnect": "Déconnecté",
+        "disconnectAndContinue": "Se déconnecter et continuer",
+        "noDevicesFound": "Aucun appareil DLNA trouvé",
+        "nowCasting": "Diffusion en cours",
+        "searching": "Recherche d'appareils…",
+        "shiftDisconnectHint": "Maintenez Maj enfoncée et appuyez sur Déconnecter pour continuer la lecture sur l'enceinte"
     }
 }
