@@ -1,12 +1,14 @@
 import { closeAllModals } from '@mantine/modals';
 import isElectron from 'is-electron';
+import { nanoid } from 'nanoid/non-secure';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
+import { CustomHeadersInput } from '/@/renderer/features/servers/components/custom-headers-input';
 import { queryClient } from '/@/renderer/lib/react-query';
-import { getServerById, useAuthStoreActions } from '/@/renderer/store';
+import { getServerById, useAuthStore, useAuthStoreActions } from '/@/renderer/store';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
@@ -24,6 +26,7 @@ import {
     ServerListItemWithCredential,
     ServerType,
 } from '/@/shared/types/domain-types';
+import { HEADER_NAME_PATTERN, normalizeCustomHeaders } from '/@/shared/utils/server-headers';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
@@ -50,6 +53,11 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
 
     const form = useForm({
         initialValues: {
+            customHeaders: Object.entries(server?.customHeaders || {}).map(([key, value]) => ({
+                id: nanoid(),
+                key,
+                value,
+            })),
             isAdmin: server?.isAdmin,
             legacyAuth: false,
             name: server?.name,
@@ -70,6 +78,23 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
     const handleSubmit = form.onSubmit(async (values) => {
         try {
             setIsLoading(true);
+
+            const invalidHeader = values.customHeaders.find((entry) => {
+                const key = entry.key.trim();
+                const value = entry.value.trim();
+                if (!key && !value) return false;
+                if (!key || !value) return true;
+                return !HEADER_NAME_PATTERN.test(key);
+            });
+
+            if (invalidHeader) {
+                setIsLoading(false);
+                return toast.error({
+                    message: t('form.addServer.error_customHeaderInvalid'),
+                });
+            }
+
+            const normalizedCustomHeaders = normalizeCustomHeaders(values.customHeaders);
 
             // Check if we can skip authentication
             const usernameChanged = values.username !== server.username;
@@ -95,6 +120,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
 
                 serverItem = {
                     ...existingServer,
+                    customHeaders: normalizedCustomHeaders,
                     id: server.id,
                     name: values.name,
                     type: values.type,
@@ -118,6 +144,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                         username: values.username,
                     },
                     values.type,
+                    normalizedCustomHeaders,
                 );
 
                 if (!data) {
@@ -128,6 +155,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
 
                 serverItem = {
                     credential: data.credential,
+                    customHeaders: normalizedCustomHeaders,
                     id: server.id,
                     isAdmin: data.isAdmin,
                     name: values.name,
@@ -163,9 +191,10 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
 
             updateServer(server.id, serverItem);
 
-            // After re-authenticating, switch to the updated server so the user
-            // isn't left on the credentials / server-required screen.
-            if (!canSkipAuth) {
+            // After re-authenticating or updating, switch to the updated server if
+            // there is no current server or if this is the active server.
+            const currentServer = useAuthStore.getState().currentServer;
+            if (!canSkipAuth || !currentServer || currentServer.id === server.id) {
                 const updated = getServerById(server.id);
                 if (updated) {
                     setCurrentServer(updated);
@@ -252,6 +281,16 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                         />
                         {form.isDirty('preferRemoteUrl') && <ModifiedFieldIndicator />}
                     </Group>
+                )}
+                {isElectron() && (
+                    <CustomHeadersInput
+                        entries={form.values.customHeaders}
+                        keyLabel={t('form.addServer.input_customHeaderKey')}
+                        onAddLabel={t('form.addServer.input_customHeaderAdd')}
+                        onChange={(entries) => form.setFieldValue('customHeaders', entries)}
+                        onRemoveLabel={t('form.addServer.input_customHeaderRemove')}
+                        valueLabel={t('form.addServer.input_customHeaderValue')}
+                    />
                 )}
                 <TextInput
                     label={t('form.addServer.input', {

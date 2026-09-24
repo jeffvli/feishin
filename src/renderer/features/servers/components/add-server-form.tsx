@@ -12,6 +12,10 @@ import {
 import JellyfinIcon from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeIcon from '/@/renderer/features/servers/assets/navidrome.png';
 import SubsonicIcon from '/@/renderer/features/servers/assets/opensubsonic.png';
+import {
+    CustomHeaderEntry,
+    CustomHeadersInput,
+} from '/@/renderer/features/servers/components/custom-headers-input';
 import { IgnoreCorsSslSwitches } from '/@/renderer/features/servers/components/ignore-cors-ssl-switches';
 import { JellyfinQuickConnectButton } from '/@/renderer/features/servers/components/jellyfin-quick-connect-button';
 import {
@@ -36,6 +40,7 @@ import { useFocusTrap } from '/@/shared/hooks/use-focus-trap';
 import { useForm } from '/@/shared/hooks/use-form';
 import { AuthenticationResponse, ServerListItemWithCredential } from '/@/shared/types/domain-types';
 import { DiscoveredServerItem, ServerType, toServerType } from '/@/shared/types/types';
+import { HEADER_NAME_PATTERN, normalizeCustomHeaders } from '/@/shared/utils/server-headers';
 
 const autodiscover = isElectron() ? window.api.autodiscover : null;
 const localSettings = isElectron() ? window.api.localSettings : null;
@@ -112,6 +117,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
     const form = useForm({
         initialValues: {
+            customHeaders: [] as CustomHeaderEntry[],
             legacyAuth: isLegacyAuth(),
             name:
                 (localSettings ? localSettings.env.SERVER_NAME : window.SERVER_NAME) || 'My Server',
@@ -142,10 +148,12 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         start: startQuickConnect,
         stop: stopQuickConnect,
     } = useJellyfinQuickConnect({
+        customHeaders: normalizeCustomHeaders(form.values.customHeaders),
         onAuthenticated: (data) => {
             const url = form.values.url;
             const serverItem: ServerListItemWithCredential = {
                 credential: data.credential,
+                customHeaders: normalizeCustomHeaders(form.values.customHeaders),
                 id: nanoid(),
                 isAdmin: data.isAdmin,
                 name: form.values.name,
@@ -198,6 +206,22 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             });
         }
 
+        const invalidHeader = values.customHeaders.find((entry) => {
+            const key = entry.key.trim();
+            const value = entry.value.trim();
+            if (!key && !value) return false;
+            if (!key || !value) return true;
+            return !HEADER_NAME_PATTERN.test(key);
+        });
+
+        if (invalidHeader) {
+            return toast.error({
+                message: t('form.addServer.error_customHeaderInvalid'),
+            });
+        }
+
+        const normalizedCustomHeaders = normalizeCustomHeaders(values.customHeaders);
+
         try {
             setIsLoading(true);
             const data: AuthenticationResponse | undefined = await authFunction(
@@ -208,6 +232,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                     username: values.username,
                 },
                 values.type as ServerType,
+                normalizedCustomHeaders,
             );
 
             if (!data) {
@@ -218,6 +243,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
             const serverItem: ServerListItemWithCredential = {
                 credential: data.credential,
+                customHeaders: normalizedCustomHeaders,
                 id: nanoid(),
                 isAdmin: data.isAdmin,
                 name: values.name,
@@ -350,6 +376,15 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                     )}
                     {isElectron() && (
                         <>
+                            <Divider />
+                            <CustomHeadersInput
+                                entries={form.values.customHeaders}
+                                keyLabel={t('form.addServer.input_customHeaderKey')}
+                                onAddLabel={t('form.addServer.input_customHeaderAdd')}
+                                onChange={(entries) => form.setFieldValue('customHeaders', entries)}
+                                onRemoveLabel={t('form.addServer.input_customHeaderRemove')}
+                                valueLabel={t('form.addServer.input_customHeaderValue')}
+                            />
                             <Divider />
                             <IgnoreCorsSslSwitches />
                             <Divider />
