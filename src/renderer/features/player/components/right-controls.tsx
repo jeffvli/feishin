@@ -36,7 +36,9 @@ import {
     useSetFullScreenPlayerStore,
     useSettingsStoreActions,
     useShowFavorites,
+    useShowNowPlayingInSidebar,
     useShowRatings,
+    useSidebarNowPlaying,
     useSidebarRightExpanded,
     useSideQueueType,
     useVolumeWheelStep,
@@ -101,6 +103,7 @@ export const RightControls = () => {
                 <PlayerConfig />
                 <LyricsButton />
                 {showFavorites && <FavoriteButton />}
+                <NowPlayingButton />
                 <QueueButton />
                 {playbackType === PlayerType.DLNA ? <DlnaVolumeButton /> : <VolumeButton />}
             </Group>
@@ -343,22 +346,33 @@ const AutoDJButton = () => {
 const QueueButton = () => {
     const { t } = useTranslation();
     const isSidebarRightExpanded = useSidebarRightExpanded();
+    const nowPlayingOpen = useSidebarNowPlaying();
     const { setSideBar } = useAppStoreActions();
     const sideQueueType = useSideQueueType();
     const { bindings } = useHotkeySettings();
     const [popoverOpened, setPopoverOpened] = useState(false);
     const handleToggleQueue = () => {
-        if (sideQueueType === 'sideQueue') setSideBar({ rightExpanded: !isSidebarRightExpanded });
-        else setPopoverOpened((prev) => !prev);
+        if (sideQueueType === 'sideQueue') {
+            if (nowPlayingOpen) {
+                setSideBar({ nowPlaying: false, rightExpanded: true });
+                return;
+            }
+            setSideBar({ rightExpanded: !isSidebarRightExpanded });
+        } else setPopoverOpened((prev) => !prev);
     };
     useHotkeys([
         [bindings.toggleQueue.isGlobal ? '' : bindings.toggleQueue.hotkey, handleToggleQueue],
     ]);
     if (sideQueueType === 'sideQueue') {
+        const queueVisible = isSidebarRightExpanded && !nowPlayingOpen;
+
         return (
             <ActionIcon
                 icon={isSidebarRightExpanded ? 'panelRightClose' : 'panelRightOpen'}
-                iconProps={{ size: 'lg' }}
+                iconProps={{
+                    color: queueVisible ? 'primary' : undefined,
+                    size: 'lg',
+                }}
                 onClick={(e) => {
                     e.stopPropagation();
                     handleToggleQueue();
@@ -380,6 +394,42 @@ const QueueButton = () => {
                 handleToggleQueue();
             }}
             opened={popoverOpened}
+        />
+    );
+};
+
+const NowPlayingButton = () => {
+    const { t } = useTranslation();
+    const nowPlayingOpen = useSidebarNowPlaying();
+    const { setSideBar } = useAppStoreActions();
+    const sideQueueType = useSideQueueType();
+    const showNowPlaying = useShowNowPlayingInSidebar();
+
+    if (sideQueueType !== 'sideQueue' || !showNowPlaying) {
+        return null;
+    }
+
+    return (
+        <ActionIcon
+            icon="itemSong"
+            iconProps={{
+                color: nowPlayingOpen ? 'primary' : undefined,
+                size: 'lg',
+            }}
+            onClick={(e) => {
+                e.stopPropagation();
+                if (nowPlayingOpen) {
+                    setSideBar({ nowPlaying: false, rightExpanded: false });
+                } else {
+                    setSideBar({ nowPlaying: true, rightExpanded: true });
+                }
+            }}
+            size="sm"
+            tooltip={{
+                label: t('page.sidebar.nowPlaying'),
+                openDelay: 0,
+            }}
+            variant="subtle"
         />
     );
 };

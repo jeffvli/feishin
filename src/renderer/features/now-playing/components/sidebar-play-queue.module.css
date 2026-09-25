@@ -38,6 +38,23 @@
     background-color: var(--theme-colors-background-alternate);
 }
 
+.now-playing-section {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    padding: var(--theme-spacing-md);
+    overflow: hidden;
+    background: var(--theme-colors-background);
+    background-color: var(--theme-colors-background-alternate);
+}
+
+.now-playing-header {
+    flex-shrink: 0;
+    margin-bottom: var(--theme-spacing-sm);
+}
+
 .lyrics-section :global(.synchronized-lyrics),
 .lyrics-section :global(.synchronized-karaoke-lyrics) {
     padding: 2rem 0 4rem !important;

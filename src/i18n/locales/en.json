@@ -497,6 +497,13 @@
             "viewAll": "View all",
             "viewAllTracks": "View all $t(entity.track, {\"count\": 2})"
         },
+        "nowPlaying": {
+            "empty": "Nothing playing",
+            "plays_one": "{{count}} play",
+            "plays_other": "{{count}} plays",
+            "showLess": "Show less",
+            "showMore": "Show more"
+        },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
@@ -721,7 +728,9 @@
             "transcoding": "Transcoding",
             "discord": "Discord",
             "logger": "Logger",
-            "playerFilters": "Player Filters"
+            "playerFilters": "Player Filters",
+            "nowPlayingBehavior": "Now Playing behavior",
+            "nowPlayingDisplay": "Now Playing display"
         },
         "sidebar": {
             "albumArtists": "Album Artists",
@@ -1145,6 +1154,8 @@
         "preferLocalLyrics": "Prefer local lyrics",
         "showLyricsInSidebar_description": "A panel will be added to the attached play queue that displays the lyrics",
         "showLyricsInSidebar": "Show lyrics in player sidebar",
+        "showNowPlayingInSidebar_description": "Click the player bar album art to open a now playing view over the side queue",
+        "showNowPlayingInSidebar": "Show now playing in player sidebar",
         "showFavorites": "Show favorites",
         "showFavorites_description": "Controls if the favorite (heart) buttons show up in the interface",
         "showQueueInSidebar_description": "A panel will be added to the player sidebar that displays the play queue",
@@ -1320,7 +1331,24 @@
         "microtonalPitchControls": "Microtonal pitch controls",
         "microtonalPitchControls_description": "Add more pitch controls to go between semi-tones",
         "sidebarImageEnabled": "Expand album art button",
-        "sidebarImageEnabled_description": "Show a button on the player bar's album art to expand it into the sidebar. Disabling this also hides the button and collapses the album art if it is currently expanded"
+        "sidebarImageEnabled_description": "Show a button on the player bar's album art to expand it into the sidebar. Disabling this also hides the button and collapses the album art if it is currently expanded",
+        "nowPlaying_autoOpenOnPlay": "Open on play",
+        "nowPlaying_autoOpenOnPlay_description": "With Play Now or Shuffle",
+        "nowPlaying_coverArtOpensPanel": "Cover art opens panel",
+        "nowPlaying_coverArtOpensPanel_description": "Clicking the player bar cover art opens or closes the Now Playing panel when the side queue is enabled",
+        "nowPlaying_showAlbum": "Show album",
+        "nowPlaying_showArtistBio": "Show artist biography",
+        "nowPlaying_showArtistCard": "Show artist card",
+        "nowPlaying_showExternalLinks": "Show external links",
+        "nowPlaying_showGenres": "Show genres",
+        "nowPlaying_showArtistActions": "Show artist actions",
+        "nowPlaying_showSimilarArtists": "Show similar artists",
+        "nowPlaying_showTopSongs": "Show top songs",
+        "nowPlaying_showTrackArt": "Show track art",
+        "nowPlaying_showTrackArtist": "Show track artist",
+        "nowPlaying_showTrackArtist_description": "Show the artist name under the track title. The artist is also shown in the artist card below",
+        "nowPlaying_itemConfiguration": "Now Playing sections",
+        "nowPlaying_itemConfiguration_description": "Configure which sections are shown and in what order"
     },
     "table": {
         "column": {

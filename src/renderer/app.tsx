@@ -15,6 +15,7 @@ import { useCheckForUpdates } from '/@/renderer/hooks/use-check-for-updates';
 import { useFullscreenAutoOpen } from '/@/renderer/hooks/use-fullscreen-auto-open';
 import { useFullscreenToggle } from '/@/renderer/hooks/use-fullscreen-toggle';
 import { useNativeMenuSync } from '/@/renderer/hooks/use-native-menu-sync';
+import { useNowPlayingAutoOpen } from '/@/renderer/hooks/use-now-playing-auto-open';
 import { useSyncSettingsToMain } from '/@/renderer/hooks/use-sync-settings-to-main';
 import { AppRouter } from '/@/renderer/router/app-router';
 import {
@@ -122,6 +123,7 @@ const AppEffects = () => (
         <NativeMenuSyncEffect />
         <FullscreenToggleEffect />
         <FullscreenAutoOpenEffect />
+        <NowPlayingAutoOpenEffect />
         <InputFocusEffect />
     </>
 );
@@ -274,6 +276,12 @@ const FullscreenToggleEffect = () => {
 
 const FullscreenAutoOpenEffect = () => {
     useFullscreenAutoOpen();
+
+    return null;
+};
+
+const NowPlayingAutoOpenEffect = () => {
+    useNowPlayingAutoOpen();
 
     return null;
 };

@@ -242,6 +242,7 @@ function emitPlayerPlayEvent(
     targetSongUniqueId: string | undefined,
     set: (fn: (state: PlayerState) => void) => void,
     get: () => PlayerState,
+    openNowPlaying = false,
 ): void {
     // Clear radio before status changes so onPlayerStatus does not restart the stream.
     clearActiveRadio();
@@ -285,6 +286,7 @@ function emitPlayerPlayEvent(
             eventEmitter.emit('PLAYER_PLAY', {
                 id: targetSongUniqueId,
                 index: playIndex,
+                openNowPlaying,
             });
         }
     } else {
@@ -298,6 +300,7 @@ function emitPlayerPlayEvent(
             eventEmitter.emit('PLAYER_PLAY', {
                 id: currentSong._uniqueId,
                 index: currentIndex,
+                openNowPlaying,
             });
         }
     }
@@ -574,7 +577,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 }
                             });
 
-                            emitPlayerPlayEvent(targetSongUniqueId, set, get);
+                            emitPlayerPlayEvent(targetSongUniqueId, set, get, true);
                             break;
                         }
                         case Play.SHUFFLE: {
@@ -599,7 +602,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 state.queue.shuffled = generateShuffledIndexes(shuffledIds.length);
                             });
 
-                            emitPlayerPlayEvent(targetSongUniqueId, set, get);
+                            emitPlayerPlayEvent(targetSongUniqueId, set, get, true);
                             break;
                         }
                     }
