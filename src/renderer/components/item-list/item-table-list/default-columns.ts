@@ -23,7 +23,7 @@ export const SONG_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 240,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: true,
         label: i18n.t('table.config.label.rowIndex'),
@@ -68,7 +68,7 @@ export const SONG_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 300,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: true,
         label: i18n.t('table.config.label.duration'),
@@ -176,7 +176,7 @@ export const SONG_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 100,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: false,
         label: i18n.t('table.config.label.trackNumber'),
@@ -293,7 +293,7 @@ export const SONG_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 100,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: true,
         label: i18n.t('table.config.label.favorite'),
@@ -302,7 +302,7 @@ export const SONG_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 60,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: false,
         label: i18n.t('table.config.label.rating'),
@@ -311,7 +311,7 @@ export const SONG_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 100,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: false,
         label: i18n.t('table.config.label.actions'),
@@ -325,7 +325,7 @@ export const PLAYLIST_SONG_TABLE_COLUMNS: DefaultTableColumn[] = SONG_TABLE_COLU
 
 export const ALBUM_TABLE_COLUMNS: DefaultTableColumn[] = [
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: true,
         label: i18n.t('table.config.label.rowIndex'),
@@ -370,7 +370,7 @@ export const ALBUM_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 300,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: true,
         label: i18n.t('table.config.label.duration'),
@@ -478,7 +478,7 @@ export const ALBUM_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 100,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: true,
         label: i18n.t('table.config.label.favorite'),
@@ -487,7 +487,7 @@ export const ALBUM_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 60,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: false,
         label: i18n.t('table.config.label.rating'),
@@ -496,7 +496,7 @@ export const ALBUM_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 100,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: false,
         label: i18n.t('table.config.label.actions'),
@@ -508,7 +508,7 @@ export const ALBUM_TABLE_COLUMNS: DefaultTableColumn[] = [
 
 export const ALBUM_ARTIST_TABLE_COLUMNS: DefaultTableColumn[] = [
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: true,
         label: i18n.t('table.config.label.rowIndex'),
@@ -535,7 +535,7 @@ export const ALBUM_ARTIST_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 300,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: false,
         label: i18n.t('table.config.label.duration'),
@@ -598,7 +598,7 @@ export const ALBUM_ARTIST_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 100,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: true,
         label: i18n.t('table.config.label.favorite'),
@@ -607,7 +607,7 @@ export const ALBUM_ARTIST_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 60,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: false,
         label: i18n.t('table.config.label.rating'),
@@ -616,7 +616,7 @@ export const ALBUM_ARTIST_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 100,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: false,
         label: i18n.t('table.config.label.actions'),
@@ -628,7 +628,7 @@ export const ALBUM_ARTIST_TABLE_COLUMNS: DefaultTableColumn[] = [
 
 export const PLAYLIST_TABLE_COLUMNS: DefaultTableColumn[] = [
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: true,
         label: i18n.t('table.config.label.rowIndex'),
@@ -664,7 +664,7 @@ export const PLAYLIST_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 300,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: true,
         label: i18n.t('table.config.label.duration'),
@@ -691,7 +691,7 @@ export const PLAYLIST_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 100,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: false,
         label: i18n.t('table.config.label.actions'),
@@ -703,7 +703,7 @@ export const PLAYLIST_TABLE_COLUMNS: DefaultTableColumn[] = [
 
 export const GENRE_TABLE_COLUMNS: DefaultTableColumn[] = [
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: true,
         label: i18n.t('table.config.label.rowIndex'),
@@ -739,7 +739,7 @@ export const GENRE_TABLE_COLUMNS: DefaultTableColumn[] = [
         width: 100,
     },
     {
-        align: 'center',
+        align: 'start',
         autoSize: false,
         isEnabled: false,
         label: i18n.t('table.config.label.actions'),
