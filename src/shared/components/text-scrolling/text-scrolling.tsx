@@ -35,22 +35,43 @@ export const BaseTextScrolling = ({ children, gap, pause, speed, ...rest }: Text
         const checkOverflow = () => {
             const container = containerRef.current;
             const text = textRef.current;
+            const track = trackRef.current;
 
             if (!container || !text) {
                 return;
             }
 
             const overflow = text.scrollWidth - container.clientWidth;
-            const textWidth = text.scrollWidth;
+
+            // A title that fits must never inherit a previous title's scroll
+            // position: clear any running animation and snap back to origin.
+            if (overflow <= 0 && track) {
+                track.getAnimations().forEach((animation) => animation.cancel());
+                track.style.transform = '';
+            }
 
             setIsOverflowing(overflow > 0);
-            setScrollDistance(textWidth);
+            setScrollDistance(text.scrollWidth);
         };
 
         checkOverflow();
+
+        // Webfonts (e.g. the 900-weight title face) change text width after
+        // first paint; re-check once they settle so short titles are not
+        // stuck in a stale overflowing state.
+        let fontsDone = false;
+        document.fonts?.ready.then(() => {
+            if (!fontsDone) {
+                checkOverflow();
+            }
+        });
+
         window.addEventListener('resize', checkOverflow);
 
-        return () => window.removeEventListener('resize', checkOverflow);
+        return () => {
+            fontsDone = true;
+            window.removeEventListener('resize', checkOverflow);
+        };
     }, [children]);
 
     useEffect(() => {
@@ -117,10 +138,15 @@ export const BaseTextScrolling = ({ children, gap, pause, speed, ...rest }: Text
         };
     }, [isOverflowing, scrollDistance, gap, pause, speed]);
 
+    // Remount the track per title so scroll state (overflow flag, distance,
+    // transform) from a previous title can never leak into the next one.
+    const trackKey = typeof children === 'string' ? children : 'text-scrolling-track';
+
     return (
         <div className={styles.scrollingTextContainer} ref={containerRef}>
             <div
                 className={styles.track}
+                key={trackKey}
                 ref={trackRef}
                 style={{ '--scroll-gap': `${gap}px` } as CSSProperties}
             >
