@@ -11,6 +11,7 @@ export enum JFAlbumArtistListSort {
 
 export enum JFAlbumListSort {
     ALBUM_ARTIST = 'AlbumArtist,SortName',
+    ALBUM_ARTIST_YEAR_ALBUM = 'AlbumArtist,ProductionYear,SortName',
     COMMUNITY_RATING = 'CommunityRating,SortName',
     CRITIC_RATING = 'CriticRating,SortName',
     NAME = 'SortName',
@@ -588,6 +589,7 @@ const album = z.object({
 
 const albumListSort = {
     ALBUM_ARTIST: 'AlbumArtist,SortName',
+    ALBUM_ARTIST_YEAR_ALBUM: 'AlbumArtist,ProductionYear,SortName',
     COMMUNITY_RATING: 'CommunityRating,SortName',
     CRITIC_RATING: 'CriticRating,SortName',
     NAME: 'SortName',
