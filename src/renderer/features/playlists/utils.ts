@@ -14,6 +14,9 @@ export function playlistSongsToAlbums(songs: Song[]): PlaylistAlbumRow[] {
     let prevAlbumId = songs[0].albumId;
 
     const pushRow = (song: Song, groupSongs: Song[]) => {
+        const lastPlayedDates = groupSongs
+            .map((s) => s.lastPlayedAt)
+            .filter((d): d is string => d !== null);
         rows.push({
             _itemType: LibraryItem.ALBUM,
             _playlistSongs: groupSongs,
@@ -27,7 +30,7 @@ export function playlistSongsToAlbums(songs: Song[]): PlaylistAlbumRow[] {
             createdAt: song.createdAt,
             discs: null,
             dominantColor: null,
-            duration: null,
+            duration: groupSongs.reduce((total, s) => total + s.duration, 0),
             explicitStatus: song.explicitStatus,
             gain: null,
             genres: song.genres,
@@ -35,7 +38,10 @@ export function playlistSongsToAlbums(songs: Song[]): PlaylistAlbumRow[] {
             imageId: song.imageId,
             imageUrl: song.imageUrl,
             isCompilation: song.compilation,
-            lastPlayedAt: song.lastPlayedAt,
+            lastPlayedAt:
+                lastPlayedDates.length > 0
+                    ? lastPlayedDates.reduce((a, b) => (a > b ? a : b))
+                    : null,
             mbzId: null,
             mbzReleaseGroupId: null,
             missing: null,
@@ -44,7 +50,7 @@ export function playlistSongsToAlbums(songs: Song[]): PlaylistAlbumRow[] {
             originalYear: 0,
             participants: song.participants,
             peak: null,
-            playCount: null,
+            playCount: groupSongs.reduce((total, s) => total + s.playCount, 0),
             ratedAt: null,
             recordLabels: [],
             releaseDate: song.releaseDate,
@@ -52,7 +58,7 @@ export function playlistSongsToAlbums(songs: Song[]): PlaylistAlbumRow[] {
             releaseTypes: [],
             releaseYear: song.releaseYear,
             size: null,
-            songCount: null,
+            songCount: groupSongs.length,
             sortName: song.album ?? '',
             starredAt: null,
             tags: song.tags,
