@@ -77,6 +77,8 @@ const getSubsonicImageRequest = ({
 
 const ALBUM_LIST_SORT_MAPPING: Record<AlbumListSort, AlbumListSortType | undefined> = {
     [AlbumListSort.ALBUM_ARTIST]: AlbumListSortType.ALPHABETICAL_BY_ARTIST,
+    // No server-side equivalent: fetch pre-sorted by artist and refine client-side below.
+    [AlbumListSort.ALBUM_ARTIST_YEAR_ALBUM]: AlbumListSortType.ALPHABETICAL_BY_ARTIST,
     [AlbumListSort.ARTIST]: undefined,
     [AlbumListSort.COMMUNITY_RATING]: undefined,
     [AlbumListSort.CRITIC_RATING]: undefined,
@@ -731,11 +733,16 @@ export const SubsonicController: InternalControllerEndpoint = {
             throw new Error('Failed to get album list');
         }
 
+        const items =
+            res.body.albumList2.album?.map((album) =>
+                ssNormalize.album(album, apiClientProps.server),
+            ) || [];
+
         return {
             items:
-                res.body.albumList2.album?.map((album) =>
-                    ssNormalize.album(album, apiClientProps.server),
-                ) || [],
+                query.sortBy === AlbumListSort.ALBUM_ARTIST_YEAR_ALBUM
+                    ? sortAlbumList(items, query.sortBy, query.sortOrder)
+                    : items,
             startIndex: query.startIndex,
             totalRecordCount: null,
         };
