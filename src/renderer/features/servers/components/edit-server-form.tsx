@@ -12,6 +12,7 @@ import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { PasswordInput } from '/@/shared/components/password-input/password-input';
+import { Select } from '/@/shared/components/select/select';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { toast } from '/@/shared/components/toast/toast';
@@ -20,6 +21,7 @@ import { useFocusTrap } from '/@/shared/hooks/use-focus-trap';
 import { useForm } from '/@/shared/hooks/use-form';
 import {
     AuthenticationResponse,
+    AuthMode,
     ServerListItem,
     ServerListItemWithCredential,
     ServerType,
@@ -50,8 +52,8 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
 
     const form = useForm({
         initialValues: {
+            auth: server?.auth,
             isAdmin: server?.isAdmin,
-            legacyAuth: false,
             name: server?.name,
             password: password || '',
             preferInstantMix: server.preferInstantMix,
@@ -113,7 +115,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 data = await authFunction(
                     values.url,
                     {
-                        legacy: values.legacyAuth,
+                        auth: values.auth,
                         password: values.password,
                         username: values.username,
                     },
@@ -127,6 +129,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 }
 
                 serverItem = {
+                    auth: values.auth,
                     credential: data.credential,
                     id: server.id,
                     isAdmin: data.isAdmin,
@@ -253,19 +256,26 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                         {form.isDirty('preferRemoteUrl') && <ModifiedFieldIndicator />}
                     </Group>
                 )}
-                <TextInput
-                    label={t('form.addServer.input', {
-                        context: 'username',
-                    })}
-                    required
-                    rightSection={form.isDirty('username') && <ModifiedFieldIndicator />}
-                    {...form.getInputProps('username')}
-                />
+                {(form.values.type !== ServerType.SUBSONIC ||
+                    form.values.auth !== AuthMode.API_KEY) && (
+                    <TextInput
+                        label={t('form.addServer.input', {
+                            context: 'username',
+                        })}
+                        required
+                        rightSection={form.isDirty('username') && <ModifiedFieldIndicator />}
+                        {...form.getInputProps('username')}
+                    />
+                )}
                 <PasswordInput
                     data-autofocus
                     label={t('form.addServer.input', {
                         context: 'password',
                     })}
+                    required={
+                        form.values.type === ServerType.SUBSONIC &&
+                        form.values.auth !== AuthMode.API_KEY
+                    }
                     {...form.getInputProps('password')}
                 />
                 {localSettings && isNavidrome && (
@@ -279,13 +289,26 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     />
                 )}
                 {isSubsonic && (
-                    <Checkbox
+                    <Select
+                        clearable
+                        data={[
+                            {
+                                label: t('form.addServer.input', {
+                                    context: 'legacyAuthentication',
+                                }),
+                                value: AuthMode.LEGACY,
+                            },
+                            {
+                                label: t('form.addServer.input', {
+                                    context: 'subsonicApiKey',
+                                }),
+                                value: AuthMode.API_KEY,
+                            },
+                        ]}
                         label={t('form.addServer.input', {
-                            context: 'legacyAuthentication',
+                            context: 'subsonicLoginMode',
                         })}
-                        {...form.getInputProps('legacyAuth', {
-                            type: 'checkbox',
-                        })}
+                        {...form.getInputProps('auth')}
                     />
                 )}
                 {form.values.type === ServerType.JELLYFIN && (

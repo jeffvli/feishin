@@ -28,13 +28,18 @@ import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { Paper } from '/@/shared/components/paper/paper';
 import { PasswordInput } from '/@/shared/components/password-input/password-input';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
+import { Select } from '/@/shared/components/select/select';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { useFocusTrap } from '/@/shared/hooks/use-focus-trap';
 import { useForm } from '/@/shared/hooks/use-form';
-import { AuthenticationResponse, ServerListItemWithCredential } from '/@/shared/types/domain-types';
+import {
+    AuthenticationResponse,
+    AuthMode,
+    ServerListItemWithCredential,
+} from '/@/shared/types/domain-types';
 import { DiscoveredServerItem, ServerType, toServerType } from '/@/shared/types/types';
 
 const autodiscover = isElectron() ? window.api.autodiscover : null;
@@ -112,7 +117,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
     const form = useForm({
         initialValues: {
-            legacyAuth: isLegacyAuth(),
+            auth: isLegacyAuth() ? AuthMode.LEGACY : undefined,
             name:
                 (localSettings ? localSettings.env.SERVER_NAME : window.SERVER_NAME) || 'My Server',
             password: '',
@@ -134,7 +139,9 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         form.values.type === ServerType.JELLYFIN && signInMethod === 'quickConnect';
 
     const isSubmitDisabled =
-        !form.values.name || !form.values.url || (!showQuickConnect && !form.values.username);
+        !form.values.name ||
+        !form.values.url ||
+        (!showQuickConnect && form.values.auth !== AuthMode.API_KEY && !form.values.username);
 
     const {
         code: quickConnectCode,
@@ -203,7 +210,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             const data: AuthenticationResponse | undefined = await authFunction(
                 values.url,
                 {
-                    legacy: values.legacyAuth,
+                    auth: values.auth,
                     password: values.password,
                     username: values.username,
                 },
@@ -217,6 +224,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             }
 
             const serverItem: ServerListItemWithCredential = {
+                auth: values.auth,
                 credential: data.credential,
                 id: nanoid(),
                 isAdmin: data.isAdmin,
@@ -366,13 +374,16 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                     )}
                     {!showQuickConnect && (
                         <>
-                            <TextInput
-                                label={t('form.addServer.input', {
-                                    context: 'username',
-                                })}
-                                required
-                                {...form.getInputProps('username')}
-                            />
+                            {(form.values.type !== ServerType.SUBSONIC ||
+                                form.values.auth !== AuthMode.API_KEY) && (
+                                <TextInput
+                                    label={t('form.addServer.input', {
+                                        context: 'username',
+                                    })}
+                                    required
+                                    {...form.getInputProps('username')}
+                                />
+                            )}
                             <PasswordInput
                                 description={
                                     form.values.type === ServerType.NAVIDROME &&
@@ -381,6 +392,10 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                                 label={t('form.addServer.input', {
                                     context: 'password',
                                 })}
+                                required={
+                                    form.values.type === ServerType.SUBSONIC &&
+                                    form.values.auth === AuthMode.API_KEY
+                                }
                                 {...form.getInputProps('password')}
                             />
                         </>
@@ -396,12 +411,26 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                         />
                     )}
                     {form.values.type === ServerType.SUBSONIC && (
-                        <Checkbox
-                            disabled={serverLock}
+                        <Select
+                            clearable
+                            data={[
+                                {
+                                    label: t('form.addServer.input', {
+                                        context: 'legacyAuthentication',
+                                    }),
+                                    value: AuthMode.LEGACY,
+                                },
+                                {
+                                    label: t('form.addServer.input', {
+                                        context: 'subsonicApiKey',
+                                    }),
+                                    value: AuthMode.API_KEY,
+                                },
+                            ]}
                             label={t('form.addServer.input', {
-                                context: 'legacyAuthentication',
+                                context: 'subsonicLoginMode',
                             })}
-                            {...form.getInputProps('legacyAuth', { type: 'checkbox' })}
+                            {...form.getInputProps('auth')}
                         />
                     )}
                     {form.values.type === ServerType.JELLYFIN && (
