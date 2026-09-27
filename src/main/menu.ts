@@ -555,6 +555,7 @@ export default class MenuBuilder {
             {
                 id: MENU_ITEM_IDS.help,
                 label: translations.help,
+                role: 'help',
                 submenu: [
                     {
                         click() {
