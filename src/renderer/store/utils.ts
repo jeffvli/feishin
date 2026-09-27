@@ -12,7 +12,11 @@ type PlayerStorePersistedSlice = {
 };
 
 export function cleanQueueForPersistence(queue: QueueData): QueueData {
-    const allQueueIds = new Set(queue.default || []);
+    const allQueueIds = new Set([
+        ...(queue.consumed || []),
+        ...(queue.default || []),
+        ...(queue.source?.trackIds || []),
+    ]);
     const songs = queue.songs || {};
     const cleanedSongs: Record<string, QueueSong> = {};
 
