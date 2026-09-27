@@ -487,6 +487,17 @@
             "title": "Private Mode"
         }
     },
+    "offline": {
+        "available": "Available offline",
+        "downloadComplete": "{{count}} items are available offline",
+        "downloadCompleteTitle": "Download complete",
+        "downloadFailedTitle": "Download failed",
+        "downloadProgress": "Downloading for offline playback",
+        "downloading": "Downloading {{progress}}%",
+        "failed": "Download failed",
+        "itemCount": "{{count}} tracks",
+        "partial": "Partially downloaded ({{downloaded}}/{{total}})"
+    },
     "page": {
         "albumArtistDetail": {
             "about": "About {{artist}}",

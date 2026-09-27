@@ -14,6 +14,7 @@ import {
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { useIsActiveRow } from '/@/renderer/components/item-list/item-table-list/item-table-list-context';
 import { JoinedArtists } from '/@/renderer/features/albums/components/joined-artists';
+import { OfflineStatusIcon } from '/@/renderer/features/offline/components/offline-status-icon';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
 import {
     LONG_PRESS_PLAY_BEHAVIOR,
@@ -164,6 +165,7 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
                     >
                         <ExplicitIndicator explicitStatus={item?.explicitStatus} />
                         {item.name as string}
+                        <OfflineStatusIcon item={item} itemType={props.itemType} />
                     </Text>
                     <div className={styles.artists}>
                         <JoinedArtists
@@ -334,6 +336,7 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
                     >
                         <ExplicitIndicator explicitStatus={song?.explicitStatus} />
                         {row.name as string}
+                        <OfflineStatusIcon item={item} itemType={props.itemType} />
                         {song?.trackSubtitle && props.itemType !== LibraryItem.QUEUE_SONG && (
                             <span
                                 className={clsx(styles.trackSubtitle, {

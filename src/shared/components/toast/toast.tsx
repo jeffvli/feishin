@@ -8,11 +8,12 @@ import {
     updateNotification,
 } from '@mantine/notifications';
 import clsx from 'clsx';
+import { ReactNode } from 'react';
 
 import styles from './toast.module.css';
 
 interface NotificationProps extends Omit<NotificationData, 'message'> {
-    message?: string;
+    message?: ReactNode;
     onClose?: () => void;
     type?: 'error' | 'info' | 'success' | 'warning';
 }

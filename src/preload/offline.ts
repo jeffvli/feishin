@@ -1,5 +1,7 @@
 import type {
+    OfflineBatchDownloadRequest,
     OfflineDownloadRequest,
+    OfflineDownloadTask,
     OfflineEntry,
     OfflinePlaybackSource,
     OfflinePlaylist,
@@ -12,6 +14,19 @@ import { ipcRenderer } from 'electron';
 
 const download = (request: OfflineDownloadRequest): Promise<OfflineEntry> =>
     ipcRenderer.invoke('offline-download', request);
+
+const downloadBatch = (request: OfflineBatchDownloadRequest): Promise<OfflineEntry[]> =>
+    ipcRenderer.invoke('offline-download-batch', request);
+
+const listDownloadTasks = (): Promise<OfflineDownloadTask[]> =>
+    ipcRenderer.invoke('offline-download-tasks');
+
+const onDownloadProgress = (callback: (task: OfflineDownloadTask) => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, task: OfflineDownloadTask) =>
+        callback(task);
+    ipcRenderer.on('offline-download-progress', listener);
+    return () => ipcRenderer.removeListener('offline-download-progress', listener);
+};
 
 const getStorageInfo = (): Promise<OfflineStorageInfo> => ipcRenderer.invoke('offline-storage-get');
 
@@ -39,9 +54,12 @@ const syncPlaylist = (request: OfflinePlaylistSyncRequest): Promise<OfflinePlayl
 
 export const offline = {
     download,
+    downloadBatch,
     getStorageInfo,
     list,
+    listDownloadTasks,
     listPlaylists,
+    onDownloadProgress,
     remove,
     removePlaylist,
     resolve,

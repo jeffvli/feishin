@@ -18,6 +18,7 @@ const syncTracks = async (playlist: OfflinePlaylist, songs: Song[]) => {
     try {
         const result = await window.api.offline.syncPlaylist({
             playlist,
+            silent: true,
             tracks: songs.map((song) => ({
                 song,
                 url: api.controller.getDownloadUrl({

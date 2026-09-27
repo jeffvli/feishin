@@ -1,0 +1,25 @@
+.root {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    color: var(--theme-colors-foreground);
+}
+
+.inline {
+    margin-inline-start: var(--theme-spacing-xs);
+    vertical-align: middle;
+}
+
+.badge {
+    position: absolute;
+    right: var(--theme-spacing-sm);
+    bottom: var(--theme-spacing-sm);
+    z-index: 6;
+    width: 28px;
+    height: 28px;
+    pointer-events: auto;
+    background: var(--theme-colors-surface);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 50%);
+}

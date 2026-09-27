@@ -1,5 +1,7 @@
 import type {
+    OfflineBatchDownloadRequest,
     OfflineDownloadRequest,
+    OfflineDownloadTask,
     OfflineEntry,
     OfflinePlaybackSource,
     OfflinePlaylist,
@@ -8,12 +10,12 @@ import type {
     OfflineStorageInfo,
 } from '/@/shared/types/offline';
 
-import { app, dialog, ipcMain, net } from 'electron';
-import { createHash } from 'node:crypto';
+import { app, BrowserWindow, dialog, ipcMain, net } from 'electron';
+import { createHash, randomUUID } from 'node:crypto';
 import { createWriteStream } from 'node:fs';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import { Readable } from 'node:stream';
+import { Readable, Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 
 import { store } from '/@/main/features/core/settings';
@@ -32,7 +34,64 @@ type OfflineManifestV1 = {
 
 const EMPTY_MANIFEST: OfflineManifest = { entries: {}, playlists: {}, version: 2 };
 const OFFLINE_DIRECTORY_SETTING = 'offline_download_directory';
+const downloadTasks = new Map<string, OfflineDownloadTask>();
+const lastTaskEmit = new Map<string, number>();
 let manifestUpdate = Promise.resolve();
+
+const emitTask = (task: OfflineDownloadTask, force = false) => {
+    const now = Date.now();
+    if (!force && now - (lastTaskEmit.get(task.id) ?? 0) < 100) return;
+
+    task.updatedAt = new Date(now).toISOString();
+    lastTaskEmit.set(task.id, now);
+    for (const window of BrowserWindow.getAllWindows()) {
+        window.webContents.send('offline-download-progress', task);
+    }
+};
+
+const createTask = (
+    item: OfflineBatchDownloadRequest['item'],
+    tracks: OfflineDownloadRequest[],
+    silent = false,
+): OfflineDownloadTask => {
+    const finishedTasks = [...downloadTasks.values()]
+        .filter((task) => task.state === 'complete' || task.state === 'error')
+        .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    while (downloadTasks.size >= 50 && finishedTasks.length > 0) {
+        const finishedTask = finishedTasks.shift();
+        if (!finishedTask) break;
+        downloadTasks.delete(finishedTask.id);
+        lastTaskEmit.delete(finishedTask.id);
+    }
+
+    const now = new Date().toISOString();
+    const task: OfflineDownloadTask = {
+        bytesDownloaded: 0,
+        bytesTotal: tracks.reduce((total, track) => total + Math.max(0, track.song.size || 0), 0),
+        completed: 0,
+        createdAt: now,
+        error: null,
+        id: randomUUID(),
+        itemIds: item.ids,
+        itemType: item.type,
+        name: item.name,
+        serverId: item.serverId,
+        silent,
+        songIds: tracks.map((track) => track.song.id),
+        state: 'queued',
+        total: tracks.length,
+        updatedAt: now,
+    };
+    downloadTasks.set(task.id, task);
+    emitTask(task, true);
+    return task;
+};
+
+const failTask = (task: OfflineDownloadTask, error: unknown) => {
+    task.error = error instanceof Error ? error.message : 'Download failed';
+    task.state = 'error';
+    emitTask(task, true);
+};
 
 const getDefaultOfflineRoot = () => path.join(app.getPath('userData'), 'offline');
 const getManifestPath = () => path.join(getDefaultOfflineRoot(), 'manifest.json');
@@ -263,6 +322,7 @@ export const resolveOfflineSource = async (
 const download = async (
     request: OfflineDownloadRequest,
     ownership: { manual?: boolean; playlistId?: string } = { manual: true },
+    onBytes?: (bytes: number) => void,
 ): Promise<OfflineEntry> => {
     const serverDirectory = hashPart(request.song._serverId);
     const relativeFileName = path.join(
@@ -280,8 +340,15 @@ const download = async (
             throw new Error(`Download failed with HTTP ${response.status}`);
         }
 
+        const progress = new Transform({
+            transform(chunk: Buffer, _encoding, callback) {
+                onBytes?.(chunk.length);
+                callback(null, chunk);
+            },
+        });
         await pipeline(
             Readable.fromWeb(response.body as Parameters<typeof Readable.fromWeb>[0]),
+            progress,
             createWriteStream(temporaryPath),
         );
         await fs.rm(destinationPath, { force: true });
@@ -318,6 +385,34 @@ const download = async (
             serverId: request.song._serverId,
             songId: request.song.id,
         });
+        throw error;
+    }
+};
+
+const downloadBatch = async (request: OfflineBatchDownloadRequest): Promise<OfflineEntry[]> => {
+    const tracks = [...new Map(request.tracks.map((track) => [track.song.id, track])).values()];
+    const task = createTask(request.item, tracks);
+    const entries: OfflineEntry[] = [];
+
+    try {
+        task.state = 'downloading';
+        emitTask(task, true);
+        for (const track of tracks) {
+            const entry = await download(track, { manual: true }, (bytes) => {
+                task.bytesDownloaded += bytes;
+                emitTask(task);
+            });
+            entries.push(entry);
+            task.completed += 1;
+            emitTask(task, true);
+        }
+        task.bytesTotal = Math.max(task.bytesTotal, task.bytesDownloaded);
+        task.bytesDownloaded = task.bytesTotal;
+        task.state = 'complete';
+        emitTask(task, true);
+        return entries;
+    } catch (error) {
+        failTask(task, error);
         throw error;
     }
 };
@@ -368,71 +463,121 @@ const syncPlaylist = async (
     request: OfflinePlaylistSyncRequest,
 ): Promise<OfflinePlaylistSyncResult> => {
     const tracks = [...new Map(request.tracks.map((track) => [track.song.id, track])).values()];
-    let downloaded = 0;
-    let unchanged = 0;
+    const task = createTask(
+        {
+            ids: [request.playlist.id],
+            name: request.playlist.name,
+            serverId: request.playlist.serverId,
+            type: 'playlist',
+        },
+        tracks,
+        request.silent,
+    );
 
-    for (const track of tracks) {
-        const manifest = await readManifest();
-        const entry = manifest.entries[getEntryKey(request.playlist.serverId, track.song.id)];
-        const filePath = entry && resolveEntryPath(entry.fileName);
-        const fileExists = filePath
-            ? await fs
-                  .access(filePath)
-                  .then(() => true)
-                  .catch(() => false)
-            : false;
+    try {
+        task.state = 'downloading';
+        emitTask(task, true);
+        let downloaded = 0;
+        let unchanged = 0;
 
-        if (!entry || !fileExists || entry.fingerprint !== getFingerprint(track.song)) {
-            await download(track, { manual: false, playlistId: request.playlist.id });
-            downloaded += 1;
-            continue;
-        }
+        for (const track of tracks) {
+            const manifest = await readManifest();
+            const entry = manifest.entries[getEntryKey(request.playlist.serverId, track.song.id)];
+            const filePath = entry && resolveEntryPath(entry.fileName);
+            const fileExists = filePath
+                ? await fs
+                      .access(filePath)
+                      .then(() => true)
+                      .catch(() => false)
+                : false;
 
-        await updateManifest((nextManifest) => {
-            const nextEntry =
-                nextManifest.entries[getEntryKey(request.playlist.serverId, track.song.id)];
-            if (!nextEntry) return;
-            nextEntry.playlistIds = [...new Set([request.playlist.id, ...nextEntry.playlistIds])];
-            nextEntry.song = { ...track.song, imageUrl: null };
-        });
-        unchanged += 1;
-    }
-
-    const songIds = tracks.map((track) => track.song.id);
-    let removed = 0;
-    const playlist = await updateManifest(async (manifest): Promise<OfflinePlaylist> => {
-        const key = getPlaylistKey(request.playlist.serverId, request.playlist.id);
-        const previousSongIds = new Set(manifest.playlists[key]?.songIds ?? []);
-        const currentSongIds = new Set(songIds);
-
-        for (const songId of previousSongIds) {
-            if (currentSongIds.has(songId)) continue;
-            const entryKey = getEntryKey(request.playlist.serverId, songId);
-            const entry = manifest.entries[entryKey];
-            if (!entry) continue;
-
-            entry.playlistIds = entry.playlistIds.filter((id) => id !== request.playlist.id);
-            if (!entry.manual && entry.playlistIds.length === 0) {
-                const filePath = resolveEntryPath(entry.fileName);
-                if (filePath) await fs.rm(filePath, { force: true });
-                delete manifest.entries[entryKey];
-                removed += 1;
+            if (!entry || !fileExists || entry.fingerprint !== getFingerprint(track.song)) {
+                await download(
+                    track,
+                    { manual: false, playlistId: request.playlist.id },
+                    (bytes) => {
+                        task.bytesDownloaded += bytes;
+                        emitTask(task);
+                    },
+                );
+                downloaded += 1;
+            } else {
+                await updateManifest((nextManifest) => {
+                    const nextEntry =
+                        nextManifest.entries[getEntryKey(request.playlist.serverId, track.song.id)];
+                    if (!nextEntry) return;
+                    nextEntry.playlistIds = [
+                        ...new Set([request.playlist.id, ...nextEntry.playlistIds]),
+                    ];
+                    nextEntry.song = { ...track.song, imageUrl: null };
+                });
+                task.bytesDownloaded += Math.max(0, track.song.size || 0);
+                unchanged += 1;
             }
+            task.completed += 1;
+            emitTask(task, true);
         }
 
-        const nextPlaylist: OfflinePlaylist = {
-            ...request.playlist,
-            songIds,
-            syncedAt: new Date().toISOString(),
-        };
-        manifest.playlists[key] = nextPlaylist;
-        return nextPlaylist;
-    });
+        const songIds = tracks.map((track) => track.song.id);
+        let removed = 0;
+        const playlist = await updateManifest(async (manifest): Promise<OfflinePlaylist> => {
+            const key = getPlaylistKey(request.playlist.serverId, request.playlist.id);
+            const previousSongIds = new Set(manifest.playlists[key]?.songIds ?? []);
+            const currentSongIds = new Set(songIds);
 
-    return { downloaded, playlist, removed, unchanged };
+            for (const songId of previousSongIds) {
+                if (currentSongIds.has(songId)) continue;
+                const entryKey = getEntryKey(request.playlist.serverId, songId);
+                const entry = manifest.entries[entryKey];
+                if (!entry) continue;
+
+                entry.playlistIds = entry.playlistIds.filter((id) => id !== request.playlist.id);
+                if (!entry.manual && entry.playlistIds.length === 0) {
+                    const filePath = resolveEntryPath(entry.fileName);
+                    if (filePath) await fs.rm(filePath, { force: true });
+                    delete manifest.entries[entryKey];
+                    removed += 1;
+                }
+            }
+
+            const nextPlaylist: OfflinePlaylist = {
+                ...request.playlist,
+                songIds,
+                syncedAt: new Date().toISOString(),
+            };
+            manifest.playlists[key] = nextPlaylist;
+            return nextPlaylist;
+        });
+
+        task.bytesTotal = Math.max(task.bytesTotal, task.bytesDownloaded);
+        task.bytesDownloaded = task.bytesTotal;
+        task.state = 'complete';
+        emitTask(task, true);
+        return { downloaded, playlist, removed, unchanged };
+    } catch (error) {
+        failTask(task, error);
+        throw error;
+    }
 };
 
-ipcMain.handle('offline-download', (_event, request: OfflineDownloadRequest) => download(request));
+ipcMain.handle('offline-download', async (_event, request: OfflineDownloadRequest) => {
+    const [entry] = await downloadBatch({
+        item: {
+            ids: [request.song.id],
+            name: request.song.name,
+            serverId: request.song._serverId,
+            type: 'track',
+        },
+        tracks: [request],
+    });
+    return entry;
+});
+ipcMain.handle('offline-download-batch', (_event, request: OfflineBatchDownloadRequest) =>
+    downloadBatch(request),
+);
+ipcMain.handle('offline-download-tasks', (): OfflineDownloadTask[] =>
+    [...downloadTasks.values()].sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
+);
 ipcMain.handle('offline-storage-get', () => getStorageInfo());
 ipcMain.handle('offline-storage-select', async (): Promise<null | string> => {
     const result = await dialog.showOpenDialog({
@@ -447,7 +592,18 @@ ipcMain.handle('offline-storage-set', (_event, directory: null | string) =>
 );
 ipcMain.handle('offline-list', async (): Promise<OfflineEntry[]> => {
     const manifest = await readManifest();
-    return Object.values(manifest.entries);
+    const entries = await Promise.all(
+        Object.values(manifest.entries).map(async (entry) => {
+            const filePath = resolveEntryPath(entry.fileName);
+            if (!filePath) return null;
+            const exists = await fs
+                .access(filePath)
+                .then(() => true)
+                .catch(() => false);
+            return exists ? entry : null;
+        }),
+    );
+    return entries.filter((entry): entry is OfflineEntry => entry !== null);
 });
 ipcMain.handle('offline-playlist-list', async (): Promise<OfflinePlaylist[]> => {
     const manifest = await readManifest();

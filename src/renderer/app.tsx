@@ -10,6 +10,8 @@ import isElectron from 'is-electron';
 import { lazy, memo, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
 import i18n from '/@/i18n/i18n';
+import { OfflineDownloadNotifications } from '/@/renderer/features/offline/components/offline-download-notifications';
+import { initOfflineDownloads } from '/@/renderer/features/offline/offline-download.store';
 import { WebAudioContext } from '/@/renderer/features/player/context/webaudio-context';
 import { useCheckForUpdates } from '/@/renderer/hooks/use-check-for-updates';
 import { useFullscreenAutoOpen } from '/@/renderer/hooks/use-fullscreen-auto-open';
@@ -91,6 +93,7 @@ const AppShell = memo(function AppShell() {
     return (
         <>
             <AppEffects />
+            <OfflineDownloadNotifications />
             <Notifications
                 containerWidth="300px"
                 position="bottom-center"
@@ -123,8 +126,17 @@ const AppEffects = () => (
         <FullscreenToggleEffect />
         <FullscreenAutoOpenEffect />
         <InputFocusEffect />
+        <OfflineDownloadsEffect />
     </>
 );
+
+const OfflineDownloadsEffect = () => {
+    useEffect(() => {
+        void initOfflineDownloads();
+    }, []);
+
+    return null;
+};
 
 const SyncSettingsEffect = () => {
     useSyncSettingsToMain();
