@@ -1,18 +1,18 @@
 {
     "action": {
-        "addToFavorites": "Додати в $t(entity.favorite, {\"count\": 2})",
+        "addToFavorites": "Додати в «Улюблене»",
         "addOrRemoveFromSelection": "Додати до вибраного або вилучити з нього",
         "selectRangeOfItems": "Вибрати діапазон елементів",
-        "addToPlaylist": "Додати в $t(entity.playlist, {\"count\": 1})",
+        "addToPlaylist": "Додати до плейлиста",
         "clearQueue": "Очистити чергу",
-        "createPlaylist": "Створити $t(entity.playlist, {\"count\": 1})",
-        "createRadioStation": "Створити $t(entity.radioStation, {\"count\": 1})",
-        "deletePlaylist": "Видалити $t(entity.playlist, {\"count\": 1})",
-        "deleteRadioStation": "Видалити $t(entity.radioStation, {\"count\": 1})",
+        "createPlaylist": "Створити плейлист",
+        "createRadioStation": "Додати радіостанцію",
+        "deletePlaylist": "Видалити плейлист",
+        "deleteRadioStation": "Видалити радіостанцію",
         "selectAll": "Вибрати все",
         "deselectAll": "Скасувати вибір",
         "downloadStarted": "Розпочато завантаження {{count}} елементів",
-        "editPlaylist": "Редагувати $t(entity.playlist, {\"count\": 1})",
+        "editPlaylist": "Редагувати плейлист",
         "goToPage": "Перейти на сторінку",
         "moveToNext": "Перемістити далі",
         "moveToBottom": "Перемістити вниз",
@@ -26,11 +26,11 @@
         "shuffleAll": "Перемішати все",
         "shuffleSelected": "Перемішати вибране",
         "refresh": "$t(common.refresh)",
-        "removeFromFavorites": "Прибрати позначку «$t(entity.favorite, {\"count\": 2})»",
-        "removeFromPlaylist": "Вилучити з $t(entity.playlist, {\"count\": 1})",
+        "removeFromFavorites": "Вилучити з «Улюбленого»",
+        "removeFromPlaylist": "Вилучити з плейлиста",
         "removeFromQueue": "Вилучити з черги",
-        "setRating": "Установити оцінку",
-        "viewPlaylists": "Переглянути $t(entity.playlist, {\"count\": 2})",
+        "setRating": "Оцінити",
+        "viewPlaylists": "Переглянути плейлисти",
         "viewMore": "Показати більше",
         "openApplicationDirectory": "Відкрити папку програми",
         "openIn": {
@@ -43,7 +43,7 @@
         "goToCurrent": "Перейти до поточного елемента",
         "collapseAllFolders": "Згорнути всі папки",
         "expandAllFolders": "Розгорнути всі папки",
-        "createPlaylistFromQueue": "Створити $t(entity.playlist, {\"count\": 1}) з черги"
+        "createPlaylistFromQueue": "Створити плейлист з черги"
     },
     "common": {
         "countSelected": "Вибрано: {{count}}",
@@ -77,7 +77,7 @@
         "configure": "Налаштувати",
         "confirm": "Підтвердити",
         "create": "Створити",
-        "currentSong": "Поточний $t(entity.track, {\"count\": 1})",
+        "currentSong": "Поточний трек",
         "decrease": "Зменшити",
         "delete": "Видалити",
         "descending": "За спаданням",
@@ -127,7 +127,7 @@
         "path": "Шлях",
         "playerMustBePaused": "Плеєр має бути призупинено",
         "preview": "Попередній перегляд",
-        "previousSong": "Попередній $t(entity.track, {\"count\": 1})",
+        "previousSong": "Попередній трек",
         "private": "Приватний",
         "public": "Публічний",
         "quit": "Вийти",
@@ -231,7 +231,7 @@
         "playlistWithCount_one": "{{count}} плейлист",
         "playlistWithCount_few": "{{count}} плейлисти",
         "playlistWithCount_many": "{{count}} плейлистів",
-        "smartPlaylist": "Розумний $t(entity.playlist, {\"count\": 1})",
+        "smartPlaylist": "Розумний плейлист",
         "track_one": "Трек",
         "track_few": "Треки",
         "track_many": "Треків",
@@ -399,21 +399,21 @@
             "description": "Ця дія додасть усі елементи з поточного відфільтрованого подання"
         },
         "addToPlaylist": {
-            "create": "Створити $t(entity.playlist, {\"count\": 1}) {{playlist}}",
+            "create": "Створити плейлист «{{playlist}}»",
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
             "input_skipDuplicates": "Пропускати дублікати",
-            "searchOrCreate": "Знайдіть $t(entity.playlist, {\"count\": 2}) або введіть назву, щоб створити новий",
+            "searchOrCreate": "Знайдіть плейлисти або введіть назву, щоб створити новий",
             "success": "Додано $t(entity.trackWithCount, {\"count\": {{message}} }). $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} }) оновлено",
-            "title": "Додати в $t(entity.playlist, {\"count\": 1})",
-            "noneAdded": "$t(entity.playlist, {\"count\": 1}) «{{playlist}}»: не додано жодного треку"
+            "title": "Додати до плейлиста",
+            "noneAdded": "Плейлист «{{playlist}}»: не додано жодного треку"
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",
             "input_name": "$t(common.name)",
             "input_owner": "$t(common.owner)",
             "input_public": "Публічний",
-            "success": "$t(entity.playlist, {\"count\": 1}) успішно створено",
-            "title": "Створити $t(entity.playlist, {\"count\": 1})"
+            "success": "Плейлист успішно створено",
+            "title": "Створити плейлист"
         },
         "createRadioStation": {
             "success": "Радіостанцію успішно створено",
@@ -423,14 +423,14 @@
             "input_streamUrl": "URL-адреса потоку"
         },
         "deletePlaylist": {
-            "input_confirm": "Для підтвердження введіть назву ($t(entity.playlist, {\"count\": 1}))",
-            "success": "$t(entity.playlist, {\"count\": 1}) успішно видалено",
-            "title": "Видалити $t(entity.playlist, {\"count\": 1})"
+            "input_confirm": "Для підтвердження введіть назву плейлиста",
+            "success": "Плейлист успішно видалено",
+            "title": "Видалити плейлист"
         },
         "editPlaylist": {
             "publicJellyfinNote": "З певної причини Jellyfin не повідомляє, чи є плейлист публічним. Якщо ви хочете, щоб він залишався публічним, залиште цей параметр вибраним",
-            "success": "$t(entity.playlist, {\"count\": 1}) успішно оновлено",
-            "title": "Редагувати $t(entity.playlist, {\"count\": 1})"
+            "success": "Плейлист успішно оновлено",
+            "title": "Редагувати плейлист"
         },
         "lyricsExport": {
             "export": "Експортувати текст пісні",
@@ -499,7 +499,7 @@
             "description": "Усі елементи з поточної черги буде вилучено."
         },
         "createPrefilledPlaylist": {
-            "title": "Створити $t(entity.playlist, {\"count\": 1}) з вибраних пісень"
+            "title": "Створити плейлист з вибраних пісень"
         }
     },
     "player": {
@@ -566,20 +566,20 @@
             "groupingTypePrimary": "Основні типи релізів",
             "recentReleases": "Нові релізи",
             "viewDiscography": "Переглянути дискографію",
-            "relatedArtists": "Пов’язані $t(entity.artist, {\"count\": 2})",
+            "relatedArtists": "Пов’язані виконавці",
             "topSongs": "Найпопулярніші пісні",
             "topSongsCommunity": "Спільнота",
             "topSongsFrom": "Найпопулярніші пісні з {{title}}",
             "topSongsPersonal": "Особисте",
             "favoriteSongsFrom": "Улюблені пісні з {{title}}",
             "viewAll": "Переглянути все",
-            "viewAllTracks": "Переглянути всі $t(entity.track, {\"count\": 2})"
+            "viewAllTracks": "Переглянути всі треки"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
         "albumDetail": {
-            "moreFromArtist": "Ще від: $t(entity.artist, {\"count\": 1})",
+            "moreFromArtist": "Ще від цього виконавця",
             "moreFromGeneric": "Ще від {{item}}",
             "released": "Випущено"
         },
@@ -655,8 +655,8 @@
             "playShuffled": "$t(player.shuffle)",
             "shareItem": "Поділитися елементом",
             "goTo": "Перейти до",
-            "goToAlbum": "Відкрити $t(entity.album, {\"count\": 1})",
-            "goToAlbumArtist": "Відкрити $t(entity.albumArtist, {\"count\": 1})",
+            "goToAlbum": "Відкрити альбом",
+            "goToAlbumArtist": "Перейти до виконавця альбому",
             "showDetails": "Відомості",
             "editMetadata": "Редагувати метадані"
         },
