@@ -280,7 +280,9 @@ export const useDefaultItemListControls = (args?: UseDefaultItemListControlsArgs
                 if (itemType === LibraryItem.QUEUE_SONG) {
                     const queueSong = item as QueueSong;
                     if (queueSong._uniqueId) {
-                        playerRef.current.mediaPlay(queueSong._uniqueId);
+                        playerRef.current.mediaPlay(queueSong._uniqueId, {
+                            consumePrevious: true,
+                        });
                     }
                 }
             },

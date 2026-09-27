@@ -710,6 +710,7 @@ const PlaybackSettingsSchema = z.object({
     audioDeviceId: z.string().nullable().optional(),
     audioFadeOnStatusChange: z.boolean(),
     compressor: CompressorSettingsSchema,
+    consumeQueue: z.boolean(),
     equalizer: EqSettingsSchema,
     filters: z.array(PlayerFilterSchema),
     mediaSession: z.boolean(),
@@ -2085,6 +2086,7 @@ const initialState: SettingsState = {
             release: 250,
             threshold: -24,
         },
+        consumeQueue: true,
         equalizer: {
             bands: [
                 { freq: 31.5, gain: 0 },
@@ -2931,10 +2933,14 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     });
                 }
 
+                if (version < 35) {
+                    state.playback.consumeQueue = true;
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 34,
+            version: 35,
         },
     ),
 );

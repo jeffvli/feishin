@@ -177,13 +177,13 @@ importers:
         specifier: ^6.15.2
         version: 6.15.2
       react:
-        specifier: ^19.2.7
+        specifier: 19.2.7
         version: 19.2.7
       react-call:
         specifier: ^1.8.2
         version: 1.8.2(react@19.2.7)
       react-dom:
-        specifier: ^19.2.7
+        specifier: 19.2.7
         version: 19.2.7(react@19.2.7)
       react-error-boundary:
         specifier: ^5.0.0

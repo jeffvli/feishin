@@ -20,6 +20,7 @@ import {
     InitialTimestampRestoreHook,
     QueueRestoreTimestampHook,
 } from '/@/renderer/features/player/hooks/use-queue-restore';
+import { QueueSourceRefreshHook } from '/@/renderer/features/player/hooks/use-queue-source-refresh';
 import { ScrobbleHook } from '/@/renderer/features/player/hooks/use-scrobble';
 import { UpdateCurrentSongHook } from '/@/renderer/features/player/hooks/use-update-current-song';
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
@@ -145,6 +146,7 @@ export const AudioPlayers = () => {
             <RemoteRadioPushHook />
             <RemoteSettingsPushHook />
             <AutoDJHook />
+            <QueueSourceRefreshHook />
             <QueueRestoreTimestampHook />
             <InitialTimestampRestoreHook />
             <UpdateCurrentSongHook />

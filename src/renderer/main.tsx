@@ -9,6 +9,65 @@ import { createRoot } from 'react-dom/client';
 import { App } from '/@/renderer/app';
 import { queryClient } from '/@/renderer/lib/react-query';
 
+// React 19.2 adds component metadata to development performance entries. Large
+// queue objects can exceed Chromium's structured-clone limit and crash the
+// renderer while it records those entries. Keep the useful timing data, but
+// omit the potentially unbounded component properties in development builds.
+if (import.meta.env.DEV) {
+    const originalMeasure = performance.measure;
+
+    performance.measure = function (
+        measureName: string,
+        startOrMeasureOptions?: PerformanceMeasureOptions | string,
+        endMark?: string,
+    ): PerformanceMeasure {
+        let safeStartOrOptions = startOrMeasureOptions;
+
+        if (typeof startOrMeasureOptions === 'object' && startOrMeasureOptions?.detail) {
+            const detail = startOrMeasureOptions.detail;
+            const devtools =
+                typeof detail === 'object' && detail !== null && 'devtools' in detail
+                    ? detail.devtools
+                    : null;
+
+            if (typeof devtools === 'object' && devtools !== null) {
+                safeStartOrOptions = {
+                    ...startOrMeasureOptions,
+                    detail: {
+                        ...detail,
+                        devtools: {
+                            ...devtools,
+                            properties: null,
+                        },
+                    },
+                };
+            }
+        }
+
+        try {
+            return Reflect.apply(originalMeasure, performance, [
+                measureName,
+                safeStartOrOptions,
+                endMark,
+            ]) as PerformanceMeasure;
+        } catch (error) {
+            if (
+                error instanceof DOMException &&
+                error.name === 'DataCloneError' &&
+                typeof safeStartOrOptions === 'object' &&
+                safeStartOrOptions !== null
+            ) {
+                return Reflect.apply(originalMeasure, performance, [
+                    measureName,
+                    { ...safeStartOrOptions, detail: null },
+                ]) as PerformanceMeasure;
+            }
+
+            throw error;
+        }
+    };
+}
+
 function createIDBPersister(idbValidKey: IDBValidKey = 'reactQuery') {
     return {
         persistClient: async (client: PersistedClient) => {

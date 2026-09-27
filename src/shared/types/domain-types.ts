@@ -67,15 +67,25 @@ export interface PlayerData {
 }
 
 export interface QueueData {
+    consumed: string[];
     default: string[];
+    preparedRefillBoundary: null | string;
+    recentlyPlayed: string[];
     shuffled: number[];
     songs: Record<string, QueueSong>;
+    source: null | QueueSource;
 }
 
 export type QueueSong = Song & {
     _contextPlaylistId?: null | string;
     _uniqueId: string;
 };
+
+export interface QueueSource {
+    id: string;
+    trackIds: string[];
+    type: LibraryItem.ALBUM | LibraryItem.PLAYLIST;
+}
 
 export interface SavedCollection {
     filterQueryString: string;

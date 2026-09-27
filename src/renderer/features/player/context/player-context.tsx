@@ -75,7 +75,7 @@ export interface PlayerContext {
     increaseVolume: (amount: number) => void;
     mediaNext: (toNextAlbum: boolean) => void;
     mediaPause: () => void;
-    mediaPlay: (id?: string) => void;
+    mediaPlay: (id?: string, options?: { consumePrevious?: boolean }) => void;
     mediaPlayByIndex: (index: number) => void;
     mediaPrevious: (toPreviousAlbum: boolean) => void;
     mediaSeekToTimestamp: (timestamp: number) => void;
@@ -682,10 +682,10 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     }, [storeActions]);
 
     const mediaPlay = useCallback(
-        (id?: string) => {
-            logger.debug('Media play', { id });
+        (id?: string, options?: { consumePrevious?: boolean }) => {
+            logger.debug('Media play', { id, options });
 
-            storeActions.mediaPlay(id);
+            storeActions.mediaPlay(id, options);
         },
         [storeActions],
     );

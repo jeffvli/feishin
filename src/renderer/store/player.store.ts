@@ -16,7 +16,14 @@ import {
 } from '/@/renderer/store/timestamp.store';
 import { migratePlayerStorePersist, playerStoreStorage } from '/@/renderer/store/utils';
 import { shuffleInPlace } from '/@/renderer/utils/shuffle';
-import { PlayerData, QueueData, QueueSong, Song } from '/@/shared/types/domain-types';
+import {
+    LibraryItem,
+    PlayerData,
+    QueueData,
+    QueueSong,
+    QueueSource,
+    Song,
+} from '/@/shared/types/domain-types';
 import {
     CrossfadeStyle,
     Play,
@@ -42,6 +49,7 @@ interface Actions {
     clearSelected: (items: QueueSong[]) => void;
     decreaseVolume: (value: number) => void;
     getCurrentSong: () => QueueSong | undefined;
+    getPlaybackQueue: () => GroupedQueue;
     getPlayerData: () => PlayerData;
     getQueue: (groupBy?: QueueGroupingProperty) => GroupedQueue;
     getQueueOrder: () => GroupedQueue;
@@ -51,7 +59,7 @@ interface Actions {
     mediaAutoNext: () => PlayerData;
     mediaNext: (toNextAlbum: boolean) => void;
     mediaPause: () => void;
-    mediaPlay: (id?: string) => void;
+    mediaPlay: (id?: string, options?: { consumePrevious?: boolean }) => void;
     mediaPlayByIndex: (index: number) => void;
     mediaPrevious: (toPreviousAlbum: boolean) => void;
     mediaSeekToTimestamp: (timestamp: number) => void;
@@ -64,6 +72,8 @@ interface Actions {
     moveSelectedToBottom: (items: QueueSong[]) => void;
     moveSelectedToNext: (items: QueueSong[]) => void;
     moveSelectedToTop: (items: QueueSong[]) => void;
+    prepareQueueRefill: () => void;
+    refreshQueueSource: (items: Song[]) => void;
     setCrossfadeDuration: (duration: number) => void;
     setCrossfadeStyle: (style: CrossfadeStyle) => void;
     setPauseOnNextSongEnd: (value: boolean) => void;
@@ -83,6 +93,23 @@ interface Actions {
 interface GroupedQueue {
     groups: { count: number; name: string }[];
     items: QueueSong[];
+}
+
+interface PlaybackQueueState {
+    player: {
+        index: number;
+        shuffle: PlayerShuffle;
+    };
+    queue: {
+        default: string[];
+        shuffled: number[];
+    };
+}
+
+interface QueueConsumptionResult {
+    currentIndex: number;
+    nextIndex: number;
+    shouldStop: boolean;
 }
 
 interface State {
@@ -331,16 +358,6 @@ function generateShuffledIndexes(length: number): number[] {
     return shuffleInPlace(indexes);
 }
 
-// Helper function to regenerate shuffled indexes if shuffle is enabled
-function regenerateShuffledIndexesIfNeeded(state: {
-    player: { shuffle: PlayerShuffle };
-    queue: { default: string[]; shuffled: number[] };
-}): void {
-    if (isShuffleEnabled(state)) {
-        state.queue.shuffled = generateShuffledIndexes(state.queue.default.length);
-    }
-}
-
 const initialState: State = {
     hydrated: false,
     mpvInitialized: false,
@@ -360,9 +377,13 @@ const initialState: State = {
         volume: 30,
     },
     queue: {
+        consumed: [],
         default: [],
+        preparedRefillBoundary: null,
+        recentlyPlayed: [],
         shuffled: [],
         songs: {},
+        source: null,
     },
 };
 
@@ -535,6 +556,8 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 state.player.playerNum = 1;
                                 setTimestampStore(0);
                                 state.queue.default = newUniqueIds;
+                                resetQueueCycle(state, newItems, newUniqueIds);
+                                cleanupOrphanedSongs(state);
 
                                 if (state.player.shuffle === PlayerShuffle.TRACK) {
                                     // If targetSongUniqueId is provided, ensure it's at position 0 in shuffled array
@@ -594,6 +617,8 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 state.player.playerNum = 1;
                                 setTimestampStore(0);
                                 state.queue.default = shuffledIds;
+                                resetQueueCycle(state, newItems, newUniqueIds);
+                                cleanupOrphanedSongs(state);
 
                                 // Always maintain shuffled array when using Play.SHUFFLE
                                 state.queue.shuffled = generateShuffledIndexes(shuffledIds.length);
@@ -731,13 +756,18 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 clearQueue: () => {
                     set((state) => {
                         state.player.index = -1;
+                        state.queue.consumed = [];
                         state.queue.default = [];
+                        state.queue.preparedRefillBoundary = null;
+                        state.queue.recentlyPlayed = [];
                         state.queue.shuffled = [];
                         state.queue.songs = {};
+                        state.queue.source = null;
                     });
                 },
                 clearSelected: (items: QueueSong[]) => {
                     set((state) => {
+                        const currentTrackUniqueId = state.getCurrentSong()?._uniqueId;
                         const uniqueIds = new Set(items.map((item) => item._uniqueId));
 
                         const indexesToRemove = new Set<number>();
@@ -751,6 +781,15 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         state.queue.default = state.queue.default.filter(
                             (id) => !uniqueIds.has(id),
                         );
+
+                        if (state.queue.source) {
+                            state.queue.source.trackIds = state.queue.source.trackIds.filter(
+                                (id) => !uniqueIds.has(id),
+                            );
+                            if (state.queue.source.trackIds.length === 0) {
+                                state.queue.source = null;
+                            }
+                        }
 
                         if (isShuffleEnabled(state)) {
                             // Remove indexes from shuffled array and adjust remaining indexes
@@ -773,7 +812,15 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
 
                         cleanupOrphanedSongs(state);
 
-                        recalculatePlayerIndex(state, state.queue.default);
+                        const playbackIds = getPlaybackQueueIds(state);
+                        if (currentTrackUniqueId && playbackIds.includes(currentTrackUniqueId)) {
+                            applyPlaybackQueueOrder(state, playbackIds, currentTrackUniqueId);
+                        } else {
+                            state.player.index =
+                                playbackIds.length === 0
+                                    ? -1
+                                    : Math.min(state.player.index, playbackIds.length - 1);
+                        }
                     });
                 },
                 decreaseVolume: (value: number) => {
@@ -792,6 +839,23 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     }
 
                     return queue.items[index];
+                },
+                getPlaybackQueue: () => {
+                    const state = get();
+                    const queue = state.getQueueOrder();
+
+                    if (!isShuffleEnabled(state)) {
+                        return queue;
+                    }
+
+                    const items = state.queue.shuffled
+                        .map((queueIndex) => queue.items[queueIndex])
+                        .filter((item): item is QueueSong => item !== undefined);
+
+                    return {
+                        groups: [{ count: items.length, name: 'All' }],
+                        items,
+                    };
                 },
                 getPlayerData: () => {
                     const state = get();
@@ -940,6 +1004,50 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     const queue = stateSnapshot.getQueueOrder();
                     const isShuffle = isShuffleEnabled(stateSnapshot);
 
+                    if (
+                        useSettingsStore.getState().playback.consumeQueue &&
+                        repeat !== PlayerRepeat.ONE
+                    ) {
+                        let consumptionResult: QueueConsumptionResult = {
+                            currentIndex,
+                            nextIndex: -1,
+                            shouldStop: true,
+                        };
+                        const pauseOnNext = player.pauseOnNextSongEnd;
+
+                        set((state) => {
+                            consumptionResult = consumeCurrentQueueSong(state);
+                            const newStatus = consumptionResult.shouldStop
+                                ? PlayerStatus.STOPPED
+                                : pauseOnNext
+                                  ? PlayerStatus.PAUSED
+                                  : PlayerStatus.PLAYING;
+
+                            state.player.playerNum =
+                                newStatus === PlayerStatus.PLAYING
+                                    ? player.playerNum === 1
+                                        ? 2
+                                        : 1
+                                    : player.playerNum;
+                            state.player.status = newStatus;
+                            setTimestampStore(0);
+
+                            if (consumptionResult.shouldStop) {
+                                state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
+                            }
+
+                            if (pauseOnNext) {
+                                state.player.pauseOnNextSongEnd = false;
+                            }
+                        });
+
+                        if (consumptionResult.shouldStop) {
+                            emitPlayerStop(get, true);
+                        }
+
+                        return get().getPlayerData();
+                    }
+
                     const playbackLength = isShuffle
                         ? stateSnapshot.queue.shuffled.length
                         : queue.items.length;
@@ -1067,6 +1175,40 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
 
                     const isStopped = state.player.status === PlayerStatus.STOPPED;
 
+                    if (useSettingsStore.getState().playback.consumeQueue) {
+                        const targetUniqueId = toNextAlbum
+                            ? findNextAlbumUniqueId(state)
+                            : undefined;
+                        let consumptionResult: QueueConsumptionResult = {
+                            currentIndex,
+                            nextIndex: -1,
+                            shouldStop: true,
+                        };
+
+                        set((draft) => {
+                            consumptionResult = consumeCurrentQueueSong(draft, targetUniqueId);
+                            draft.player.playerNum = 1;
+                            draft.player.status = consumptionResult.shouldStop
+                                ? PlayerStatus.STOPPED
+                                : PlayerStatus.PLAYING;
+                            setTimestampStore(0);
+
+                            if (consumptionResult.shouldStop) {
+                                draft.player.seekToTimestamp = uniqueSeekToTimestamp(0);
+                            }
+                        });
+
+                        if (consumptionResult.shouldStop) {
+                            emitPlayerStop(get, true);
+                        } else {
+                            eventEmitter.emit('MEDIA_NEXT', {
+                                currentIndex: consumptionResult.currentIndex,
+                                nextIndex: consumptionResult.nextIndex,
+                            });
+                        }
+                        return;
+                    }
+
                     if (repeat === PlayerRepeat.ONE) {
                         // Manual next while repeat-one is active should still advance in the queue.
                         const nextIndex = Math.min(playbackLength - 1, currentIndex + 1);
@@ -1145,7 +1287,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         state.player.status = PlayerStatus.PAUSED;
                     });
                 },
-                mediaPlay: (id?: string) => {
+                mediaPlay: (id?: string, options?: { consumePrevious?: boolean }) => {
                     let playIndex: number | undefined;
 
                     // Playing a specific queue song should dismiss radio first.
@@ -1155,12 +1297,16 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
 
                     set((state) => {
                         if (id) {
-                            const queue = state.getQueue();
+                            if (
+                                options?.consumePrevious &&
+                                useSettingsStore.getState().playback.consumeQueue
+                            ) {
+                                consumeQueueSongsBeforeTarget(state, id);
+                            }
 
-                            // Find the song in the original queue
-                            const queueIndex = queue.items.findIndex(
-                                (item) => item._uniqueId === id,
-                            );
+                            // Find the song in the remaining displayed queue. In consume mode,
+                            // manually selecting a later song removes every song above it first.
+                            const queueIndex = state.queue.default.indexOf(id);
 
                             if (queueIndex !== -1) {
                                 if (
@@ -1203,31 +1349,33 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     clearActiveRadio();
 
                     set((state) => {
-                        const queue = state.getQueue();
-
-                        if (index === -1 || index >= queue.items.length) {
+                        if (index === -1 || index >= state.queue.default.length) {
                             state.player.status = PlayerStatus.PAUSED;
                             return;
                         }
 
-                        // Get the song's unique ID from the queue
-                        const song = queue.items[index];
-                        if (song) {
-                            songId = song._uniqueId;
+                        const targetUniqueId = state.queue.default[index];
+                        if (!targetUniqueId) {
+                            state.player.status = PlayerStatus.PAUSED;
+                            return;
                         }
 
-                        // index is the position in the original queue
+                        songId = targetUniqueId;
+
+                        const queueIndex = state.queue.default.indexOf(targetUniqueId);
+
                         if (isShuffleEnabled(state)) {
                             // Find the shuffled position for this queue index
                             const shuffledPosition = findShuffledPositionForQueueIndex(
-                                index,
+                                queueIndex,
                                 state.queue.shuffled,
                             );
-                            playIndex = shuffledPosition !== undefined ? shuffledPosition : index;
+                            playIndex =
+                                shuffledPosition !== undefined ? shuffledPosition : queueIndex;
                             state.player.index = playIndex;
                         } else {
-                            playIndex = index;
-                            state.player.index = index;
+                            playIndex = queueIndex;
+                            state.player.index = queueIndex;
                         }
                         setTimestampStore(0);
 
@@ -1376,9 +1524,9 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     }
                 },
                 moveSelectedTo: (items: QueueSong[], uniqueId: string, edge: 'bottom' | 'top') => {
-                    const itemUniqueIds = items.map((item) => item._uniqueId);
-
                     set((state) => {
+                        const currentTrackUniqueId = state.getCurrentSong()?._uniqueId;
+                        const itemUniqueIds = items.map((item) => item._uniqueId);
                         const existingIds = new Set(Object.keys(state.queue.songs));
 
                         // Add new songs to songs object (avoiding duplicates)
@@ -1388,28 +1536,36 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             }
                         });
 
-                        // Find the index of the drop target
-                        const index = state.queue.default.findIndex((id) => id === uniqueId);
+                        appendMissingQueueIds(state, itemUniqueIds);
 
-                        // Get the new index based on the edge
-                        const insertIndex = Math.max(0, edge === 'top' ? index : index + 1);
+                        const playbackIds = getPlaybackQueueIds(state);
+                        const movedIds = getMovedIdsInPlaybackOrder(playbackIds, itemUniqueIds);
+                        const movedIdSet = new Set(movedIds);
 
-                        const idsBefore = state.queue.default
-                            .slice(0, insertIndex)
-                            .filter((id) => !itemUniqueIds.includes(id));
+                        if (movedIdSet.has(uniqueId)) {
+                            return;
+                        }
 
-                        const idsAfter = state.queue.default
-                            .slice(insertIndex)
-                            .filter((id) => !itemUniqueIds.includes(id));
+                        const remainingIds = playbackIds.filter((id) => !movedIdSet.has(id));
+                        const targetIndex = remainingIds.findIndex((id) => id === uniqueId);
 
-                        const newQueue = [...idsBefore, ...itemUniqueIds, ...idsAfter];
+                        if (targetIndex === -1) {
+                            return;
+                        }
 
-                        recalculatePlayerIndex(state, newQueue);
-                        state.queue.default = newQueue;
+                        const insertIndex = edge === 'top' ? targetIndex : targetIndex + 1;
+                        const newQueue = [
+                            ...remainingIds.slice(0, insertIndex),
+                            ...movedIds,
+                            ...remainingIds.slice(insertIndex),
+                        ];
+
+                        applyPlaybackQueueOrder(state, newQueue, currentTrackUniqueId);
                     });
                 },
                 moveSelectedToBottom: (items: QueueSong[]) => {
                     set((state) => {
+                        const currentTrackUniqueId = state.getCurrentSong()?._uniqueId;
                         const uniqueIds = items.map((item) => item._uniqueId);
 
                         // Add new songs to songs object
@@ -1417,19 +1573,21 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             state.queue.songs[item._uniqueId] = item;
                         });
 
-                        const filtered = state.queue.default.filter(
-                            (id) => !uniqueIds.includes(id),
-                        );
+                        appendMissingQueueIds(state, uniqueIds);
 
-                        const newQueue = [...filtered, ...uniqueIds];
+                        const playbackIds = getPlaybackQueueIds(state);
+                        const movedIds = getMovedIdsInPlaybackOrder(playbackIds, uniqueIds);
+                        const movedIdSet = new Set(movedIds);
+                        const filtered = playbackIds.filter((id) => !movedIdSet.has(id));
 
-                        recalculatePlayerIndex(state, newQueue);
+                        const newQueue = [...filtered, ...movedIds];
 
-                        state.queue.default = newQueue;
+                        applyPlaybackQueueOrder(state, newQueue, currentTrackUniqueId);
                     });
                 },
                 moveSelectedToNext: (items: QueueSong[]) => {
                     set((state) => {
+                        const currentTrackUniqueId = state.getCurrentSong()?._uniqueId;
                         const uniqueIds = items.map((item) => item._uniqueId);
 
                         // Add new songs to songs object
@@ -1437,33 +1595,29 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             state.queue.songs[item._uniqueId] = item;
                         });
 
-                        const currentIndex = state.player.index;
-                        let beforeCurrent = 0;
-                        const filtered = state.queue.default.filter((id, idx) => {
-                            const shouldMove = uniqueIds.includes(id);
-                            if (shouldMove && idx < currentIndex) {
-                                beforeCurrent++;
-                            }
+                        appendMissingQueueIds(state, uniqueIds);
 
-                            return !shouldMove;
-                        });
-
-                        // For every item that is before the current item, subtract one as
-                        // these items will shift the queue up
-                        const insertIndex = currentIndex + 1 - beforeCurrent;
+                        const playbackIds = getPlaybackQueueIds(state);
+                        const movedIds = getMovedIdsInPlaybackOrder(playbackIds, uniqueIds);
+                        const movedIdSet = new Set(movedIds);
+                        const filtered = playbackIds.filter((id) => !movedIdSet.has(id));
+                        const currentIndex = currentTrackUniqueId
+                            ? filtered.indexOf(currentTrackUniqueId)
+                            : -1;
+                        const insertIndex = currentIndex === -1 ? 0 : currentIndex + 1;
 
                         const newQueue = [
                             ...filtered.slice(0, insertIndex),
-                            ...uniqueIds,
+                            ...movedIds,
                             ...filtered.slice(insertIndex),
                         ];
 
-                        recalculatePlayerIndex(state, newQueue);
-                        state.queue.default = newQueue;
+                        applyPlaybackQueueOrder(state, newQueue, currentTrackUniqueId);
                     });
                 },
                 moveSelectedToTop: (items: QueueSong[]) => {
                     set((state) => {
+                        const currentTrackUniqueId = state.getCurrentSong()?._uniqueId;
                         const uniqueIds = items.map((item) => item._uniqueId);
 
                         // Add new songs to songs object
@@ -1471,15 +1625,101 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             state.queue.songs[item._uniqueId] = item;
                         });
 
-                        const filtered = state.queue.default.filter(
-                            (id) => !uniqueIds.includes(id),
-                        );
+                        appendMissingQueueIds(state, uniqueIds);
 
-                        const newQueue = [...uniqueIds, ...filtered];
+                        const playbackIds = getPlaybackQueueIds(state);
+                        const movedIds = getMovedIdsInPlaybackOrder(playbackIds, uniqueIds);
+                        const movedIdSet = new Set(movedIds);
+                        const filtered = playbackIds.filter((id) => !movedIdSet.has(id));
 
-                        recalculatePlayerIndex(state, newQueue);
+                        const newQueue = [...movedIds, ...filtered];
 
-                        state.queue.default = newQueue;
+                        applyPlaybackQueueOrder(state, newQueue, currentTrackUniqueId);
+                    });
+                },
+                prepareQueueRefill: () => {
+                    if (!useSettingsStore.getState().playback.consumeQueue) {
+                        return;
+                    }
+
+                    set((state) => {
+                        if (
+                            state.player.repeat !== PlayerRepeat.ALL ||
+                            state.player.pauseOnNextSongEnd ||
+                            state.queue.preparedRefillBoundary
+                        ) {
+                            return;
+                        }
+
+                        const playbackIds = getPlaybackQueueIds(state);
+                        if (playbackIds.length !== 1) {
+                            return;
+                        }
+
+                        const currentUniqueId = playbackIds[0];
+                        const currentSong = state.queue.songs[currentUniqueId];
+                        if (!currentSong) {
+                            return;
+                        }
+
+                        const refillSourceIds =
+                            state.player.shuffle === PlayerShuffle.TRACK
+                                ? selectShuffledRefillIds(state, currentSong.id)
+                                : [...state.queue.consumed, currentUniqueId].filter(
+                                      (id) => state.queue.songs[id] !== undefined,
+                                  );
+
+                        if (refillSourceIds.length === 0) {
+                            return;
+                        }
+
+                        const preparedIds = refillSourceIds.map((sourceId) => {
+                            const preparedId = nanoid();
+                            state.queue.songs[preparedId] = {
+                                ...state.queue.songs[sourceId],
+                                _uniqueId: preparedId,
+                            };
+                            return preparedId;
+                        });
+
+                        state.queue.default.push(...preparedIds);
+
+                        if (state.player.shuffle === PlayerShuffle.TRACK) {
+                            state.queue.shuffled = [currentUniqueId, ...preparedIds]
+                                .map((id) => state.queue.default.indexOf(id))
+                                .filter((index) => index !== -1);
+                        }
+
+                        state.queue.preparedRefillBoundary = currentUniqueId;
+                    });
+                },
+                refreshQueueSource: (items: Song[]) => {
+                    const source = get().queue.source;
+                    if (!source) {
+                        return;
+                    }
+
+                    const sourceItems = items.map((item) => ({
+                        ...item,
+                        _contextPlaylistId:
+                            source.type === LibraryItem.PLAYLIST ? source.id : undefined,
+                    }));
+                    const newItems = sourceItems.map(toQueueSong);
+                    const newUniqueIds = newItems.map((item) => item._uniqueId);
+
+                    set((state) => {
+                        if (
+                            state.queue.source?.id !== source.id ||
+                            state.queue.source.type !== source.type
+                        ) {
+                            return;
+                        }
+
+                        newItems.forEach((item) => {
+                            state.queue.songs[item._uniqueId] = item;
+                        });
+                        state.queue.source.trackIds = newUniqueIds;
+                        cleanupOrphanedSongs(state);
                     });
                 },
                 setQueue: (items, index, position) => {
@@ -1495,6 +1735,9 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         state.player.status = PlayerStatus.PLAYING;
                         state.player.playerNum = 1;
                         state.queue.default = newUniqueIds;
+                        state.queue.shuffled = [];
+                        resetQueueCycle(state, newItems, newUniqueIds);
+                        cleanupOrphanedSongs(state);
                     });
 
                     eventEmitter.emit('QUEUE_RESTORED', {
@@ -1593,49 +1836,47 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 },
                 shuffleAll: () => {
                     set((state) => {
-                        const queue = state.getQueue();
+                        const currentTrackUniqueId = state.getCurrentSong()?._uniqueId;
+                        const playbackIds = getPlaybackQueueIds(state);
                         const currentIndex = state.player.index;
-                        const currentSong = queue.items[currentIndex];
 
                         // If there's a current song playing, keep it in place
-                        if (currentSong && currentIndex >= 0 && currentIndex < queue.items.length) {
-                            const currentUniqueId = currentSong._uniqueId;
-                            const currentQueueIndex = state.queue.default.findIndex(
-                                (id) => id === currentUniqueId,
+                        if (
+                            currentTrackUniqueId &&
+                            currentIndex >= 0 &&
+                            currentIndex < playbackIds.length
+                        ) {
+                            const beforeItems = playbackIds.slice(0, currentIndex);
+                            const afterItems = playbackIds.slice(currentIndex + 1);
+
+                            applyPlaybackQueueOrder(
+                                state,
+                                [
+                                    ...shuffleInPlace([...beforeItems]),
+                                    currentTrackUniqueId,
+                                    ...shuffleInPlace([...afterItems]),
+                                ],
+                                currentTrackUniqueId,
                             );
-
-                            if (currentQueueIndex !== -1) {
-                                const beforeItems = state.queue.default.slice(0, currentQueueIndex);
-                                const afterItems = state.queue.default.slice(currentQueueIndex + 1);
-
-                                const shuffledBefore = shuffleInPlace([...beforeItems]);
-                                const shuffledAfter = shuffleInPlace([...afterItems]);
-
-                                state.queue.default = [
-                                    ...shuffledBefore,
-                                    currentUniqueId,
-                                    ...shuffledAfter,
-                                ];
-                            } else {
-                                // Current song not in default queue, just shuffle everything
-                                state.queue.default = shuffleInPlace([...state.queue.default]);
-                            }
                         } else {
                             // No current song, shuffle everything
-                            state.queue.default = shuffleInPlace([...state.queue.default]);
+                            applyPlaybackQueueOrder(
+                                state,
+                                shuffleInPlace([...playbackIds]),
+                                currentTrackUniqueId,
+                            );
                         }
-
-                        // Regenerate shuffled indexes if shuffle is enabled
-                        regenerateShuffledIndexesIfNeeded(state);
                     });
                 },
                 shuffleSelected: (items: QueueSong[]) => {
                     set((state) => {
+                        const currentTrackUniqueId = state.getCurrentSong()?._uniqueId;
+                        const playbackIds = getPlaybackQueueIds(state);
                         const itemUniqueIds = items.map((item) => item._uniqueId);
 
-                        // Find positions of selected items in the default queue
+                        // Find positions of selected items in the visible playback queue
                         const selectedPositions = itemUniqueIds
-                            .map((id) => state.queue.default.findIndex((i) => i === id))
+                            .map((id) => playbackIds.findIndex((i) => i === id))
                             .filter((idx) => idx !== -1)
                             .sort((a, b) => a - b); // Sort to maintain order
 
@@ -1644,23 +1885,18 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         }
 
                         // Get the selected items in their current order
-                        const selectedItems = selectedPositions.map(
-                            (pos) => state.queue.default[pos],
-                        );
+                        const selectedItems = selectedPositions.map((pos) => playbackIds[pos]);
 
                         // Shuffle the selected items
                         const shuffledItems = shuffleInPlace([...selectedItems]);
 
-                        // Rebuild the default queue with shuffled selected items
-                        const newDefaultQueue = [...state.queue.default];
+                        // Rebuild the playback queue with shuffled selected items
+                        const newPlaybackQueue = [...playbackIds];
                         selectedPositions.forEach((pos, i) => {
-                            newDefaultQueue[pos] = shuffledItems[i];
+                            newPlaybackQueue[pos] = shuffledItems[i];
                         });
 
-                        state.queue.default = newDefaultQueue;
-
-                        // Regenerate shuffled indexes if shuffle is enabled
-                        regenerateShuffledIndexesIfNeeded(state);
+                        applyPlaybackQueueOrder(state, newPlaybackQueue, currentTrackUniqueId);
                     });
                 },
                 toggleRepeat: () => {
@@ -1805,6 +2041,7 @@ export const usePlayerActions = () => {
             clearQueue: state.clearQueue,
             clearSelected: state.clearSelected,
             decreaseVolume: state.decreaseVolume,
+            getPlaybackQueue: state.getPlaybackQueue,
             getQueue: state.getQueue,
             increaseVolume: state.increaseVolume,
             isFirstTrackInQueue: state.isFirstTrackInQueue,
@@ -1825,6 +2062,8 @@ export const usePlayerActions = () => {
             moveSelectedToBottom: state.moveSelectedToBottom,
             moveSelectedToNext: state.moveSelectedToNext,
             moveSelectedToTop: state.moveSelectedToTop,
+            prepareQueueRefill: state.prepareQueueRefill,
+            refreshQueueSource: state.refreshQueueSource,
             setCrossfadeDuration: state.setCrossfadeDuration,
             setCrossfadeStyle: state.setCrossfadeStyle,
             setPauseOnNextSongEnd: state.setPauseOnNextSongEnd,
@@ -2314,8 +2553,43 @@ export const usePlayerQueue = () => {
     );
 };
 
+function appendMissingQueueIds(state: PlaybackQueueState, uniqueIds: string[]) {
+    const existingIds = new Set(state.queue.default);
+
+    for (const uniqueId of uniqueIds) {
+        if (!existingIds.has(uniqueId)) {
+            state.queue.default.push(uniqueId);
+            existingIds.add(uniqueId);
+        }
+    }
+}
+
+function applyPlaybackQueueOrder(
+    state: PlaybackQueueState,
+    playbackIds: string[],
+    currentTrackUniqueId: string | undefined,
+) {
+    if (isShuffleEnabled(state)) {
+        const queueIndexes = new Map(state.queue.default.map((id, index) => [id, index]));
+        state.queue.shuffled = playbackIds
+            .map((id) => queueIndexes.get(id))
+            .filter((index): index is number => index !== undefined);
+    } else {
+        state.queue.default = playbackIds;
+    }
+
+    if (currentTrackUniqueId) {
+        const currentIndex = playbackIds.indexOf(currentTrackUniqueId);
+        if (currentIndex !== -1) {
+            state.player.index = currentIndex;
+        }
+    }
+}
+
 function cleanupOrphanedSongs(state: any): boolean {
     const allQueueIds = new Set([
+        ...(state.queue.consumed || []),
+        ...(state.queue.source?.trackIds || []),
         ...state.queue.default,
         // shuffled now contains indexes, not uniqueIds, so we don't include it here
     ]);
@@ -2343,6 +2617,121 @@ function cleanupOrphanedSongs(state: any): boolean {
     }
 
     return hasOrphans;
+}
+
+function consumeCurrentQueueSong(
+    state: Pick<State, 'player' | 'queue'>,
+    targetUniqueId?: string,
+): QueueConsumptionResult {
+    const playbackIds = getPlaybackQueueIds(state);
+    const currentIndex = state.player.index;
+    const currentUniqueId = playbackIds[currentIndex];
+
+    if (!currentUniqueId) {
+        return { currentIndex, nextIndex: -1, shouldStop: true };
+    }
+
+    const defaultIndex = state.queue.default.indexOf(currentUniqueId);
+    const nextUniqueId = targetUniqueId ?? playbackIds[currentIndex + 1];
+    const currentSong = state.queue.songs[currentUniqueId];
+    const isPreparedRefillBoundary = state.queue.preparedRefillBoundary === currentUniqueId;
+
+    if (isPreparedRefillBoundary) {
+        // The remaining entries are the next cycle, so discard the completed cycle.
+        state.queue.consumed = [];
+        state.queue.preparedRefillBoundary = null;
+    } else {
+        state.queue.consumed.push(currentUniqueId);
+    }
+    if (currentSong?.id) {
+        state.queue.recentlyPlayed = [
+            ...state.queue.recentlyPlayed.filter((id) => id !== currentSong.id),
+            currentSong.id,
+        ].slice(-50);
+    }
+
+    if (defaultIndex !== -1) {
+        state.queue.default.splice(defaultIndex, 1);
+        state.queue.shuffled = state.queue.shuffled
+            .filter((index) => index !== defaultIndex)
+            .map((index) => (index > defaultIndex ? index - 1 : index));
+    }
+
+    let remainingPlaybackIds = getPlaybackQueueIds(state);
+    let nextIndex = nextUniqueId ? remainingPlaybackIds.indexOf(nextUniqueId) : -1;
+
+    if (nextIndex === -1 && remainingPlaybackIds.length === 0) {
+        refillConsumedQueue(state);
+        remainingPlaybackIds = getPlaybackQueueIds(state);
+        nextIndex = remainingPlaybackIds.length > 0 ? 0 : -1;
+    }
+
+    if (
+        nextIndex === -1 &&
+        remainingPlaybackIds.length > 0 &&
+        state.player.repeat === PlayerRepeat.ALL
+    ) {
+        nextIndex = 0;
+    }
+
+    const shouldStop = nextIndex === -1;
+    const playerIndex = shouldStop && remainingPlaybackIds.length > 0 ? 0 : nextIndex;
+    state.player.index = playerIndex;
+
+    return {
+        currentIndex,
+        nextIndex: playerIndex,
+        shouldStop,
+    };
+}
+
+function consumeQueueSongsBeforeTarget(
+    state: Pick<State, 'player' | 'queue'>,
+    targetUniqueId: string,
+) {
+    // The queue panel renders playback order, which differs from default order
+    // while shuffle is enabled. Consume only the rows visibly above the target.
+    const playbackIds = getPlaybackQueueIds(state);
+    const targetIndex = playbackIds.indexOf(targetUniqueId);
+
+    if (targetIndex <= 0) {
+        return;
+    }
+
+    const consumedIds = playbackIds.slice(0, targetIndex);
+    const consumedIdSet = new Set(consumedIds);
+    const preparedBoundaryIndex = state.queue.preparedRefillBoundary
+        ? consumedIds.indexOf(state.queue.preparedRefillBoundary)
+        : -1;
+
+    if (preparedBoundaryIndex !== -1) {
+        // A manual jump crossed into the prepared cycle. Do not carry the
+        // completed cycle's history into the new one.
+        state.queue.consumed = consumedIds.slice(preparedBoundaryIndex + 1);
+        state.queue.preparedRefillBoundary = null;
+    } else {
+        state.queue.consumed.push(...consumedIds);
+    }
+
+    let recentlyPlayed = [...state.queue.recentlyPlayed];
+    for (const uniqueId of consumedIds) {
+        const songId = state.queue.songs[uniqueId]?.id;
+        if (songId) {
+            recentlyPlayed = [...recentlyPlayed.filter((id) => id !== songId), songId];
+        }
+    }
+    state.queue.recentlyPlayed = recentlyPlayed.slice(-50);
+
+    state.queue.default = state.queue.default.filter((id) => !consumedIdSet.has(id));
+
+    if (isShuffleEnabled(state)) {
+        state.queue.shuffled = playbackIds
+            .slice(targetIndex)
+            .map((id) => state.queue.default.indexOf(id))
+            .filter((index) => index !== -1);
+    } else {
+        state.queue.shuffled = [];
+    }
 }
 
 function findIndexWithPreviousAlbum(queueItems: QueueSong[], currentIndex: number) {
@@ -2386,6 +2775,74 @@ function findLastAlbumRange(queueItems: QueueSong[]) {
     return [rangeStart + 1, rangeEnd];
 }
 
+function findNextAlbumUniqueId(state: PlayerState) {
+    const playbackIds = getPlaybackQueueIds(state);
+    const currentUniqueId = playbackIds[state.player.index];
+    const currentAlbumId = currentUniqueId
+        ? state.queue.songs[currentUniqueId]?.albumId
+        : undefined;
+
+    if (!currentAlbumId) {
+        return undefined;
+    }
+
+    const laterId = playbackIds
+        .slice(state.player.index + 1)
+        .find((id) => state.queue.songs[id]?.albumId !== currentAlbumId);
+
+    if (laterId || state.player.repeat !== PlayerRepeat.ALL) {
+        return laterId;
+    }
+
+    return playbackIds
+        .slice(0, state.player.index)
+        .find((id) => state.queue.songs[id]?.albumId !== currentAlbumId);
+}
+
+function getMovedIdsInPlaybackOrder(playbackIds: string[], uniqueIds: string[]) {
+    const uniqueIdSet = new Set(uniqueIds);
+    const playbackIdSet = new Set(playbackIds);
+    const existingIds = playbackIds.filter((id) => uniqueIdSet.has(id));
+    const newIds = uniqueIds.filter((id) => !playbackIdSet.has(id));
+
+    return [...existingIds, ...new Set(newIds)];
+}
+
+function getPlaybackQueueIds(state: PlaybackQueueState) {
+    if (!isShuffleEnabled(state)) {
+        return [...state.queue.default];
+    }
+
+    return state.queue.shuffled
+        .map((queueIndex) => state.queue.default[queueIndex])
+        .filter((id): id is string => id !== undefined);
+}
+
+function getQueueSource(items: QueueSong[], uniqueIds: string[]): null | QueueSource {
+    const playlistIds = new Set(
+        items.map((item) => item._contextPlaylistId).filter((id): id is string => Boolean(id)),
+    );
+
+    if (playlistIds.size === 1) {
+        return {
+            id: [...playlistIds][0],
+            trackIds: [...uniqueIds],
+            type: LibraryItem.PLAYLIST,
+        };
+    }
+
+    const albumIds = new Set(items.map((item) => item.albumId).filter(Boolean));
+    if (albumIds.size === 1) {
+        return {
+            id: [...albumIds][0],
+            trackIds: [...uniqueIds],
+            type: LibraryItem.ALBUM,
+        };
+    }
+
+    return null;
+}
+
 function parseUniqueSeekToTimestamp(timestamp: string) {
     return Number(timestamp.split('-')[0]);
 }
@@ -2399,6 +2856,81 @@ function recalculatePlayerIndex(state: any, queue: string[]) {
 
     const index = queue.findIndex((id) => id === currentTrack._uniqueId);
     state.player.index = Math.max(0, index);
+}
+
+function refillConsumedQueue(state: Pick<State, 'player' | 'queue'>) {
+    const selectedIds = selectShuffledRefillIds(state);
+
+    if (state.player.shuffle === PlayerShuffle.TRACK && selectedIds.length > 0) {
+        state.queue.consumed = [];
+        state.queue.default = selectedIds;
+        state.queue.preparedRefillBoundary = null;
+        state.queue.shuffled = selectedIds.map((_, index) => index);
+        return;
+    }
+
+    if (state.player.repeat === PlayerRepeat.ALL && state.queue.consumed.length > 0) {
+        state.queue.default = state.queue.consumed.filter(
+            (id) => state.queue.songs[id] !== undefined,
+        );
+        state.queue.consumed = [];
+        state.queue.preparedRefillBoundary = null;
+        state.queue.shuffled =
+            state.player.shuffle === PlayerShuffle.TRACK
+                ? generateShuffledIndexes(state.queue.default.length)
+                : [];
+    }
+}
+
+function resetQueueCycle(state: { queue: QueueData }, items: QueueSong[], uniqueIds: string[]) {
+    state.queue.consumed = [];
+    state.queue.preparedRefillBoundary = null;
+    state.queue.recentlyPlayed = [];
+    state.queue.source = getQueueSource(items, uniqueIds);
+}
+
+function selectShuffledRefillIds(
+    state: Pick<State, 'player' | 'queue'>,
+    lastPlayedSongId = state.queue.recentlyPlayed.at(-1),
+) {
+    const validSourceIds = (state.queue.source?.trackIds ?? []).filter(
+        (id) => state.queue.songs[id] !== undefined,
+    );
+
+    if (state.player.shuffle !== PlayerShuffle.TRACK || validSourceIds.length === 0) {
+        return [];
+    }
+
+    const source = state.queue.source;
+    const recentSongIds = new Set(state.queue.recentlyPlayed);
+    let selectedIds: string[];
+
+    if (source?.type === LibraryItem.PLAYLIST && validSourceIds.length > 100) {
+        const eligibleIds = validSourceIds.filter((id) => {
+            const songId = state.queue.songs[id]?.id;
+            return songId !== undefined && !recentSongIds.has(songId);
+        });
+        selectedIds = shuffleInPlace([...eligibleIds]).slice(0, 50);
+
+        if (selectedIds.length < 50) {
+            const selectedIdSet = new Set(selectedIds);
+            const fallbackIds = validSourceIds.filter((id) => !selectedIdSet.has(id));
+            selectedIds.push(...shuffleInPlace([...fallbackIds]).slice(0, 50 - selectedIds.length));
+        }
+    } else {
+        selectedIds = shuffleInPlace([...validSourceIds]);
+    }
+
+    if (selectedIds.length > 1 && state.queue.songs[selectedIds[0]]?.id === lastPlayedSongId) {
+        const swapIndex = selectedIds.findIndex(
+            (id) => state.queue.songs[id]?.id !== lastPlayedSongId,
+        );
+        if (swapIndex > 0) {
+            [selectedIds[0], selectedIds[swapIndex]] = [selectedIds[swapIndex], selectedIds[0]];
+        }
+    }
+
+    return selectedIds;
 }
 
 function toQueueSong(item: Song): QueueSong {

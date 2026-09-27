@@ -33,6 +33,7 @@ import { CrossfadeStyle, PlayerRepeat, PlayerStatus, PlayerStyle } from '/@/shar
 
 const PLAY_PAUSE_FADE_DURATION = 300;
 const PLAY_PAUSE_FADE_INTERVAL = 10;
+const QUEUE_REFILL_PRELOAD_SECONDS = 10;
 
 export function WebPlayer() {
     const playerRef = useRef<null | WebPlayerEngineHandle>(null);
@@ -40,7 +41,7 @@ export function WebPlayer() {
     const { num, player1, player2, status } = usePlayerData();
     const repeat = usePlayerRepeat();
     const repeatOneProgressRef = useRef({ player1: 0, player2: 0 });
-    const { mediaAutoNext, mediaPause, setTimestamp } = usePlayerActions();
+    const { mediaAutoNext, mediaPause, prepareQueueRefill, setTimestamp } = usePlayerActions();
     const playback = useMpvSettings();
     const { webAudio } = useWebAudio();
 
@@ -132,6 +133,23 @@ export function WebPlayer() {
         [num, repeat, setTimestamp],
     );
 
+    const prepareRefillNearTrackEnd = useCallback(
+        (playedSeconds: number, duration: number) => {
+            if (!Number.isFinite(duration) || duration <= 0) {
+                return;
+            }
+
+            const transitionDuration =
+                transitionType === PlayerStyle.CROSSFADE ? crossfadeDuration : 0;
+            const prepareAt = duration - transitionDuration - QUEUE_REFILL_PRELOAD_SECONDS;
+
+            if (playedSeconds >= Math.max(0, prepareAt)) {
+                prepareQueueRefill();
+            }
+        },
+        [crossfadeDuration, prepareQueueRefill, transitionType],
+    );
+
     const onProgressPlayer1 = useCallback(
         (e: PlayerOnProgressProps) => {
             if (!playerRef.current?.player1()) {
@@ -150,6 +168,11 @@ export function WebPlayer() {
                 handleRepeatOne(1, e.playedSeconds, getDuration(playerRef.current.player1().ref));
                 return;
             }
+
+            prepareRefillNearTrackEnd(
+                e.playedSeconds,
+                getDuration(playerRef.current.player1().ref),
+            );
 
             switch (transitionType) {
                 case PlayerStyle.CROSSFADE:
@@ -188,6 +211,7 @@ export function WebPlayer() {
             isTransitioning,
             num,
             player2,
+            prepareRefillNearTrackEnd,
             repeat,
             setTimestamp,
             transitionType,
@@ -213,6 +237,11 @@ export function WebPlayer() {
                 handleRepeatOne(2, e.playedSeconds, getDuration(playerRef.current.player2().ref));
                 return;
             }
+
+            prepareRefillNearTrackEnd(
+                e.playedSeconds,
+                getDuration(playerRef.current.player2().ref),
+            );
 
             switch (transitionType) {
                 case PlayerStyle.CROSSFADE:
@@ -251,6 +280,7 @@ export function WebPlayer() {
             isTransitioning,
             num,
             player1,
+            prepareRefillNearTrackEnd,
             repeat,
             setTimestamp,
             transitionType,
