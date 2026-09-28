@@ -67,6 +67,7 @@
 
 .favorite-badge {
     position: absolute;
+    z-index: 2;
     top: -50px;
     left: -50px;
     width: 80px;
