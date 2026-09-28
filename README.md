@@ -29,7 +29,6 @@
 
 ---
 
-KatiesAmp is a branded fork of [Feishin](https://github.com/jeffvli/feishin), built for Katie O'Brien's Irish Tavern.
 
 ## Features
 
@@ -41,9 +40,6 @@ KatiesAmp is a branded fork of [Feishin](https://github.com/jeffvli/feishin), bu
 - [x] Synchronized and unsynchronized lyrics support
 - [ ] [Request a feature](https://github.com/jeffvli/feishin/issues) or [view taskboard](https://github.com/users/jeffvli/projects/5/views/1)
 
-## Screenshots
-
-<a href="./media/preview_full_screen_player.png"><img src="./media/preview_full_screen_player.png" width="49.5%"/></a> <a href="./media/preview_album_artist_detail.png"><img src="./media/preview_album_artist_detail.png" width="49.5%"/></a> <a href="./media/preview_album_detail.png"><img src="./media/preview_album_detail.png" width="49.5%"/></a> <a href="./media/preview_smart_playlist.png"><img src="./media/preview_smart_playlist.png" width="49.5%"/></a>
 
 ## Getting Started
 
