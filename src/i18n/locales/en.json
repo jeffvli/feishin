@@ -386,7 +386,9 @@
             "input_skipDuplicates": "Skip duplicates",
             "searchOrCreate": "Search $t(entity.playlist, {\"count\": 2}) or type to create a new one",
             "success": "Added $t(entity.trackWithCount, {\"count\": {{message}} }) to $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
-            "title": "Add to $t(entity.playlist, {\"count\": 1})"
+            "title": "Add to $t(entity.playlist, {\"count\": 1})",
+            "alreadyInPlaylist": "This song is already in this playlist",
+            "disableSkipDuplicatesForAddingExistingInPlaylist": "This song is already in this playlist and \"{{skipDuplicates}}\" is enabled. Please uncheck \"{{skipDuplicates}}\" to add this song to the playlist."
         },
         "createPlaylist": {
             "input_description": "$t(common.description)",

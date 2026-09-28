@@ -19,6 +19,7 @@ import styles from './context-menu.module.css';
 import { animationVariants } from '/@/shared/components/animations/animation-variants';
 import { AppIcon, Icon } from '/@/shared/components/icon/icon';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
+import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 
 interface ContextMenuContext {
     open: boolean;
@@ -51,6 +52,7 @@ interface ItemProps {
     leftIcon?: keyof typeof AppIcon;
     onSelect?: (event: Event) => void;
     rightIcon?: keyof typeof AppIcon;
+    tooltip?: ReactNode;
 }
 
 interface LabelProps extends React.ComponentPropsWithoutRef<'div'> {
@@ -114,12 +116,14 @@ function Divider(props: DividerProps) {
 }
 
 function Item(props: ItemProps) {
-    const { children, className, disabled, isSelected, leftIcon, onSelect, rightIcon } = props;
+    const { children, className, disabled, isSelected, leftIcon, onSelect, rightIcon, tooltip } =
+        props;
 
-    return (
+    const item = (
         <RadixContextMenu.Item
             className={clsx(styles.item, className, {
                 [styles.disabled]: disabled,
+                [styles.disabledWithTooltip]: disabled && tooltip,
                 [styles.selected]: isSelected,
                 [styles['has-left-icon']]: !!leftIcon,
                 [styles['has-right-icon']]: !!rightIcon,
@@ -132,6 +136,8 @@ function Item(props: ItemProps) {
             {rightIcon && <Icon className={styles.rightIcon} icon={rightIcon} />}
         </RadixContextMenu.Item>
     );
+
+    return tooltip ? <Tooltip label={tooltip}>{item}</Tooltip> : item;
 }
 
 function Label(props: LabelProps) {
