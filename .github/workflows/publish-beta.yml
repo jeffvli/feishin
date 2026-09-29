@@ -7,6 +7,10 @@ on:
                 description: 'Semantic version number (e.g., 1.0.0) - beta suffix will be added automatically'
                 required: false
                 type: string
+            beta_number:
+                description: 'Optional beta number to publish (e.g., 4)'
+                required: false
+                type: string
 
 jobs:
     prepare:
@@ -88,8 +92,17 @@ jobs:
                       }
                   }
 
-                  # Calculate next beta number
-                  $nextBetaNumber = $maxBetaNumber + 1
+                  # Use an explicitly requested beta number, or calculate the next one.
+                  $requestedBetaNumber = "${{ github.event.inputs.beta_number }}"
+                  if ($requestedBetaNumber -ne "") {
+                      if ($requestedBetaNumber -notmatch '^\d+$' -or [int]$requestedBetaNumber -lt 1) {
+                          Write-Error "Invalid beta number: $requestedBetaNumber"
+                          exit 1
+                      }
+                      $nextBetaNumber = [int]$requestedBetaNumber
+                  } else {
+                      $nextBetaNumber = $maxBetaNumber + 1
+                  }
                   Write-Host "Next beta number: $nextBetaNumber"
 
                   # Create beta suffix with incrementing number
@@ -113,7 +126,7 @@ jobs:
 
         strategy:
             matrix:
-                os: [windows-latest, macos-26, ubuntu-latest]
+                os: [windows-latest]
 
         steps:
             - name: Checkout git repo
@@ -149,45 +162,6 @@ jobs:
                   retry_on: error
                   command: |
                       pnpm run publish:win:beta
-                  on_retry_command: pnpm cache delete
-
-            - name: Build and Publish releases (macOS)
-              if: matrix.os == 'macos-26'
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              uses: nick-invision/retry@v3.0.2
-              with:
-                  timeout_minutes: 30
-                  max_attempts: 3
-                  retry_on: error
-                  command: |
-                      pnpm run publish:mac:beta
-                  on_retry_command: pnpm cache delete
-
-            - name: Build and Publish releases (Linux)
-              if: matrix.os == 'ubuntu-latest'
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              uses: nick-invision/retry@v3.0.2
-              with:
-                  timeout_minutes: 30
-                  max_attempts: 3
-                  retry_on: error
-                  command: |
-                      pnpm run publish:linux:beta
-                  on_retry_command: pnpm cache delete
-
-            - name: Build and Publish releases (Linux ARM64)
-              if: matrix.os == 'ubuntu-latest'
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              uses: nick-invision/retry@v3.0.2
-              with:
-                  timeout_minutes: 30
-                  max_attempts: 3
-                  retry_on: error
-                  command: |
-                      pnpm run publish:linux-arm64:beta
                   on_retry_command: pnpm cache delete
 
     edit-release:

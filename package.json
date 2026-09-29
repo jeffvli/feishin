@@ -1,6 +1,6 @@
 {
     "name": "katiesamp",
-    "version": "0.1.4-beta.1",
+    "version": "0.1.4-beta.4",
     "description": "Katie O'Brien's modern self-hosted music player.",
     "keywords": [
         "subsonic",
@@ -59,7 +59,7 @@
         "publish:mac:beta": "pnpm run build && electron-builder --config electron-builder-beta.yml --publish always --mac",
         "publish:win": "pnpm run build && electron-builder --publish always --win",
         "publish:win:alpha": "pnpm run build && electron-builder --config electron-builder-alpha.yml --publish always --win",
-        "publish:win:beta": "pnpm run build && electron-builder --config electron-builder-beta.yml --publish always --win",
+        "publish:win:beta": "pnpm run build && electron-builder --config electron-builder-beta.yml --publish always --win --x64",
         "publish:win-arm64": "pnpm run build && electron-builder --publish always --win --arm64",
         "publish:win-arm64:alpha": "pnpm run build && electron-builder --config electron-builder-alpha.yml --publish always --win --arm64",
         "publish:win-arm64:beta": "pnpm run build && electron-builder --config electron-builder-beta.yml --publish always --win --arm64",
