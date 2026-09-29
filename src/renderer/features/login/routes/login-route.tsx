@@ -114,6 +114,9 @@ const LoginRoute = () => {
 
     const [signInMethod, setSignInMethod] = useState<JellyfinSignInMethod>('password');
     const showQuickConnect = serverType === ServerType.JELLYFIN && signInMethod === 'quickConnect';
+    const lockedServer = serverLock
+        ? findExistingServerLockServer(serverList, normalizeServerUrl(serverUrl), serverType)
+        : undefined;
 
     const {
         code: quickConnectCode,
@@ -121,6 +124,7 @@ const LoginRoute = () => {
         start: startQuickConnect,
         stop: stopQuickConnect,
     } = useJellyfinQuickConnect({
+        customHeaders: lockedServer?.customHeaders,
         onAuthenticated: (data) => {
             const normalizedUrl = normalizeServerUrl(serverUrl);
             const normalizedRemoteURL = normalizeServerUrl(remoteUrl);
@@ -212,6 +216,7 @@ const LoginRoute = () => {
                     username: values.username,
                 },
                 serverType as ServerType,
+                lockedServer?.customHeaders,
             );
 
             if (!data) {

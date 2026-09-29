@@ -172,6 +172,7 @@ export const useRadioAudioInstance = () => {
         }
 
         if (currentStreamUrl) {
+            mpvPlayer.setProperties({ 'http-header-fields': [] });
             mpvPlayer.setQueue(currentStreamUrl, undefined, !isPlaying);
         } else {
             mpvPlayer.pause();

@@ -223,8 +223,8 @@ export const controller = {
             server.type,
         )?.(addContext({ ...args, apiClientProps: { ...args.apiClientProps, server } }));
     },
-    authenticate(url, body, type) {
-        return apiController('authenticate', type)(url, body);
+    authenticate(url, body, type, customHeaders = {}) {
+        return apiController('authenticate', type)(url, body, customHeaders);
     },
     createFavorite(args) {
         const server = getServerById(args.apiClientProps.serverId);

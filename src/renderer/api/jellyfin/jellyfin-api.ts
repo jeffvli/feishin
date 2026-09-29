@@ -8,6 +8,7 @@ import packageJson from '../../../../package.json';
 
 import i18n from '/@/i18n/i18n';
 import { validateResponse } from '/@/renderer/api/response-validation';
+import { mergeDesktopHeaders } from '/@/renderer/api/server-headers';
 import { authenticationFailure } from '/@/renderer/api/utils';
 import { useAuthStore } from '/@/renderer/store';
 import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
@@ -501,12 +502,13 @@ export const createAuthHeader = (): string => {
 };
 
 export const jfApiClient = (args: {
+    customHeaders?: Record<string, string>;
     forceRemoteUrl?: boolean;
     server: null | ServerListItemWithCredential;
     signal?: AbortSignal;
     url?: string;
 }) => {
-    const { forceRemoteUrl, server, signal, url } = args;
+    const { customHeaders, forceRemoteUrl, server, signal, url } = args;
 
     return initClient(contract, {
         api: async ({ body, headers, method, path, route }) => {
@@ -527,10 +529,16 @@ export const jfApiClient = (args: {
                 const result = await axiosClient.request({
                     data: body,
                     headers: {
-                        ...headers,
-                        ...(token
-                            ? { Authorization: createAuthHeader().concat(`, Token="${token}"`) }
-                            : { Authorization: createAuthHeader() }),
+                        ...mergeDesktopHeaders(server?.customHeaders ?? customHeaders, {
+                            ...headers,
+                            ...(token
+                                ? {
+                                      Authorization: createAuthHeader().concat(
+                                          `, Token="${token}"`,
+                                      ),
+                                  }
+                                : { Authorization: createAuthHeader() }),
+                        }),
                     },
                     method: method as Method,
                     params,
