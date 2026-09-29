@@ -10,6 +10,7 @@ import styles from './sidebar-playlist-list.module.css';
 
 import { ItemImage, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
+import { OfflineStatusIcon } from '/@/renderer/features/offline/components/offline-status-icon';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { openCreatePlaylistModal } from '/@/renderer/features/playlists/components/create-playlist-form';
@@ -301,6 +302,7 @@ export const PlaylistRowButton = memo(
                             size="md"
                         >
                             {name}
+                            <OfflineStatusIcon item={item} itemType={LibraryItem.PLAYLIST} />
                         </Text>
                         {isHovered && (
                             <ItemRowPlayControls
@@ -330,6 +332,10 @@ export const PlaylistRowButton = memo(
                                     size="md"
                                 >
                                     {name}
+                                    <OfflineStatusIcon
+                                        item={item}
+                                        itemType={LibraryItem.PLAYLIST}
+                                    />
                                 </Text>
                                 <div className={styles.metadataGroup}>
                                     <div

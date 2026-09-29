@@ -17,6 +17,7 @@ import {
 } from '/@/renderer/components/item-list/helpers/item-list-state';
 import { ItemControls } from '/@/renderer/components/item-list/types';
 import { JoinedArtists } from '/@/renderer/features/albums/components/joined-artists';
+import { OfflineStatusIcon } from '/@/renderer/features/offline/components/offline-status-icon';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useShowFavorites, useShowRatings } from '/@/renderer/store';
@@ -271,6 +272,7 @@ const ItemCardStandardImageArea = memo(function ItemCardStandardImageArea({
             )}
             {showFavorite && isFavorite && <div className={styles.favoriteBadge} />}
             {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}
+            <OfflineStatusIcon item={data} itemType={itemType} variant="badge" />
             <AnimatePresence>
                 {withControls && showControls && (
                     <ItemCardControls
@@ -411,6 +413,7 @@ const CompactItemCardImageArea = memo(function CompactItemCardImageArea({
             )}
             {showFavorite && isFavorite && <div className={styles.favoriteBadge} />}
             {hasRating && <div className={styles.ratingBadge}>{userRating}</div>}
+            <OfflineStatusIcon item={data} itemType={itemType} variant="badge" />
             <AnimatePresence>
                 {withControls && showControls && data && (
                     <ItemCardControls

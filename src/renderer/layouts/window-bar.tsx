@@ -16,6 +16,7 @@ import styles from './window-bar.module.css';
 import { useRadioPlayer } from '/@/renderer/features/radio/hooks/use-radio-player';
 import {
     useAppStore,
+    useLatestVersion,
     usePlayerData,
     usePlayerStatus,
     useWindowBarTrackinfo,
@@ -137,6 +138,8 @@ export const WindowBar = () => {
     const { t } = useTranslation();
     const { windowBarStyle } = useWindowSettings();
     const windowBarTrackinfo = useWindowBarTrackinfo();
+    const { currentVersion } = useLatestVersion();
+    const appTitle = `KatiesAmp v${currentVersion}`;
 
     const playerStatus = usePlayerStatus();
     const privateMode = useAppStore((state) => state.privateMode);
@@ -162,7 +165,7 @@ export const WindowBar = () => {
         const privateModeString = privateMode ? t('page.windowBar.privateMode') : '';
 
         if (!windowBarTrackinfo) {
-            return `KatiesAmp${privateMode ? ` ${privateModeString}` : ''}`;
+            return `${appTitle}${privateMode ? ` ${privateModeString}` : ''}`;
         }
 
         // Show radio information if radio is active
@@ -182,7 +185,7 @@ export const WindowBar = () => {
                 }
             }
 
-            return `${radioStatusString}${radioTitle}${radioMetadata} — KatiesAmp${privateMode ? ` ${privateModeString}` : ''}`;
+            return `${radioStatusString}${radioTitle}${radioMetadata} — ${appTitle}${privateMode ? ` ${privateModeString}` : ''}`;
         }
 
         // Show regular song information
@@ -190,11 +193,12 @@ export const WindowBar = () => {
         const queueString = queueLength ? `(${index + 1} / ${queueLength}) ` : '';
         const title = `${
             queueLength
-                ? `${statusString}${queueString}${currentSong?.name}${currentSong?.artistName ? ` — ${currentSong?.artistName} — KatiesAmp` : ''}`
-                : 'KatiesAmp'
+                ? `${statusString}${queueString}${currentSong?.name}${currentSong?.artistName ? ` — ${currentSong?.artistName} — ${appTitle}` : ''}`
+                : appTitle
         }${privateMode ? ` ${privateModeString}` : ''}`;
         return title;
     }, [
+        appTitle,
         currentSong?.artistName,
         currentSong?.name,
         index,

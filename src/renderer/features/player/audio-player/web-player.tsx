@@ -12,7 +12,10 @@ import {
     WebPlayerEngineHandle,
 } from '/@/renderer/features/player/audio-player/engine/web-player-engine';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
-import { useSongUrl } from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
+import {
+    getSongUrl,
+    useSongUrl,
+} from '/@/renderer/features/player/audio-player/hooks/use-stream-url';
 import { PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useWebAudio } from '/@/renderer/features/player/hooks/use-webaudio';
@@ -26,7 +29,9 @@ import {
     usePlayerRepeat,
     usePlayerStoreBase,
     usePlayerVolume,
+    useTimestampStoreBase,
 } from '/@/renderer/store';
+import { logger } from '/@/renderer/utils/logger';
 import { toast } from '/@/shared/components/toast/toast';
 import { QueueSong } from '/@/shared/types/domain-types';
 import { CrossfadeStyle, PlayerRepeat, PlayerStatus, PlayerStyle } from '/@/shared/types/types';
@@ -51,6 +56,8 @@ export function WebPlayer() {
     const { audioFadeOnStatusChange, preservePitch, transcode } = usePlaybackSettings();
 
     const pendingLocalSeekRef = useRef(-1);
+    const pendingRecoverySeek1Ref = useRef(-1);
+    const pendingRecoverySeek2Ref = useRef(-1);
 
     const [localPlayerStatus, setLocalPlayerStatus] = useState<PlayerStatus>(() => {
         if (playerHandoff.pendingLocalSeek > 0) {
@@ -556,8 +563,66 @@ export function WebPlayer() {
         }
     }, [calculateReplayGain, player2, player2Source, webAudio]);
 
-    const player1Url = useSongUrl(player1, num === 1, transcode);
-    const player2Url = useSongUrl(player2, num === 2, transcode);
+    const resolvedPlayer1Url = useSongUrl(player1, num === 1, transcode);
+    const resolvedPlayer2Url = useSongUrl(player2, num === 2, transcode);
+    const [player1Fallback, setPlayer1Fallback] = useState<null | {
+        songUniqueId: string;
+        url: string;
+    }>(null);
+    const [player2Fallback, setPlayer2Fallback] = useState<null | {
+        songUniqueId: string;
+        url: string;
+    }>(null);
+    const player1Url =
+        player1Fallback && player1Fallback.songUniqueId === player1?._uniqueId
+            ? player1Fallback.url
+            : resolvedPlayer1Url;
+    const player2Url =
+        player2Fallback && player2Fallback.songUniqueId === player2?._uniqueId
+            ? player2Fallback.url
+            : resolvedPlayer2Url;
+
+    const recoverOfflineSource = useCallback(
+        async (song: QueueSong | undefined, position: number, slot: 1 | 2) => {
+            if (!song) return false;
+
+            try {
+                const url = await getSongUrl(song, transcode, false, true, undefined, false);
+                if (!url) return false;
+
+                const resumePosition =
+                    slot === num
+                        ? Math.max(position, useTimestampStoreBase.getState().timestamp)
+                        : position;
+
+                if (slot === 1) {
+                    pendingRecoverySeek1Ref.current = resumePosition;
+                    setPlayer1Fallback({ songUniqueId: song._uniqueId, url });
+                } else {
+                    pendingRecoverySeek2Ref.current = resumePosition;
+                    setPlayer2Fallback({ songUniqueId: song._uniqueId, url });
+                }
+                return true;
+            } catch (error) {
+                logger.error('Failed to resolve streaming fallback for offline playback', {
+                    error,
+                    serverId: song._serverId,
+                    songId: song.id,
+                });
+                return false;
+            }
+        },
+        [num, transcode],
+    );
+
+    const applyRecoverySeekIfNeeded = useCallback((reactPlayer: ReactPlayer, slot: 1 | 2) => {
+        const pendingSeekRef = slot === 1 ? pendingRecoverySeek1Ref : pendingRecoverySeek2Ref;
+        if (pendingSeekRef.current < 0) return;
+
+        const seekTo = pendingSeekRef.current;
+        pendingSeekRef.current = -1;
+        reactPlayer.seekTo(seekTo, 'seconds');
+    }, []);
 
     const applyPendingSeekIfNeeded = useCallback(
         (reactPlayer: ReactPlayer, activeSlot: 1 | 2) => {
@@ -576,6 +641,7 @@ export function WebPlayer() {
 
     const handlePlayer1Start = useCallback(
         async (reactPlayer: ReactPlayer) => {
+            applyRecoverySeekIfNeeded(reactPlayer, 1);
             applyPendingSeekIfNeeded(reactPlayer, 1);
             if (!webAudio || player1Source) return;
             if (player1Url) {
@@ -594,11 +660,12 @@ export function WebPlayer() {
                 setPlayer1Source(source);
             }
         },
-        [applyPendingSeekIfNeeded, player1Source, player1Url, webAudio],
+        [applyPendingSeekIfNeeded, applyRecoverySeekIfNeeded, player1Source, player1Url, webAudio],
     );
 
     const handlePlayer2Start = useCallback(
         async (reactPlayer: ReactPlayer) => {
+            applyRecoverySeekIfNeeded(reactPlayer, 2);
             applyPendingSeekIfNeeded(reactPlayer, 2);
             if (!webAudio || player2Source) return;
             if (player2Url) {
@@ -615,7 +682,7 @@ export function WebPlayer() {
                 setPlayer2Source(source);
             }
         },
-        [applyPendingSeekIfNeeded, player2Source, player2Url, webAudio],
+        [applyPendingSeekIfNeeded, applyRecoverySeekIfNeeded, player2Source, player2Url, webAudio],
     );
 
     const handleOnErrorPause = useCallback(() => {
@@ -637,6 +704,8 @@ export function WebPlayer() {
             onEndedPlayer1={handleOnEndedPlayer1}
             onEndedPlayer2={handleOnEndedPlayer2}
             onErrorPause={handleOnErrorPause}
+            onOfflineSourceErrorPlayer1={(position) => recoverOfflineSource(player1, position, 1)}
+            onOfflineSourceErrorPlayer2={(position) => recoverOfflineSource(player2, position, 2)}
             onProgressPlayer1={onProgressPlayer1}
             onProgressPlayer2={onProgressPlayer2}
             onStartedPlayer1={handlePlayer1Start}
