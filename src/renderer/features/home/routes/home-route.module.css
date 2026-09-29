@@ -1,0 +1,311 @@
+.home-page {
+    --brand-deep-teal: #063f40;
+    --brand-teal: #0a5757;
+    --brand-mint: #83c3a6;
+    --brand-mint-bright: #a7dcc2;
+
+    position: relative;
+    display: flex;
+    width: 100%;
+    min-height: 100%;
+    padding: clamp(1rem, 4cqi, 3rem);
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.ambient-glow {
+    position: absolute;
+    top: 5%;
+    left: 8%;
+    z-index: -1;
+    width: min(70cqi, 760px);
+    aspect-ratio: 1;
+    pointer-events: none;
+    background: radial-gradient(circle, alpha(var(--brand-mint), 0.16), transparent 67%);
+    filter: blur(18px);
+}
+
+.home-card {
+    position: relative;
+    display: grid;
+    width: min(100%, 1120px);
+    min-width: 0;
+    padding: clamp(1rem, 3.5cqi, 2.75rem);
+    margin: auto;
+    overflow: hidden;
+    color: var(--theme-colors-foreground);
+    background:
+        linear-gradient(145deg, alpha(var(--brand-deep-teal), 0.23), transparent 54%),
+        var(--theme-colors-surface);
+    border: 1px solid alpha(var(--brand-mint), 0.35);
+    border-radius: clamp(1rem, 2.5cqi, 1.75rem);
+    box-shadow: 0 1.5rem 4rem alpha(#000, 0.2);
+}
+
+.home-card::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: min(42cqi, 360px);
+    height: 5px;
+    content: '';
+    background: linear-gradient(90deg, transparent, var(--brand-mint));
+}
+
+.brand-panel,
+.details-panel,
+.info-card {
+    min-width: 0;
+}
+
+.brand-panel {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 3cqi, 2rem);
+    align-items: center;
+    justify-content: center;
+    padding: clamp(0.25rem, 2cqi, 1rem);
+    text-align: center;
+}
+
+.logo-frame {
+    display: grid;
+    place-items: center;
+    width: min(100%, 520px);
+    aspect-ratio: 2500 / 1850;
+}
+
+.company-logo {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 1rem 1.5rem alpha(#000, 0.24));
+}
+
+.brand-copy {
+    min-width: 0;
+}
+
+.eyebrow,
+.card-label {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--brand-mint-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+}
+
+.product-name {
+    margin: 0.35rem 0 0;
+    font-size: clamp(2.1rem, 8cqi, 4.5rem);
+    line-height: 0.95;
+    color: var(--theme-colors-foreground);
+    letter-spacing: -0.045em;
+}
+
+.product-description {
+    max-width: 36rem;
+    margin: 0.8rem auto 0;
+    font-size: clamp(0.9rem, 2.3cqi, 1.05rem);
+    line-height: 1.55;
+    color: var(--theme-colors-foreground-muted);
+}
+
+.details-panel {
+    display: grid;
+    gap: 1rem;
+    margin-top: clamp(1.25rem, 4cqi, 2.5rem);
+}
+
+.info-card {
+    padding: clamp(1rem, 3cqi, 1.5rem);
+    background: alpha(var(--theme-colors-background), 0.68);
+    border: 1px solid alpha(var(--theme-colors-border), 0.7);
+    border-radius: 1rem;
+}
+
+.details-list {
+    display: grid;
+    gap: 0;
+    margin: 0.65rem 0 0;
+}
+
+.detail-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+    gap: 1rem;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid alpha(var(--theme-colors-border), 0.55);
+}
+
+.detail-row:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.detail-row dt {
+    color: var(--theme-colors-foreground-muted);
+}
+
+.detail-row dd {
+    min-width: 0;
+    margin: 0;
+    font-weight: 650;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.version-badge {
+    padding: 0.3rem 0.65rem;
+    font-size: 0.82rem;
+    color: var(--brand-mint-bright);
+    background: alpha(var(--brand-teal), 0.34);
+    border: 1px solid alpha(var(--brand-mint), 0.38);
+    border-radius: 999px;
+}
+
+.connection-status {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    text-align: left;
+    background: alpha(var(--theme-colors-surface), 0.64);
+    border: 1px solid alpha(var(--theme-colors-border), 0.55);
+    border-radius: 0.7rem;
+}
+
+.connection-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.55rem;
+    align-items: start;
+}
+
+.connection-row dd {
+    text-align: left;
+}
+
+.connection-label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.status-dot {
+    flex: 0 0 auto;
+    width: 0.55rem;
+    height: 0.55rem;
+    background: var(--theme-colors-foreground-muted);
+    border-radius: 50%;
+}
+
+.status-dot[data-status='connected'] {
+    background: var(--brand-mint);
+    box-shadow: 0 0 0.6rem alpha(var(--brand-mint), 0.55);
+}
+
+.status-dot[data-status='checking'] {
+    background: #f5c451;
+}
+
+.status-dot[data-status='unavailable'] {
+    background: #ef6b73;
+}
+
+.support-card {
+    background:
+        linear-gradient(135deg, alpha(var(--brand-teal), 0.3), transparent 72%),
+        alpha(var(--theme-colors-background), 0.72);
+}
+
+.support-name {
+    margin: 0.45rem 0 0;
+    font-size: clamp(1.4rem, 4cqi, 2rem);
+    line-height: 1.1;
+}
+
+.contact-list {
+    display: grid;
+    gap: 0.7rem;
+    margin-top: 1.25rem;
+}
+
+.contact-item {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: start;
+    padding: 0.75rem;
+    color: var(--theme-colors-foreground);
+    overflow-wrap: anywhere;
+    text-decoration: none;
+    background: alpha(var(--theme-colors-surface), 0.64);
+    border: 1px solid transparent;
+    border-radius: 0.7rem;
+}
+
+.contact-type {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--brand-mint-bright);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+@container (min-width: 620px) {
+    .details-panel {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@container (min-width: 900px) {
+    .home-card {
+        grid-template-columns: minmax(0, 1.12fr) minmax(320px, 0.88fr);
+        gap: clamp(2rem, 5cqi, 4rem);
+        align-items: center;
+    }
+
+    .details-panel {
+        grid-template-columns: 1fr;
+        margin-top: 0;
+    }
+
+    .brand-panel {
+        align-items: flex-start;
+        padding-right: 0;
+        text-align: left;
+    }
+
+    .product-description {
+        margin-right: 0;
+        margin-left: 0;
+    }
+}
+
+@container (max-width: 430px) {
+    .home-page {
+        padding: 0.65rem;
+    }
+
+    .home-card {
+        padding: 0.8rem;
+    }
+
+    .brand-panel {
+        gap: 0.7rem;
+    }
+
+    .detail-row,
+    .contact-item {
+        grid-template-columns: 1fr;
+        gap: 0.3rem;
+    }
+
+    .detail-row dd {
+        text-align: left;
+    }
+
+}
