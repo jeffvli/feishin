@@ -730,10 +730,18 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 },
                 clearQueue: () => {
                     set((state) => {
-                        state.player.index = -1;
-                        state.queue.default = [];
+                        const currentSong =
+                            state.player.status === PlayerStatus.PLAYING &&
+                            !useSettingsStore.getState().general.discardQueueSkipsCurrentTrack
+                                ? state.getCurrentSong()
+                                : undefined;
+
+                        state.queue.default = currentSong ? [currentSong._uniqueId] : [];
                         state.queue.shuffled = [];
-                        state.queue.songs = {};
+                        state.queue.songs = currentSong
+                            ? { [currentSong._uniqueId]: currentSong }
+                            : {};
+                        state.player.index = currentSong ? 0 : -1;
                     });
                 },
                 clearSelected: (items: QueueSong[]) => {
@@ -1933,7 +1941,7 @@ export const subscribeNextSongInsertion = (onChange: (song: QueueSong | undefine
             let nextSong: QueueSong | undefined;
             if (isShuffleEnabled(state) && repeat !== PlayerRepeat.ONE) {
                 // Calculate next in shuffled order
-                const nextShuffledIndex = state.player.index + 1;
+                const nextShuffledIndex = queueIndex + 1;
                 if (nextShuffledIndex < state.queue.shuffled.length) {
                     const nextQueueIndex = state.queue.shuffled[nextShuffledIndex];
                     nextSong = queue.items[nextQueueIndex];

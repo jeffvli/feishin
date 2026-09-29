@@ -162,6 +162,8 @@ let confirmQueueChanges = true;
 // a desktop install that has customized its accent/shade settings anyway.
 let currentAccentColor: null | { dark: string; light: string } = null;
 
+let discardQueueSkipsCurrentTrack = true;
+
 // Only ever called once `client.auth` is true (either immediately, for an
 // unprotected server, or from the `authenticate` message handler) — sending
 // this unconditionally on every connection would leak playback state, the
@@ -174,6 +176,12 @@ function sendInitialState(client: StatefulWebSocket): void {
     client.send(JSON.stringify({ data: currentRadioStatus, event: 'radio-status' }));
     client.send(
         JSON.stringify({ data: confirmQueueChanges, event: 'confirm-queue-changes-setting' }),
+    );
+    client.send(
+        JSON.stringify({
+            data: discardQueueSkipsCurrentTrack,
+            event: 'discard-queue-skips-current-track',
+        }),
     );
     if (currentAccentColor) {
         client.send(JSON.stringify({ data: currentAccentColor, event: 'accent-color' }));
@@ -965,6 +973,11 @@ ipcMain.on('update-radio-status', (_event, status: ServerRadioStatus['data']) =>
 ipcMain.on('update-confirm-queue-changes-setting', (_event, enabled: boolean) => {
     confirmQueueChanges = enabled;
     broadcast({ data: enabled, event: 'confirm-queue-changes-setting' });
+});
+
+ipcMain.on('update-discard-queue-skips-current-track', (_event, enabled: boolean) => {
+    discardQueueSkipsCurrentTrack = enabled;
+    broadcast({ data: enabled, event: 'discard-queue-skips-current-track' });
 });
 
 ipcMain.on('update-accent-color', (_event, color: { dark: string; light: string }) => {
