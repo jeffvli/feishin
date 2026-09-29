@@ -12,6 +12,7 @@ import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 
 export const UpdateAvailableDialog = () => {
     const [opened, setOpened] = useState(false);
+    const [readyToInstall, setReadyToInstall] = useState(false);
     const [version, setVersion] = useState<string>('');
     const { t } = useTranslation();
     const [versionDismissed, setVersionDismissed] = useLocalStorage<string>({
@@ -24,24 +25,45 @@ export const UpdateAvailableDialog = () => {
         const handleUpdateAvailable = (newVersion: string) => {
             if (versionDismissed !== newVersion) {
                 setVersion(newVersion);
+                setReadyToInstall(false);
                 setOpened(true);
             }
         };
 
-        window.api.utils.rendererUpdateAvailable(handleUpdateAvailable);
+        const handleUpdateDownloaded = (newVersion: string) => {
+            setVersion(newVersion);
+            setReadyToInstall(true);
+            setOpened(true);
+        };
+
+        const removeAvailableListener =
+            window.api.utils.rendererUpdateAvailable(handleUpdateAvailable);
+        const removeDownloadedListener =
+            window.api.utils.rendererUpdateDownloaded(handleUpdateDownloaded);
+
+        void window.api.utils.getUpdateState().then((state) => {
+            if (state.status === 'downloaded' && state.version) {
+                handleUpdateDownloaded(state.version);
+            }
+        });
 
         return () => {
-            window.api.ipc.removeListener?.('update-available', handleUpdateAvailable);
+            removeAvailableListener();
+            removeDownloadedListener();
         };
     }, [versionDismissed]);
 
     if (!opened) return null;
 
     const handleDismiss = () => {
-        if (version) {
+        if (version && !readyToInstall) {
             setVersionDismissed(version);
         }
         setOpened(false);
+    };
+
+    const handleInstall = async () => {
+        await window.api.utils.installUpdate();
     };
 
     return (
@@ -55,23 +77,40 @@ export const UpdateAvailableDialog = () => {
         >
             <Stack gap="md">
                 <Text fw={700} size="md">
-                    {t('common.newVersionAvailable')} - {version}
+                    {readyToInstall
+                        ? t('common.updateReady', 'Update ready')
+                        : t('common.newVersionAvailable')}{' '}
+                    - {version}
                 </Text>
+                {readyToInstall && (
+                    <Text isMuted size="sm">
+                        {t(
+                            'common.updateReadyDescription',
+                            'Restart KatiesAmp to finish installing the update.',
+                        )}
+                    </Text>
+                )}
                 <Group justify="flex-end">
                     <Button onClick={handleDismiss} size="xs" variant="default">
-                        {t('common.dismiss')}
+                        {readyToInstall ? t('common.later', 'Later') : t('common.dismiss')}
                     </Button>
-                    <Button
-                        component="a"
-                        href="https://github.com/kevlaws/feishin/releases/latest"
-                        onClick={handleDismiss}
-                        rightSection={<Icon icon="externalLink" size="sm" />}
-                        size="xs"
-                        target="_blank"
-                        variant="filled"
-                    >
-                        {t('action.viewMore')}
-                    </Button>
+                    {readyToInstall ? (
+                        <Button onClick={handleInstall} size="xs" variant="filled">
+                            {t('action.restartToUpdate', 'Restart now')}
+                        </Button>
+                    ) : (
+                        <Button
+                            component="a"
+                            href="https://github.com/kevlaws/feishin/releases/latest"
+                            onClick={handleDismiss}
+                            rightSection={<Icon icon="externalLink" size="sm" />}
+                            size="xs"
+                            target="_blank"
+                            variant="filled"
+                        >
+                            {t('action.viewMore')}
+                        </Button>
+                    )}
                 </Group>
             </Stack>
         </Dialog>
