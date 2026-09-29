@@ -9,6 +9,7 @@ import { createWithEqualityFn } from 'zustand/traditional';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { useRadioStore as useRadioPlayerStore } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { createSelectors } from '/@/renderer/lib/zustand';
+import { insertQueueIdsAtTarget } from '/@/renderer/store/player-queue-insertion';
 import { removeQueueIds, shouldRefillQueue } from '/@/renderer/store/player-queue-repeat';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import {
@@ -201,20 +202,6 @@ export function mapShuffledToQueueIndex(shuffledIndex: number, shuffled: number[
 // We need to use a unique id so that the equalityFn can work if attempting to set the same timestamp
 export function uniqueSeekToTimestamp(timestamp: number) {
     return `${timestamp}-${nanoid()}`;
-}
-
-// Helper function to add new indexes to shuffled array after current position
-function addIndexesToShuffled(
-    shuffled: number[],
-    currentShuffledIndex: number,
-    newIndexes: number[],
-): number[] {
-    // Keep everything before and including current position
-    const beforeCurrent = shuffled.slice(0, currentShuffledIndex + 1);
-    // Shuffle everything after current position plus new indexes
-    const afterCurrent = shuffled.slice(currentShuffledIndex + 1);
-    const toShuffle = [...afterCurrent, ...newIndexes];
-    return [...beforeCurrent, ...shuffleInPlace(toShuffle)];
 }
 
 // Helper function to adjust shuffled indexes when items are inserted
@@ -641,73 +628,26 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         : undefined;
 
                     set((state) => {
+                        const currentTrackUniqueId = state.getCurrentSong()?._uniqueId;
+                        const playbackIds = getPlaybackQueueIds(state);
+                        const newPlaybackIds = insertQueueIdsAtTarget(
+                            playbackIds,
+                            newUniqueIds,
+                            uniqueId,
+                            edge,
+                        );
+
+                        if (newPlaybackIds === playbackIds) {
+                            return;
+                        }
+
                         // Add new songs to songs object
                         newItems.forEach((item) => {
                             state.queue.songs[item._uniqueId] = item;
                         });
 
-                        const index = state.queue.default.findIndex((id) => id === uniqueId);
-
-                        const insertIndex = Math.max(0, edge === 'top' ? index : index + 1);
-
-                        const newQueue = [
-                            ...state.queue.default.slice(0, insertIndex),
-                            ...newUniqueIds,
-                            ...state.queue.default.slice(insertIndex),
-                        ];
-
-                        state.queue.default = newQueue;
-
-                        if (state.player.shuffle === PlayerShuffle.TRACK) {
-                            const currentTrack = state.getCurrentSong() as QueueSong | undefined;
-                            const currentTrackUniqueId = currentTrack?._uniqueId;
-
-                            if (currentTrackUniqueId) {
-                                // Adjust existing shuffled indexes that are >= insertIndex
-                                const adjustedShuffled = state.queue.shuffled.map((idx) => {
-                                    if (idx >= insertIndex) {
-                                        return idx + newUniqueIds.length;
-                                    }
-                                    return idx;
-                                });
-
-                                // New items will be at indexes starting from insertIndex
-                                const newIndexes = Array.from(
-                                    { length: newUniqueIds.length },
-                                    (_, i) => insertIndex + i,
-                                );
-
-                                const currentShuffledIndex = state.player.index;
-                                state.queue.shuffled = addIndexesToShuffled(
-                                    adjustedShuffled,
-                                    currentShuffledIndex,
-                                    newIndexes,
-                                );
-
-                                // Recalculate player index to the shuffled position
-                                const queueIndex = newQueue.findIndex(
-                                    (id) => id === currentTrackUniqueId,
-                                );
-                                if (queueIndex !== -1) {
-                                    const shuffledPosition = state.queue.shuffled.findIndex(
-                                        (idx) => idx === queueIndex,
-                                    );
-                                    if (shuffledPosition !== -1) {
-                                        state.player.index = shuffledPosition;
-                                    }
-                                }
-                            } else {
-                                // No current track, regenerate shuffled indexes
-                                state.queue.shuffled = generateShuffledIndexes(newQueue.length);
-                            }
-                        } else {
-                            // Recalculate the player index if we're inserting items above the current index
-                            if (insertIndex <= state.player.index) {
-                                state.player.index = state.player.index + newUniqueIds.length;
-                            }
-
-                            recalculatePlayerIndex(state, newQueue);
-                        }
+                        appendMissingQueueIds(state, newUniqueIds);
+                        applyPlaybackQueueOrder(state, newPlaybackIds, currentTrackUniqueId);
                     });
 
                     // If playSongId is provided, find the song and start playback on it
@@ -2858,17 +2798,6 @@ function getQueueSource(items: QueueSong[], uniqueIds: string[]): null | QueueSo
 
 function parseUniqueSeekToTimestamp(timestamp: string) {
     return Number(timestamp.split('-')[0]);
-}
-
-function recalculatePlayerIndex(state: any, queue: string[]) {
-    const currentTrack = state.getCurrentSong() as QueueSong | undefined;
-
-    if (!currentTrack) {
-        return;
-    }
-
-    const index = queue.findIndex((id) => id === currentTrack._uniqueId);
-    state.player.index = Math.max(0, index);
 }
 
 function refillConsumedQueue(state: Pick<State, 'player' | 'queue'>) {
