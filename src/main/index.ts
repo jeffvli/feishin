@@ -109,7 +109,7 @@ function attachUpdaterMilestoneLogs(updater: UpdaterInstance): void {
 
 function configureAndGetUpdater(): UpdaterInstance {
     const isBetaVersion = packageJson.version.includes('-beta');
-    let releaseChannel = store.get('release_channel');
+    const releaseChannel = store.get('release_channel');
     const isNotConfigured = releaseChannel !== 'beta' && releaseChannel !== 'latest';
 
     log.info('Release channel:', releaseChannel);
