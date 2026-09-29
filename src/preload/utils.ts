@@ -104,8 +104,22 @@ const download = (url: string) => {
     ipcRenderer.send('download-url', url);
 };
 
-const checkForUpdates = (): Promise<{ updateAvailable: boolean; version?: string }> => {
+export type AppUpdateState = {
+    error?: string;
+    status: 'available' | 'checking' | 'downloaded' | 'error' | 'idle' | 'not-available';
+    version?: string;
+};
+
+const checkForUpdates = (): Promise<AppUpdateState> => {
     return ipcRenderer.invoke('app-check-for-updates');
+};
+
+const getUpdateState = (): Promise<AppUpdateState> => {
+    return ipcRenderer.invoke('app-get-update-state');
+};
+
+const installUpdate = (): Promise<boolean> => {
+    return ipcRenderer.invoke('app-install-update');
 };
 
 const startPowerSaveBlocker = (full: boolean) => {
@@ -167,7 +181,17 @@ const rendererOpenReleaseNotes = (cb: () => void) => {
 };
 
 const rendererUpdateAvailable = (cb: (version: string) => void) => {
-    ipcRenderer.on('update-available', (_, version) => cb(version));
+    const listener = (_event: IpcRendererEvent, version: string) => cb(version);
+    ipcRenderer.on('update-available', listener);
+
+    return () => ipcRenderer.removeListener('update-available', listener);
+};
+
+const rendererUpdateDownloaded = (cb: (version: string) => void) => {
+    const listener = (_event: IpcRendererEvent, version: string) => cb(version);
+    ipcRenderer.on('update-downloaded', listener);
+
+    return () => ipcRenderer.removeListener('update-downloaded', listener);
 };
 
 export const utils = {
@@ -179,6 +203,8 @@ export const utils = {
     exportDiagnostics,
     forceGarbageCollection,
     getCustomCss,
+    getUpdateState,
+    installUpdate,
     isLinux,
     isMacOS,
     isWindows,
@@ -200,6 +226,7 @@ export const utils = {
     rendererTogglePrivateMode,
     rendererToggleSidebar,
     rendererUpdateAvailable,
+    rendererUpdateDownloaded,
     saveCustomCss,
     separator: isWindows() ? '\\' : '/',
     setInputFocused,

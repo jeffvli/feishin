@@ -44,7 +44,16 @@ import {
 } from '/@/main/utils/window-bounds';
 import { PlayerRepeat, PlayerStatus, PlayerType, TitleTheme } from '/@/shared/types/types';
 
+type AppUpdateState = {
+    error?: string;
+    status: 'available' | 'checking' | 'downloaded' | 'error' | 'idle' | 'not-available';
+    version?: string;
+};
+
 type UpdaterInstance = typeof autoUpdater;
+
+let appUpdateState: AppUpdateState = { status: 'idle' };
+let updaterListenersAttached = false;
 
 class AppUpdater {
     constructor() {
@@ -61,10 +70,6 @@ class AppUpdater {
                             available: true,
                             version: result.updateInfo.version,
                         });
-                        getMainWindow()?.webContents.send(
-                            'update-available',
-                            result.updateInfo.version,
-                        );
                     } else {
                         log.info('Updater check complete', { available: false });
                     }
@@ -77,18 +82,25 @@ class AppUpdater {
 }
 
 function attachUpdaterMilestoneLogs(updater: UpdaterInstance): void {
+    if (updaterListenersAttached) return;
+    updaterListenersAttached = true;
+
     let downloadStarted = false;
 
     updater.on('checking-for-update', () => {
         log.info('Updater checking for update');
+        setAppUpdateState({ status: 'checking' });
     });
 
     updater.on('update-available', (info) => {
         log.info('Updater update available', { version: info.version });
+        setAppUpdateState({ status: 'available', version: info.version });
+        getMainWindow()?.webContents.send('update-available', info.version);
     });
 
     updater.on('update-not-available', (info) => {
         log.info('Updater update not available', { version: info.version });
+        setAppUpdateState({ status: 'not-available', version: info.version });
     });
 
     updater.on('download-progress', () => {
@@ -100,10 +112,13 @@ function attachUpdaterMilestoneLogs(updater: UpdaterInstance): void {
 
     updater.on('update-downloaded', (info) => {
         log.info('Updater download complete', { version: info.version });
+        setAppUpdateState({ status: 'downloaded', version: info.version });
+        getMainWindow()?.webContents.send('update-downloaded', info.version);
     });
 
     updater.on('error', (error) => {
         log.error('Updater error', error);
+        setAppUpdateState({ error: error.message, status: 'error' });
     });
 }
 
@@ -141,6 +156,15 @@ function configureAndGetUpdater(): UpdaterInstance {
     }
 
     return autoUpdater;
+}
+
+function getAppUpdateState(): AppUpdateState {
+    return appUpdateState;
+}
+
+function setAppUpdateState(state: AppUpdateState): void {
+    appUpdateState = state;
+    getMainWindow()?.webContents.send('update-state-changed', state);
 }
 
 protocol.registerSchemesAsPrivileged([
@@ -533,6 +557,46 @@ async function createWindow(first = true): Promise<void> {
         return mainWindow?.webContents.session.clearCache();
     });
 
+    ipcMain.handle('app-check-for-updates', async () => {
+        const initialState = getAppUpdateState();
+        if (initialState.status === 'checking' || initialState.status === 'downloaded') {
+            return initialState;
+        }
+
+        try {
+            const updater = configureAndGetUpdater();
+            attachUpdaterMilestoneLogs(updater);
+            const result = await updater.checkForUpdates();
+
+            const currentState = getAppUpdateState();
+            if (currentState.status === 'downloaded') {
+                return currentState;
+            }
+
+            if (!result) {
+                return { status: 'not-available' } satisfies AppUpdateState;
+            }
+
+            return {
+                status: result.isUpdateAvailable ? 'available' : 'not-available',
+                version: result.updateInfo.version,
+            } satisfies AppUpdateState;
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            log.error('Manual check for updates failed', error);
+            return { error: message, status: 'error' } satisfies AppUpdateState;
+        }
+    });
+
+    ipcMain.handle('app-get-update-state', () => getAppUpdateState());
+
+    ipcMain.handle('app-install-update', () => {
+        if (appUpdateState.status !== 'downloaded') return false;
+
+        setImmediate(() => autoUpdater.quitAndInstall(false, true));
+        return true;
+    });
+
     ipcMain.on('app-restart', () => {
         // Fix for .AppImage
         if (process.env.APPIMAGE) {
@@ -631,6 +695,8 @@ async function createWindow(first = true): Promise<void> {
         log.info('Main window closed');
         ipcMain.removeHandler('window-clear-cache');
         ipcMain.removeHandler('app-check-for-updates');
+        ipcMain.removeHandler('app-get-update-state');
+        ipcMain.removeHandler('app-install-update');
         mainWindow = null;
     });
 
