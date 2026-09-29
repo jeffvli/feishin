@@ -9,6 +9,7 @@ import { createWithEqualityFn } from 'zustand/traditional';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { useRadioStore as useRadioPlayerStore } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { createSelectors } from '/@/renderer/lib/zustand';
+import { removeQueueIds, shouldRefillQueue } from '/@/renderer/store/player-queue-repeat';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import {
     setTimestamp as setTimestampStore,
@@ -380,6 +381,7 @@ const initialState: State = {
         consumed: [],
         default: [],
         preparedRefillBoundary: null,
+        preparedRefillIds: [],
         recentlyPlayed: [],
         shuffled: [],
         songs: {},
@@ -759,6 +761,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         state.queue.consumed = [];
                         state.queue.default = [];
                         state.queue.preparedRefillBoundary = null;
+                        state.queue.preparedRefillIds = [];
                         state.queue.recentlyPlayed = [];
                         state.queue.shuffled = [];
                         state.queue.songs = {};
@@ -1691,6 +1694,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         }
 
                         state.queue.preparedRefillBoundary = currentUniqueId;
+                        state.queue.preparedRefillIds = preparedIds;
                     });
                 },
                 refreshQueueSource: (items: Song[]) => {
@@ -1766,6 +1770,9 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 setRepeat: (repeat: PlayerRepeat) => {
                     set((state) => {
                         state.player.repeat = repeat;
+                        if (repeat !== PlayerRepeat.ALL) {
+                            discardPreparedQueueRefill(state);
+                        }
                     });
                 },
                 setShuffle: (shuffle: PlayerShuffle) => {
@@ -1887,6 +1894,10 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             state.player.repeat = PlayerRepeat.ALL;
                         } else {
                             state.player.repeat = PlayerRepeat.NONE;
+                        }
+
+                        if (state.player.repeat !== PlayerRepeat.ALL) {
+                            discardPreparedQueueRefill(state);
                         }
                     });
                 },
@@ -2604,6 +2615,7 @@ function consumeCurrentQueueSong(
         // The remaining entries are the next cycle, so discard the completed cycle.
         state.queue.consumed = [];
         state.queue.preparedRefillBoundary = null;
+        state.queue.preparedRefillIds = [];
     } else {
         state.queue.consumed.push(currentUniqueId);
     }
@@ -2673,6 +2685,7 @@ function consumeQueueSongsBeforeTarget(
         // completed cycle's history into the new one.
         state.queue.consumed = consumedIds.slice(preparedBoundaryIndex + 1);
         state.queue.preparedRefillBoundary = null;
+        state.queue.preparedRefillIds = [];
     } else {
         state.queue.consumed.push(...consumedIds);
     }
@@ -2708,6 +2721,30 @@ function createAnchoredShuffledPlaybackIds(
 
     const remainingIds = playbackIds.filter((id) => id !== currentTrackUniqueId);
     return [currentTrackUniqueId, ...shuffleInPlace(remainingIds)];
+}
+
+function discardPreparedQueueRefill(state: Pick<State, 'player' | 'queue'>) {
+    const preparedRefillIds = state.queue.preparedRefillIds ?? [];
+    if (!state.queue.preparedRefillBoundary && preparedRefillIds.length === 0) {
+        return;
+    }
+
+    const currentUniqueId = getPlaybackQueueIds(state)[state.player.index];
+    const queueOrder = removeQueueIds(state.queue.default, state.queue.shuffled, preparedRefillIds);
+
+    state.queue.default = queueOrder.defaultIds;
+    state.queue.shuffled = queueOrder.shuffledIndexes;
+    state.queue.preparedRefillBoundary = null;
+    state.queue.preparedRefillIds = [];
+
+    if (currentUniqueId) {
+        const currentIndex = getPlaybackQueueIds(state).indexOf(currentUniqueId);
+        if (currentIndex !== -1) {
+            state.player.index = currentIndex;
+        }
+    }
+
+    cleanupOrphanedSongs(state);
 }
 
 function findIndexWithPreviousAlbum(queueItems: QueueSong[], currentIndex: number) {
@@ -2835,12 +2872,17 @@ function recalculatePlayerIndex(state: any, queue: string[]) {
 }
 
 function refillConsumedQueue(state: Pick<State, 'player' | 'queue'>) {
+    if (!shouldRefillQueue(state.player.repeat)) {
+        return;
+    }
+
     const selectedIds = selectShuffledRefillIds(state);
 
     if (state.player.shuffle === PlayerShuffle.TRACK && selectedIds.length > 0) {
         state.queue.consumed = [];
         state.queue.default = selectedIds;
         state.queue.preparedRefillBoundary = null;
+        state.queue.preparedRefillIds = [];
         state.queue.shuffled = selectedIds.map((_, index) => index);
         return;
     }
@@ -2851,6 +2893,7 @@ function refillConsumedQueue(state: Pick<State, 'player' | 'queue'>) {
         );
         state.queue.consumed = [];
         state.queue.preparedRefillBoundary = null;
+        state.queue.preparedRefillIds = [];
         state.queue.shuffled =
             state.player.shuffle === PlayerShuffle.TRACK
                 ? generateShuffledIndexes(state.queue.default.length)
@@ -2861,6 +2904,7 @@ function refillConsumedQueue(state: Pick<State, 'player' | 'queue'>) {
 function resetQueueCycle(state: { queue: QueueData }, items: QueueSong[], uniqueIds: string[]) {
     state.queue.consumed = [];
     state.queue.preparedRefillBoundary = null;
+    state.queue.preparedRefillIds = [];
     state.queue.recentlyPlayed = [];
     state.queue.source = getQueueSource(items, uniqueIds);
 }

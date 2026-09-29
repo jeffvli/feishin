@@ -64,6 +64,7 @@
         "publish:win-arm64:alpha": "pnpm run build && electron-builder --config electron-builder-alpha.yml --publish always --win --arm64",
         "publish:win-arm64:beta": "pnpm run build && electron-builder --config electron-builder-beta.yml --publish always --win --arm64",
         "start": "electron-vite preview",
+        "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/*.test.mjs",
         "typecheck": "pnpm run typecheck:node && pnpm run typecheck:web",
         "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
         "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false",
