@@ -1393,7 +1393,8 @@
             "owner": "Propriétaire",
             "sampleRate": "Taux d'échantillonnage",
             "date": "Date",
-            "year": "Année"
+            "year": "Année",
+            "bitDepth": "Bits par échantillon"
         }
     },
     "dragDropZone": {
