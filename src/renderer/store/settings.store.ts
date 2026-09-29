@@ -10,6 +10,8 @@ import { immer } from 'zustand/middleware/immer';
 import { shallow } from 'zustand/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
+import packageJson from '../../../package.json';
+
 import i18n from '/@/i18n/i18n';
 import {
     ALBUM_ARTIST_TABLE_COLUMNS,
@@ -739,7 +741,7 @@ const WindowSettingsSchema = z.object({
     minimizeToTray: z.boolean(),
     preventSleepOnPlayback: z.boolean(),
     preventSuspendOnPlayback: z.boolean(),
-    releaseChannel: z.enum(['alpha', 'beta', 'latest']),
+    releaseChannel: z.enum(['beta', 'latest']),
     startMinimized: z.boolean(),
     tray: z.boolean(),
     windowBarStyle: z.nativeEnum(Platform),
@@ -2268,7 +2270,7 @@ const initialState: SettingsState = {
         minimizeToTray: false,
         preventSleepOnPlayback: false,
         preventSuspendOnPlayback: false,
-        releaseChannel: 'latest',
+        releaseChannel: packageJson.version.includes('-beta') ? 'beta' : 'latest',
         startMinimized: false,
         tray: true,
         windowBarStyle: platformDefaultWindowBarStyle,
@@ -2937,10 +2939,17 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     state.playback.consumeQueue = true;
                 }
 
+                if (
+                    version < 36 &&
+                    (state.window.releaseChannel as string | undefined) === 'alpha'
+                ) {
+                    state.window.releaseChannel = 'beta';
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 35,
+            version: 36,
         },
     ),
 );

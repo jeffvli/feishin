@@ -747,7 +747,7 @@
         "releaseChannel_optionBeta": "Beta",
         "releaseChannel_optionLatest": "Seneste",
         "releaseChannel": "Udgivelseskanal",
-        "releaseChannel_description": "Vælg mellem stabile, beta- eller alpha-udgivelser (nightly) til automatiske opdateringer",
+        "releaseChannel_description": "Vælg mellem stabile eller betaudgivelser til automatiske opdateringer",
         "disableLibraryUpdateOnStartup": "Deaktiver kontrol for nye versioner ved opstart",
         "discordApplicationId_description": "Program-ID'et til {{discord}} rich presence (standard er {{defaultId}})",
         "discordApplicationId": "{{discord}}-program-ID",

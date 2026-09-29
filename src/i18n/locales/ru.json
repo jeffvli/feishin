@@ -1071,7 +1071,7 @@
         "releaseChannel_optionBeta": "Бета",
         "releaseChannel_optionLatest": "Последняя",
         "releaseChannel": "Канал выпуска",
-        "releaseChannel_description": "Выберите между стабильной, бета или альфа (ночной) версией для автоматического обновления",
+        "releaseChannel_description": "Выберите стабильную или бета-версию для автоматического обновления",
         "discordDisplayType_artistname": "Имя исполнителя (исполнителей)",
         "discordDisplayType_description": "Изменяет информацию о текущем треке в вашем статусе",
         "discordDisplayType_songname": "Имя песни",

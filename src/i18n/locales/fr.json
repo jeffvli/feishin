@@ -831,7 +831,7 @@
         "releaseChannel_optionLatest": "Dernière",
         "releaseChannel_optionBeta": "Bêta",
         "releaseChannel": "Canal de diffusion",
-        "releaseChannel_description": "Choisissez entre les versions stable, bêta ou alpha (nocturne) pour les mises à jour automatiques",
+        "releaseChannel_description": "Choisissez entre les versions stables ou bêta pour les mises à jour automatiques",
         "mediaSession": "Activer media session",
         "mediaSession_description": "Active l'intégration de Media Session, affichant les contrôles multimédias et les métadonnées dans la superposition du volume du système et sur l'écran de verrouillage.",
         "enableAutoTranslation_description": "Activer la traduction automatiquement lorsque les paroles sont chargées",

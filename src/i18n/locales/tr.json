@@ -850,7 +850,7 @@
         "useThemePrimaryShade": "Tema ana renginin tonunu kullan",
         "artistReleaseTypeConfiguration_description": "Albüm sanatçısı sayfasında hangi yayın türlerinin gösterileceğini ve hangi sırayla listeleneceğini yapılandırın",
         "automaticUpdates_description": "Güncellemeleri otomatik olarak kontrol et ve yükle",
-        "releaseChannel_description": "Otomatik güncellemeler için stable, beta veya alfa (nightly) sürümler arasından seçim yapın",
+        "releaseChannel_description": "Otomatik güncellemeler için kararlı veya beta sürümleri arasından seçim yapın",
         "discordLinkType_description": "Şarkı ve sanatçı alanlarına {{discord}} zengin durum bilgisinde {{lastfm}} veya {{musicbrainz}} için harici bağlantılar ekler. {{musicbrainz}} en doğru seçenektir ancak etiketlere ihtiyaç duyar ve sanatçı bağlantısı sağlamaz; buna karşılık {{lastfm}} her zaman bir bağlantı sunar. Ekstra ağ isteği oluşturmaz",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}} kullan, {{lastfm}} yedek olarak",
         "discordLinkType_none": "$t(common.none)",
