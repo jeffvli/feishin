@@ -1,4 +1,9 @@
-import type { OfflineDownloadTask, OfflineEntry, OfflinePlaylist } from '/@/shared/types/offline';
+import type {
+    OfflineAlbum,
+    OfflineDownloadTask,
+    OfflineEntry,
+    OfflinePlaylist,
+} from '/@/shared/types/offline';
 
 import isElectron from 'is-electron';
 import { shallow } from 'zustand/shallow';
@@ -16,6 +21,8 @@ export type OfflineItemStatus = {
 
 type OfflineDownloadState = {
     albumCounts: Record<string, number>;
+    albums: Record<string, OfflineAlbum>;
+    completeAlbums: Record<string, boolean>;
     completePlaylists: Record<string, boolean>;
     entries: Record<string, OfflineEntry>;
     playlistCounts: Record<string, number>;
@@ -37,6 +44,8 @@ const itemKey = (serverId: string, itemId: string) => `${serverId}:${itemId}`;
 
 export const useOfflineDownloadStore = createWithEqualityFn<OfflineDownloadState>()(() => ({
     albumCounts: {},
+    albums: {},
+    completeAlbums: {},
     completePlaylists: {},
     entries: {},
     playlistCounts: {},
@@ -45,22 +54,36 @@ export const useOfflineDownloadStore = createWithEqualityFn<OfflineDownloadState
     tasks: {},
 }));
 
-const setSnapshot = (entries: OfflineEntry[], playlists: OfflinePlaylist[]) => {
+const setSnapshot = (
+    albums: OfflineAlbum[],
+    entries: OfflineEntry[],
+    playlists: OfflinePlaylist[],
+) => {
     const entriesByKey: Record<string, OfflineEntry> = {};
     const albumCounts: Record<string, number> = {};
+    const albumsByKey: Record<string, OfflineAlbum> = {};
     const playlistCounts: Record<string, number> = {};
     const playlistsByKey: Record<string, OfflinePlaylist> = {};
 
     for (const entry of entries) {
         entriesByKey[entryKey(entry.song._serverId, entry.song.id)] = entry;
-        if (entry.song.albumId) {
-            const key = itemKey(entry.song._serverId, entry.song.albumId);
+        for (const albumId of entry.albumIds) {
+            const key = itemKey(entry.song._serverId, albumId);
             albumCounts[key] = (albumCounts[key] ?? 0) + 1;
         }
         for (const playlistId of entry.playlistIds) {
             const key = itemKey(entry.song._serverId, playlistId);
             playlistCounts[key] = (playlistCounts[key] ?? 0) + 1;
         }
+    }
+
+    const completeAlbums: Record<string, boolean> = {};
+    for (const album of albums) {
+        const key = itemKey(album.serverId, album.id);
+        albumsByKey[key] = album;
+        completeAlbums[key] = album.songIds.every((songId) =>
+            Boolean(entriesByKey[entryKey(album.serverId, songId)]),
+        );
     }
 
     const completePlaylists: Record<string, boolean> = {};
@@ -74,6 +97,8 @@ const setSnapshot = (entries: OfflineEntry[], playlists: OfflinePlaylist[]) => {
 
     useOfflineDownloadStore.setState({
         albumCounts,
+        albums: albumsByKey,
+        completeAlbums,
         completePlaylists,
         entries: entriesByKey,
         playlistCounts,
@@ -88,8 +113,12 @@ export const refreshOfflineDownloads = (): Promise<void> => {
     if (!offlineApi) return Promise.resolve();
     if (refreshPromise) return refreshPromise;
 
-    refreshPromise = Promise.all([offlineApi.list(), offlineApi.listPlaylists()])
-        .then(([entries, playlists]) => setSnapshot(entries, playlists))
+    refreshPromise = Promise.all([
+        offlineApi.listAlbums(),
+        offlineApi.list(),
+        offlineApi.listPlaylists(),
+    ])
+        .then(([albums, entries, playlists]) => setSnapshot(albums, entries, playlists))
         .catch((error) => {
             logger.warn('Failed to refresh offline download status', { error: String(error) });
         })
@@ -111,7 +140,17 @@ const updateTask = (task: OfflineDownloadTask) => {
             ),
         };
     });
-    if (task.state === 'complete' || task.state === 'error') void refreshOfflineDownloads();
+    if (task.state === 'cancelled' || task.state === 'complete' || task.state === 'error') {
+        void refreshOfflineDownloads();
+    }
+};
+
+export const refreshOfflineTasks = async () => {
+    if (!offlineApi) return;
+    const tasks = await offlineApi.listDownloadTasks();
+    useOfflineDownloadStore.setState({
+        tasks: Object.fromEntries(tasks.map((task) => [task.id, task])),
+    });
 };
 
 let unsubscribe: (() => void) | null = null;
@@ -185,12 +224,10 @@ const getStatus = (
         total = 1;
         complete = downloaded === 1;
     } else if (type === 'album') {
-        downloaded = state.albumCounts[itemKey(serverId, item.id)] ?? 0;
-        total ||=
-            latestTask?.itemType === 'album' && latestTask.state === 'complete'
-                ? latestTask.total
-                : 0;
-        complete = total > 0 && downloaded >= total;
+        const key = itemKey(serverId, item.id);
+        downloaded = state.albumCounts[key] ?? 0;
+        total ||= state.albums[key]?.songIds.length ?? downloaded;
+        complete = Boolean(state.completeAlbums[key]) && downloaded >= total;
     } else {
         const key = itemKey(serverId, item.id);
         downloaded = state.playlistCounts[key] ?? 0;

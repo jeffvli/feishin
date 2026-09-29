@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState, WheelEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { PopoverPlayQueue } from '/@/renderer/features/now-playing/components/popover-play-queue';
+import { OfflineDownloadManager } from '/@/renderer/features/offline/components/offline-download-manager';
 import { DlnaCastButton } from '/@/renderer/features/player/components/dlna-cast-button';
 import { DlnaVolumeButton } from '/@/renderer/features/player/components/dlna/volume-button';
 import { PlayerConfig } from '/@/renderer/features/player/components/player-config';
@@ -97,6 +98,7 @@ export const RightControls = () => {
             </Group>
             <Group align="center" gap="xs" wrap="nowrap">
                 <DlnaCastButton />
+                <OfflineDownloadManager />
                 <SleepTimerButton />
                 <PlayerConfig />
                 <LyricsButton />

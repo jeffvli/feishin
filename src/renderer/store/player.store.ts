@@ -1773,25 +1773,20 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         const wasShuffled = state.player.shuffle === PlayerShuffle.TRACK;
                         const willBeShuffled = shuffle === PlayerShuffle.TRACK;
                         const currentIndex = state.player.index;
+                        const currentTrackUniqueId = getPlaybackQueueIds(state)[currentIndex];
 
                         state.player.shuffle = shuffle;
 
                         if (willBeShuffled) {
-                            state.queue.shuffled = generateShuffledIndexes(
-                                state.queue.default.length,
+                            const shuffledPlaybackIds = createAnchoredShuffledPlaybackIds(
+                                state.queue.default,
+                                currentTrackUniqueId,
                             );
-
-                            // Convert current index to shuffled position if there's a current song
-                            if (currentIndex >= 0 && currentIndex < state.queue.default.length) {
-                                // Find the shuffled position that corresponds to the current queue position
-                                const shuffledPosition = findShuffledPositionForQueueIndex(
-                                    currentIndex,
-                                    state.queue.shuffled,
-                                );
-                                if (shuffledPosition !== undefined) {
-                                    state.player.index = shuffledPosition;
-                                }
-                            }
+                            applyPlaybackQueueOrder(
+                                state,
+                                shuffledPlaybackIds,
+                                currentTrackUniqueId,
+                            );
                         } else {
                             // When disabling shuffle, convert shuffled position back to queue position
                             if (
@@ -1828,44 +1823,29 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 shuffle: () => {
                     set((state) => {
                         if (state.player.shuffle === PlayerShuffle.TRACK) {
-                            state.queue.shuffled = generateShuffledIndexes(
-                                state.queue.default.length,
+                            const playbackIds = getPlaybackQueueIds(state);
+                            const currentTrackUniqueId = playbackIds[state.player.index];
+                            const shuffledPlaybackIds = createAnchoredShuffledPlaybackIds(
+                                playbackIds,
+                                currentTrackUniqueId,
+                            );
+                            applyPlaybackQueueOrder(
+                                state,
+                                shuffledPlaybackIds,
+                                currentTrackUniqueId,
                             );
                         }
                     });
                 },
                 shuffleAll: () => {
                     set((state) => {
-                        const currentTrackUniqueId = state.getCurrentSong()?._uniqueId;
                         const playbackIds = getPlaybackQueueIds(state);
-                        const currentIndex = state.player.index;
-
-                        // If there's a current song playing, keep it in place
-                        if (
-                            currentTrackUniqueId &&
-                            currentIndex >= 0 &&
-                            currentIndex < playbackIds.length
-                        ) {
-                            const beforeItems = playbackIds.slice(0, currentIndex);
-                            const afterItems = playbackIds.slice(currentIndex + 1);
-
-                            applyPlaybackQueueOrder(
-                                state,
-                                [
-                                    ...shuffleInPlace([...beforeItems]),
-                                    currentTrackUniqueId,
-                                    ...shuffleInPlace([...afterItems]),
-                                ],
-                                currentTrackUniqueId,
-                            );
-                        } else {
-                            // No current song, shuffle everything
-                            applyPlaybackQueueOrder(
-                                state,
-                                shuffleInPlace([...playbackIds]),
-                                currentTrackUniqueId,
-                            );
-                        }
+                        const currentTrackUniqueId = playbackIds[state.player.index];
+                        const shuffledPlaybackIds = createAnchoredShuffledPlaybackIds(
+                            playbackIds,
+                            currentTrackUniqueId,
+                        );
+                        applyPlaybackQueueOrder(state, shuffledPlaybackIds, currentTrackUniqueId);
                     });
                 },
                 shuffleSelected: (items: QueueSong[]) => {
@@ -1915,6 +1895,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         const wasShuffled = state.player.shuffle === PlayerShuffle.TRACK;
                         const willBeShuffled = state.player.shuffle !== PlayerShuffle.TRACK;
                         const currentIndex = state.player.index;
+                        const currentTrackUniqueId = getPlaybackQueueIds(state)[currentIndex];
 
                         state.player.shuffle =
                             state.player.shuffle === PlayerShuffle.NONE
@@ -1922,32 +1903,15 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 : PlayerShuffle.NONE;
 
                         if (willBeShuffled) {
-                            // Enabling shuffle: create shuffled indexes with current track as first
-                            const combinedLength = state.queue.default.length;
-
-                            if (
-                                combinedLength > 0 &&
-                                currentIndex >= 0 &&
-                                currentIndex < combinedLength
-                            ) {
-                                // Get the current queue position (actual index in combined queue)
-                                const currentQueuePosition = currentIndex;
-
-                                // Create shuffled indexes with current track first
-                                const remainingIndexes = Array.from(
-                                    { length: combinedLength },
-                                    (_, i) => i,
-                                ).filter((idx) => idx !== currentQueuePosition);
-                                const shuffledRemaining = shuffleInPlace([...remainingIndexes]);
-
-                                state.queue.shuffled = [currentQueuePosition, ...shuffledRemaining];
-
-                                // Set player index to 0 since current track is now first in shuffled array
-                                state.player.index = 0;
-                            } else {
-                                // No current track, just generate shuffled indexes normally
-                                state.queue.shuffled = generateShuffledIndexes(combinedLength);
-                            }
+                            const shuffledPlaybackIds = createAnchoredShuffledPlaybackIds(
+                                state.queue.default,
+                                currentTrackUniqueId,
+                            );
+                            applyPlaybackQueueOrder(
+                                state,
+                                shuffledPlaybackIds,
+                                currentTrackUniqueId,
+                            );
                         } else {
                             // Disabling shuffle: clear shuffled indexes and convert index back
                             if (
@@ -2732,6 +2696,18 @@ function consumeQueueSongsBeforeTarget(
     } else {
         state.queue.shuffled = [];
     }
+}
+
+function createAnchoredShuffledPlaybackIds(
+    playbackIds: string[],
+    currentTrackUniqueId: string | undefined,
+) {
+    if (!currentTrackUniqueId || !playbackIds.includes(currentTrackUniqueId)) {
+        return shuffleInPlace([...playbackIds]);
+    }
+
+    const remainingIds = playbackIds.filter((id) => id !== currentTrackUniqueId);
+    return [currentTrackUniqueId, ...shuffleInPlace(remainingIds)];
 }
 
 function findIndexWithPreviousAlbum(queueItems: QueueSong[], currentIndex: number) {

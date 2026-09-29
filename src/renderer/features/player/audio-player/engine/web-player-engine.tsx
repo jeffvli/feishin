@@ -27,6 +27,8 @@ interface WebPlayerEngineProps {
     onEndedPlayer1: () => void;
     onEndedPlayer2: () => void;
     onErrorPause: () => void;
+    onOfflineSourceErrorPlayer1?: (position: number) => Promise<boolean>;
+    onOfflineSourceErrorPlayer2?: (position: number) => Promise<boolean>;
     onProgressPlayer1: (e: PlayerOnProgressProps) => void;
     onProgressPlayer2: (e: PlayerOnProgressProps) => void;
     onStartedPlayer1: (player: ReactPlayer) => void;
@@ -67,6 +69,8 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
         onEndedPlayer1,
         onEndedPlayer2,
         onErrorPause,
+        onOfflineSourceErrorPlayer1 = async () => false,
+        onOfflineSourceErrorPlayer2 = async () => false,
         onProgressPlayer1,
         onProgressPlayer2,
         onStartedPlayer1,
@@ -85,6 +89,8 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
     const player2Ref = useRef<null | ReactPlayer>(null);
     const networkRetryCount1 = useRef(0);
     const networkRetryCount2 = useRef(0);
+    const offlineRecoveryAttempted1 = useRef(false);
+    const offlineRecoveryAttempted2 = useRef(false);
     const [ReactPlayerComponent, setReactPlayerComponent] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -199,6 +205,9 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
         onEnded: () => void,
         onErrorPause: () => void,
         networkRetryCountRef: React.RefObject<number>,
+        offlineRecoveryAttemptedRef: React.RefObject<boolean>,
+        source: string | undefined,
+        recoverOfflineSource: (position: number) => Promise<boolean>,
     ) => {
         return ({ target }: ErrorEvent) => {
             const { current: player } = playerRef;
@@ -214,6 +223,37 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
             const isNetworkError =
                 code === MediaError.MEDIA_ERR_NETWORK ||
                 code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED;
+
+            if (
+                isNetworkError &&
+                source?.startsWith('feishin-offline:') &&
+                !offlineRecoveryAttemptedRef.current
+            ) {
+                offlineRecoveryAttemptedRef.current = true;
+                const position = Number.isFinite(target.currentTime) ? target.currentTime : 0;
+                logger.warn('Offline playback failed, falling back to streaming', {
+                    code,
+                    label,
+                    position,
+                });
+                void recoverOfflineSource(position).then((recovered) => {
+                    if (recovered) {
+                        logger.info('Offline playback recovered with streaming source', {
+                            position,
+                        });
+                        return;
+                    }
+
+                    logger.error('Offline playback streaming fallback failed', {
+                        code,
+                        label,
+                        position,
+                    });
+                    pauseBothPlayers();
+                    onErrorPause();
+                });
+                return;
+            }
 
             if (isNetworkError) {
                 if (networkRetryCountRef.current < MAX_NETWORK_RETRIES) {
@@ -267,6 +307,8 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
     useEffect(() => {
         networkRetryCount1.current = 0;
         networkRetryCount2.current = 0;
+        offlineRecoveryAttempted1.current = false;
+        offlineRecoveryAttempted2.current = false;
     }, [src1, src2]);
 
     // When not playing, always pause both players — even during a transition
@@ -339,6 +381,9 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                     () => onEndedPlayer1(),
                     onErrorPause,
                     networkRetryCount1,
+                    offlineRecoveryAttempted1,
+                    src1,
+                    onOfflineSourceErrorPlayer1,
                 )}
                 onProgress={onProgressPlayer1}
                 onReady={handleOnReadyPlayer1}
@@ -365,6 +410,9 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                     () => onEndedPlayer2(),
                     onErrorPause,
                     networkRetryCount2,
+                    offlineRecoveryAttempted2,
+                    src2,
+                    onOfflineSourceErrorPlayer2,
                 )}
                 onProgress={onProgressPlayer2}
                 onReady={handleOnReadyPlayer2}

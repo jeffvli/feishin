@@ -80,6 +80,22 @@ export const OfflineDownloadNotifications = () => {
                 continue;
             }
 
+            if (task.state === 'cancelled') {
+                const cancellation = {
+                    autoClose: 3000,
+                    id,
+                    loading: false,
+                    message: t('offline.downloadCancelled', 'The download was cancelled'),
+                    title: t('offline.downloadCancelledTitle', 'Download cancelled'),
+                    withCloseButton: true,
+                };
+                if (shown.current.has(task.id)) toast.update(cancellation);
+                else toast.info(cancellation);
+                shown.current.add(task.id);
+                terminal.current.add(task.id);
+                continue;
+            }
+
             const failure = {
                 autoClose: false as const,
                 id,
