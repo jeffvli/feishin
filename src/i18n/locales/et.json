@@ -877,7 +877,7 @@
         "releaseChannel_optionBeta": "Beeta",
         "releaseChannel_optionLatest": "Uusim",
         "releaseChannel": "Uuenduskanal",
-        "releaseChannel_description": "Vali automaatsete uuenduste jaoks stabiilne, beeta- või alfaversioon (öised versioonid)",
+        "releaseChannel_description": "Vali automaatsete uuenduste jaoks stabiilne või beetaversioon",
         "disableLibraryUpdateOnStartup": "Keela uuenduste otsimine rakenduse käivitumisel",
         "discordApplicationId_description": "Rakenduse tunnus {{discord}} olekuteabe (rich presence) jaoks (vaikimisi {{defaultId}})",
         "discordApplicationId": "Rakenduse {{discord}} tunnus",

@@ -718,7 +718,7 @@
         "artistBackgroundBlur_description": "調整套用至藝人背景圖片的模糊程度",
         "releaseChannel_optionLatest": "最新版本",
         "releaseChannel_optionBeta": "測試版",
-        "releaseChannel_description": "選擇自動更新時要使用穩定、測試或是 alpha (每日建構版) 版本",
+        "releaseChannel_description": "選擇自動更新時要使用穩定版或測試版",
         "discordDisplayType": "{{discord}} presence 顯示類型",
         "discordDisplayType_description": "變更您在狀態中正在聆聽的內容",
         "discordDisplayType_songname": "歌曲名稱",

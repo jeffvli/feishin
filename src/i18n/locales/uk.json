@@ -934,7 +934,7 @@
         "releaseChannel_optionBeta": "Бета",
         "releaseChannel_optionLatest": "Остання стабільна",
         "releaseChannel": "Канал випусків",
-        "releaseChannel_description": "Виберіть стабільні, бета- або альфа-версії (нічні збірки) для автоматичних оновлень",
+        "releaseChannel_description": "Виберіть стабільну або бета-версію для автоматичних оновлень",
         "disableLibraryUpdateOnStartup": "Не перевіряти наявність нових версій під час запуску",
         "discordApplicationId_description": "ID програми для розширеного статусу {{discord}} (типово {{defaultId}})",
         "discordApplicationId": "ID програми {{discord}}",

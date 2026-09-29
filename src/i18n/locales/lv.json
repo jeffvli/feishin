@@ -782,7 +782,7 @@
         "releaseChannel_optionBeta": "Bēta versija",
         "releaseChannel_optionLatest": "Jaunākais",
         "releaseChannel": "Izdevuma kanāls",
-        "releaseChannel_description": "Izvēlieties starp stabilu, beta vai alfa (nakts) versiju, lai saņemtu automātiskus atjauninājumus",
+        "releaseChannel_description": "Izvēlieties starp stabilu vai beta versiju, lai saņemtu automātiskus atjauninājumus",
         "disableLibraryUpdateOnStartup": "Atspējot jaunāko versiju pārbaudi programmas palaišanas laikā",
         "discordApplicationId_description": "Lietojumprogrammas ID, kas paredzēta {{discord}} bagātīgai klātbūtnei (noklusējums ir {{defaultId}})",
         "discordApplicationId": "{{discord}} lietojumprogrammas ID",

@@ -903,7 +903,7 @@
         "releaseChannel_optionBeta": "பீட்டா",
         "releaseChannel_optionLatest": "அண்மைக் கால",
         "releaseChannel": "வெளியீடு சேனல்",
-        "releaseChannel_description": "தானியங்கி புதுப்பிப்புகளுக்கு நிலையான, பீட்டா அல்லது ஆல்பா (இரவு) வெளியீடுகளுக்கு இடையே தேர்வு செய்யவும்",
+        "releaseChannel_description": "தானியங்கி புதுப்பிப்புகளுக்கு நிலையான அல்லது பீட்டா வெளியீடுகளுக்கு இடையே தேர்வு செய்யவும்",
         "discordDisplayType_artistname": "கலைஞர் பெயர்(கள்)",
         "discordDisplayType_description": "உங்கள் நிலையில் நீங்கள் கேட்பதை மாற்றுகிறது",
         "discordDisplayType_songname": "பாடல் பெயர்",

@@ -8,5 +8,7 @@
 - [ ] Add automatic gain control and loudness levelling.
 - [x] Remove songs from the play queue after playback or manual skipping, with repeat-all and shuffle-aware repopulation.
 - [ ] Create automation.
-- [ ] Add my logo and contact information for support.
+- [x] Add my logo and contact information for support.
 - [x] Fix the shuffle button in the playback bar and the queue list order becoming inconsistent.
+- [x] Fix repeat-off playback so a playlist stops at the end instead of repeating.
+- [ ] Set the new default application settings on installation.

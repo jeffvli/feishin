@@ -1122,7 +1122,7 @@
         "releaseChannel_optionBeta": "Beta",
         "releaseChannel_optionLatest": "Latest",
         "releaseChannel": "Veröffentlichungskanal",
-        "releaseChannel_description": "Zwischen stabilen, Beta- oder Alpha-Versionen (Nightly) für automatische Updates wählen",
+        "releaseChannel_description": "Zwischen stabilen oder Beta-Versionen für automatische Updates wählen",
         "discordDisplayType_artistname": "Interpretenname(n)",
         "discordDisplayType_description": "Ändert den aktuellen Titel im Zuhör-Status",
         "discordDisplayType_songname": "Songname",

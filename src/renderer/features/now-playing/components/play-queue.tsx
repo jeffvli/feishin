@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
 
 import styles from './play-queue.module.css';
+import { getQueueBackgroundDropMode } from './queue-drop';
 
 import { useItemListColumnReorder } from '/@/renderer/components/item-list/helpers/use-item-list-column-reorder';
 import { useItemListColumnResize } from '/@/renderer/components/item-list/helpers/use-item-list-column-resize';
@@ -227,6 +228,8 @@ const EmptyQueueDropZone = () => {
             },
             onDrop: (args) => {
                 if (args.self.type === DragTarget.QUEUE_SONG) {
+                    const dropMode = getQueueBackgroundDropMode(playerContext.getQueue().length);
+                    const playType = dropMode === 'append' ? Play.LAST : Play.NOW;
                     const sourceServerId = (
                         args.source.item?.[0] as unknown as { _serverId: string }
                     )?._serverId;
@@ -240,7 +243,7 @@ const EmptyQueueDropZone = () => {
                                     sourceServerId,
                                     args.source.id,
                                     sourceItemType,
-                                    Play.NOW,
+                                    playType,
                                 );
                             }
                             break;
@@ -251,7 +254,7 @@ const EmptyQueueDropZone = () => {
                                     sourceServerId,
                                     args.source.id,
                                     sourceItemType,
-                                    Play.NOW,
+                                    playType,
                                 );
                             }
                             break;
@@ -262,7 +265,7 @@ const EmptyQueueDropZone = () => {
                                     sourceServerId,
                                     args.source.id,
                                     sourceItemType,
-                                    Play.NOW,
+                                    playType,
                                 );
                             }
                             break;
@@ -295,13 +298,13 @@ const EmptyQueueDropZone = () => {
                                     sourceServerId,
                                     folderIds,
                                     LibraryItem.FOLDER,
-                                    Play.NOW,
+                                    playType,
                                 );
                             }
 
                             // Handle songs: add directly to queue
                             if (songs.length > 0) {
-                                playerContext.addToQueueByData(songs, Play.NOW);
+                                playerContext.addToQueueByData(songs, playType);
                             }
 
                             break;
@@ -312,7 +315,7 @@ const EmptyQueueDropZone = () => {
                                     sourceServerId,
                                     args.source.id,
                                     sourceItemType,
-                                    Play.NOW,
+                                    playType,
                                 );
                             }
                             break;
@@ -323,7 +326,7 @@ const EmptyQueueDropZone = () => {
                                     sourceServerId,
                                     args.source.id,
                                     sourceItemType,
-                                    Play.NOW,
+                                    playType,
                                 );
                             }
                             break;
@@ -331,14 +334,18 @@ const EmptyQueueDropZone = () => {
                         case DragTarget.QUEUE_SONG: {
                             const sourceItems = (args.source.item || []) as QueueSong[];
                             if (sourceItems.length > 0) {
-                                playerContext.addToQueueByData(sourceItems, Play.NOW);
+                                if (dropMode === 'append') {
+                                    playerContext.moveSelectedToBottom(sourceItems);
+                                } else {
+                                    playerContext.addToQueueByData(sourceItems, Play.NOW);
+                                }
                             }
                             break;
                         }
                         case DragTarget.SONG: {
                             const sourceItems = (args.source.item || []) as Song[];
                             if (sourceItems.length > 0) {
-                                playerContext.addToQueueByData(sourceItems, Play.NOW);
+                                playerContext.addToQueueByData(sourceItems, playType);
                             }
                             break;
                         }

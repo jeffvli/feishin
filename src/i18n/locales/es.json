@@ -296,7 +296,7 @@
         "releaseChannel_optionLatest": "Última versión",
         "releaseChannel_optionBeta": "Beta",
         "releaseChannel": "Canal de lanzamiento",
-        "releaseChannel_description": "Elige entre lanzamientos estables, beta, o alpha (nightly) para las actualizaciones automáticas",
+        "releaseChannel_description": "Elige entre lanzamientos estables o beta para las actualizaciones automáticas",
         "artistBackground_description": "Añade una imagen de fondo para las páginas de artistas que contienen el arte de los artistas",
         "mediaSession": "Activar sesión de medios",
         "mediaSession_description": "Activa la integración de la sesión de medios, mostrando los controles de medios y los metadatos en la superposición del volumen del sistema y en la pantalla de bloqueo. Requiere el Reproductor Web de Audio.",

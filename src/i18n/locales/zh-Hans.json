@@ -494,7 +494,7 @@
         "releaseChannel_optionLatest": "最新稳定版",
         "releaseChannel_optionBeta": "测试版",
         "releaseChannel": "发布通道",
-        "releaseChannel_description": "选择稳定版、测试版或 Alpha（夜间构建版）以启用自动更新",
+        "releaseChannel_description": "选择稳定版或测试版以启用自动更新",
         "mediaSession": "启用媒体会话",
         "mediaSession_description": "启用媒体会话集成，在系统音量叠加层和锁屏界面显示媒体控件和元数据",
         "exportImportSettings_control_description": "通过 JSON 导出和导入设置",

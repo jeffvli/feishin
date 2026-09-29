@@ -936,7 +936,7 @@
         "releaseChannel_optionBeta": "Beta",
         "releaseChannel_optionLatest": "Latest",
         "releaseChannel": "Release channel",
-        "releaseChannel_description": "Choose between stable, beta, or alpha (nightly) releases for automatic updates",
+        "releaseChannel_description": "Choose between stable or beta releases for automatic updates",
         "disableLibraryUpdateOnStartup": "Disable checking for new versions on startup",
         "discordApplicationId_description": "The application ID for {{discord}} rich presence (defaults to {{defaultId}})",
         "discordApplicationId": "{{discord}} application ID",

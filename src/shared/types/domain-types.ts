@@ -70,6 +70,7 @@ export interface QueueData {
     consumed: string[];
     default: string[];
     preparedRefillBoundary: null | string;
+    preparedRefillIds: string[];
     recentlyPlayed: string[];
     shuffled: number[];
     songs: Record<string, QueueSong>;

@@ -782,7 +782,7 @@
         "releaseChannel_optionBeta": "Beta",
         "releaseChannel_optionLatest": "Meest recente",
         "releaseChannel": "Releasekanaal",
-        "releaseChannel_description": "Kies tussen stabiele, of beta- of alpha-releases (nachtelijk) voor automatische updates",
+        "releaseChannel_description": "Kies tussen stabiele of bèta-releases voor automatische updates",
         "disableLibraryUpdateOnStartup": "Niet controleren op nieuwe versies bij het opstarten",
         "discordApplicationId_description": "De applicatie-ID voor {{discord}} rich presence (standaard is {{defaultId}})",
         "hotkey_listPlayNow": "Nu in lijst spelen",

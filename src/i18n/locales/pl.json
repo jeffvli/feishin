@@ -1020,7 +1020,7 @@
         "releaseChannel_optionBeta": "Beta",
         "releaseChannel_optionLatest": "Najnowsza",
         "releaseChannel": "Kanał wydań",
-        "releaseChannel_description": "Wybieraj pomiędzy wydaniami stabilnymi, beta lub alpha (nightly) dla automatycznych aktualizacji",
+        "releaseChannel_description": "Wybieraj pomiędzy wydaniami stabilnymi lub beta dla automatycznych aktualizacji",
         "discordDisplayType_artistname": "Nazwa(y) wykonawców",
         "discordDisplayType_description": "Zmienia co jest pokazywane jako słuchane w twoim statusie",
         "discordDisplayType_songname": "Nazwa piosenki",

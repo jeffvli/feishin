@@ -891,7 +891,7 @@
         "releaseChannel_optionLatest": "Última versió",
         "releaseChannel_optionBeta": "Beta",
         "releaseChannel": "Canal de versions",
-        "releaseChannel_description": "Trieu entre versions estables i beta o alfa (diàries) per les actualitzacions automàtiques",
+        "releaseChannel_description": "Trieu entre versions estables o beta per a les actualitzacions automàtiques",
         "mediaSession": "Activa media session",
         "mediaSession_description": "Activa la integració amb Media Session per mostrar els controls multimèdia i les metadades a l'indicador de volum del sistema i la pantalla de bloqueig. Requereix el Reproductor Web d'Àudio.",
         "crossfadeStyle": "Estil de fosa encadenada",

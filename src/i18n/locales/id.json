@@ -954,7 +954,7 @@
         "releaseChannel_optionBeta": "Beta",
         "releaseChannel_optionLatest": "Terbaru",
         "releaseChannel": "Kanal rilis",
-        "releaseChannel_description": "Pilih antara rilis stabil, beta, atau alpha (nightly) untuk pembaruan otomatis",
+        "releaseChannel_description": "Pilih antara rilis stabil atau beta untuk pembaruan otomatis",
         "discordDisplayType_artistname": "Nama artis",
         "discordDisplayType_description": "Mengubah apa yang Anda dengarkan di status Anda",
         "discordDisplayType_songname": "Nama lagu",

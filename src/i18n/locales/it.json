@@ -480,7 +480,7 @@
         "releaseChannel_optionBeta": "Beta",
         "releaseChannel_optionLatest": "Stabile",
         "releaseChannel": "Canale di rilascio",
-        "releaseChannel_description": "Seleziona tra rilascio stabile, beta o alpha (nightly) per gli aggiornamenti automatici",
+        "releaseChannel_description": "Seleziona tra versione stabile o beta per gli aggiornamenti automatici",
         "discordRichPresence": "{{discord}} Rich Presence",
         "releaseChannel_optionAlpha": "Alpha (nightly)",
         "automaticUpdates_description": "Controlla e installa aggiornamenti automaticamente",
