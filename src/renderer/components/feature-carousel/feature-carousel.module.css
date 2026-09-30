@@ -190,6 +190,20 @@
     max-width: 200px;
 }
 
+/* The shared `.image-container` base sets `height: 100%`, which combined with
+   `width: 100%` pins both dimensions and makes `aspect-ratio` a no-op. Inside
+   the fixed-height multi-carousel `.image-section` (160px+) that produced a
+   tall non-square box (e.g. 120px wide x 160px tall), so `object-fit: cover`
+   cropped the sides off the square album art. `height: auto` lets
+   `aspect-ratio` derive a true square from the width instead. Scoped to
+   (0,2,0) so it beats the (0,1,0) base rule regardless of stylesheet order.
+   In single-carousel mode the parent section is `height: auto`, so this is a
+   no-op square there. */
+.image-section .album-image-container {
+    height: auto;
+    aspect-ratio: 1 / 1;
+}
+
 .album-image-container::before {
     position: absolute;
     top: 0;
@@ -211,7 +225,11 @@
 .album-image {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    /* Respect the 'Use native cover art aspect ratio' setting like the rest
+       of the app does (`contain` when enabled, `cover` otherwise). This
+       carousel previously hardcoded `cover`, so the setting had no effect
+       here. */
+    object-fit: var(--theme-image-fit);
     border-radius: var(--theme-radius-md);
 }
 
