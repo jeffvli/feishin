@@ -160,8 +160,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(
                 return;
             }
 
-            const selectedItems =
-                tableRef.current?.internalState.getSelected() as QueueSong[];
+            const selectedItems = tableRef.current?.internalState.getSelected() as QueueSong[];
 
             if (!selectedItems || selectedItems.length === 0) {
                 return;
