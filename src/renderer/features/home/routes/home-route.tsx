@@ -39,10 +39,9 @@ import { Platform } from '/@/shared/types/types';
 // exposes `recently_played` for albums and Jellyfin exposes `IsPlayed` for
 // songs; other servers ignore the unknown flag and rely on the client-side
 // played filter in the carousel components instead.
-const albumPlayedQueries: Partial<Record<HomeItem, Partial<Omit<AlbumListQuery, 'startIndex'>>>> =
-    {
-        [HomeItem.RECENTLY_PLAYED]: { isRecentlyPlayed: true },
-    };
+const albumPlayedQueries: Partial<Record<HomeItem, Partial<Omit<AlbumListQuery, 'startIndex'>>>> = {
+    [HomeItem.RECENTLY_PLAYED]: { isRecentlyPlayed: true },
+};
 
 const songPlayedQueries: Partial<Record<HomeItem, Partial<Omit<SongListQuery, 'startIndex'>>>> = {
     [HomeItem.MOST_PLAYED]: { isPlayed: true },
