@@ -14,6 +14,7 @@ import {
     PlayLastTextButton,
     PlayNextTextButton,
     PlayTextButton,
+    WideShuffleButton,
 } from '/@/renderer/features/shared/components/play-button';
 import { LONG_PRESS_PLAY_BEHAVIOR } from '/@/renderer/features/shared/components/play-button-group';
 import { usePlayButtonClick } from '/@/renderer/features/shared/hooks/use-play-button-click';
@@ -337,6 +338,7 @@ export const calculateTitleSize = (title: string) => {
 };
 
 interface LibraryHeaderMenuProps {
+    compactPlaybackControls?: boolean;
     favorite?: boolean;
     onAlbumRadio?: () => void;
     onArtistRadio?: () => void;
@@ -349,6 +351,7 @@ interface LibraryHeaderMenuProps {
 }
 
 export const LibraryHeaderMenu = ({
+    compactPlaybackControls = false,
     favorite,
     onAlbumRadio,
     onArtistRadio,
@@ -356,6 +359,7 @@ export const LibraryHeaderMenu = ({
     onMore,
     onPlay,
     onRating,
+    onShuffle,
     rating,
 }: LibraryHeaderMenuProps) => {
     const { t } = useTranslation();
@@ -395,15 +399,33 @@ export const LibraryHeaderMenu = ({
     return (
         <div className={styles.libraryHeaderMenu}>
             <Group wrap="nowrap">
-                {onPlay && <PlayTextButton {...handlePlayNow.handlers} {...handlePlayNow.props} />}
                 {onPlay && (
-                    <PlayNextTextButton {...handlePlayNext.handlers} {...handlePlayNext.props} />
+                    <PlayTextButton
+                        aria-label={t('player.play')}
+                        {...handlePlayNow.handlers}
+                        {...handlePlayNow.props}
+                    />
                 )}
-                {onPlay && (
-                    <PlayLastTextButton {...handlePlayLast.handlers} {...handlePlayLast.props} />
+                {onPlay && !compactPlaybackControls && (
+                    <PlayNextTextButton
+                        aria-label={t('player.addNext')}
+                        {...handlePlayNext.handlers}
+                        {...handlePlayNext.props}
+                    />
+                )}
+                {onPlay && !compactPlaybackControls && (
+                    <PlayLastTextButton
+                        aria-label={t('player.addLast')}
+                        {...handlePlayLast.handlers}
+                        {...handlePlayLast.props}
+                    />
+                )}
+                {compactPlaybackControls && onShuffle && (
+                    <WideShuffleButton aria-label={t('action.shuffle')} onClick={onShuffle} />
                 )}
                 {onAlbumRadio && (
                     <ActionIcon
+                        aria-label={t('player.albumRadio')}
                         disabled={isPlayerFetching}
                         onClick={onAlbumRadio}
                         size="lg"
@@ -458,6 +480,7 @@ export const LibraryHeaderMenu = ({
                 )}
                 {onMore && (
                     <ActionIcon
+                        aria-label={t('common.moreOptions', { defaultValue: 'More options' })}
                         icon="ellipsisHorizontal"
                         onClick={onMore}
                         size="lg"
