@@ -133,14 +133,11 @@ export const useSyncSettingsToMain = () => {
                             (rendererValueNormalized === null ||
                                 rendererValueNormalized === PlayerType.WEB) &&
                             typeof mainValueNormalized === 'string' &&
-                            (Object.values(PlayerType) as string[]).includes(
-                                mainValueNormalized,
-                            )
+                            (Object.values(PlayerType) as string[]).includes(mainValueNormalized)
                         ) {
-                            logger.info(
-                                'Restoring audio player type from main process settings',
-                                { playbackType: mainValueNormalized },
-                            );
+                            logger.info('Restoring audio player type from main process settings', {
+                                playbackType: mainValueNormalized,
+                            });
                             useSettingsStore.getState().actions.setSettings({
                                 playback: { type: mainValueNormalized as PlayerType },
                             });
