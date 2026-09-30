@@ -469,9 +469,8 @@ const AlbumMetadataExternalLinks = ({
                         variant="subtle"
                     />
                 )}
+                {/* Native spotify:search: splits %20 queries, so use '+' (#2264) */}
                 {spotify && (
-                    {/* Use '+' for spaces: the native spotify:search: handler
-                        truncates %20-encoded multi-word queries (#2264) */}
                     <ActionIcon
                         component="a"
                         href={
