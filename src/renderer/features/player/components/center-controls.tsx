@@ -4,7 +4,6 @@ import styles from './center-controls.module.css';
 
 import { MainPlayButton, PlayerButton } from '/@/renderer/features/player/components/player-button';
 import { PlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
-import { openShuffleAllModal } from '/@/renderer/features/player/components/shuffle-all-modal';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     useIsPlayingRadio,
@@ -43,7 +42,6 @@ export const CenterControls = () => {
                         {skip?.enabled && <SkipForwardButton disabled={isRadioActive} />}
                         <NextButton disabled={isRadioActive} />
                         <RepeatButton disabled={isRadioActive} />
-                        <ShuffleAllButton disabled={isRadioActive} />
                     </div>
                 </div>
             </>
@@ -62,7 +60,6 @@ export const CenterControls = () => {
                     {skip?.enabled && <SkipForwardButton />}
                     <NextButton />
                     <RepeatButton />
-                    <ShuffleAllButton />
                 </div>
             </div>
             <PlayerbarSlider />
@@ -104,7 +101,6 @@ const RadioStopButton = ({ disabled }: { disabled?: boolean }) => {
         />
     );
 };
-
 const StopButton = ({ disabled }: { disabled?: boolean }) => {
     const { t } = useTranslation();
     const buttonSize = useButtonSize();
@@ -305,24 +301,6 @@ const RepeatButton = ({ disabled }: { disabled?: boolean }) => {
                                 context: 'one',
                             })
                 }`,
-                openDelay: 0,
-            }}
-            variant="tertiary"
-        />
-    );
-};
-
-const ShuffleAllButton = ({ disabled }: { disabled?: boolean }) => {
-    const { t } = useTranslation();
-    const buttonSize = useButtonSize();
-
-    return (
-        <PlayerButton
-            disabled={disabled}
-            icon={<Icon fill="default" icon="mediaRandom" size={buttonSize} />}
-            onClick={() => openShuffleAllModal()}
-            tooltip={{
-                label: t('form.shuffleAll.title'),
                 openDelay: 0,
             }}
             variant="tertiary"

@@ -111,6 +111,7 @@ type AlbumArtistContextMenuProps = {
 };
 
 type AlbumContextMenuProps = {
+    compact?: boolean;
     items: Album[];
     type: LibraryItem.ALBUM;
 };

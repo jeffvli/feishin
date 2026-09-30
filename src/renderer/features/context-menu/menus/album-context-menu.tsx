@@ -14,15 +14,26 @@ import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { Album, LibraryItem } from '/@/shared/types/domain-types';
 
 interface AlbumContextMenuProps {
+    compact?: boolean;
     items: Album[];
     type: LibraryItem.ALBUM;
 }
 
-export const AlbumContextMenu = ({ items, type }: AlbumContextMenuProps) => {
+export const AlbumContextMenu = ({ compact, items, type }: AlbumContextMenuProps) => {
     const { ids } = useMemo(() => {
         const ids = items.map((item) => item.id);
         return { ids };
     }, [items]);
+
+    if (compact) {
+        return (
+            <ContextMenu.Content>
+                <PlayAction compact ids={ids} itemType={LibraryItem.ALBUM} />
+                <ContextMenu.Divider />
+                <DownloadAction items={items} itemType={type} />
+            </ContextMenu.Content>
+        );
+    }
 
     return (
         <ContextMenu.Content

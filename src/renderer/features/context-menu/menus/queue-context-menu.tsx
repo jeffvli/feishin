@@ -1,16 +1,13 @@
 import { useMemo } from 'react';
 
 import { DownloadAction } from '/@/renderer/features/context-menu/actions/download-action';
-import { EditMetadataAction } from '/@/renderer/features/context-menu/actions/edit-metadata-action';
 import { GetInfoAction } from '/@/renderer/features/context-menu/actions/get-info-action';
 import { GoToAction } from '/@/renderer/features/context-menu/actions/go-to-action';
 import { MoveQueueItemsAction } from '/@/renderer/features/context-menu/actions/move-queue-items-action';
 import { PlayAction } from '/@/renderer/features/context-menu/actions/play-action';
-import { PlayTrackRadioAction } from '/@/renderer/features/context-menu/actions/play-track-radio-action';
 import { RemoveFromQueueAction } from '/@/renderer/features/context-menu/actions/remove-from-queue-action';
 import { SetFavoriteAction } from '/@/renderer/features/context-menu/actions/set-favorite-action';
 import { SetRatingAction } from '/@/renderer/features/context-menu/actions/set-rating-action';
-import { ShareAction } from '/@/renderer/features/context-menu/actions/share-action';
 import { ShowInFileExplorerAction } from '/@/renderer/features/context-menu/actions/show-in-file-explorer-action';
 import { ShuffleItemsAction } from '/@/renderer/features/context-menu/actions/shuffle-items-action';
 import { ContextMenuPreview } from '/@/renderer/features/context-menu/components/context-menu-preview';
@@ -37,18 +34,14 @@ export const QueueContextMenu = ({ items }: QueueContextMenuProps) => {
             <MoveQueueItemsAction items={items} />
             <ShuffleItemsAction items={items} />
             <ContextMenu.Divider />
-            <PlayTrackRadioAction disabled={items.length > 1} skipFirstSong song={items[0]} />
-            <ContextMenu.Divider />
             <SetFavoriteAction ids={ids} itemType={LibraryItem.SONG} />
             <SetRatingAction ids={ids} itemType={LibraryItem.SONG} />
             <ContextMenu.Divider />
             <DownloadAction items={items} itemType={LibraryItem.QUEUE_SONG} />
-            <ShareAction ids={ids} itemType={LibraryItem.SONG} />
             <ContextMenu.Divider />
             <GoToAction items={items} />
             <ShowInFileExplorerAction items={items} />
             <ContextMenu.Divider />
-            <EditMetadataAction songs={items} />
             <GetInfoAction disabled={items.length === 0} items={items} />
         </ContextMenu.Content>
     );

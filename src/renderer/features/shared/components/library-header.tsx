@@ -14,6 +14,7 @@ import {
     PlayLastTextButton,
     PlayNextTextButton,
     PlayTextButton,
+    WideDownloadButton,
     WideShuffleButton,
 } from '/@/renderer/features/shared/components/play-button';
 import { LONG_PRESS_PLAY_BEHAVIOR } from '/@/renderer/features/shared/components/play-button-group';
@@ -339,9 +340,13 @@ export const calculateTitleSize = (title: string) => {
 
 interface LibraryHeaderMenuProps {
     compactPlaybackControls?: boolean;
+    downloadLabel?: string;
     favorite?: boolean;
+    isDownloaded?: boolean;
+    isDownloadPending?: boolean;
     onAlbumRadio?: () => void;
     onArtistRadio?: () => void;
+    onDownload?: () => void;
     onFavorite?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     onMore?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     onPlay?: (type: Play) => void;
@@ -352,9 +357,13 @@ interface LibraryHeaderMenuProps {
 
 export const LibraryHeaderMenu = ({
     compactPlaybackControls = false,
+    downloadLabel,
     favorite,
+    isDownloaded,
+    isDownloadPending,
     onAlbumRadio,
     onArtistRadio,
+    onDownload,
     onFavorite,
     onMore,
     onPlay,
@@ -398,9 +407,10 @@ export const LibraryHeaderMenu = ({
 
     return (
         <div className={styles.libraryHeaderMenu}>
-            <Group wrap="nowrap">
+            <Group wrap={compactPlaybackControls ? 'wrap' : 'nowrap'}>
                 {onPlay && (
                     <PlayTextButton
+                        alwaysShowLabel={compactPlaybackControls}
                         aria-label={t('player.play')}
                         {...handlePlayNow.handlers}
                         {...handlePlayNow.props}
@@ -421,7 +431,22 @@ export const LibraryHeaderMenu = ({
                     />
                 )}
                 {compactPlaybackControls && onShuffle && (
-                    <WideShuffleButton aria-label={t('action.shuffle')} onClick={onShuffle} />
+                    <WideShuffleButton
+                        alwaysShowLabel
+                        aria-label={t('action.shuffle')}
+                        onClick={onShuffle}
+                    />
+                )}
+                {onDownload && (
+                    <WideDownloadButton
+                        alwaysShowLabel={compactPlaybackControls}
+                        aria-label={downloadLabel}
+                        downloaded={isDownloaded}
+                        loading={isDownloadPending}
+                        onClick={onDownload}
+                    >
+                        {downloadLabel}
+                    </WideDownloadButton>
                 )}
                 {onAlbumRadio && (
                     <ActionIcon

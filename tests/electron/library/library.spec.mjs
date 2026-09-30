@@ -31,8 +31,11 @@ test('@full keeps the album detail screen focused on playback', async ({ page })
     await expect(heading).toBeVisible({ timeout: 15_000 });
 
     const header = heading.locator('..');
-    await expect(header.getByRole('button', { exact: true, name: 'Play' })).toBeVisible();
-    await expect(header.getByRole('button', { exact: true, name: 'Shuffle' })).toBeVisible();
+    for (const label of ['Play', 'Shuffle', 'Download']) {
+        const button = header.getByRole('button', { exact: true, name: label });
+        await expect(button).toBeVisible();
+        await expect(button.getByText(label, { exact: true })).toBeVisible();
+    }
     await expect(header.getByRole('button', { exact: true, name: 'Next' })).toHaveCount(0);
     await expect(header.getByRole('button', { exact: true, name: 'Last' })).toHaveCount(0);
     await expect(header.getByRole('button', { exact: true, name: 'Album radio' })).toHaveCount(0);
@@ -57,6 +60,16 @@ test('@full labels the sidebar album list with the selected music folder', async
         sidebar.getByRole('button', { exact: true, name: "Katie O'Brien's Music" }),
     ).toBeVisible();
     await expect(sidebar.getByText('Automation Album', { exact: true })).toBeVisible();
+    await sidebar.getByText('Automation Album', { exact: true }).click({ button: 'right' });
+    for (const label of ['Play', 'Shuffle', 'Play next', 'Add to end of queue']) {
+        await expect(page.getByRole('menuitem', { exact: true, name: label })).toBeVisible();
+    }
+    await expect(
+        page.getByRole('menuitem', { exact: true, name: 'Keep album available offline' }),
+    ).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'Album radio' })).toHaveCount(0);
+    await expect(page.getByRole('menuitem', { name: 'Share item' })).toHaveCount(0);
+    await expect(page.getByRole('menuitem', { name: 'Edit Metadata' })).toHaveCount(0);
     await expect
         .poll(() =>
             mockJellyfin.state.requests.some((request) => {

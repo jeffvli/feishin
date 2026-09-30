@@ -39,11 +39,13 @@ export const DefaultPlayButton = forwardRef<HTMLButtonElement, DefaultPlayButton
 DefaultPlayButton.displayName = 'DefaultPlayButton';
 
 interface TextPlayButtonProps extends ButtonProps {
+    alwaysShowLabel?: boolean;
     onLongPress?: (e: React.MouseEvent<HTMLButtonElement>) => void;
     showTooltip?: boolean;
 }
 
 export const PlayTextButton = ({
+    alwaysShowLabel,
     className,
     showTooltip = true,
     variant = 'default',
@@ -64,7 +66,9 @@ export const PlayTextButton = ({
             {props.children || (
                 <Group gap="sm" wrap="nowrap">
                     <Icon icon="mediaPlay" size="lg" />
-                    <span className={styles.text}>{t('player.play')}</span>
+                    <span className={clsx(styles.text, alwaysShowLabel && styles.alwaysShowLabel)}>
+                        {t('player.play')}
+                    </span>
                 </Group>
             )}
         </Button>
@@ -123,12 +127,40 @@ export const PlayLastTextButton = ({ ...props }: TextPlayButtonProps) => {
     return button;
 };
 
-export const WideShuffleButton = ({ ...props }: TextPlayButtonProps) => {
+export const WideShuffleButton = ({ alwaysShowLabel, ...props }: TextPlayButtonProps) => {
     return (
-        <PlayTextButton {...props}>
+        <PlayTextButton alwaysShowLabel={alwaysShowLabel} {...props}>
             <Group gap="sm" wrap="nowrap">
                 <Icon fill="default" icon="mediaShuffle" size="lg" />
-                <span className={styles.text}>{t('action.shuffle')}</span>
+                <span className={clsx(styles.text, alwaysShowLabel && styles.alwaysShowLabel)}>
+                    {t('action.shuffle')}
+                </span>
+            </Group>
+        </PlayTextButton>
+    );
+};
+
+interface WideDownloadButtonProps extends TextPlayButtonProps {
+    downloaded?: boolean;
+}
+
+export const WideDownloadButton = ({
+    alwaysShowLabel,
+    children,
+    downloaded,
+    ...props
+}: WideDownloadButtonProps) => {
+    return (
+        <PlayTextButton alwaysShowLabel={alwaysShowLabel} {...props} showTooltip={false}>
+            <Group gap="sm" wrap="nowrap">
+                <Icon
+                    color={downloaded ? 'success' : undefined}
+                    icon={downloaded ? 'success' : 'download'}
+                    size="lg"
+                />
+                <span className={clsx(styles.text, alwaysShowLabel && styles.alwaysShowLabel)}>
+                    {children || t('page.contextMenu.download')}
+                </span>
             </Group>
         </PlayTextButton>
     );
