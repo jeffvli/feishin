@@ -34,6 +34,21 @@ interface AlbumCarouselProps {
     title: React.ReactNode | string;
 }
 
+// Servers may return never-played albums when sorting by play count or play
+// date (issue #2416). Keep those out of the home "Most/Recently played"
+// sections; the carousel hides itself when the first page ends up empty.
+const isPlayedAlbum = (sortBy: AlbumListSort, album: Album) => {
+    if (sortBy === AlbumListSort.PLAY_COUNT) {
+        return (album.playCount ?? 0) > 0;
+    }
+
+    if (sortBy === AlbumListSort.RECENTLY_PLAYED) {
+        return album.lastPlayedAt != null;
+    }
+
+    return true;
+};
+
 const BaseAlbumInfiniteCarousel = (props: AlbumCarouselProps & { rows: DataRow[] }) => {
     const {
         containerQuery,
@@ -59,9 +74,10 @@ const BaseAlbumInfiniteCarousel = (props: AlbumCarouselProps & { rows: DataRow[]
 
     const cards = useMemo(() => {
         const allItems = albums?.pages.flatMap((page: AlbumListResponse) => page.items) || [];
+        const playedItems = allItems.filter((album) => isPlayedAlbum(sortBy, album));
         const filteredItems = excludeIds
-            ? allItems.filter((album) => !excludeIds.includes(album.id))
-            : allItems;
+            ? playedItems.filter((album) => !excludeIds.includes(album.id))
+            : playedItems;
 
         return filteredItems.map((album: Album) => ({
             content: (
@@ -79,7 +95,7 @@ const BaseAlbumInfiniteCarousel = (props: AlbumCarouselProps & { rows: DataRow[]
             ),
             id: album.id,
         }));
-    }, [albums, controls, excludeIds, rows]);
+    }, [albums, controls, excludeIds, rows, sortBy]);
 
     const handleNextPage = useCallback(() => {}, []);
 
@@ -89,9 +105,11 @@ const BaseAlbumInfiniteCarousel = (props: AlbumCarouselProps & { rows: DataRow[]
         refetch();
     }, [refetch]);
 
-    const firstPageItems = excludeIds
+    const rawFirstPageItems = excludeIds
         ? albums?.pages[0]?.items.filter((album) => !excludeIds.includes(album.id)) || []
         : albums?.pages[0]?.items || [];
+
+    const firstPageItems = rawFirstPageItems.filter((album) => isPlayedAlbum(sortBy, album));
 
     if (firstPageItems.length === 0) {
         return null;

@@ -25,13 +25,29 @@ import {
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
 import {
+    AlbumListQuery,
     AlbumListSort,
     LibraryItem,
     ServerType,
+    SongListQuery,
     SongListSort,
     SortOrder,
 } from '/@/shared/types/domain-types';
 import { Platform } from '/@/shared/types/types';
+
+// Server-side played filters for the home sections (issue #2416). Navidrome
+// exposes `recently_played` for albums and Jellyfin exposes `IsPlayed` for
+// songs; other servers ignore the unknown flag and rely on the client-side
+// played filter in the carousel components instead.
+const albumPlayedQueries: Partial<Record<HomeItem, Partial<Omit<AlbumListQuery, 'startIndex'>>>> =
+    {
+        [HomeItem.RECENTLY_PLAYED]: { isRecentlyPlayed: true },
+    };
+
+const songPlayedQueries: Partial<Record<HomeItem, Partial<Omit<SongListQuery, 'startIndex'>>>> = {
+    [HomeItem.MOST_PLAYED]: { isPlayed: true },
+    [HomeItem.RECENTLY_PLAYED]: { isPlayed: true },
+};
 
 const HomeRoute = () => {
     const { t } = useTranslation();
@@ -151,6 +167,7 @@ const HomeRoute = () => {
                                         containerQuery={containerQuery}
                                         enableRefresh={carousel.enableRefresh}
                                         key={`carousel-${carousel.uniqueId}`}
+                                        query={albumPlayedQueries[carousel.uniqueId]}
                                         queryKey={['home', 'album', carousel.uniqueId] as const}
                                         rowCount={1}
                                         sortBy={carousel.sortBy as AlbumListSort}
@@ -166,6 +183,7 @@ const HomeRoute = () => {
                                         containerQuery={containerQuery}
                                         enableRefresh={carousel.enableRefresh}
                                         key={`carousel-${carousel.uniqueId}`}
+                                        query={songPlayedQueries[carousel.uniqueId]}
                                         queryKey={['home', 'song', carousel.uniqueId] as const}
                                         rowCount={1}
                                         sortBy={carousel.sortBy as SongListSort}

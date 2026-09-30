@@ -691,6 +691,7 @@ export interface SongListQuery extends BaseQuery<SongListSort> {
     genreIds?: string[];
     hasRating?: boolean;
     imageSize?: number;
+    isPlayed?: boolean;
     limit?: number;
     maxYear?: number;
     minYear?: number;
