@@ -82,13 +82,13 @@ const getBlurHash = (
 const jellyfinPremiereFields = (item: {
     PremiereDate?: string;
     ProductionYear?: number;
-}): { originalYear: number; releaseDate: null | string; releaseYear: null | number } => {
+}): { originalYear: null | number; releaseDate: null | string; releaseYear: null | number } => {
     const premiere = parsePartialIsoDateFromApi(item.PremiereDate ?? null);
     const prodYear = coerceYear(item.ProductionYear);
-    const releaseYear: null | number =
-        premiere.year > 0 ? premiere.year : prodYear > 0 ? prodYear : null;
-    const releaseDate = premiere.date ?? (prodYear > 0 ? String(prodYear) : null);
-    const originalYear = premiere.year > 0 ? premiere.year : prodYear;
+    const fallbackYear = prodYear && prodYear > 0 ? prodYear : null;
+    const releaseYear: null | number = premiere.year > 0 ? premiere.year : fallbackYear;
+    const releaseDate = premiere.date ?? (fallbackYear !== null ? String(fallbackYear) : null);
+    const originalYear = premiere.year > 0 ? premiere.year : fallbackYear;
     return { originalYear, releaseDate, releaseYear };
 };
 
@@ -169,7 +169,7 @@ const normalizeSong = (
         compilation: null,
         container,
         createdAt: item.DateCreated,
-        date: releaseDate || String(releaseYear),
+        date: releaseDate || (releaseYear !== null ? String(releaseYear) : null),
         discNumber: (item.ParentIndexNumber && item.ParentIndexNumber) || 1,
         discSubtitle: null,
         duration: item.RunTimeTicks / TICKS_PER_MS,

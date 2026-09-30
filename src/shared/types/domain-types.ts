@@ -200,7 +200,7 @@ export type Album = {
     missing: boolean | null;
     name: string;
     originalDate: null | PartialIsoDateString;
-    originalYear: number;
+    originalYear: null | number;
     participants: null | Record<string, RelatedArtist[]>;
     peak: GainInfo | null;
     playCount: null | number;
