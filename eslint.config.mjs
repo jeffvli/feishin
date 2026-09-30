@@ -6,7 +6,15 @@ import eslintPluginReactHooks from 'eslint-plugin-react-hooks';
 import eslintPluginReactRefresh from 'eslint-plugin-react-refresh';
 
 export default tseslint.config(
-    { ignores: ['**/node_modules', '**/dist', '**/out', 'commitlint.config.mjs'] },
+    {
+        ignores: [
+            '**/node_modules',
+            '**/dist',
+            '**/out',
+            '**/test-results',
+            'commitlint.config.mjs',
+        ],
+    },
     tseslint.configs.recommended,
     perfectionist.configs['recommended-natural'],
     eslintPluginReact.configs.flat.recommended,
@@ -49,6 +57,12 @@ export default tseslint.config(
             'react/display-name': 'off',
             semi: ['error', 'always'],
             'single-attribute-per-line': 'off',
+        },
+    },
+    {
+        files: ['tests/**/*.mjs'],
+        rules: {
+            '@typescript-eslint/explicit-function-return-type': 'off',
         },
     },
     eslintConfigPrettier,

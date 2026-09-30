@@ -63,9 +63,16 @@ jobs:
             - name: Build Windows x64 package
               run: pnpm run package:win
 
+            - name: Run extended Electron UI tests
+              run: pnpm run test:ui:nightly
+
             - name: Verify packaged application
               shell: pwsh
               run: scripts/automation/verify-windows-package.ps1 -ManifestName 'latest.yml'
+
+            - name: Verify Windows installer lifecycle
+              shell: pwsh
+              run: scripts/automation/verify-windows-installer.ps1 -ManifestName 'latest.yml'
 
             - name: Upload nightly package
               uses: actions/upload-artifact@v7
@@ -76,4 +83,13 @@ jobs:
                       dist/*.blockmap
                       dist/*.yml
                   if-no-files-found: error
+                  retention-days: 14
+
+            - name: Upload nightly UI-test evidence
+              if: always()
+              uses: actions/upload-artifact@v7
+              with:
+                  name: electron-ui-nightly-${{ github.run_id }}
+                  path: test-results/electron
+                  if-no-files-found: ignore
                   retention-days: 14

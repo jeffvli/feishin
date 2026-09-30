@@ -1,0 +1,43 @@
+name: KatiesAmp Jellyfin Contract
+
+on:
+    schedule:
+        - cron: '30 3 * * 1'
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    contract:
+        name: Jellyfin Contract
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        services:
+            jellyfin:
+                image: jellyfin/jellyfin:latest
+                ports:
+                    - 8096:8096
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v6
+
+            - name: Install Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+
+            - name: Wait for Jellyfin
+              shell: bash
+              run: |
+                  for attempt in {1..30}; do
+                    if curl --fail --silent http://127.0.0.1:8096/System/Info/Public >/dev/null; then
+                      exit 0
+                    fi
+                    sleep 2
+                  done
+                  echo 'Jellyfin did not become ready in time' >&2
+                  exit 1
+
+            - name: Verify public API contract
+              run: node scripts/automation/verify-jellyfin-contract.mjs http://127.0.0.1:8096
