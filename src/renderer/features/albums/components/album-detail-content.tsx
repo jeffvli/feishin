@@ -6,7 +6,7 @@ import type {
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ReactNode, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 import styles from './album-detail-content.module.css';
 
@@ -35,7 +35,7 @@ import { FILTER_KEYS, searchLibraryItems } from '/@/renderer/features/shared/uti
 import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, usePlayerSong } from '/@/renderer/store';
-import { useExternalLinks, useSettingsStore } from '/@/renderer/store/settings.store';
+import { useSettingsStore } from '/@/renderer/store/settings.store';
 import { sentenceCase, titleCase } from '/@/renderer/utils';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
 import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types';
@@ -267,39 +267,6 @@ const AlbumMetadataTags = ({ album }: AlbumMetadataTagsProps) => {
     );
 };
 
-interface AlbumMetadataGenresProps {
-    genres?: Array<{ id: string; name: string }>;
-}
-
-const AlbumMetadataGenres = ({ genres }: AlbumMetadataGenresProps) => {
-    const { t } = useTranslation();
-
-    if (!genres || genres.length === 0) return null;
-
-    return (
-        <Stack gap="xs">
-            <Text fw={600} isNoSelect size="sm" tt="uppercase">
-                {t('entity.genre', {
-                    count: genres.length,
-                })}
-            </Text>
-            <Pill.Group>
-                {genres.map((genre) => (
-                    <PillLink
-                        key={`genre-${genre.id}`}
-                        size="md"
-                        to={generatePath(AppRoute.LIBRARY_GENRES_DETAIL, {
-                            genreId: genre.id,
-                        })}
-                    >
-                        {genre.name}
-                    </PillLink>
-                ))}
-            </Pill.Group>
-        </Stack>
-    );
-};
-
 // interface AlbumMetadataArtistsProps {
 //     artists?: Array<{ id: string; name: string }>;
 // }
@@ -333,168 +300,6 @@ const AlbumMetadataGenres = ({ genres }: AlbumMetadataGenresProps) => {
 //     );
 // };
 
-interface AlbumMetadataExternalLinksProps {
-    albumArtist?: string;
-    albumName?: string;
-    externalLinks: boolean;
-    lastFM: boolean;
-    listenBrainz: boolean;
-    mbzId?: null | string;
-    mbzReleaseGroupId?: null | string;
-    musicBrainz: boolean;
-    nativeSpotify: boolean;
-    qobuz: boolean;
-    spotify: boolean;
-}
-
-const getListenBrainzUrl = (
-    mbzReleaseGroupId: null | string,
-    albumArtist?: string,
-    albumName?: string,
-) => {
-    if (mbzReleaseGroupId) {
-        return `https://listenbrainz.org/album/${mbzReleaseGroupId}`;
-    }
-
-    if (albumArtist || albumName) {
-        return `https://listenbrainz.org/search/?search_term=${encodeURIComponent([albumArtist, albumName].filter(Boolean).join(' ').trim())}`;
-    }
-
-    return null;
-};
-
-const getQobuzUrl = (albumArtist?: string, albumName?: string) => {
-    if (albumArtist || albumName) {
-        return `https://www.qobuz.com/us-en/search/albums/${encodeURIComponent([albumArtist, albumName].filter(Boolean).join(' ').trim())}`;
-    }
-
-    return null;
-};
-
-const AlbumMetadataExternalLinks = ({
-    albumArtist,
-    albumName,
-    externalLinks,
-    lastFM,
-    listenBrainz,
-    mbzId,
-    mbzReleaseGroupId,
-    musicBrainz,
-    nativeSpotify,
-    qobuz,
-    spotify,
-}: AlbumMetadataExternalLinksProps) => {
-    const { t } = useTranslation();
-
-    const listenBrainzUrl = getListenBrainzUrl(mbzReleaseGroupId || null, albumArtist, albumName);
-    const qobuzUrl = getQobuzUrl(albumArtist, albumName);
-
-    if (!externalLinks || (!lastFM && !listenBrainz && !musicBrainz && !qobuz && !spotify)) {
-        return null;
-    }
-
-    return (
-        <Stack gap="xs">
-            <Text fw={600} isNoSelect size="sm" tt="uppercase">
-                {t('common.externalLinks')}
-            </Text>
-            <Group className={styles.externalLinksGroup} gap="xs">
-                {lastFM && (
-                    <ActionIcon
-                        component="a"
-                        href={`https://www.last.fm/music/${encodeURIComponent(
-                            albumArtist || '',
-                        )}/${encodeURIComponent(albumName || '')}`}
-                        icon="brandLastfm"
-                        iconProps={{
-                            size: '2xl',
-                        }}
-                        radius="md"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        tooltip={{
-                            label: t('action.openIn.lastfm'),
-                        }}
-                        variant="subtle"
-                    />
-                )}
-                {mbzId && musicBrainz ? (
-                    <ActionIcon
-                        component="a"
-                        href={`https://musicbrainz.org/release/${mbzId}`}
-                        icon="brandMusicBrainz"
-                        iconProps={{
-                            size: '2xl',
-                        }}
-                        radius="md"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        tooltip={{
-                            label: t('action.openIn.musicbrainz'),
-                        }}
-                        variant="subtle"
-                    />
-                ) : null}
-                {listenBrainz && listenBrainzUrl && (
-                    <ActionIcon
-                        component="a"
-                        href={listenBrainzUrl}
-                        icon="brandListenBrainz"
-                        iconProps={{
-                            size: '2xl',
-                        }}
-                        radius="md"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        tooltip={{
-                            label: t('action.openIn.listenbrainz'),
-                        }}
-                        variant="subtle"
-                    />
-                )}
-                {qobuz && qobuzUrl && (
-                    <ActionIcon
-                        component="a"
-                        href={qobuzUrl}
-                        icon="brandQobuz"
-                        iconProps={{
-                            size: '2xl',
-                        }}
-                        radius="md"
-                        rel="noopener noreferrer"
-                        target="_blank"
-                        tooltip={{
-                            label: t('action.openIn.qobuz'),
-                        }}
-                        variant="subtle"
-                    />
-                )}
-                {spotify && (
-                    <ActionIcon
-                        component="a"
-                        href={
-                            nativeSpotify
-                                ? `spotify:search:${encodeURIComponent(albumArtist || '')}%20${encodeURIComponent(albumName || '')}`
-                                : `https://open.spotify.com/search/${encodeURIComponent(albumArtist || '')}%20${encodeURIComponent(albumName || '')}`
-                        }
-                        icon="brandSpotify"
-                        iconProps={{
-                            size: '2xl',
-                        }}
-                        radius="md"
-                        rel="noopener noreferrer"
-                        target={nativeSpotify ? undefined : '_blank'}
-                        tooltip={{
-                            label: t('action.openIn.spotify'),
-                        }}
-                        variant="subtle"
-                    />
-                )}
-            </Group>
-        </Stack>
-    );
-};
-
 export const AlbumDetailContent = () => {
     const { albumId } = useParams() as { albumId: string };
     const server = useCurrentServer();
@@ -502,15 +307,10 @@ export const AlbumDetailContent = () => {
         albumQueries.detail({ query: { id: albumId }, serverId: server.id }),
     );
 
-    const { externalLinks, lastFM, listenBrainz, musicBrainz, nativeSpotify, qobuz, spotify } =
-        useExternalLinks();
-
     const comment = detailQuery?.data?.comment;
 
     const releaseYear = detailQuery?.data?.releaseYear;
     const labels = detailQuery?.data?.recordLabels;
-
-    const mbzId = detailQuery?.data?.mbzId;
 
     return (
         <div className={styles.contentContainer}>
@@ -527,21 +327,7 @@ export const AlbumDetailContent = () => {
                         )}
                     </div>
                     <div className={styles.metadataColumn}>
-                        <AlbumMetadataGenres genres={detailQuery?.data?.genres} />
                         <AlbumMetadataTags album={detailQuery?.data} />
-                        <AlbumMetadataExternalLinks
-                            albumArtist={detailQuery?.data?.albumArtistName}
-                            albumName={detailQuery?.data?.name}
-                            externalLinks={externalLinks}
-                            lastFM={lastFM}
-                            listenBrainz={listenBrainz}
-                            mbzId={mbzId || undefined}
-                            mbzReleaseGroupId={detailQuery?.data?.mbzReleaseGroupId}
-                            musicBrainz={musicBrainz}
-                            nativeSpotify={nativeSpotify}
-                            qobuz={qobuz}
-                            spotify={spotify}
-                        />
                     </div>
                 </div>
                 {labels && (

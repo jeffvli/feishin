@@ -4,7 +4,10 @@ import type ReactPlayer from 'react-player';
 import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 import { AudioPlayer, PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
-import { convertToLogVolume } from '/@/renderer/features/player/audio-player/utils/player-utils';
+import {
+    convertToLogVolume,
+    shouldInterruptPlaybackForError,
+} from '/@/renderer/features/player/audio-player/utils/player-utils';
 import { logger } from '/@/renderer/utils/logger';
 import { PlayerStatus } from '/@/shared/types/types';
 
@@ -87,12 +90,17 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
 
     const player1Ref = useRef<null | ReactPlayer>(null);
     const player2Ref = useRef<null | ReactPlayer>(null);
+    const playerNumRef = useRef(playerNum);
     const networkRetryCount1 = useRef(0);
     const networkRetryCount2 = useRef(0);
     const offlineRecoveryAttempted1 = useRef(false);
     const offlineRecoveryAttempted2 = useRef(false);
     const [ReactPlayerComponent, setReactPlayerComponent] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        playerNumRef.current = playerNum;
+    }, [playerNum]);
 
     useEffect(() => {
         let isMounted = true;
@@ -202,6 +210,7 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
 
     const handleOnError = (
         playerRef: React.RefObject<null | ReactPlayer>,
+        failedPlayer: 1 | 2,
         onEnded: () => void,
         onErrorPause: () => void,
         networkRetryCountRef: React.RefObject<number>,
@@ -219,6 +228,10 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
             const { error } = target;
             const code = error?.code;
             const label = mediaErrorLabel(code);
+            const isActivePlayer = shouldInterruptPlaybackForError(
+                playerNumRef.current,
+                failedPlayer,
+            );
 
             const isNetworkError =
                 code === MediaError.MEDIA_ERR_NETWORK ||
@@ -247,10 +260,13 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                     logger.error('Offline playback streaming fallback failed', {
                         code,
                         label,
+                        player: failedPlayer,
                         position,
                     });
-                    pauseBothPlayers();
-                    onErrorPause();
+                    if (shouldInterruptPlaybackForError(playerNumRef.current, failedPlayer)) {
+                        pauseBothPlayers();
+                        onErrorPause();
+                    }
                 });
                 return;
             }
@@ -260,20 +276,31 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                     networkRetryCountRef.current += 1;
                     logger.warn('Playback error, retrying', {
                         code,
+                        isActivePlayer,
                         label,
+                        player: failedPlayer,
                         retryCount: networkRetryCountRef.current,
                     });
                     const audio = target;
                     setTimeout(() => {
-                        pauseBothPlayers();
+                        const retryingActivePlayer = shouldInterruptPlaybackForError(
+                            playerNumRef.current,
+                            failedPlayer,
+                        );
+                        if (retryingActivePlayer) {
+                            pauseBothPlayers();
+                        }
                         audio.load();
-                        audio.play().catch(() => {
-                            logger.error('Playback error, retries exhausted', {
-                                code,
-                                label,
-                                retryCount: networkRetryCountRef.current,
+                        if (retryingActivePlayer) {
+                            audio.play().catch(() => {
+                                logger.error('Playback error, retry failed', {
+                                    code,
+                                    label,
+                                    player: failedPlayer,
+                                    retryCount: networkRetryCountRef.current,
+                                });
                             });
-                        });
+                        }
                     }, NETWORK_RETRY_DELAY_MS);
                     return;
                 }
@@ -283,11 +310,22 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                 return;
             }
 
+            if (!isActivePlayer) {
+                logger.warn('Queued track preload failed; current playback continuing', {
+                    code,
+                    label,
+                    player: failedPlayer,
+                    retryCount: networkRetryCountRef.current,
+                });
+                return;
+            }
+
             pauseBothPlayers();
             if (code === MediaError.MEDIA_ERR_DECODE) {
                 logger.error('Playback decode error, skipping track', {
                     code,
                     label,
+                    player: failedPlayer,
                     retryCount: networkRetryCountRef.current,
                 });
                 onEnded();
@@ -295,6 +333,7 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                 logger.error('Playback error, pausing', {
                     code,
                     label,
+                    player: failedPlayer,
                     retryCount: networkRetryCountRef.current,
                 });
                 if (onErrorPause) {
@@ -378,6 +417,7 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                 onEnded={src1 && !loopPlayer1 ? () => onEndedPlayer1() : undefined}
                 onError={handleOnError(
                     player1Ref,
+                    1,
                     () => onEndedPlayer1(),
                     onErrorPause,
                     networkRetryCount1,
@@ -407,6 +447,7 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                 onEnded={src2 && !loopPlayer2 ? () => onEndedPlayer2() : undefined}
                 onError={handleOnError(
                     player2Ref,
+                    2,
                     () => onEndedPlayer2(),
                     onErrorPause,
                     networkRetryCount2,

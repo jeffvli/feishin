@@ -1,13 +1,11 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { forwardRef, Fragment, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 
 import styles from './album-detail-header.module.css';
 
-import { queryKeys } from '/@/renderer/api/query-keys';
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
-import { JoinedArtists } from '/@/renderer/features/albums/components/joined-artists';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
@@ -16,10 +14,9 @@ import {
 } from '/@/renderer/features/shared/components/library-header';
 import { useSetFavorite } from '/@/renderer/features/shared/hooks/use-set-favorite';
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
-import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer, useShowFavorites, useShowRatings } from '/@/renderer/store';
-import { useArtistRadioCount, usePlayButtonBehavior } from '/@/renderer/store/settings.store';
+import { usePlayButtonBehavior } from '/@/renderer/store/settings.store';
 import { formatDurationString, formatPartialIsoDateUTC, formatSizeString } from '/@/renderer/utils';
 import { normalizeReleaseTypes } from '/@/renderer/utils/normalize-release-types';
 import { Group } from '/@/shared/components/group/group';
@@ -35,8 +32,6 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
     const server = useCurrentServer();
     const showRatings = useShowRatings();
     const showFavorites = useShowFavorites();
-    const queryClient = useQueryClient();
-    const albumRadioCount = useArtistRadioCount();
     const detailQuery = useQuery(
         albumQueries.detail({ query: { id: albumId }, serverId: server?.id }),
     );
@@ -46,7 +41,7 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
         (detailQuery?.data?._serverType === ServerType.NAVIDROME ||
             detailQuery?.data?._serverType === ServerType.SUBSONIC);
 
-    const { addToQueueByData, addToQueueByFetch } = usePlayer();
+    const { addToQueueByFetch } = usePlayer();
     const playButtonBehavior = usePlayButtonBehavior();
 
     const setRating = useSetRating();
@@ -97,28 +92,6 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
             cmd: { items: [detailQuery.data], type: LibraryItem.ALBUM },
             event: e,
         });
-    };
-
-    const handleAlbumRadio = async () => {
-        if (!server?.id || !albumId) return;
-
-        try {
-            const albumRadioSongs = await queryClient.fetchQuery({
-                ...songsQueries.albumRadio({
-                    query: {
-                        albumId: albumId,
-                        count: albumRadioCount,
-                    },
-                    serverId: server.id,
-                }),
-                queryKey: queryKeys.player.fetch({ albumId: albumId }),
-            });
-            if (albumRadioSongs && albumRadioSongs.length > 0) {
-                addToQueueByData(albumRadioSongs, Play.NOW);
-            }
-        } catch (error) {
-            console.error('Failed to load album radio:', error);
-        }
     };
 
     const releaseYear = detailQuery?.data?.releaseYear;
@@ -274,15 +247,9 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
                             </Fragment>
                         ))}
                     </Group>
-                    <Group className={styles.metadataGroup}>
-                        <JoinedArtists
-                            artistName={detailQuery?.data?.albumArtistName || ''}
-                            artists={detailQuery?.data?.albumArtists || []}
-                        />
-                    </Group>
                     <LibraryHeaderMenu
+                        compactPlaybackControls
                         favorite={detailQuery?.data?.userFavorite}
-                        onAlbumRadio={handleAlbumRadio}
                         onFavorite={handleFavorite}
                         onMore={handleMoreOptions}
                         onPlay={(type) => handlePlay(type)}

@@ -5,3 +5,6 @@ export const convertToLogVolume = (linearVolume: number) => {
 
     return Number.isFinite(volume) ? Math.min(1, Math.max(0, volume)) : 0;
 };
+
+export const shouldInterruptPlaybackForError = (activePlayer: number, failedPlayer: number) =>
+    activePlayer === failedPlayer;

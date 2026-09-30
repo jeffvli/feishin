@@ -12,15 +12,10 @@ import {
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
+import { SidebarAlbumList } from '/@/renderer/features/sidebar/components/sidebar-album-list';
 import { SidebarCollectionList } from '/@/renderer/features/sidebar/components/sidebar-collection-list';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
-import {
-    SidebarPlaylistAddDragContext,
-    SidebarPlaylistList,
-    SidebarSharedPlaylistList,
-    useSidebarPlaylistAddDragMonitor,
-} from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
 import {
     useAppStore,
     useAppStoreActions,
@@ -34,7 +29,6 @@ import {
     SidebarItemType,
     useSidebarImageEnabled,
     useSidebarItems,
-    useSidebarPlaylistList,
     useWindowSettings,
 } from '/@/renderer/store/settings.store';
 import { Accordion } from '/@/shared/components/accordion/accordion';
@@ -50,21 +44,8 @@ import { useImageHashUrl } from '/@/shared/hooks/use-image-hash-url';
 import { ExplicitStatus, LibraryItem } from '/@/shared/types/domain-types';
 import { Platform } from '/@/shared/types/types';
 
-const SidebarPlaylistSection = () => {
-    const isAddDragActive = useSidebarPlaylistAddDragMonitor();
-
-    return (
-        <SidebarPlaylistAddDragContext.Provider value={isAddDragActive}>
-            <SidebarPlaylistList />
-            <SidebarSharedPlaylistList />
-        </SidebarPlaylistAddDragContext.Provider>
-    );
-};
-
 export const Sidebar = () => {
     const { t } = useTranslation();
-
-    const sidebarPlaylistList = useSidebarPlaylistList();
 
     const translatedSidebarItemMap = useMemo(
         () => ({
@@ -134,7 +115,7 @@ export const Sidebar = () => {
                         item: styles.accordionItem,
                         root: styles.accordionRoot,
                     }}
-                    defaultValue={['library', 'collections', 'playlists']}
+                    defaultValue={['library', 'collections', 'albums']}
                     multiple
                 >
                     <Accordion.Item value="library">
@@ -157,7 +138,7 @@ export const Sidebar = () => {
                         </Accordion.Panel>
                     </Accordion.Item>
                     <SidebarCollectionList />
-                    {sidebarPlaylistList && <SidebarPlaylistSection />}
+                    <SidebarAlbumList />
                 </Accordion>
             </ScrollArea>
             <AnimatePresence initial={false} mode="popLayout">
