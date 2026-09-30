@@ -176,6 +176,10 @@
     outline-offset: 2px;
 }
 
+.collapsed-header {
+    padding: 0 0.3rem;
+}
+
 .collapsed-header:hover > * {
     color: var(--theme-colors-foreground);
 }
