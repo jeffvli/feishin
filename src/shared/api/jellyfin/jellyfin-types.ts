@@ -703,6 +703,7 @@ const updatePlaylistParameters = z.object({
     Ids: z.string().array().optional(),
     IsPublic: z.boolean().optional(),
     Name: z.string().optional(),
+    Overview: z.string().optional(),
 });
 
 const addToPlaylist = z.object({

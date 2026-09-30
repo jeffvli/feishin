@@ -247,6 +247,7 @@ const JF_FIELDS = {
         'ChildCount',
         'ParentId',
         'SortName',
+        'Overview',
     ],
     PLAYLIST_LIST: ['ChildCount', 'Genres', 'DateCreated', 'ParentId', 'Overview'],
     SONG: ['Genres', 'DateCreated', 'MediaSources', 'ParentId', 'Tags', 'SortName', 'ProviderIds'],
@@ -2228,6 +2229,11 @@ export const JellyfinController: InternalControllerEndpoint = {
             body: {
                 IsPublic: body.public,
                 Name: body.name,
+                // Preserve the playlist Overview (exposed as `comment` in the
+                // shared update payload). Jellyfin leaves fields it does not
+                // understand untouched, and an undefined value keeps the
+                // current server-side Overview instead of erasing it.
+                Overview: body.comment || undefined,
             },
             params: {
                 id: query.id,
