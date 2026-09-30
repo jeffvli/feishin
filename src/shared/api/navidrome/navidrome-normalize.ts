@@ -221,19 +221,28 @@ const normalizeSong = (
             ? songReleaseYear
             : fromSongRelease.year > 0
               ? fromSongRelease.year
-              : null;
+              : songYear > 0
+                ? songYear
+                : fromSongDate.year > 0
+                  ? fromSongDate.year
+                  : null;
     const releaseDate =
-        fromSongRelease.date ?? (songReleaseYear > 0 ? String(songReleaseYear) : null);
+        fromSongRelease.date ??
+        (songReleaseYear > 0 ? String(songReleaseYear) : null) ??
+        fromSongDate.date ??
+        (songYear > 0 ? String(songYear) : null);
     const date = fromSongDate.date ?? (songYear > 0 ? String(songYear) : null);
     const year = songYear > 0 ? songYear : fromSongDate.year > 0 ? fromSongDate.year : null;
     const originalDate =
-        fromSongOriginal.date ?? (songOriginalYear > 0 ? String(songOriginalYear) : null);
+        fromSongOriginal.date ??
+        (songOriginalYear > 0 ? String(songOriginalYear) : null) ??
+        releaseDate;
     const originalYear =
         songOriginalYear > 0
             ? songOriginalYear
             : fromSongOriginal.year > 0
               ? fromSongOriginal.year
-              : null;
+              : releaseYear;
 
     return {
         album: item.album,
