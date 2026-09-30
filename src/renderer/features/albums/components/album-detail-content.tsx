@@ -470,11 +470,13 @@ const AlbumMetadataExternalLinks = ({
                     />
                 )}
                 {spotify && (
+                    {/* Use '+' for spaces: the native spotify:search: handler
+                        truncates %20-encoded multi-word queries (#2264) */}
                     <ActionIcon
                         component="a"
                         href={
                             nativeSpotify
-                                ? `spotify:search:${encodeURIComponent(albumArtist || '')}%20${encodeURIComponent(albumName || '')}`
+                                ? `spotify:search:${encodeURIComponent(albumArtist || '').replace(/%20/g, '+')}+${encodeURIComponent(albumName || '').replace(/%20/g, '+')}`
                                 : `https://open.spotify.com/search/${encodeURIComponent(albumArtist || '')}%20${encodeURIComponent(albumName || '')}`
                         }
                         icon="brandSpotify"
