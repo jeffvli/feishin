@@ -80,6 +80,7 @@ export const LoggerSettings = memo(() => {
                 rendererSettings: getRendererSettingsForExport(),
                 server: currentServer
                     ? {
+                          enableAudiobooks: currentServer.enableAudiobooks,
                           isAdmin: currentServer.isAdmin,
                           isLocalUrl: isLocalUrl(currentServer.url),
                           musicFolderId: currentServer.musicFolderId,

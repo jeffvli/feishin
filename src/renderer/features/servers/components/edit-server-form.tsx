@@ -50,6 +50,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
 
     const form = useForm({
         initialValues: {
+            enableAudiobooks: server.enableAudiobooks,
             isAdmin: server?.isAdmin,
             legacyAuth: false,
             name: server?.name,
@@ -145,6 +146,10 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
             // Update optional fields
             if (values.preferInstantMix !== undefined) {
                 serverItem.preferInstantMix = values.preferInstantMix;
+            }
+
+            if (values.enableAudiobooks !== undefined) {
+                serverItem.enableAudiobooks = values.enableAudiobooks;
             }
 
             if (values.savePassword !== undefined) {
@@ -289,17 +294,30 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     />
                 )}
                 {form.values.type === ServerType.JELLYFIN && (
-                    <Checkbox
-                        description={t('form.addServer.input', {
-                            context: 'preferInstantMixDescription',
-                        })}
-                        label={t('form.addServer.input', {
-                            context: 'preferInstantMix',
-                        })}
-                        {...form.getInputProps('preferInstantMix', {
-                            type: 'checkbox',
-                        })}
-                    />
+                    <>
+                        <Checkbox
+                            description={t('form.addServer.input', {
+                                context: 'preferInstantMixDescription',
+                            })}
+                            label={t('form.addServer.input', {
+                                context: 'preferInstantMix',
+                            })}
+                            {...form.getInputProps('preferInstantMix', {
+                                type: 'checkbox',
+                            })}
+                        />
+                        <Checkbox
+                            description={t('form.addServer.input', {
+                                context: 'enableAudiobooksDescription',
+                            })}
+                            label={t('form.addServer.input', {
+                                context: 'enableAudiobooks',
+                            })}
+                            {...form.getInputProps('enableAudiobooks', {
+                                type: 'checkbox',
+                            })}
+                        />
+                    </>
                 )}
                 <Group justify="flex-end">
                     <ModalButton onClick={onCancel}>{t('common.cancel')}</ModalButton>

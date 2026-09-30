@@ -204,6 +204,7 @@ const normalizeSong = (
         id: item.Id,
         imageId: getSongImageId(item),
         imageUrl: null,
+        isResumable: item.Type === 'AudioBook',
         lastPlayedAt: null,
         libraryId: null,
         libraryName: null,
@@ -224,6 +225,9 @@ const normalizeSong = (
         playlistItemId: item.PlaylistItemId,
         releaseDate,
         releaseYear,
+        resumePositionMs: item.UserData
+            ? item.UserData.PlaybackPositionTicks / TICKS_PER_MS
+            : undefined,
         sampleRate,
         size,
         sortName: item.SortName || item.Name,

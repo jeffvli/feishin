@@ -82,6 +82,7 @@ const jfImage = {
 } as const;
 
 const jfCollection = {
+    BOOKS: 'books',
     MUSIC: 'music',
     PLAYLISTS: 'playlists',
 } as const;
