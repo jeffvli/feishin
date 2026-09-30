@@ -51,14 +51,14 @@ jobs:
             - name: Build Electron application
               run: pnpm run build:electron
 
-            - name: Run Electron smoke tests
-              run: pnpm run test:electron
+            - name: Run Electron UI tests
+              run: pnpm run test:ui
 
-            - name: Upload smoke-test evidence
+            - name: Upload UI-test evidence
               if: always()
               uses: actions/upload-artifact@v7
               with:
-                  name: electron-smoke-${{ github.run_id }}
+                  name: electron-ui-${{ github.run_id }}
                   path: test-results/electron
                   if-no-files-found: ignore
                   retention-days: 14

@@ -119,6 +119,10 @@ jobs:
               shell: pwsh
               run: scripts/automation/verify-windows-package.ps1 -ManifestName '${{ steps.version.outputs.manifest }}'
 
+            - name: Verify Windows installer lifecycle
+              shell: pwsh
+              run: scripts/automation/verify-windows-installer.ps1 -ManifestName '${{ steps.version.outputs.manifest }}'
+
             - name: Generate SHA-256 checksums
               shell: pwsh
               run: |
