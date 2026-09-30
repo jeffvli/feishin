@@ -1,4 +1,4 @@
-import { expect, login, navigateTo, test } from '../fixtures/katiesamp-test.mjs';
+import { expect, getSongCell, login, navigateTo, test } from '../fixtures/katiesamp-test.mjs';
 
 test.beforeEach(async ({ page }) => {
     await login(page);
@@ -13,9 +13,9 @@ test('@full loads albums from Jellyfin', async ({ page }) => {
 
 test('@full loads songs from Jellyfin', async ({ page }) => {
     await navigateTo(page, '/library/songs');
-    await expect(
-        page.getByText('Automation Track 1', { exact: true }).filter({ visible: true }).first(),
-    ).toBeVisible({ timeout: 15_000 });
+    await expect(getSongCell(page, 'Automation Track 1')).toBeVisible({
+        timeout: 15_000,
+    });
 });
 
 test('@full loads playlists from Jellyfin', async ({ page }) => {

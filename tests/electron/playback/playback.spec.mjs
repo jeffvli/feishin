@@ -1,12 +1,9 @@
-import { expect, login, navigateTo, test } from '../fixtures/katiesamp-test.mjs';
+import { expect, getSongCell, login, navigateTo, test } from '../fixtures/katiesamp-test.mjs';
 
 test('@nightly starts a fixture track from the songs library', async ({ mockJellyfin, page }) => {
     await login(page);
     await navigateTo(page, '/library/songs');
-    const song = page
-        .getByText('Automation Track 1', { exact: true })
-        .filter({ visible: true })
-        .first();
+    const song = getSongCell(page, 'Automation Track 1');
     await expect(song).toBeVisible({ timeout: 15_000 });
     await song.dblclick();
     await expect(page.getByText('Automation Track 1', { exact: true }).last()).toBeVisible();

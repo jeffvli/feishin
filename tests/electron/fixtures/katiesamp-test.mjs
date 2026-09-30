@@ -87,6 +87,12 @@ export const test = base.extend({
 
 export { expect };
 
+export const getSongCell = (page, name) =>
+    page
+        .getByText(name, { exact: true })
+        .locator('xpath=ancestor::div[@data-row-index][1]')
+        .first();
+
 export const login = async (page, credentials = {}) => {
     await page.getByLabel('Username').fill(credentials.username || 'Admin');
     await page.getByRole('textbox', { name: 'Password' }).fill(credentials.password || 'password');
