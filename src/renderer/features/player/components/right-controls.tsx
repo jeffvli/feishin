@@ -8,7 +8,6 @@ import { DlnaCastButton } from '/@/renderer/features/player/components/dlna-cast
 import { DlnaVolumeButton } from '/@/renderer/features/player/components/dlna/volume-button';
 import { PlayerConfig } from '/@/renderer/features/player/components/player-config';
 import { CustomPlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
-import { SleepTimerButton } from '/@/renderer/features/player/components/sleep-timer-button';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useAudioDevices } from '/@/renderer/features/settings/components/playback/audio-settings';
 import {
@@ -99,7 +98,6 @@ export const RightControls = () => {
             <Group align="center" gap="xs" wrap="nowrap">
                 <DlnaCastButton />
                 <OfflineDownloadManager />
-                <SleepTimerButton />
                 <PlayerConfig />
                 <LyricsButton />
                 {showFavorites && <FavoriteButton />}

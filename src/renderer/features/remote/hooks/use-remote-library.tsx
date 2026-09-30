@@ -15,6 +15,7 @@ import { useArtistRadioCount } from '/@/renderer/store';
 import { useAuthStore } from '/@/renderer/store/auth.store';
 import { usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { useRemoteSettings } from '/@/renderer/store/settings.store';
+import { PRODUCT_FEATURES } from '/@/shared/product-features';
 import {
     Album,
     AlbumListSort,
@@ -266,6 +267,11 @@ export const useRemoteLibrary = () => {
         });
 
         remote.requestRadio(async ({ limit, requestId, searchTerm, startIndex }) => {
+            if (!PRODUCT_FEATURES.radioStations) {
+                remote.respondRadio(requestId, false, []);
+                return;
+            }
+
             const server = useAuthStore.getState().currentServer;
             if (!server) {
                 remote?.respondRadio(requestId, false, []);
@@ -417,6 +423,11 @@ export const useRemoteLibrary = () => {
         });
 
         remote.requestAddToPlaylist(async ({ playlistId, requestId, songId }) => {
+            if (!PRODUCT_FEATURES.playlistEditing) {
+                ackOperation(requestId, 'Playlist editing is disabled');
+                return;
+            }
+
             const server = useAuthStore.getState().currentServer;
             if (!server) {
                 ackOperation(requestId, 'No server connected');
@@ -467,6 +478,8 @@ export const useRemoteLibrary = () => {
         });
 
         remote.requestPlayRadio(async ({ id }) => {
+            if (!PRODUCT_FEATURES.radioStations) return;
+
             const server = useAuthStore.getState().currentServer;
             if (!server) return;
 

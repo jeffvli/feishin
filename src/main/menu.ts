@@ -33,7 +33,6 @@ const MENU_ITEM_IDS = {
     pause: 'playback-pause',
     play: 'playback-play',
     previous: 'playback-previous',
-    privateMode: 'app-private-mode',
     repeat: 'playback-repeat',
     seekBackward: 'playback-seek-backward',
     seekForward: 'playback-seek-forward',
@@ -88,7 +87,6 @@ export default class MenuBuilder {
         accelerators,
         inputFocused = false,
         playbackStatus = PlayerStatus.PAUSED,
-        privateMode = false,
         repeatMode = PlayerRepeat.NONE,
         shuffleEnabled = false,
         sidebarCollapsed = false,
@@ -115,15 +113,6 @@ export default class MenuBuilder {
                     },
                     label: 'Manage Servers...',
                 },
-                {
-                    checked: privateMode,
-                    click: () => {
-                        this.mainWindow.webContents.send('renderer-toggle-private-mode');
-                    },
-                    id: MENU_ITEM_IDS.privateMode,
-                    label: 'Private Session',
-                    type: 'checkbox',
-                },
                 { type: 'separator' },
                 { role: 'services' },
                 { type: 'separator' },
@@ -136,16 +125,7 @@ export default class MenuBuilder {
         };
         const subMenuFile: MenuItemConstructorOptions = {
             label: 'File',
-            submenu: [
-                {
-                    click: () => {
-                        this.mainWindow.webContents.send('renderer-open-create-playlist');
-                    },
-                    label: 'Create Playlist...',
-                },
-                { type: 'separator' },
-                { role: 'close' },
-            ],
+            submenu: [{ role: 'close' }],
         };
         const subMenuEdit: MenuItemConstructorOptions = { role: 'editMenu' };
         const subMenuView: MenuItemConstructorOptions = {
@@ -500,7 +480,6 @@ export default class MenuBuilder {
         accelerators,
         inputFocused = false,
         playbackStatus = PlayerStatus.PAUSED,
-        privateMode = false,
         repeatMode = PlayerRepeat.NONE,
         shuffleEnabled = false,
         sidebarCollapsed = false,
@@ -509,14 +488,12 @@ export default class MenuBuilder {
             return;
         }
 
-        const privateModeItem = this.applicationMenu.getMenuItemById(MENU_ITEM_IDS.privateMode);
         const sidebarItem = this.applicationMenu.getMenuItemById(MENU_ITEM_IDS.sidebarCollapsed);
         const pauseItem = this.applicationMenu.getMenuItemById(MENU_ITEM_IDS.pause);
         const playItem = this.applicationMenu.getMenuItemById(MENU_ITEM_IDS.play);
         const repeatItem = this.applicationMenu.getMenuItemById(MENU_ITEM_IDS.repeat);
         const shuffleItem = this.applicationMenu.getMenuItemById(MENU_ITEM_IDS.shuffle);
 
-        if (privateModeItem) privateModeItem.checked = privateMode;
         if (sidebarItem) sidebarItem.checked = sidebarCollapsed;
         if (pauseItem) pauseItem.visible = playbackStatus === PlayerStatus.PLAYING;
         if (playItem) playItem.visible = playbackStatus !== PlayerStatus.PLAYING;

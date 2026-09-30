@@ -23,7 +23,6 @@ import { DropdownMenu, MenuItemProps } from '/@/shared/components/dropdown-menu/
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
-import { toast } from '/@/shared/components/toast/toast';
 
 const browser = isElectron() ? window.api.browser : null;
 
@@ -82,8 +81,7 @@ export const AppMenu = () => {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const collapsed = useAppStore((state) => state.sidebar.collapsed);
-    const privateMode = useAppStore((state) => state.privateMode);
-    const { setPrivateMode, setSideBar } = useAppStoreActions();
+    const { setSideBar } = useAppStoreActions();
     const { setSettings } = useSettingsStoreActions();
     const settings = useGeneralSettings();
     const currentServer = useCurrentServer();
@@ -99,22 +97,6 @@ export const AppMenu = () => {
 
     const handleExpandSidebar = () => {
         setSideBar({ collapsed: false });
-    };
-
-    const handlePrivateModeOff = () => {
-        setPrivateMode(false);
-        toast.info({
-            message: t('form.privateMode.disabled'),
-            title: t('form.privateMode.title'),
-        });
-    };
-
-    const handlePrivateModeOn = () => {
-        setPrivateMode(true);
-        toast.info({
-            message: t('form.privateMode.enabled'),
-            title: t('form.privateMode.title'),
-        });
     };
 
     const handleQuit = () => {
@@ -218,29 +200,6 @@ export const AppMenu = () => {
             label: t('page.appMenu.settings'),
             onClick: () => openSettingsModal(),
             type: 'item',
-        },
-        {
-            condition: privateMode,
-            id: 'private-mode-off',
-            item: {
-                icon: 'lock',
-                iconColor: 'error',
-                label: t('page.appMenu.privateModeOff'),
-                onClick: handlePrivateModeOff,
-                type: 'item',
-            },
-            type: 'conditional-item',
-        },
-        {
-            condition: !privateMode,
-            id: 'private-mode-on',
-            item: {
-                icon: 'lockOpen',
-                label: t('page.appMenu.privateModeOn'),
-                onClick: handlePrivateModeOn,
-                type: 'item',
-            },
-            type: 'conditional-item',
         },
         {
             id: 'divider-4',

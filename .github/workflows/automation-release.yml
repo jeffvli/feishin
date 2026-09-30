@@ -1,0 +1,160 @@
+name: KatiesAmp Release
+
+on:
+    workflow_dispatch:
+        inputs:
+            channel:
+                description: Release channel
+                required: true
+                default: beta
+                type: choice
+                options:
+                    - beta
+                    - release
+            version:
+                description: Optional base version, for example 0.1.4
+                required: false
+                type: string
+
+permissions:
+    contents: write
+
+jobs:
+    checks:
+        name: Run full validation
+        uses: ./.github/workflows/automation-full.yml
+
+    release:
+        name: Publish Windows x64
+        needs: checks
+        runs-on: windows-latest
+        timeout-minutes: 45
+        env:
+            DISABLE_AUTO_UPDATES: '1'
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+            WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+        steps:
+            - name: Require the development branch
+              shell: pwsh
+              run: |
+                  if ('${{ github.ref_name }}' -ne 'development') {
+                      throw 'Releases must be started from the development branch.'
+                  }
+
+            - name: Check out repository
+              uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Install Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Resolve release version
+              id: version
+              shell: pwsh
+              run: |
+                  $requestedVersion = '${{ inputs.version }}'.Trim()
+                  $channel = '${{ inputs.channel }}'
+                  $currentVersion = (Get-Content package.json | ConvertFrom-Json).version
+                  $baseVersion = if ($requestedVersion) {
+                      $requestedVersion
+                  } else {
+                      $currentVersion -replace '-.*$', ''
+                  }
+
+                  if ($baseVersion -notmatch '^\d+\.\d+\.\d+$') {
+                      throw "Invalid base version: $baseVersion"
+                  }
+
+                  if ($channel -eq 'beta') {
+                      $maxBeta = 0
+                      $releases = gh release list --limit 100 --json tagName | ConvertFrom-Json
+                      foreach ($release in $releases) {
+                          if ($release.tagName -match "^v$([regex]::Escape($baseVersion))-beta\.(\d+)$") {
+                              $maxBeta = [Math]::Max($maxBeta, [int]$matches[1])
+                          }
+                      }
+                      $resolvedVersion = "$baseVersion-beta.$($maxBeta + 1)"
+                      $manifest = 'beta.yml'
+                  } else {
+                      $resolvedVersion = $baseVersion
+                      $manifest = 'latest.yml'
+                  }
+
+                  $tag = "v$resolvedVersion"
+                  gh release view $tag *> $null
+                  if ($LASTEXITCODE -eq 0) {
+                      throw "Release $tag already exists."
+                  }
+
+                  "version=$resolvedVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+                  "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+                  "manifest=$manifest" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+            - name: Set application version
+              run: node scripts/automation/set-version.mjs "${{ steps.version.outputs.version }}"
+
+            - name: Build Windows x64 installer
+              shell: pwsh
+              run: |
+                  pnpm run build
+                  $config = if ('${{ inputs.channel }}' -eq 'beta') {
+                      'electron-builder-beta.yml'
+                  } else {
+                      'electron-builder.yml'
+                  }
+                  pnpm exec electron-builder --config $config --win --x64 --publish never
+
+            - name: Verify packaged application and update files
+              shell: pwsh
+              run: scripts/automation/verify-windows-package.ps1 -ManifestName '${{ steps.version.outputs.manifest }}'
+
+            - name: Generate SHA-256 checksums
+              shell: pwsh
+              run: |
+                  Get-ChildItem dist -File |
+                      Where-Object { $_.Extension -in '.exe', '.blockmap', '.yml' } |
+                      ForEach-Object {
+                          $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $_.FullName).Hash.ToLowerInvariant()
+                          "$hash  $($_.Name)"
+                      } | Set-Content -LiteralPath dist/SHA256SUMS.txt
+
+            - name: Upload release evidence
+              uses: actions/upload-artifact@v7
+              with:
+                  name: katiesamp-${{ steps.version.outputs.version }}-windows-x64
+                  path: |
+                      dist/*.exe
+                      dist/*.blockmap
+                      dist/*.yml
+                      dist/SHA256SUMS.txt
+                  if-no-files-found: error
+                  retention-days: 30
+
+            - name: Publish GitHub release
+              shell: pwsh
+              run: |
+                  $assets = Get-ChildItem dist -File |
+                      Where-Object { $_.Extension -in '.exe', '.blockmap', '.yml', '.txt' } |
+                      ForEach-Object { $_.FullName }
+                  $arguments = @(
+                      'release', 'create', '${{ steps.version.outputs.tag }}',
+                      '--target', '${{ github.sha }}',
+                      '--title', 'KatiesAmp ${{ steps.version.outputs.tag }}',
+                      '--generate-notes'
+                  )
+                  if ('${{ inputs.channel }}' -eq 'beta') {
+                      $arguments += '--prerelease'
+                  }
+                  $arguments += $assets
+                  & gh @arguments

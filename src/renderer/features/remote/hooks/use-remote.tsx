@@ -9,6 +9,7 @@ import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-
 import { usePlayerActions, usePlayerStore, useRemoteSettings } from '/@/renderer/store';
 import { logger } from '/@/renderer/utils/logger';
 import { toast } from '/@/shared/components/toast/toast';
+import { PRODUCT_FEATURES } from '/@/shared/product-features';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 const remote = isElectron() ? window.api.remote : null;
@@ -81,21 +82,25 @@ export const useRemote = () => {
             setVolume(data.volume);
         });
 
-        remote.requestFavorite((data: { favorite: boolean; id: string; serverId: string }) => {
-            logger.debug('Remote request favorite received', {
-                favorite: data.favorite,
-                id: data.id,
-                serverId: data.serverId,
+        if (PRODUCT_FEATURES.favoriteChanges) {
+            remote.requestFavorite((data: { favorite: boolean; id: string; serverId: string }) => {
+                logger.debug('Remote request favorite received', {
+                    favorite: data.favorite,
+                    id: data.id,
+                    serverId: data.serverId,
+                });
+                const mutator = data.favorite
+                    ? addToFavoritesMutation
+                    : removeFromFavoritesMutation;
+                mutator.mutate({
+                    apiClientProps: { serverId: data.serverId },
+                    query: {
+                        id: [data.id],
+                        type: LibraryItem.SONG,
+                    },
+                });
             });
-            const mutator = data.favorite ? addToFavoritesMutation : removeFromFavoritesMutation;
-            mutator.mutate({
-                apiClientProps: { serverId: data.serverId },
-                query: {
-                    id: [data.id],
-                    type: LibraryItem.SONG,
-                },
-            });
-        });
+        }
 
         return () => {
             ipc?.removeAllListeners('request-position');

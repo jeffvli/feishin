@@ -1,12 +1,10 @@
 import { nanoid } from 'nanoid/non-secure';
-import { Dispatch, useCallback } from 'react';
+import { Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createSearchParams, generatePath, useNavigate } from 'react-router';
 
-import { openCreatePlaylistModal } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServer } from '/@/renderer/store';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 interface HomeCommandsProps {
@@ -26,13 +24,6 @@ export const HomeCommands = ({
 }: HomeCommandsProps) => {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const server = useCurrentServer();
-
-    const handleCreatePlaylistModal = useCallback(() => {
-        handleClose();
-        openCreatePlaylistModal(server);
-    }, [handleClose, server]);
-
     const handleSearch = () => {
         navigate(
             {
@@ -58,9 +49,6 @@ export const HomeCommands = ({
                     {query
                         ? t('page.globalSearch.commands.searchFor', { query })
                         : `${t('common.search')}...`}
-                </Command.Item>
-                <Command.Item onSelect={handleCreatePlaylistModal}>
-                    {t('action.createPlaylist')}...
                 </Command.Item>
                 <Command.Item onSelect={() => setPages([...pages, CommandPalettePages.GO_TO])}>
                     {t('page.globalSearch.commands.goToPage')}...

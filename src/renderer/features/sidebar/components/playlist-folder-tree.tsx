@@ -36,6 +36,7 @@ import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
+import { PRODUCT_FEATURES } from '/@/shared/product-features';
 import { LibraryItem, Playlist } from '/@/shared/types/domain-types';
 import { DragData, DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
 
@@ -297,7 +298,7 @@ export const usePlaylistRootDrop = (allPlaylists: Playlist[]) => {
                 void handleDrop(source);
             },
         },
-        isEnabled: true,
+        isEnabled: PRODUCT_FEATURES.playlistEditing,
     });
 
     return { isDraggedOver, ref };
@@ -477,7 +478,7 @@ const usePlaylistFolderExpandDrop = (folderPath: string) => {
                 dragExpand?.onFolderDrop(folderPath);
             },
         },
-        isEnabled: Boolean(dragExpand),
+        isEnabled: PRODUCT_FEATURES.playlistEditing && Boolean(dragExpand),
     });
 };
 
@@ -590,7 +591,7 @@ const usePlaylistFolderDrop = (folderPath: string, allPlaylists: Playlist[]) => 
                 void handleDrop(source);
             },
         },
-        isEnabled: true,
+        isEnabled: PRODUCT_FEATURES.playlistEditing,
     });
 
     return { isDraggedOver, isDragging, ref };

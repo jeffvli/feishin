@@ -1,0 +1,28 @@
+version: 2
+updates:
+    - package-ecosystem: npm
+      directory: /
+      target-branch: development
+      schedule:
+          interval: weekly
+          day: wednesday
+          time: '03:00'
+          timezone: Europe/London
+      open-pull-requests-limit: 5
+      groups:
+          safe-dependency-updates:
+              patterns:
+                  - '*'
+              update-types:
+                  - minor
+                  - patch
+
+    - package-ecosystem: github-actions
+      directory: /
+      target-branch: development
+      schedule:
+          interval: weekly
+          day: wednesday
+          time: '03:30'
+          timezone: Europe/London
+      open-pull-requests-limit: 5

@@ -35,6 +35,7 @@ import { Spoiler } from '/@/shared/components/spoiler/spoiler';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
+import { PRODUCT_FEATURES } from '/@/shared/product-features';
 import { LibraryItem, Playlist, Song } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
 import { Play } from '/@/shared/types/types';
@@ -196,10 +197,12 @@ export const PlaylistDetailSongListHeader = ({
                 <LibraryHeader
                     compact
                     imageOverlay={
-                        <ImageUploadOverlay
-                            data={detailQuery?.data}
-                            onUploadFile={handlePlaylistImageUpload}
-                        />
+                        PRODUCT_FEATURES.playlistEditing ? (
+                            <ImageUploadOverlay
+                                data={detailQuery?.data}
+                                onUploadFile={handlePlaylistImageUpload}
+                            />
+                        ) : undefined
                     }
                     imageUrl={imageUrl}
                     item={{
@@ -211,7 +214,11 @@ export const PlaylistDetailSongListHeader = ({
                         thumbHash: detailQuery?.data?.thumbHash,
                         type: LibraryItem.PLAYLIST,
                     }}
-                    onImageFileDrop={canUploadPlaylistImage ? handlePlaylistImageUpload : undefined}
+                    onImageFileDrop={
+                        PRODUCT_FEATURES.playlistEditing && canUploadPlaylistImage
+                            ? handlePlaylistImageUpload
+                            : undefined
+                    }
                     title={playlistDisplayName}
                     topRight={<ListSearchInput />}
                 >

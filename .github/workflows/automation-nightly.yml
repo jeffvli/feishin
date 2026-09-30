@@ -1,0 +1,79 @@
+name: KatiesAmp Nightly
+
+on:
+    schedule:
+        - cron: '0 2 * * *'
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    changes:
+        name: Check for recent changes
+        runs-on: ubuntu-latest
+        outputs:
+            run: ${{ steps.changes.outputs.run }}
+        steps:
+            - name: Check out repository history
+              uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+
+            - name: Detect changes
+              id: changes
+              shell: bash
+              run: |
+                  if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ -n "$(git log --since='25 hours ago' --format=%H -1)" ]; then
+                    echo "run=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "run=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+    full:
+        name: Run full validation
+        needs: changes
+        if: needs.changes.outputs.run == 'true'
+        uses: ./.github/workflows/automation-full.yml
+
+    package:
+        name: Package nightly Windows x64 build
+        needs: [changes, full]
+        if: needs.changes.outputs.run == 'true'
+        runs-on: windows-latest
+        timeout-minutes: 45
+        env:
+            DISABLE_AUTO_UPDATES: '1'
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v6
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Install Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Build Windows x64 package
+              run: pnpm run package:win
+
+            - name: Verify packaged application
+              shell: pwsh
+              run: scripts/automation/verify-windows-package.ps1 -ManifestName 'latest.yml'
+
+            - name: Upload nightly package
+              uses: actions/upload-artifact@v7
+              with:
+                  name: katiesamp-nightly-${{ github.run_id }}-windows-x64
+                  path: |
+                      dist/*.exe
+                      dist/*.blockmap
+                      dist/*.yml
+                  if-no-files-found: error
+                  retention-days: 14

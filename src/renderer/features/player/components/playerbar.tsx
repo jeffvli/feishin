@@ -18,6 +18,22 @@ import { useFullScreenPlayerStore, useSetFullScreenPlayerStore } from '/@/render
 import { usePlayerbarOpenDrawer } from '/@/renderer/store';
 import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
 
+const INTERACTIVE_PLAYERBAR_SELECTOR = [
+    'a',
+    'button',
+    'input',
+    'select',
+    'textarea',
+    '[contenteditable="true"]',
+    '[role="button"]',
+    '[role="checkbox"]',
+    '[role="combobox"]',
+    '[role="link"]',
+    '[role="menuitem"]',
+    '[role="slider"]',
+    '[role="switch"]',
+].join(',');
+
 export const Playerbar = () => {
     const playerbarOpenDrawer = usePlayerbarOpenDrawer();
     const { expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
@@ -27,6 +43,21 @@ export const Playerbar = () => {
     const handleToggleFullScreenPlayer = (e?: KeyboardEvent | MouseEvent<HTMLDivElement>) => {
         e?.stopPropagation();
         setFullScreenPlayerStore({ expanded: !isFullScreenPlayerExpanded });
+    };
+
+    const handlePlayerbarDoubleClick = (event: MouseEvent<HTMLDivElement>) => {
+        if (event.button !== 0) {
+            return;
+        }
+
+        const target = event.target;
+
+        if (!(target instanceof Element) || target.closest(INTERACTIVE_PLAYERBAR_SELECTOR)) {
+            return;
+        }
+
+        event.preventDefault();
+        handleToggleFullScreenPlayer(event);
     };
 
     if (isMobile) {
@@ -41,6 +72,7 @@ export const Playerbar = () => {
         <div
             className={clsx(styles.container, PlaybackSelectors.mediaPlayer)}
             onClick={playerbarOpenDrawer ? handleToggleFullScreenPlayer : undefined}
+            onDoubleClick={handlePlayerbarDoubleClick}
         >
             <div className={styles.controlsGrid}>
                 <div className={styles.leftGridItem}>

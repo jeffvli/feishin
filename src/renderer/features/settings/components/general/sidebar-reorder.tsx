@@ -20,7 +20,6 @@ const SIDEBAR_ITEMS: Array<[string, string]> = [
     [SidebarItem.NOW_PLAYING, 'page.sidebar.nowPlaying'],
     [SidebarItem.PLAYLISTS, 'page.sidebar.playlists'],
     [SidebarItem.COLLECTIONS, 'page.sidebar.collections'],
-    [SidebarItem.RADIO, 'page.sidebar.radio'],
     [SidebarItem.SEARCH, 'page.sidebar.search'],
     [SidebarItem.SETTINGS, 'page.sidebar.settings'],
     [SidebarItem.TRACKS, 'page.sidebar.tracks'],
@@ -34,10 +33,12 @@ export const SidebarReorder = () => {
         const settingsMap = new Map(sidebarItems.map((item) => [item.id, item]));
         const defaultMap = new Map(defaultSidebarItems.map((item) => [item.id, item]));
 
-        const merged = sidebarItems.map((item) => ({
-            ...item,
-            id: item.id,
-        }));
+        const merged = sidebarItems
+            .filter((item) => item.id !== SidebarItem.RADIO)
+            .map((item) => ({
+                ...item,
+                id: item.id,
+            }));
 
         SIDEBAR_ITEMS.forEach(([itemId]) => {
             if (!settingsMap.has(itemId)) {

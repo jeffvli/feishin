@@ -35,6 +35,7 @@ import { Select } from '/@/shared/components/select/select';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Switch } from '/@/shared/components/switch/switch';
 import { toast } from '/@/shared/components/toast/toast';
+import { PRODUCT_FEATURES } from '/@/shared/product-features';
 import { FontType } from '/@/shared/types/types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
@@ -627,7 +628,7 @@ export const ApplicationSettings = memo(() => {
             description: t('setting.showFavorites', {
                 context: 'description',
             }),
-            isHidden: false,
+            isHidden: !PRODUCT_FEATURES.favoriteChanges,
             title: t('setting.showFavorites'),
         },
         {

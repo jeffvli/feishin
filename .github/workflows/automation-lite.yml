@@ -1,0 +1,41 @@
+name: KatiesAmp Lite
+
+on:
+    pull_request:
+        branches: [development]
+    push:
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: katiesamp-lite-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    quality:
+        name: KatiesAmp Lite
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v6
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Install Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Run type, code, and style checks
+              run: pnpm run lint
+
+            - name: Run unit tests
+              run: pnpm test

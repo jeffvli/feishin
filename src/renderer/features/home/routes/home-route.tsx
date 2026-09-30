@@ -8,11 +8,14 @@ import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/nati
 import companyLogo from '/@/renderer/features/home/assets/katie-obriens-logo.webp';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
+import { useServerLibraryControls } from '/@/renderer/features/shared/hooks/use-server-library-controls';
 import { useCurrentServer } from '/@/renderer/store';
+import { Select } from '/@/shared/components/select/select';
 
 const SUPPORT_EMAIL = 'k.laws@katieobriensirishtaverns.com';
 const SUPPORT_PHONE = '07969 765 597';
 const CONNECTION_CHECK_INTERVAL_MS = 60_000;
+const ALL_MUSIC_FOLDERS_VALUE = '__all-music-folders__';
 
 type ConnectionStatus = 'checking' | 'connected' | 'not-connected' | 'offline' | 'unavailable';
 
@@ -105,6 +108,16 @@ const useServerConnectionStatus = (serverId?: string) => {
 const HomeRoute = () => {
     const server = useCurrentServer();
     const connectionStatus = useServerConnectionStatus(server?.id);
+    const { musicFolders, musicFoldersQuery, selectedMusicFolders, selectMusicFolder } =
+        useServerLibraryControls();
+    const musicFolderOptions = [
+        { label: 'All music folders', value: ALL_MUSIC_FOLDERS_VALUE },
+        ...(musicFolders?.items.map((folder) => ({
+            label: folder.name,
+            value: folder.id,
+        })) || []),
+    ];
+    const selectedMusicFolderId = selectedMusicFolders[0]?.id || ALL_MUSIC_FOLDERS_VALUE;
     const connectionLabel = {
         checking: 'Checking connection…',
         connected: `Connected to ${server?.name || 'server'}`,
@@ -122,14 +135,14 @@ const HomeRoute = () => {
                         <div className={styles.brandPanel}>
                             <div className={styles.logoFrame}>
                                 <img
-                                    alt="Katie O'Brien's Irish Tavern"
+                                    alt="Katie O'Brien's Irish Taverns"
                                     className={styles.companyLogo}
                                     src={companyLogo}
                                 />
                             </div>
 
                             <div className={styles.brandCopy}>
-                                <p className={styles.eyebrow}>{"Katie O'Brien's Irish Tavern"}</p>
+                                <p className={styles.eyebrow}>{"Katie O'Brien's Irish Taverns"}</p>
                                 <h1 className={styles.productName} id="katiesamp-home-title">
                                     KatiesAmp
                                 </h1>
@@ -170,6 +183,34 @@ const HomeRoute = () => {
                                             <span className={styles.connectionLabel}>
                                                 {connectionLabel}
                                             </span>
+                                        </dd>
+                                    </div>
+                                    <div className={styles.detailRow}>
+                                        <dt>Music folder</dt>
+                                        <dd className={styles.musicFolderControl}>
+                                            <Select
+                                                aria-label="Select music folder"
+                                                data={musicFolderOptions}
+                                                disabled={
+                                                    musicFoldersQuery.isLoading ||
+                                                    musicFoldersQuery.isError ||
+                                                    !musicFolders?.items.length
+                                                }
+                                                onChange={(value) =>
+                                                    selectMusicFolder(
+                                                        value === ALL_MUSIC_FOLDERS_VALUE
+                                                            ? undefined
+                                                            : value || undefined,
+                                                    )
+                                                }
+                                                placeholder={
+                                                    musicFoldersQuery.isLoading
+                                                        ? 'Loading folders…'
+                                                        : 'Folders unavailable'
+                                                }
+                                                value={selectedMusicFolderId}
+                                                width="100%"
+                                            />
                                         </dd>
                                     </div>
                                 </dl>

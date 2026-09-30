@@ -1,6 +1,6 @@
 import { useIsFetching } from '@tanstack/react-query';
 import clsx from 'clsx';
-import { MouseEvent, RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import { RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './play-queue-list-controls.module.css';
@@ -10,7 +10,6 @@ import { SONG_TABLE_COLUMNS } from '/@/renderer/components/item-list/item-table-
 import { ItemListHandle } from '/@/renderer/components/item-list/types';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { useRestoreQueue, useSaveQueue } from '/@/renderer/features/player/hooks/use-queue-restore';
-import { openCreatePrefilledPlaylistModal } from '/@/renderer/features/playlists/components/create-playlist-form';
 import {
     ListConfigMenu,
     SONG_DISPLAY_TYPES,
@@ -114,11 +113,6 @@ export const PlayQueueListControls = ({
         player.shuffleAll();
     };
 
-    const handleCreatePlaylistFromQueue = (e?: MouseEvent<HTMLButtonElement>) => {
-        const queueSongs = player.getQueue();
-        openCreatePrefilledPlaylistModal(server, queueSongs, e);
-    };
-
     const isRestoreBusy = isSavingQueue || Boolean(isFetching);
     const showTier1Menu = supportsQueue && overflowTier >= 1;
     const showTier2Menu = overflowTier >= 2;
@@ -191,13 +185,6 @@ export const PlayQueueListControls = ({
                         tooltip={{ label: t('action.goToCurrent') }}
                         variant="subtle"
                     />
-                    <ActionIcon
-                        icon="playlistAdd"
-                        iconProps={{ size: 'lg' }}
-                        onClick={handleCreatePlaylistFromQueue}
-                        tooltip={{ label: t('action.createPlaylistFromQueue') }}
-                        variant="subtle"
-                    />
                 </span>
                 <span className={styles.moreTrigger}>
                     <DropdownMenu position="bottom-start">
@@ -246,12 +233,6 @@ export const PlayQueueListControls = ({
                                         onClick={handleJumpToCurrent}
                                     >
                                         {t('action.goToCurrent')}
-                                    </DropdownMenu.Item>
-                                    <DropdownMenu.Item
-                                        leftSection={<Icon icon="playlistAdd" />}
-                                        onClick={() => handleCreatePlaylistFromQueue()}
-                                    >
-                                        {t('action.createPlaylistFromQueue')}
                                     </DropdownMenu.Item>
                                 </>
                             )}

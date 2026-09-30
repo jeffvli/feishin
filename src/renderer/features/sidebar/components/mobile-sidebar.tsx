@@ -60,7 +60,7 @@ export const MobileSidebar = () => {
         if (!sidebarItems) return [];
 
         const items = sidebarItems
-            .filter((item) => !item.disabled)
+            .filter((item) => !item.disabled && item.id !== 'Radio')
             .map((item) => ({
                 ...item,
                 label:

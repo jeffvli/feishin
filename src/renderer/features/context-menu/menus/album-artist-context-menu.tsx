@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import { AddToPlaylistAction } from '/@/renderer/features/context-menu/actions/add-to-playlist-action';
 import { DownloadAction } from '/@/renderer/features/context-menu/actions/download-action';
 import { GetInfoAction } from '/@/renderer/features/context-menu/actions/get-info-action';
 import { PlayAction } from '/@/renderer/features/context-menu/actions/play-action';
@@ -29,8 +28,6 @@ export const AlbumArtistContextMenu = ({ items, type }: AlbumArtistContextMenuPr
         >
             <PlayAction ids={ids} itemType={LibraryItem.ALBUM_ARTIST} />
             <PlayArtistRadioAction artist={items[0]} disabled={items.length > 1} />
-            <ContextMenu.Divider />
-            <AddToPlaylistAction items={ids} itemType={LibraryItem.ALBUM_ARTIST} />
             <ContextMenu.Divider />
             <SetFavoriteAction ids={ids} itemType={LibraryItem.ALBUM_ARTIST} />
             <SetRatingAction ids={ids} itemType={LibraryItem.ALBUM_ARTIST} />
