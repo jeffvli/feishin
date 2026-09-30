@@ -27,6 +27,19 @@
     :global(.ag-row-hover) {
         background: rgb(0 0 0 / 10%) !important;
     }
+
+    /* ItemTableList alternate-row cells use opaque theme backgrounds
+       (var(--theme-colors-background) / darken(...)) that would paint over
+       the dynamic fullscreen background and ignore the opacity overlay.
+       Use transparent/translucent backgrounds instead so the striping
+       composites over the background and scales with its opacity. */
+    [class*='alternate-row-even'] {
+        background-color: transparent !important;
+    }
+
+    [class*='alternate-row-odd'] {
+        background-color: rgb(0 0 0 / 10%) !important;
+    }
 }
 
 .queue-container-fade-top-bottom {
