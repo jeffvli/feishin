@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import styles from './play-queue.module.css';
 
@@ -155,23 +155,33 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(
         const { focused, ref: containerFocusRef } = useFocusWithin();
         const player = usePlayer();
 
-        useHotkeys([
+        const handleRemoveSelectedFromQueue = useCallback(() => {
+            if (!focused) {
+                return;
+            }
+
+            const selectedItems =
+                tableRef.current?.internalState.getSelected() as QueueSong[];
+
+            if (!selectedItems || selectedItems.length === 0) {
+                return;
+            }
+
+            player.clearSelected(selectedItems);
+        }, [focused, player]);
+
+        // Backspace covers macOS keyboards (which lack a forward-delete key)
+        // while Delete covers Windows/Linux. Mantine ignores events from
+        // inputs/textareas/selects by default (see tagsToIgnore below), and
+        // the `focused` check ensures the queue list itself has focus, so
+        // typing in the queue search field or any text field is unaffected.
+        useHotkeys(
             [
-                'delete',
-                () => {
-                    if (focused) {
-                        const selectedItems =
-                            tableRef.current?.internalState.getSelected() as QueueSong[];
-
-                        if (!selectedItems || selectedItems.length === 0) {
-                            return;
-                        }
-
-                        player.clearSelected(selectedItems);
-                    }
-                },
+                ['backspace', handleRemoveSelectedFromQueue],
+                ['delete', handleRemoveSelectedFromQueue],
             ],
-        ]);
+            ['input', 'textarea', 'select'],
+        );
 
         return (
             <div className={styles.container} ref={containerFocusRef}>
