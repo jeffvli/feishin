@@ -13,9 +13,9 @@ test('@full loads albums from Jellyfin', async ({ page }) => {
 
 test('@full loads songs from Jellyfin', async ({ page }) => {
     await navigateTo(page, '/library/songs');
-    await expect(page.getByText('Automation Track 1', { exact: true }).first()).toBeVisible({
-        timeout: 15_000,
-    });
+    await expect(
+        page.getByText('Automation Track 1', { exact: true }).filter({ visible: true }).first(),
+    ).toBeVisible({ timeout: 15_000 });
 });
 
 test('@full loads playlists from Jellyfin', async ({ page }) => {

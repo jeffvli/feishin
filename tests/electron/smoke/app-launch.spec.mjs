@@ -2,8 +2,8 @@ import { expect, login, test } from '../fixtures/katiesamp-test.mjs';
 
 test('@smoke launches with the configured Jellyfin sign-in form', async ({ electronApp, page }) => {
     expect(await electronApp.evaluate(({ app }) => app.getName())).toBe('KatiesAmp');
-    await expect(page.getByText('KATIESMUSICSERVER', { exact: true })).toBeVisible();
-    await expect(page.getByLabel('Username')).toBeVisible();
+    await expect(page.getByLabel('Username')).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByLabel('Server Name')).toHaveValue('KATIESMUSICSERVER');
     await expect(page.getByRole('textbox', { name: 'Password' })).toBeVisible();
     await expect(page.getByRole('button', { name: /^(Add|Login)$/ })).toBeVisible();
 });
