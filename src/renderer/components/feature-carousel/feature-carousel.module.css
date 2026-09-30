@@ -225,6 +225,7 @@
 .album-image {
     width: 100%;
     height: 100%;
+
     /* Respect the 'Use native cover art aspect ratio' setting like the rest
        of the app does (`contain` when enabled, `cover` otherwise). This
        carousel previously hardcoded `cover`, so the setting had no effect
