@@ -40,6 +40,7 @@ import {
 import { Accordion } from '/@/shared/components/accordion/accordion';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Center } from '/@/shared/components/center/center';
+import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { ImageUnloader } from '/@/shared/components/image/image';
@@ -55,6 +56,7 @@ const SidebarPlaylistSection = () => {
 
     return (
         <SidebarPlaylistAddDragContext.Provider value={isAddDragActive}>
+            <Divider my="xs" />
             <SidebarPlaylistList />
             <SidebarSharedPlaylistList />
         </SidebarPlaylistAddDragContext.Provider>
