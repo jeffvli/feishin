@@ -30,6 +30,7 @@ import { mergeOverridingColumns } from '/@/renderer/store/utils';
 import { FontValueSchema } from '/@/renderer/types/fonts';
 import { randomString } from '/@/renderer/utils';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
+import { PRODUCT_FEATURES } from '/@/shared/product-features';
 import { AppTheme } from '/@/shared/themes/app-theme-types';
 import { LibraryItem, LyricSource, SavedCollection } from '/@/shared/types/domain-types';
 import {
@@ -3154,7 +3155,10 @@ export const usePlayerbarOpenDrawer = () =>
 export const useShowRatings = () => useSettingsStore((state) => state.general.showRatings, shallow);
 
 export const useShowFavorites = () =>
-    useSettingsStore((state) => state.general.showFavorites, shallow);
+    useSettingsStore(
+        (state) => PRODUCT_FEATURES.favoriteChanges && state.general.showFavorites,
+        shallow,
+    );
 
 export const useArtistRadioCount = () =>
     useSettingsStore((state) => state.general.artistRadioCount, shallow);

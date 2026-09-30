@@ -1,30 +1,25 @@
 import { closeAllModals, openModal } from '@mantine/modals';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import { controller } from '/@/renderer/api/controller';
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
 import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
 import { ServerList } from '/@/renderer/features/servers/components/server-list';
-import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
-import { startScanWatch, useScanStatus } from '/@/renderer/features/shared/hooks/use-scan-status';
+import { useServerLibraryControls } from '/@/renderer/features/shared/hooks/use-server-library-controls';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAuthStoreActions, useCurrentServer, useServerList } from '/@/renderer/store';
-import { hasFeature } from '/@/shared/api/utils';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Icon } from '/@/shared/components/icon/icon';
-import { toast } from '/@/shared/components/toast/toast';
 import {
     ServerListItem,
     ServerListItemWithCredential,
     ServerType,
 } from '/@/shared/types/domain-types';
-import { ServerFeature } from '/@/shared/types/features-types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
@@ -34,13 +29,14 @@ export const ServerSelectorItems = () => {
     const currentServer = useCurrentServer();
     const serverList = useServerList();
     const { logout, setCurrentServer, setMusicFolderId } = useAuthStoreActions();
-    const { isScanning, isWatching } = useScanStatus();
-
-    const { data: musicFolders } = useQuery(
-        currentServer
-            ? sharedQueries.musicFolders({ query: null, serverId: currentServer.id })
-            : { enabled: false, queryKey: ['disabled'] },
-    );
+    const {
+        clearMusicFolders,
+        musicFolders,
+        rescanLibrary,
+        selectedMusicFolders,
+        supportsMultiSelect,
+        toggleMusicFolder,
+    } = useServerLibraryControls();
 
     const handleSetCurrentServer = (server: ServerListItemWithCredential) => {
         navigate(AppRoute.HOME);
@@ -73,51 +69,11 @@ export const ServerSelectorItems = () => {
         });
     };
 
-    const supportsMultiSelect = hasFeature(currentServer, ServerFeature.MUSIC_FOLDER_MULTISELECT);
-
     const queryClient = useQueryClient();
-
-    const handleToggleMusicFolder = (musicFolderId: string) => {
-        if (supportsMultiSelect) {
-            const currentIds = currentServer.musicFolderId || [];
-            const isSelected = currentIds.includes(musicFolderId);
-
-            if (isSelected) {
-                // Remove from selection
-                const newIds = currentIds.filter((id) => id !== musicFolderId);
-                setMusicFolderId(newIds.length > 0 ? newIds : undefined);
-            } else {
-                // Add to selection
-                setMusicFolderId([...currentIds, musicFolderId]);
-            }
-        } else {
-            const currentId = Array.isArray(currentServer.musicFolderId)
-                ? currentServer.musicFolderId[0]
-                : currentServer.musicFolderId;
-            const isSelected = currentId === musicFolderId;
-
-            if (isSelected) {
-                setMusicFolderId(undefined);
-            } else {
-                setMusicFolderId([musicFolderId]);
-            }
-        }
-
-        queryClient.removeQueries();
-    };
-
-    const handleClearMusicFolders = () => {
-        setMusicFolderId(undefined);
-        queryClient.removeQueries();
-    };
 
     if (!currentServer) {
         return null;
     }
-
-    const selectedMusicFolders =
-        musicFolders?.items.filter((folder) => currentServer.musicFolderId?.includes(folder.id)) ||
-        [];
 
     const handleManageServersModal = () => {
         openModal({
@@ -139,23 +95,6 @@ export const ServerSelectorItems = () => {
         setTimeout(() => {
             queryClient.clear();
         }, 0);
-    };
-
-    const handleRescanLibrary = async () => {
-        if (!currentServer || isWatching || isScanning) {
-            return;
-        }
-
-        try {
-            await controller.startLibraryScan({
-                apiClientProps: { serverId: currentServer.id },
-            });
-            startScanWatch();
-        } catch (err) {
-            toast.error({
-                message: err instanceof Error ? err.message : String(err),
-            });
-        }
     };
 
     return (
@@ -208,7 +147,7 @@ export const ServerSelectorItems = () => {
                     {currentServer.isAdmin && (
                         <DropdownMenu.Item
                             leftSection={<Icon icon="refresh" />}
-                            onClick={handleRescanLibrary}
+                            onClick={() => void rescanLibrary()}
                         >
                             {t('page.appMenu.rescanLibrary')}
                         </DropdownMenu.Item>
@@ -229,7 +168,7 @@ export const ServerSelectorItems = () => {
                     <DropdownMenu.Item
                         isSelected={selectedMusicFolders.length === 0}
                         leftSection={<Icon icon="minus" />}
-                        onClick={handleClearMusicFolders}
+                        onClick={clearMusicFolders}
                     >
                         {t('common.none')}
                     </DropdownMenu.Item>
@@ -244,7 +183,7 @@ export const ServerSelectorItems = () => {
                                 isSelected={isSelected}
                                 key={`musicFolder-${folder.id}`}
                                 leftSection={<Icon icon={isSelected ? 'check' : 'folder'} />}
-                                onClick={() => handleToggleMusicFolder(folder.id)}
+                                onClick={() => toggleMusicFolder(folder.id)}
                             >
                                 {folder.name}
                             </DropdownMenu.Item>

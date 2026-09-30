@@ -44,6 +44,7 @@ import { Modal } from '/@/shared/components/modal/modal';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { useDisclosure } from '/@/shared/hooks/use-disclosure';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
+import { PRODUCT_FEATURES } from '/@/shared/product-features';
 import { LibraryItem, Song, SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
@@ -204,13 +205,14 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 <MoreButton onClick={handleMore} />
             </Group>
             <Group gap="sm" wrap="nowrap">
-                {isViewEditMode &&
+                {PRODUCT_FEATURES.playlistEditing &&
+                    isViewEditMode &&
                     (isSmartPlaylist ? (
                         editActions
                     ) : (
                         <SaveAndReplaceButton mode={mode} songIds={tracks} />
                     ))}
-                {isViewEditMode && (
+                {PRODUCT_FEATURES.playlistEditing && isViewEditMode && (
                     <Button
                         onClick={() => setMode?.(mode === 'edit' ? 'view' : 'edit')}
                         uppercase

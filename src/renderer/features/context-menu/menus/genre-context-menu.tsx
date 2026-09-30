@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import { AddToPlaylistAction } from '/@/renderer/features/context-menu/actions/add-to-playlist-action';
 import { PlayAction } from '/@/renderer/features/context-menu/actions/play-action';
 import { ContextMenuPreview } from '/@/renderer/features/context-menu/components/context-menu-preview';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
@@ -22,8 +21,6 @@ export const GenreContextMenu = ({ items, type }: GenreContextMenuProps) => {
             bottomStickyContent={<ContextMenuPreview items={items} itemType={type} />}
         >
             <PlayAction ids={ids} itemType={LibraryItem.ALBUM} />
-            <ContextMenu.Divider />
-            <AddToPlaylistAction items={ids} itemType={LibraryItem.ALBUM} />
         </ContextMenu.Content>
     );
 };

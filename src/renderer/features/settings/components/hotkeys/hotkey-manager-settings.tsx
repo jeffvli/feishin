@@ -18,6 +18,7 @@ import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Table } from '/@/shared/components/table/table';
 import { TextInput } from '/@/shared/components/text-input/text-input';
+import { PRODUCT_FEATURES } from '/@/shared/product-features';
 import {
     keyboardCodeToHotkeyKey,
     MODIFIER_KEY_CODES,
@@ -215,7 +216,9 @@ export const HotkeyManagerSettings = memo(() => {
     }, [bindings]);
 
     const filteredBindings = useMemo(() => {
-        const base = Object.keys(bindings);
+        const base = Object.keys(bindings).filter(
+            (binding) => PRODUCT_FEATURES.favoriteChanges || !binding.startsWith('favorite'),
+        );
 
         if (keyword === '') {
             return base.filter((binding) => BINDINGS_MAP[binding as keyof typeof BINDINGS_MAP]);

@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 
-import { AddToPlaylistAction } from '/@/renderer/features/context-menu/actions/add-to-playlist-action';
 import { DownloadAction } from '/@/renderer/features/context-menu/actions/download-action';
 import { PlayAction } from '/@/renderer/features/context-menu/actions/play-action';
 import { ShareAction } from '/@/renderer/features/context-menu/actions/share-action';
@@ -24,8 +23,6 @@ export const FolderContextMenu = ({ items, type }: FolderContextMenuProps) => {
             bottomStickyContent={<ContextMenuPreview items={items} itemType={type} />}
         >
             <PlayAction ids={ids} itemType={LibraryItem.FOLDER} />
-            <ContextMenu.Divider />
-            <AddToPlaylistAction items={ids} itemType={LibraryItem.FOLDER} />
             <ContextMenu.Divider />
             <DownloadAction items={items} itemType={type} />
             <ShareAction ids={ids} itemType={LibraryItem.FOLDER} />

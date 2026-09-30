@@ -9,7 +9,6 @@ import { MainPlayerListenerHook } from '/@/renderer/features/player/audio-player
 import { JukeboxPlayer } from '/@/renderer/features/player/audio-player/jukebox-player';
 import { MpvPlayer } from '/@/renderer/features/player/audio-player/mpv-player';
 import { WebPlayer } from '/@/renderer/features/player/audio-player/web-player';
-import { SleepTimerHook } from '/@/renderer/features/player/components/sleep-timer-button';
 import { AutoDJHook } from '/@/renderer/features/player/hooks/use-auto-dj';
 import { AutosaveHook } from '/@/renderer/features/player/hooks/use-autosave';
 import { MediaSessionHook } from '/@/renderer/features/player/hooks/use-media-session';
@@ -132,7 +131,6 @@ export const AudioPlayers = () => {
     }, []);
     return (
         <>
-            <SleepTimerHook />
             <ScrobbleHook />
             <PowerSaveBlockerHook />
             <DiscordRpcHook />

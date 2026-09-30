@@ -361,7 +361,7 @@ const initialState: State = {
         shuffle: PlayerShuffle.NONE,
         speed: 1,
         status: PlayerStatus.PAUSED,
-        transitionType: PlayerStyle.GAPLESS,
+        transitionType: PlayerStyle.CROSSFADE,
         volume: 30,
     },
     queue: {

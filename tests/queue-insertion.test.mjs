@@ -32,8 +32,5 @@ test('multiple dropped songs retain their source order', () => {
 test('a stale target leaves the queue unchanged', () => {
     const playbackIds = ['current', 'second'];
 
-    assert.equal(
-        insertQueueIdsAtTarget(playbackIds, ['dropped'], 'missing', 'top'),
-        playbackIds,
-    );
+    assert.equal(insertQueueIdsAtTarget(playbackIds, ['dropped'], 'missing', 'top'), playbackIds);
 });

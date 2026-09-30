@@ -13,7 +13,6 @@ import { ContextMenuController } from '/@/renderer/features/context-menu/context
 import { OfflineStatusIcon } from '/@/renderer/features/offline/components/offline-status-icon';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
-import { openCreatePlaylistModal } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { useIsMutatingSidebarPlaylistFolderMove } from '/@/renderer/features/playlists/mutations/sidebar-playlist-folder-move-mutation';
 import { ItemRowPlayControls } from '/@/renderer/features/shared/components/item-row-play-controls';
 import {
@@ -48,6 +47,7 @@ import { Icon } from '/@/shared/components/icon/icon';
 import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
 import { Text } from '/@/shared/components/text/text';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
+import { PRODUCT_FEATURES } from '/@/shared/product-features';
 import {
     LibraryItem,
     Playlist,
@@ -140,6 +140,7 @@ export const PlaylistRowButton = memo(
                 canDrop: (args) => {
                     // Allow dropping items into a playlist (ADD)
                     const canAdd =
+                        PRODUCT_FEATURES.playlistEditing &&
                         !isSmartPlaylist &&
                         args.source.itemType !== undefined &&
                         args.source.type !== DragTarget.PLAYLIST &&
@@ -194,7 +195,7 @@ export const PlaylistRowButton = memo(
                         return;
                     }
 
-                    if (isSmartPlaylist) {
+                    if (!PRODUCT_FEATURES.playlistEditing || isSmartPlaylist) {
                         return;
                     }
 
@@ -516,10 +517,6 @@ export const SidebarPlaylistList = () => {
         setPlaylistOrder(reorderedIds);
     };
 
-    const handleCreatePlaylistModal = (e: MouseEvent<HTMLButtonElement>) => {
-        openCreatePlaylistModal(server, e);
-    };
-
     const folderViewState = usePlaylistFolderViewState(playlistItems?.items ?? []);
     const { folderView, groups, tree } = folderViewState;
     const navigation = usePlaylistNavigationState();
@@ -578,18 +575,6 @@ export const SidebarPlaylistList = () => {
                         </Text>
                     </Group>
                     <Group gap="xs" wrap="nowrap">
-                        <ActionIcon
-                            icon="add"
-                            iconProps={{
-                                size: 'lg',
-                            }}
-                            onClick={handleCreatePlaylistModal}
-                            size="xs"
-                            tooltip={{
-                                label: t('action.createPlaylist'),
-                            }}
-                            variant="subtle"
-                        />
                         {showExpandAll && (
                             <ActionIcon
                                 icon={allExpanded ? 'collapseAll' : 'expandAll'}

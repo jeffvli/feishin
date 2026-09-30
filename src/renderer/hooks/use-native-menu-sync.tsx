@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 
 import packageJson from '../../../package.json';
 
-import { openCreatePlaylistModal } from '/@/renderer/features/playlists/components/create-playlist-form';
 import { ServerList } from '/@/renderer/features/servers/components/server-list';
 import { openSettingsModal } from '/@/renderer/features/settings/utils/open-settings-modal';
 import { openReleaseNotesModal } from '/@/renderer/release-notes-modal';
@@ -13,12 +12,12 @@ import {
     useAppStore,
     useAppStoreActions,
     useCommandPalette,
-    useCurrentServer,
     usePlayerHydrated,
     usePlayerRepeat,
     usePlayerShuffle,
     usePlayerStatus,
 } from '/@/renderer/store';
+import { PRODUCT_FEATURES } from '/@/shared/product-features';
 import { PlayerShuffle } from '/@/shared/types/types';
 
 const ipc = isElectron() ? window.api.ipc : null;
@@ -29,11 +28,16 @@ export const useNativeMenuSync = () => {
     const sidebar = useAppStore((state) => state.sidebar);
     const { setPrivateMode, setSideBar } = useAppStoreActions();
     const { open: openCommandPalette } = useCommandPalette();
-    const server = useCurrentServer();
     const playerHydrated = usePlayerHydrated();
     const playerRepeat = usePlayerRepeat();
     const playerShuffle = usePlayerShuffle();
     const playerStatus = usePlayerStatus();
+
+    useEffect(() => {
+        if (!PRODUCT_FEATURES.privateMode && privateMode) {
+            setPrivateMode(false);
+        }
+    }, [privateMode, setPrivateMode]);
 
     useEffect(() => {
         if (!isElectron()) {
@@ -68,20 +72,6 @@ export const useNativeMenuSync = () => {
             return undefined;
         }
 
-        window.api.utils.rendererOpenCreatePlaylist(() => {
-            openCreatePlaylistModal(server);
-        });
-
-        return () => {
-            ipc?.removeAllListeners('renderer-open-create-playlist');
-        };
-    }, [server]);
-
-    useEffect(() => {
-        if (!isElectron()) {
-            return undefined;
-        }
-
         window.api.utils.rendererOpenManageServers(() => {
             openModal({
                 children: <ServerList />,
@@ -95,7 +85,7 @@ export const useNativeMenuSync = () => {
     }, [t]);
 
     useEffect(() => {
-        if (!isElectron()) {
+        if (!isElectron() || !PRODUCT_FEATURES.privateMode) {
             return undefined;
         }
 

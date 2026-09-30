@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { HashRouter, Route, Routes } from 'react-router';
+import { HashRouter, Navigate, Route, Routes } from 'react-router';
 
 import { ShuffleAllContextModal } from '/@/renderer/features/player/components/shuffle-all-modal';
 import { SettingsContextModal } from '/@/renderer/features/settings/components/settings-modal';
@@ -77,8 +77,6 @@ const GenreDetailRoute = lazy(
 );
 
 const FolderListRoute = lazy(() => import('/@/renderer/features/folders/routes/folder-list-route'));
-
-const RadioListRoute = lazy(() => import('/@/renderer/features/radio/routes/radio-list-route'));
 
 const SearchRoute = lazy(() => import('/@/renderer/features/search/routes/search-route'));
 
@@ -300,7 +298,10 @@ export const AppRouter = () => {
                                             element={<PlaylistListRoute />}
                                             path={AppRoute.PLAYLISTS}
                                         />
-                                        <Route element={<RadioListRoute />} path={AppRoute.RADIO} />
+                                        <Route
+                                            element={<Navigate replace to={AppRoute.HOME} />}
+                                            path={AppRoute.RADIO}
+                                        />
                                         <Route
                                             element={<PlaylistDetailSongListRoute />}
                                             path={AppRoute.PLAYLISTS_DETAIL_SONGS}

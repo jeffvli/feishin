@@ -1,0 +1,64 @@
+name: KatiesAmp Full
+
+on:
+    pull_request:
+        branches: [development]
+    workflow_call:
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+concurrency:
+    group: katiesamp-full-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    full:
+        name: KatiesAmp Full
+        runs-on: windows-latest
+        timeout-minutes: 30
+        env:
+            DISABLE_AUTO_UPDATES: '1'
+        steps:
+            - name: Check out repository
+              uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@v4
+
+            - name: Install Node.js
+              uses: actions/setup-node@v6
+              with:
+                  node-version: 24
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Validate pull request commits
+              if: github.event_name == 'pull_request'
+              run: pnpm exec commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+
+            - name: Run type, code, and style checks
+              run: pnpm run lint
+
+            - name: Run unit tests
+              run: pnpm test
+
+            - name: Build Electron application
+              run: pnpm run build:electron
+
+            - name: Run Electron smoke tests
+              run: pnpm run test:electron
+
+            - name: Upload smoke-test evidence
+              if: always()
+              uses: actions/upload-artifact@v7
+              with:
+                  name: electron-smoke-${{ github.run_id }}
+                  path: test-results/electron
+                  if-no-files-found: ignore
+                  retention-days: 14

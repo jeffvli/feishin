@@ -221,6 +221,10 @@
         alpha(var(--theme-colors-background), 0.72);
 }
 
+.music-folder-control {
+    width: min(100%, 14rem);
+}
+
 .support-name {
     margin: 0.45rem 0 0;
     font-size: clamp(1.4rem, 4cqi, 2rem);
@@ -259,6 +263,7 @@
     .details-panel {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
 }
 
 @container (min-width: 900px) {
@@ -308,4 +313,7 @@
         text-align: left;
     }
 
+    .music-folder-control {
+        width: 100%;
+    }
 }
