@@ -176,6 +176,7 @@
 }
 
 .resize-handle-dragging {
+    background: var(--theme-colors-border);
     opacity: 1;
 }
 

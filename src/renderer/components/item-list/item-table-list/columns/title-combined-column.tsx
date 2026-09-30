@@ -80,7 +80,7 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
     if (item && 'name' in item && 'imageUrl' in item && 'artists' in item) {
         const rowHeight = props.getRowHeight(props.rowIndex, props);
         const path = getTitlePath(props.itemType, (rowItem as any).id as string);
-        const align = props.columns[props.columnIndex]?.align || 'start';
+        const align = 'start' as 'center' | 'end' | 'start';
         const hasAlbumGroupColumn = props.hasAlbumGroupColumn ?? false;
 
         const item = rowItem as any;
@@ -247,7 +247,7 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
     if (row && 'name' in row && 'imageUrl' in row && 'artists' in row) {
         const rowHeight = props.getRowHeight(props.rowIndex, props);
         const path = getTitlePath(props.itemType, (rowItem as any).id as string);
-        const align = props.columns[props.columnIndex]?.align || 'start';
+        const align = 'start' as 'center' | 'end' | 'start';
         const hasAlbumGroupColumn = props.hasAlbumGroupColumn ?? false;
 
         const item = rowItem as any;

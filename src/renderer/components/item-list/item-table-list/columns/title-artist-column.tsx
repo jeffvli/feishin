@@ -22,7 +22,7 @@ export const DefaultTitleArtistColumn = (props: ItemTableListInnerColumn) => {
     const rowItem = props.getRowItem?.(props.rowIndex) ?? (props.data as any[])[props.rowIndex];
     const row: object | undefined = (rowItem as any)?.id;
     const item = rowItem as any;
-    const align = props.columns[props.columnIndex]?.align || 'start';
+    const align = 'start' as 'center' | 'end' | 'start';
 
     if (item && 'name' in item && 'artists' in item) {
         const rowHeight = props.getRowHeight(props.rowIndex, props);
@@ -95,7 +95,7 @@ export const QueueSongTitleArtistColumn = (props: ItemTableListInnerColumn) => {
 
     const song = rowItem as QueueSong;
     const isActive = useIsActiveRow(song?.id, song?._uniqueId);
-    const align = props.columns[props.columnIndex]?.align || 'start';
+    const align = 'start' as 'center' | 'end' | 'start';
     const alignClass =
         align === 'center' ? 'align-center' : align === 'end' ? 'align-right' : 'align-left';
 
