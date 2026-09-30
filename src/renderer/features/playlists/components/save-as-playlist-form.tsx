@@ -38,7 +38,7 @@ export const SaveAsPlaylistForm = ({
         initialValues: {
             comment: body.comment || '',
             name: body.name || '',
-            public: body.public,
+            public: body.public ?? false,
             queryBuilderRules: body.queryBuilderRules,
         },
     });

@@ -429,7 +429,7 @@ export const JellyfinController: InternalControllerEndpoint = {
 
         const res = await jfApiClient(apiClientProps).createPlaylist({
             body: {
-                IsPublic: body.public,
+                IsPublic: body.public ?? false,
                 MediaType: 'Audio',
                 Name: body.name,
                 UserId: apiClientProps.server.userId,
@@ -2226,7 +2226,7 @@ export const JellyfinController: InternalControllerEndpoint = {
 
         const res = await jfApiClient(apiClientProps).updatePlaylist({
             body: {
-                IsPublic: body.public,
+                IsPublic: body.public ?? false,
                 Name: body.name,
             },
             params: {

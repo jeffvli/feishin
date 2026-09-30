@@ -180,7 +180,7 @@ export const NavidromeController: InternalControllerEndpoint = {
                 comment: body.comment,
                 name: body.name,
                 ownerId: body.ownerId,
-                public: body.public,
+                public: body.public ?? false,
                 rules: body.queryBuilderRules ?? null,
                 sync: body.sync,
             },
