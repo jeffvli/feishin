@@ -31,11 +31,13 @@ AI-generated code **is accepted** under the following conditions:
 
 Pull requests are **manually reviewed** by maintainers which means that submitting any form of slop wastes our precious time that could otherwise go towards fixing bugs or implementing new features.
 
+When communicating with maintainers or other users in issues, discussions, or pull requests, DO NOT respond to others with solely AI generated text. I and other maintainers spend REAL and VALUABLE time maintaining this project, so communicating in your own words is the bare minimum that I ask of you.
+
 ## Pull requests
 
 Please include:
 
-- A clear description of the change
+- A clear description of the change in your own words
 - Screenshots or recordings for UI changes if applicable
 
 ## Translations
