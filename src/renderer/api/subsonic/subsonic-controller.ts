@@ -1013,10 +1013,17 @@ export const SubsonicController: InternalControllerEndpoint = {
         }
 
         // else if user selects 'favorites'
+        // Query the starred listing directly (favorite: true) instead of
+        // filtering per-album responses: getAlbum entries can omit the starred
+        // flag for tracks that are in fact starred (and shown as favorited in
+        // the artist's track list), which wrongly dropped them from this
+        // section. The Navidrome-native adapter is unaffected because it
+        // filters server-side on starred.
         const res = await SubsonicController.getSongList({
             apiClientProps,
             query: {
                 artistIds: [query.artistId],
+                favorite: true,
                 sortBy: SongListSort.FAVORITED,
                 sortOrder: SortOrder.DESC,
                 startIndex: 0,
@@ -1615,8 +1622,15 @@ export const SubsonicController: InternalControllerEndpoint = {
 
             if (filterArtistIds?.length) {
                 const idSet = new Set(filterArtistIds);
-                allResults = allResults.filter((song) =>
-                    song.albumArtists?.some((aa) => idSet.has(aa.id)),
+                // Match track artists in addition to album artists: a starred
+                // track credited to the artist (e.g. featured appearance) must
+                // not be dropped just because the album artist differs. This
+                // mirrors the Navidrome-native adapter, which filters
+                // server-side on the track artist id.
+                allResults = allResults.filter(
+                    (song) =>
+                        song.albumArtists?.some((aa) => idSet.has(aa.id)) ||
+                        song.artists?.some((a) => idSet.has(a.id)),
                 );
             }
 
