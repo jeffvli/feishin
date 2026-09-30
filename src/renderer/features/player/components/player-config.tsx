@@ -269,7 +269,6 @@ const AudioPlayerTypeConfig = () => {
                         ? [{ disabled: true, label: 'DLNA', value: PlayerType.DLNA }]
                         : []),
                 ]}
-                defaultValue={playbackSettings.type}
                 disabled={status === PlayerStatus.PLAYING || isCasting}
                 onChange={(e) => {
                     setSettings({
@@ -280,6 +279,7 @@ const AudioPlayerTypeConfig = () => {
                         value: e,
                     });
                 }}
+                value={playbackSettings.type}
                 variant="filled"
                 width="100%"
             />

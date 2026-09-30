@@ -5,6 +5,7 @@ import i18n from '/@/i18n/i18n';
 import { openRestartRequiredToast } from '/@/renderer/features/settings/restart-toast';
 import { useSettingsStore } from '/@/renderer/store/settings.store';
 import { logger } from '/@/renderer/utils/logger';
+import { PlayerType } from '/@/shared/types/types';
 // Synchronizes settings from the renderer store to the main process electron store
 // on app initialization. If there are differences, it updates the main store and shows
 // a restart required toast.
@@ -122,6 +123,30 @@ export const useSyncSettingsToMain = () => {
                         JSON.stringify(mainValueNormalized) !==
                         JSON.stringify(rendererValueNormalized)
                     ) {
+                        // The renderer copy of the audio player type can go stale
+                        // (e.g. cleared site data) while the main process still holds
+                        // the user's explicit choice. Adopt the main value instead of
+                        // wiping it — otherwise MPV reverts to Web on every restart.
+                        // See https://github.com/jeffvli/feishin/issues/2544
+                        if (
+                            mapping.mainStoreKey === 'playbackType' &&
+                            (rendererValueNormalized === null ||
+                                rendererValueNormalized === PlayerType.WEB) &&
+                            typeof mainValueNormalized === 'string' &&
+                            (Object.values(PlayerType) as string[]).includes(
+                                mainValueNormalized,
+                            )
+                        ) {
+                            logger.info(
+                                'Restoring audio player type from main process settings',
+                                { playbackType: mainValueNormalized },
+                            );
+                            useSettingsStore.getState().actions.setSettings({
+                                playback: { type: mainValueNormalized as PlayerType },
+                            });
+                            continue;
+                        }
+
                         hasDifferences = true;
                         logger.warn(
                             'Differences found between renderer and main process settings',

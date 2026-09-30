@@ -145,12 +145,12 @@ export const AudioSettings = memo(() => {
                 <Group gap="xs" wrap="nowrap">
                     <Select
                         data={selectData}
-                        defaultValue={settings.type}
                         disabled={status === PlayerStatus.PLAYING || isCasting}
                         onChange={(e) => {
                             setSettings({ playback: { type: e as PlayerType } });
                             ipc?.send('settings-set', { property: 'playbackType', value: e });
                         }}
+                        value={settings.type}
                     />
                     {showRefreshButton && (
                         <ActionIcon
