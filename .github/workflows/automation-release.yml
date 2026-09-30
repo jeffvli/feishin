@@ -76,9 +76,10 @@ jobs:
                       throw "Invalid base version: $baseVersion"
                   }
 
+                  $releases = @(gh release list --limit 100 --json tagName | ConvertFrom-Json)
+
                   if ($channel -eq 'beta') {
                       $maxBeta = 0
-                      $releases = gh release list --limit 100 --json tagName | ConvertFrom-Json
                       foreach ($release in $releases) {
                           if ($release.tagName -match "^v$([regex]::Escape($baseVersion))-beta\.(\d+)$") {
                               $maxBeta = [Math]::Max($maxBeta, [int]$matches[1])
@@ -92,8 +93,7 @@ jobs:
                   }
 
                   $tag = "v$resolvedVersion"
-                  gh release view $tag *> $null
-                  if ($LASTEXITCODE -eq 0) {
+                  if ($releases.tagName -contains $tag) {
                       throw "Release $tag already exists."
                   }
 
