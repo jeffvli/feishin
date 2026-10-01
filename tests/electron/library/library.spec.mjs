@@ -47,6 +47,32 @@ test('@full keeps the album detail screen focused on playback', async ({ page })
     await expect(main.getByText('External links', { exact: true })).toHaveCount(0);
 });
 
+test('@full plays an album without combining its id with the selected folder', async ({
+    mockJellyfin,
+    page,
+}) => {
+    await navigateTo(page, '/library/albums/album-1');
+    const heading = page.getByRole('heading', { level: 1, name: 'Automation Album' });
+    await expect(heading).toBeVisible({ timeout: 15_000 });
+    await heading.locator('..').getByRole('button', { exact: true, name: 'Play' }).click();
+
+    await expect(page.getByRole('link', { exact: true, name: 'Automation Track 1' })).toBeVisible();
+    await expect
+        .poll(() =>
+            mockJellyfin.state.requests.some((request) => {
+                const query = Object.fromEntries(
+                    Object.entries(request.query).map(([key, value]) => [key.toLowerCase(), value]),
+                );
+                return (
+                    request.pathname.toLowerCase() === '/users/test-user/items' &&
+                    query.albumids === undefined &&
+                    query.parentid === 'album-1'
+                );
+            }),
+        )
+        .toBe(true);
+});
+
 test('@full labels the sidebar album list with the selected music folder', async ({
     mockJellyfin,
     page,

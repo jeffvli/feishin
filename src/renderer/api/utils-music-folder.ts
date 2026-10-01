@@ -8,7 +8,8 @@ export const mergeMusicFolderId = <T extends { musicFolderId?: string | string[]
         !server ||
         !server.musicFolderId ||
         server.musicFolderId.length === 0 ||
-        query.musicFolderId
+        query.musicFolderId ||
+        ('albumIds' in query && Array.isArray(query.albumIds))
     ) {
         return query;
     }

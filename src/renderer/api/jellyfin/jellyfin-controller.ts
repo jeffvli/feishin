@@ -1496,20 +1496,21 @@ export const JellyfinController: InternalControllerEndpoint = {
             const albumIdsFilter = query.albumIds
                 ? formatCommaDelimitedString(query.albumIds)
                 : undefined;
+            const singleAlbumId = query.albumIds?.length === 1 ? query.albumIds[0] : undefined;
 
             const res = await jfApiClient(apiClientProps).getSongList({
                 params: {
                     userId: apiClientProps.server?.userId,
                 },
                 query: {
-                    AlbumIds: albumIdsFilter,
+                    AlbumIds: singleAlbumId ? undefined : albumIdsFilter,
                     ArtistIds: artistIdsFilter,
                     Fields: JF_FIELDS.SONG,
                     GenreIds: query.genreIds?.join(','),
                     IncludeItemTypes: 'Audio',
                     IsFavorite: query.favorite,
                     Limit: query.limit === -1 ? undefined : query.limit,
-                    ParentId: getLibraryId(query.musicFolderId),
+                    ParentId: singleAlbumId || getLibraryId(query.musicFolderId),
                     Recursive: true,
                     SearchTerm: query.searchTerm,
                     SortBy: songListSortMap.jellyfin[query.sortBy] || 'Album,SortName',
@@ -1529,7 +1530,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             //  1. the matching album id
             //  2. An album with the name of the album.
             // It is this second condition causing issues,
-            if (query.albumIds) {
+            if (query.albumIds && !singleAlbumId) {
                 const albumIdSet = new Set(query.albumIds);
                 items = res.body.Items.filter((item) => albumIdSet.has(item.AlbumId!));
                 totalRecordCount = items.length;
