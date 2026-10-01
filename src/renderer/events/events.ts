@@ -57,6 +57,8 @@ export type PlayerLyricsFetchedEventPayload = {
 export type PlayerPlayEventPayload = {
     id: string;
     index: number;
+    /** Spotify-style: open Now Playing sidebar when the user starts playback with Play.NOW */
+    openNowPlaying?: boolean;
 };
 
 export type PlayerRepeatedEventPayload = {

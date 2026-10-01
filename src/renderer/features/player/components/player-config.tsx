@@ -20,6 +20,7 @@ import {
     usePlayerSpeed,
     usePlayerStatus,
 } from '/@/renderer/store';
+import { useAppStoreActions } from '/@/renderer/store';
 import {
     useCombinedLyricsAndVisualizer,
     useMicrotonalPitchControls,
@@ -27,6 +28,7 @@ import {
     useSettingsStore,
     useSettingsStoreActions,
     useShowLyricsInSidebar,
+    useShowNowPlayingInSidebar,
     useShowQueueInSidebar,
     useShowVisualizerInSidebar,
 } from '/@/renderer/store/settings.store';
@@ -48,6 +50,7 @@ export const PlayerConfig = () => {
     const { t } = useTranslation();
     const preservePitch = useSettingsStore((state) => state.playback.preservePitch);
     const showLyricsInSidebar = useShowLyricsInSidebar();
+    const showNowPlayingInSidebar = useShowNowPlayingInSidebar();
     const showQueueInSidebar = useShowQueueInSidebar();
     const showVisualizerInSidebar = useShowVisualizerInSidebar();
     const combinedLyricsAndVisualizer = useCombinedLyricsAndVisualizer();
@@ -55,6 +58,7 @@ export const PlayerConfig = () => {
 
     const playbackSettings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
+    const { setSideBar } = useAppStoreActions();
 
     const setPreservePitch = useCallback(
         (value: boolean) => {
@@ -152,6 +156,25 @@ export const PlayerConfig = () => {
                         onChange={(value) => {
                             setSettings({
                                 general: {
+                                    showNowPlayingInSidebar: value,
+                                },
+                            });
+                            if (!value) {
+                                setSideBar({ nowPlaying: false });
+                            }
+                        }}
+                        value={showNowPlayingInSidebar}
+                    />
+                ),
+                id: 'showNowPlayingInSidebar',
+                label: t('setting.showNowPlayingInSidebar'),
+            },
+            {
+                component: (
+                    <ListConfigBooleanControl
+                        onChange={(value) => {
+                            setSettings({
+                                general: {
                                     showLyricsInSidebar: value,
                                 },
                             });
@@ -198,7 +221,9 @@ export const PlayerConfig = () => {
         [
             combinedLyricsAndVisualizer,
             setSettings,
+            setSideBar,
             showLyricsInSidebar,
+            showNowPlayingInSidebar,
             showQueueInSidebar,
             showVisualizerInSidebar,
             t,

@@ -17,6 +17,7 @@ import {
     useAppStore,
     useAppStoreActions,
     useGlobalExpanded,
+    useSidebarNowPlaying,
     useSideQueueLayout,
     useSideQueueType,
 } from '/@/renderer/store';
@@ -39,10 +40,13 @@ export const MainContent = ({ shell }: { shell?: boolean }) => {
     const { setSideBar } = useAppStoreActions();
     const sideQueueType = useSideQueueType();
     const sideQueueLayout = useSideQueueLayout();
+    const nowPlayingOpen = useSidebarNowPlaying();
     // Keep in sync with RightSidebar: hide the grid column when no sidebar panels are visible
     const sidebarPanels = useSidebarPanels();
     const rightSidebarVisible =
-        rightExpanded && sideQueueType === 'sideQueue' && sidebarPanels.length > 0;
+        rightExpanded &&
+        sideQueueType === 'sideQueue' &&
+        (sidebarPanels.length > 0 || nowPlayingOpen);
     const [isResizing, setIsResizing] = useState(false);
     const [isResizingRight, setIsResizingRight] = useState(false);
 

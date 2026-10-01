@@ -150,6 +150,7 @@ export const artistsQueries = {
     },
     topSongs: (args: QueryHookArgs<TopSongListQuery>) => {
         return queryOptions({
+            gcTime: 1000 * 60 * 60,
             queryFn: ({ signal }) => {
                 return api.controller.getTopSongs({
                     apiClientProps: { serverId: args.serverId, signal },
@@ -157,6 +158,7 @@ export const artistsQueries = {
                 });
             },
             queryKey: queryKeys.albumArtists.topSongs(args.serverId, args.query),
+            staleTime: 1000 * 60 * 60,
             ...args.options,
         });
     },

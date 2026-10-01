@@ -8,7 +8,12 @@ import {
     useSidebarPanels,
 } from '/@/renderer/features/now-playing/components/sidebar-play-queue';
 import { ResizeHandle } from '/@/renderer/features/shared/components/resize-handle';
-import { useAppStore, useSideQueueLayout, useSideQueueType } from '/@/renderer/store';
+import {
+    useAppStore,
+    useSidebarNowPlaying,
+    useSideQueueLayout,
+    useSideQueueType,
+} from '/@/renderer/store';
 
 // const queueDrawerVariants: Variants = {
 //     closed: (windowBarStyle) => ({
@@ -62,10 +67,13 @@ export const RightSidebar = forwardRef(
         const sideQueueType = useSideQueueType();
         const sideQueueLayout = useSideQueueLayout();
         const sidebarPanels = useSidebarPanels();
+        const nowPlayingOpen = useSidebarNowPlaying();
         const isVerticalLayout = sideQueueLayout === 'vertical';
 
         const showRightSidebar =
-            rightExpanded && sideQueueType === 'sideQueue' && sidebarPanels.length > 0;
+            rightExpanded &&
+            sideQueueType === 'sideQueue' &&
+            (sidebarPanels.length > 0 || nowPlayingOpen);
 
         return (
             <>

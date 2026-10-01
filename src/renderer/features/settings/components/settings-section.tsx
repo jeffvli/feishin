@@ -11,6 +11,7 @@ export type SettingOption = {
     indent?: boolean;
     isHidden?: boolean;
     note?: string;
+    showDescription?: boolean;
     title: string;
 };
 
