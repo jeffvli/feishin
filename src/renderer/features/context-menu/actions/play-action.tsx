@@ -8,12 +8,13 @@ import { LibraryItem, Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 
 interface PlayActionProps {
+    compact?: boolean;
     ids: string[];
     itemType: LibraryItem;
     songs?: Song[];
 }
 
-export const PlayAction = ({ ids, itemType, songs }: PlayActionProps) => {
+export const PlayAction = ({ compact, ids, itemType, songs }: PlayActionProps) => {
     const { t } = useTranslation();
     const player = usePlayer();
     const serverId = useCurrentServerId();
@@ -66,6 +67,25 @@ export const PlayAction = ({ ids, itemType, songs }: PlayActionProps) => {
     }, [handlePlay, playButtonBehavior]);
 
     if (ids.length === 0) return null;
+
+    if (compact) {
+        return (
+            <>
+                <ContextMenu.Item leftIcon="mediaPlay" onSelect={handlePlayNow}>
+                    {t('player.play')}
+                </ContextMenu.Item>
+                <ContextMenu.Item leftIcon="mediaShuffle" onSelect={handlePlayShuffled}>
+                    {t('action.shuffle')}
+                </ContextMenu.Item>
+                <ContextMenu.Item leftIcon="mediaPlayNext" onSelect={handlePlayNext}>
+                    {t('page.contextMenu.playNext')}
+                </ContextMenu.Item>
+                <ContextMenu.Item leftIcon="mediaPlayLast" onSelect={handlePlayLast}>
+                    {t('page.contextMenu.addToQueueEnd')}
+                </ContextMenu.Item>
+            </>
+        );
+    }
 
     return (
         <ContextMenu.Submenu>

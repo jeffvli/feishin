@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import isElectron from 'is-electron';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { api } from '/@/renderer/api';
@@ -28,10 +28,11 @@ const songItemTypes = new Set([
     LibraryItem.SONG,
 ]);
 
-export const DownloadAction = ({ items, itemType }: DownloadActionProps) => {
+export const useDownloadAction = ({ items, itemType }: DownloadActionProps) => {
     const { t } = useTranslation();
     const server = useCurrentServer();
     const queryClient = useQueryClient();
+    const [isPending, setIsPending] = useState(false);
     const isAlbumSelection = itemType === LibraryItem.ALBUM;
     const isSongSelection = songItemTypes.has(itemType);
     const isPlaylistSelection = itemType === LibraryItem.PLAYLIST;
@@ -110,6 +111,9 @@ export const DownloadAction = ({ items, itemType }: DownloadActionProps) => {
     }, [itemType, items, queryClient, server.id]);
 
     const onSelect = useCallback(async () => {
+        if (isPending) return;
+        setIsPending(true);
+
         try {
             if (!isElectron()) {
                 for (const item of items) {
@@ -250,9 +254,12 @@ export const DownloadAction = ({ items, itemType }: DownloadActionProps) => {
                     defaultValue: 'Could not save items for offline playback',
                 }),
             });
+        } finally {
+            setIsPending(false);
         }
     }, [
         isAlbumSelection,
+        isPending,
         isPlaylistSelection,
         isSongSelection,
         items,
@@ -265,35 +272,54 @@ export const DownloadAction = ({ items, itemType }: DownloadActionProps) => {
         t,
     ]);
 
+    const isAvailableOffline =
+        (isSongSelection && offlineStatusQuery.data) ||
+        (isPlaylistSelection && offlinePlaylistStatusQuery.data) ||
+        (isAlbumSelection && offlineAlbumStatusQuery.data);
+    const compactLabel =
+        isElectron() && isAvailableOffline
+            ? t('page.contextMenu.removeOffline', {
+                  defaultValue: 'Remove offline download',
+              })
+            : t('page.contextMenu.download');
+    const label =
+        isElectron() && isPlaylistSelection && offlinePlaylistStatusQuery.data
+            ? t('page.contextMenu.stopOfflinePlaylistSync', {
+                  defaultValue: 'Stop keeping playlist offline',
+              })
+            : isElectron() && isPlaylistSelection
+              ? t('page.contextMenu.keepPlaylistOffline', {
+                    defaultValue: 'Keep playlist available offline',
+                })
+              : isElectron() && isAlbumSelection && offlineAlbumStatusQuery.data
+                ? t('page.contextMenu.stopOfflineAlbumSync', {
+                      defaultValue: 'Stop keeping album offline',
+                  })
+                : isElectron() && isAlbumSelection
+                  ? t('page.contextMenu.keepAlbumOffline', {
+                        defaultValue: 'Keep album available offline',
+                    })
+                  : isElectron() && offlineStatusQuery.data
+                    ? t('page.contextMenu.removeOffline', {
+                          defaultValue: 'Remove offline download',
+                      })
+                    : isElectron()
+                      ? t('page.contextMenu.downloadOffline', {
+                            defaultValue: 'Download for offline use',
+                        })
+                      : t('page.contextMenu.download');
+
+    return { compactLabel, isAvailableOffline, isPending, label, onSelect };
+};
+
+export const DownloadAction = ({ items, itemType }: DownloadActionProps) => {
+    const { label, onSelect } = useDownloadAction({ items, itemType });
+
     if (items.length === 0) return null;
 
     return (
         <ContextMenu.Item leftIcon="download" onSelect={onSelect}>
-            {isElectron() && isPlaylistSelection && offlinePlaylistStatusQuery.data
-                ? t('page.contextMenu.stopOfflinePlaylistSync', {
-                      defaultValue: 'Stop keeping playlist offline',
-                  })
-                : isElectron() && isPlaylistSelection
-                  ? t('page.contextMenu.keepPlaylistOffline', {
-                        defaultValue: 'Keep playlist available offline',
-                    })
-                  : isElectron() && isAlbumSelection && offlineAlbumStatusQuery.data
-                    ? t('page.contextMenu.stopOfflineAlbumSync', {
-                          defaultValue: 'Stop keeping album offline',
-                      })
-                    : isElectron() && isAlbumSelection
-                      ? t('page.contextMenu.keepAlbumOffline', {
-                            defaultValue: 'Keep album available offline',
-                        })
-                      : isElectron() && offlineStatusQuery.data
-                        ? t('page.contextMenu.removeOffline', {
-                              defaultValue: 'Remove offline download',
-                          })
-                        : isElectron()
-                          ? t('page.contextMenu.downloadOffline', {
-                                defaultValue: 'Download for offline use',
-                            })
-                          : t('page.contextMenu.download')}
+            {label}
         </ContextMenu.Item>
     );
 };

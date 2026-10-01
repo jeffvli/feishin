@@ -58,6 +58,10 @@
         }
     }
 
+    .text.always-show-label {
+        display: inline;
+    }
+
     &[data-variant='subtle'] {
         transition: background-color 0.2s ease-in-out !important;
 

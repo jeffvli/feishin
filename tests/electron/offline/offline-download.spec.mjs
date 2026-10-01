@@ -26,10 +26,12 @@ test('@nightly shows playback and offline status beside the sidebar album', asyn
     await navigateTo(page, '/library/albums/album-1');
     const albumHeading = page.getByRole('heading', { level: 1, name: 'Automation Album' });
     await expect(albumHeading).toBeVisible({ timeout: 15_000 });
-    await albumHeading.locator('..').getByRole('button', { name: 'More options' }).click();
-    await page.getByText('Keep album available offline', { exact: true }).click();
+    await albumHeading.locator('..').getByRole('button', { name: 'Download' }).click();
 
     await expect(sidebarAlbum.getByRole('img', { name: 'Available offline' })).toBeVisible({
         timeout: 15_000,
     });
+    await expect(
+        albumHeading.locator('..').getByRole('button', { name: 'Remove offline download' }),
+    ).toBeVisible();
 });

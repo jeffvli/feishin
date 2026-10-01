@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router';
 
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
+import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { OfflineStatusIcon } from '/@/renderer/features/offline/components/offline-status-icon';
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
@@ -58,6 +59,18 @@ export const SidebarAlbumList = () => {
                     return (
                         <SidebarItem
                             key={album.id}
+                            onContextMenu={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                ContextMenuController.call({
+                                    cmd: {
+                                        compact: true,
+                                        items: [album],
+                                        type: LibraryItem.ALBUM,
+                                    },
+                                    event,
+                                });
+                            }}
                             to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: album.id })}
                         >
                             <Group gap="md" wrap="nowrap">

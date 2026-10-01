@@ -6,6 +6,7 @@ import { Link, useParams } from 'react-router';
 import styles from './album-detail-header.module.css';
 
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
+import { useDownloadAction } from '/@/renderer/features/context-menu/actions/download-action';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
@@ -35,6 +36,10 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
     const detailQuery = useQuery(
         albumQueries.detail({ query: { id: albumId }, serverId: server?.id }),
     );
+    const downloadAction = useDownloadAction({
+        items: detailQuery.data ? [detailQuery.data] : [],
+        itemType: LibraryItem.ALBUM,
+    });
 
     const showRating =
         showRatings &&
@@ -249,7 +254,11 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
                     </Group>
                     <LibraryHeaderMenu
                         compactPlaybackControls
+                        downloadLabel={downloadAction.compactLabel}
                         favorite={detailQuery?.data?.userFavorite}
+                        isDownloaded={downloadAction.isAvailableOffline}
+                        isDownloadPending={downloadAction.isPending}
+                        onDownload={() => void downloadAction.onSelect()}
                         onFavorite={handleFavorite}
                         onMore={handleMoreOptions}
                         onPlay={(type) => handlePlay(type)}
