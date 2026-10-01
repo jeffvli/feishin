@@ -15,7 +15,6 @@ import { Select } from '/@/shared/components/select/select';
 const SUPPORT_EMAIL = 'k.laws@katieobriensirishtaverns.com';
 const SUPPORT_PHONE = '07969 765 597';
 const CONNECTION_CHECK_INTERVAL_MS = 60_000;
-const ALL_MUSIC_FOLDERS_VALUE = '__all-music-folders__';
 
 type ConnectionStatus = 'checking' | 'connected' | 'not-connected' | 'offline' | 'unavailable';
 
@@ -110,14 +109,9 @@ const HomeRoute = () => {
     const connectionStatus = useServerConnectionStatus(server?.id);
     const { musicFolders, musicFoldersQuery, selectedMusicFolders, selectMusicFolder } =
         useServerLibraryControls();
-    const musicFolderOptions = [
-        { label: 'All music folders', value: ALL_MUSIC_FOLDERS_VALUE },
-        ...(musicFolders?.items.map((folder) => ({
-            label: folder.name,
-            value: folder.id,
-        })) || []),
-    ];
-    const selectedMusicFolderId = selectedMusicFolders[0]?.id || ALL_MUSIC_FOLDERS_VALUE;
+    const musicFolderOptions =
+        musicFolders?.items.map((folder) => ({ label: folder.name, value: folder.id })) || [];
+    const selectedMusicFolderId = selectedMusicFolders[0]?.id || null;
     const connectionLabel = {
         checking: 'Checking connection…',
         connected: `Connected to ${server?.name || 'server'}`,
@@ -196,17 +190,15 @@ const HomeRoute = () => {
                                                     musicFoldersQuery.isError ||
                                                     !musicFolders?.items.length
                                                 }
-                                                onChange={(value) =>
-                                                    selectMusicFolder(
-                                                        value === ALL_MUSIC_FOLDERS_VALUE
-                                                            ? undefined
-                                                            : value || undefined,
-                                                    )
-                                                }
+                                                onChange={(value) => {
+                                                    if (value) selectMusicFolder(value);
+                                                }}
                                                 placeholder={
                                                     musicFoldersQuery.isLoading
                                                         ? 'Loading folders…'
-                                                        : 'Folders unavailable'
+                                                        : musicFolders?.items.length
+                                                          ? 'Choose a music folder'
+                                                          : 'Folders unavailable'
                                                 }
                                                 value={selectedMusicFolderId}
                                                 width="100%"

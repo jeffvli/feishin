@@ -1,10 +1,11 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import { controller } from '/@/renderer/api/controller';
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { startScanWatch, useScanStatus } from '/@/renderer/features/shared/hooks/use-scan-status';
 import { useAuthStoreActions, useCurrentServer } from '/@/renderer/store';
+import { usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { hasFeature } from '/@/shared/api/utils';
 import { toast } from '/@/shared/components/toast/toast';
 import { ServerFeature } from '/@/shared/types/features-types';
@@ -33,6 +34,38 @@ export const useServerLibraryControls = () => {
             ) || [],
         [currentServer?.musicFolderId, musicFolders?.items],
     );
+
+    useEffect(() => {
+        if (!currentServer || !musicFolders) return;
+
+        const selectedIds = currentServer.musicFolderId || [];
+        const availableIds = new Set(musicFolders.items.map((folder) => folder.id));
+        const accessibleSelectedIds = selectedIds.filter((id) => availableIds.has(id));
+        const lostFolderAccess = accessibleSelectedIds.length < selectedIds.length;
+
+        if (accessibleSelectedIds.length === selectedIds.length) {
+            if (selectedIds.length > 0 || musicFolders.items.length !== 1) return;
+        }
+
+        const replacementIds =
+            accessibleSelectedIds.length > 0
+                ? accessibleSelectedIds
+                : musicFolders.items[0]
+                  ? [musicFolders.items[0].id]
+                  : undefined;
+
+        if (lostFolderAccess) {
+            const player = usePlayerStoreBase.getState();
+            player.mediaStop();
+            player.clearQueue();
+        }
+
+        setMusicFolderId(replacementIds);
+        queryClient.removeQueries({
+            predicate: (query) =>
+                query.queryKey[0] === currentServer.id && query.queryKey[1] !== 'musicFolders',
+        });
+    }, [currentServer, musicFolders, queryClient, setMusicFolderId]);
 
     const toggleMusicFolder = useCallback(
         (musicFolderId: string) => {
