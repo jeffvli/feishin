@@ -524,7 +524,9 @@
             "input_jellyfinSignInMethod": "Inicia sessió amb",
             "input_jellyfinSignInMethodPassword": "Contrasenya",
             "input_jellyfinSignInMethodQuickConnect": "Quick Connect",
-            "input_remoteUrlDescription": "S'utilitza en lloc de l'URL per a funcions externes, com ara enllaços compartits. Deixeu-ho en blanc a menys que el vostre servidor sigui accessible a una adreça diferent de fora de la vostra xarxa."
+            "input_remoteUrlDescription": "S'utilitza en lloc de l'URL per a funcions externes, com ara enllaços compartits. Deixeu-ho en blanc a menys que el vostre servidor sigui accessible a una adreça diferent de fora de la vostra xarxa.",
+            "input_enableAudiobooks": "Activa audiollibres",
+            "input_enableAudiobooksDescription": "Mostra contingut d'audiollibres de biblioteques de \"Llibres\""
         },
         "shareItem": {
             "description": "Descripció",

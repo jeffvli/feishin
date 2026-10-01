@@ -392,7 +392,9 @@
             "input_jellyfinSignInMethod": "Увійти за допомогою",
             "input_jellyfinSignInMethodPassword": "Пароль",
             "input_jellyfinSignInMethodQuickConnect": "Швидке підключення",
-            "input_remoteUrlDescription": "Використовується замість URL-адреси для зовнішніх функцій, таких як спільні посилання. Залиште це поле порожнім, якщо ваш сервер не доступний за іншою адресою за межами вашої мережі."
+            "input_remoteUrlDescription": "Використовується замість URL-адреси для зовнішніх функцій, таких як спільні посилання. Залиште це поле порожнім, якщо ваш сервер не доступний за іншою адресою за межами вашої мережі.",
+            "input_enableAudiobooks": "Увімкнути аудіокниги",
+            "input_enableAudiobooksDescription": "Показати вміст аудіокниг із бібліотек розділу «Книги»"
         },
         "largeFetchConfirmation": {
             "title": "Додати елементи до черги",
