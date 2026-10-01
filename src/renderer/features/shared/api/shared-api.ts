@@ -14,6 +14,8 @@ export const sharedQueries = {
                 });
             },
             queryKey: queryKeys.musicFolders.list(args.serverId),
+            refetchInterval: 60_000,
+            refetchOnWindowFocus: true,
             ...args.options,
         });
     },

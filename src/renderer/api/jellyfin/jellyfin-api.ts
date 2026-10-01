@@ -456,26 +456,54 @@ export const contract = c.router({
 });
 
 const axiosClient = axios.create({});
+let credentialValidation: null | { promise: Promise<boolean>; serverId: string } = null;
 
 axiosClient.defaults.paramsSerializer = (params) => {
     return qs.stringify(params, { arrayFormat: 'repeat' });
+};
+
+const hasValidCredential = (server: ServerListItemWithCredential) => {
+    if (credentialValidation?.serverId === server.id) {
+        return credentialValidation.promise;
+    }
+
+    const promise = axios
+        .get(`${getServerUrl(server)}/users/${server.userId}`, {
+            headers: {
+                Authorization: createAuthHeader().concat(`, Token="${server.credential}"`),
+            },
+            validateStatus: () => true,
+        })
+        .then((response) => response.status !== 401 && response.status !== 403)
+        .catch(() => true)
+        .finally(() => {
+            credentialValidation = null;
+        });
+
+    credentialValidation = { promise, serverId: server.id };
+    return promise;
 };
 
 axiosClient.interceptors.response.use(
     (response) => {
         return response;
     },
-    (error) => {
+    async (error) => {
         if (error.response && error.response.status === 401) {
             const currentServer = useAuthStore.getState().currentServer;
+            const requestPath = new URL(error.config?.url || '', 'http://localhost').pathname;
+            const userInfoPath = currentServer?.userId
+                ? `/users/${currentServer.userId}`.toLowerCase()
+                : '';
 
-            if (currentServer) {
-                useAuthStore
-                    .getState()
-                    .actions.updateServer(currentServer.id, { credential: undefined });
+            if (
+                currentServer?.credential &&
+                userInfoPath &&
+                requestPath.toLowerCase() !== userInfoPath &&
+                !(await hasValidCredential(currentServer))
+            ) {
+                authenticationFailure(currentServer);
             }
-
-            authenticationFailure(currentServer);
         }
 
         return Promise.reject(error);

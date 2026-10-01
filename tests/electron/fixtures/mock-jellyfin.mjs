@@ -172,7 +172,14 @@ const sendAudio = (request, response, audio) => {
 export const startMockJellyfin = async ({ songCount = 6 } = {}) => {
     const state = {
         available: true,
+        deniedItemIds: new Set(),
         library: createLibrary(songCount),
+        musicFolders: [
+            {
+                id: 'music-folder-1',
+                name: "Katie O'Brien's Music",
+            },
+        ],
         requests: [],
     };
     const audio = makeWave();
@@ -260,15 +267,13 @@ export const startMockJellyfin = async ({ songCount = 6 } = {}) => {
             else if (itemTypes?.includes('Audio')) items = state.library.songs;
             else if (itemTypes?.includes('Playlist')) items = [state.library.playlist];
             else {
-                items = [
-                    {
-                        CollectionType: 'music',
-                        Id: 'music-folder-1',
-                        IsFolder: true,
-                        Name: "Katie O'Brien's Music",
-                        Type: 'CollectionFolder',
-                    },
-                ];
+                items = state.musicFolders.map((folder) => ({
+                    CollectionType: 'music',
+                    Id: folder.id,
+                    IsFolder: true,
+                    Name: folder.name,
+                    Type: 'CollectionFolder',
+                }));
             }
 
             if (searchTerm) {
@@ -285,6 +290,10 @@ export const startMockJellyfin = async ({ songCount = 6 } = {}) => {
 
         if (request.method === 'GET' && pathname.startsWith('/users/test-user/items/')) {
             const id = url.pathname.split('/').at(-1);
+            if (state.deniedItemIds.has(id)) {
+                sendJson(response, 401, { error: 'Item is no longer accessible' });
+                return;
+            }
             const item =
                 state.library.songs.find((song) => song.Id === id) ||
                 (state.library.album.Id === id ? state.library.album : undefined) ||
@@ -403,6 +412,12 @@ export const startMockJellyfin = async ({ songCount = 6 } = {}) => {
             ),
         setAvailable: (available) => {
             state.available = available;
+        },
+        setDeniedItemIds: (ids) => {
+            state.deniedItemIds = new Set(ids);
+        },
+        setMusicFolders: (folders) => {
+            state.musicFolders = folders;
         },
         state,
         url: `http://127.0.0.1:${address.port}`,

@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import styles from './server-selector.module.css';
@@ -6,11 +5,10 @@ import styles from './server-selector.module.css';
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
 import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
-import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { useScanStatus } from '/@/renderer/features/shared/hooks/use-scan-status';
+import { useServerLibraryControls } from '/@/renderer/features/shared/hooks/use-server-library-controls';
 import { ServerSelectorItems } from '/@/renderer/features/sidebar/components/server-selector-items';
 import { useCurrentServer } from '/@/renderer/store';
-import { hasFeature } from '/@/shared/api/utils';
 import { Box } from '/@/shared/components/box/box';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Group } from '/@/shared/components/group/group';
@@ -19,28 +17,17 @@ import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { ServerType } from '/@/shared/types/domain-types';
-import { ServerFeature } from '/@/shared/types/features-types';
 
 export const ServerSelector = () => {
     const { t } = useTranslation();
     const currentServer = useCurrentServer();
     const { data: scanStatus, isScanning, isWatching } = useScanStatus();
 
-    const { data: musicFolders } = useQuery(
-        currentServer
-            ? sharedQueries.musicFolders({ query: null, serverId: currentServer.id })
-            : { enabled: false, queryKey: ['disabled'] },
-    );
+    const { selectedMusicFolders, supportsMultiSelect } = useServerLibraryControls();
 
     if (!currentServer) {
         return null;
     }
-
-    const supportsMultiSelect = hasFeature(currentServer, ServerFeature.MUSIC_FOLDER_MULTISELECT);
-
-    const selectedMusicFolders =
-        musicFolders?.items.filter((folder) => currentServer.musicFolderId?.includes(folder.id)) ||
-        [];
 
     const musicFolderDisplayText = (() => {
         if (selectedMusicFolders.length === 0) {
