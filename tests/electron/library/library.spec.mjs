@@ -56,9 +56,7 @@ test('@full plays an album without combining its id with the selected folder', a
     await expect(heading).toBeVisible({ timeout: 15_000 });
     await heading.locator('..').getByRole('button', { exact: true, name: 'Play' }).click();
 
-    await expect(
-        page.getByRole('link', { exact: true, name: 'Automation Track 1' }),
-    ).toBeVisible();
+    await expect(page.getByRole('link', { exact: true, name: 'Automation Track 1' })).toBeVisible();
     await expect
         .poll(() =>
             mockJellyfin.state.requests.some((request) => {
