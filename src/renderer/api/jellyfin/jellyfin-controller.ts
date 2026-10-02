@@ -2019,6 +2019,7 @@ export const JellyfinController: InternalControllerEndpoint = {
     },
     search: async (args) => {
         const { apiClientProps, query } = args;
+        const parentId = getLibraryId(query.musicFolderId);
 
         if (!apiClientProps.server?.userId) {
             throw new Error('No userId found');
@@ -2039,6 +2040,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                     ImageTypeLimit: 1,
                     IncludeItemTypes: 'MusicAlbum',
                     Limit: query.albumLimit,
+                    ParentId: parentId,
                     Recursive: true,
                     SearchTerm: query.query,
                     SortBy: 'SortName',
@@ -2062,6 +2064,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                     ImageTypeLimit: 1,
                     IncludeArtists: true,
                     Limit: query.albumArtistLimit,
+                    ParentId: parentId,
                     Recursive: true,
                     SearchTerm: query.query,
                     StartIndex: query.albumArtistStartIndex || 0,
@@ -2086,6 +2089,7 @@ export const JellyfinController: InternalControllerEndpoint = {
                     Fields: JF_FIELDS.SONG,
                     IncludeItemTypes: 'Audio',
                     Limit: query.songLimit,
+                    ParentId: parentId,
                     Recursive: true,
                     SearchTerm: query.query,
                     SortBy: 'Album,SortName',

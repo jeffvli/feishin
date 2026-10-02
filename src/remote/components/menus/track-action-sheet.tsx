@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { ActionSheet } from '/@/remote/components/action-sheet';
 import { AddToPlaylistSheet } from '/@/remote/components/menus/add-to-playlist-sheet';
 import { PlaySubmenuItems } from '/@/remote/components/menus/play-submenu-items';
-import { TrackRadioSubmenuItems } from '/@/remote/components/menus/track-radio-submenu-items';
 import { useAckedAction } from '/@/remote/hooks/use-acked-action';
 import { useConfirmedSend } from '/@/remote/hooks/use-confirmed-send';
 import { useSendAcked } from '/@/remote/store';
@@ -21,15 +20,15 @@ interface TrackActionSheetProps {
     track: null | { id: string; name: string };
 }
 
-type TrackActionSheetView = 'addToPlaylist' | 'play' | 'root' | 'trackRadio';
+type TrackActionSheetView = 'addToPlaylist' | 'play' | 'root';
 
 export const TrackActionSheet = ({ onClose, onRemoveFromQueue, track }: TrackActionSheetProps) => {
     const [view, setView] = useState<TrackActionSheetView>('root');
     const confirmedSend = useConfirmedSend();
     const sendAcked = useSendAcked();
     const { pendingKey, run } = useAckedAction();
-    // A play-type/track-radio pick here can trigger the "discard the
-    // queue?" confirm sheet (shell.tsx) — step aside while it's up instead
+    // A play-type pick here can trigger the "discard the queue?" confirm
+    // sheet (shell.tsx) — step aside while it's up instead
     // of stacking two sheets.
     const queueReplaceConfirmPending = !!useQueueReplaceConfirm();
 
@@ -50,13 +49,6 @@ export const TrackActionSheet = ({ onClose, onRemoveFromQueue, track }: TrackAct
                         rightIcon="arrowRightS"
                     >
                         Play
-                    </ActionSheet.Item>
-                    <ActionSheet.Item
-                        leftIcon="radio"
-                        onClick={() => setView('trackRadio')}
-                        rightIcon="arrowRightS"
-                    >
-                        Track Radio
                     </ActionSheet.Item>
                     <ActionSheet.Item
                         leftIcon="playlist"
@@ -90,26 +82,6 @@ export const TrackActionSheet = ({ onClose, onRemoveFromQueue, track }: TrackAct
                             run(
                                 playType,
                                 confirmedSend({ event: 'play-track', id: track.id, playType }),
-                                handleClose,
-                            )
-                        }
-                        pendingPlayType={pendingKey as null | Play}
-                    />
-                </>
-            )}
-            {track && view === 'trackRadio' && (
-                <>
-                    <ActionSheet.Header onBack={() => setView('root')} title="Track Radio" />
-                    <TrackRadioSubmenuItems
-                        disabled={pendingKey !== null}
-                        onSelect={(playType) =>
-                            run(
-                                playType,
-                                confirmedSend({
-                                    event: 'play-track-radio',
-                                    id: track.id,
-                                    playType,
-                                }),
                                 handleClose,
                             )
                         }

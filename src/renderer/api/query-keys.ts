@@ -355,7 +355,8 @@ export const queryKeys: Record<
             serverId: string,
             type: 'albumArtists' | 'albums' | 'songs',
             searchTerm: string,
-        ) => [serverId, 'search', 'infiniteList', type, searchTerm] as const,
+            pageSize?: number,
+        ) => [serverId, 'search', 'infiniteList', type, searchTerm, pageSize] as const,
         list: (serverId: string, query?: SearchQuery) => {
             if (query) return [serverId, 'search', 'list', query] as const;
             return [serverId, 'search', 'list'] as const;

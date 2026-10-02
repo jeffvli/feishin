@@ -259,6 +259,7 @@ export const startMockJellyfin = async ({ songCount = 6 } = {}) => {
         }
 
         if (request.method === 'GET' && pathname === '/users/test-user/items') {
+            const artistIds = getQuery(url, 'ArtistIds')?.split(',');
             const itemTypes = getQuery(url, 'IncludeItemTypes');
             const searchTerm = getQuery(url, 'SearchTerm')?.toLowerCase();
             let items;
@@ -277,7 +278,24 @@ export const startMockJellyfin = async ({ songCount = 6 } = {}) => {
             }
 
             if (searchTerm) {
-                items = items.filter((item) => item.Name.toLowerCase().includes(searchTerm));
+                items = items.filter((item) => {
+                    const searchableText = [
+                        item.Name,
+                        item.Album,
+                        item.AlbumArtist,
+                        ...(item.ArtistItems || []).map((artist) => artist.Name),
+                    ]
+                        .filter(Boolean)
+                        .join(' ')
+                        .toLowerCase();
+
+                    return searchableText.includes(searchTerm);
+                });
+            }
+            if (artistIds?.length) {
+                items = items.filter((item) =>
+                    item.ArtistItems?.some((artist) => artistIds.includes(artist.Id)),
+                );
             }
 
             sendJson(response, 200, {
@@ -315,7 +333,8 @@ export const startMockJellyfin = async ({ songCount = 6 } = {}) => {
             request.method === 'GET' &&
             (pathname === '/artists/albumartists' || pathname === '/artists')
         ) {
-            const artists = [
+            const searchTerm = getQuery(url, 'SearchTerm')?.toLowerCase();
+            let artists = [
                 {
                     Id: 'artist-1',
                     ImageBlurHashes: {},
@@ -325,6 +344,11 @@ export const startMockJellyfin = async ({ songCount = 6 } = {}) => {
                     UserData: { IsFavorite: false },
                 },
             ];
+            if (searchTerm) {
+                artists = artists.filter((artist) =>
+                    artist.Name.toLowerCase().includes(searchTerm),
+                );
+            }
             sendJson(response, 200, {
                 Items: artists,
                 StartIndex: 0,

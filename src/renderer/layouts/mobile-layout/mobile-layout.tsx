@@ -8,6 +8,7 @@ import styles from './mobile-layout.module.css';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { FullScreenVisualizer } from '/@/renderer/features/player/components/full-screen-visualizer';
 import { MobileFullscreenPlayer } from '/@/renderer/features/player/components/mobile-fullscreen-player';
+import { GlobalSearchBar } from '/@/renderer/features/search/components/global-search-bar';
 import { MobileSidebar } from '/@/renderer/features/sidebar/components/mobile-sidebar';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
 import { WindowBar } from '/@/renderer/layouts/window-bar';
@@ -51,6 +52,7 @@ export const MobileLayout = ({ shell }: MobileLayoutProps) => {
                     />
                 )}
                 <main className={styles.mainContent}>
+                    {!shell && <GlobalSearchBar />}
                     <Suspense fallback={<Spinner container />}>
                         <Outlet />
                     </Suspense>
