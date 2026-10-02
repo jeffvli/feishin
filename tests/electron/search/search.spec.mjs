@@ -139,7 +139,10 @@ test('@full drags a search result into a specific queue position', async ({ page
 
     const source = getSongCell(page.getByRole('main'), 'Automation Track 6');
     const target = getSongCell(queue, 'Automation Track 2');
-    await source.dragTo(target, { targetPosition: { x: 20, y: 2 } });
+    await source.dragTo(target, {
+        sourcePosition: { x: 20, y: 10 },
+        targetPosition: { x: 20, y: 2 },
+    });
 
     await expect(queueTrackNames).toHaveCount(7);
     await expect
