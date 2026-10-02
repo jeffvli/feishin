@@ -345,11 +345,18 @@ const QueueButton = () => {
     const isSidebarRightExpanded = useSidebarRightExpanded();
     const { setSideBar } = useAppStoreActions();
     const sideQueueType = useSideQueueType();
+    const { activeTab, expanded: isFullScreenPlayerExpanded } = useFullScreenPlayerStore();
+    const { setStore } = useFullScreenPlayerStoreActions();
     const { bindings } = useHotkeySettings();
     const [popoverOpened, setPopoverOpened] = useState(false);
     const handleToggleQueue = () => {
-        if (sideQueueType === 'sideQueue') setSideBar({ rightExpanded: !isSidebarRightExpanded });
-        else setPopoverOpened((prev) => !prev);
+        if (isFullScreenPlayerExpanded) {
+            setStore({ activeTab: activeTab === 'queue' ? '' : 'queue' });
+        } else if (sideQueueType === 'sideQueue') {
+            setSideBar({ rightExpanded: !isSidebarRightExpanded });
+        } else {
+            setPopoverOpened((prev) => !prev);
+        }
     };
     useHotkeys([
         [bindings.toggleQueue.isGlobal ? '' : bindings.toggleQueue.hotkey, handleToggleQueue],
@@ -359,7 +366,11 @@ const QueueButton = () => {
             <ActionIcon
                 aria-label={t('player.viewQueue')}
                 icon={isSidebarRightExpanded ? 'panelRightClose' : 'panelRightOpen'}
-                iconProps={{ size: 'lg' }}
+                iconProps={{
+                    color:
+                        isFullScreenPlayerExpanded && activeTab === 'queue' ? 'primary' : undefined,
+                    size: 'lg',
+                }}
                 onClick={(e) => {
                     e.stopPropagation();
                     handleToggleQueue();
