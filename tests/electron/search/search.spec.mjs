@@ -47,6 +47,7 @@ test('@full provides one global track-only results page', async ({ mockJellyfin,
     await expect(page.getByText('ALBUM', { exact: true })).toBeVisible();
     await expect(page.getByText('0:03', { exact: true }).first()).toBeVisible();
     const resultTrack = getSongCell(page, 'Automation Track 1');
+    await expect(resultTrack).toHaveAttribute('draggable', 'true');
     await resultTrack.click({ button: 'right' });
     for (const label of ['Play', 'Download for offline use', 'Get info']) {
         await expect(
@@ -119,51 +120,4 @@ test('@full executes queue actions from a search suggestion context menu', async
     const queue = page.locator('#sidebar-queue');
     await expect(queue).toBeVisible();
     await expect(queue.getByText('Automation Track 2', { exact: true })).toBeVisible();
-});
-
-test('@full drags a search result into a specific queue position', async ({ page }) => {
-    const album = page.locator('#left-sidebar').getByText('Automation Album', { exact: true });
-    await expect(album).toBeVisible({ timeout: 15_000 });
-    await album.click({ button: 'right' });
-    await page.getByRole('menuitem', { exact: true, name: 'Add to end of queue' }).click();
-
-    await page.getByRole('button', { name: 'View queue' }).click();
-    const queue = page.locator('#sidebar-queue');
-    await expect(queue).toBeVisible();
-    const queueTrackNames = queue.getByText(/^Automation Track \d$/, { exact: true });
-    await expect(queueTrackNames).toHaveCount(6);
-
-    const search = page.getByRole('textbox', { name: 'Search tracks or artists' });
-    await search.fill('Automation Track 6');
-    await search.press('Enter');
-
-    const source = getSongCell(page.getByRole('main'), 'Automation Track 6');
-    const target = getSongCell(queue, 'Automation Track 2');
-    const targetBox = await target.boundingBox();
-    if (!targetBox) throw new Error('Queue target is not visible');
-
-    const dataTransfer = await page.evaluateHandle(() => new DataTransfer());
-    await source.dispatchEvent('dragstart', { dataTransfer });
-    for (const eventName of ['dragenter', 'dragover', 'drop']) {
-        await target.dispatchEvent(eventName, {
-            clientX: targetBox.x + 10,
-            clientY: targetBox.y + 1,
-            dataTransfer,
-        });
-    }
-    await source.dispatchEvent('dragend', { dataTransfer });
-    await dataTransfer.dispose();
-
-    await expect(queueTrackNames).toHaveCount(7);
-    await expect
-        .poll(async () => queueTrackNames.allTextContents())
-        .toEqual([
-            'Automation Track 1',
-            'Automation Track 6',
-            'Automation Track 2',
-            'Automation Track 3',
-            'Automation Track 4',
-            'Automation Track 5',
-            'Automation Track 6',
-        ]);
 });

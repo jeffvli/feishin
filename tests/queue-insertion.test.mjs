@@ -34,3 +34,15 @@ test('a stale target leaves the queue unchanged', () => {
 
     assert.equal(insertQueueIdsAtTarget(playbackIds, ['dropped'], 'missing', 'top'), playbackIds);
 });
+
+test('a search result is inserted at its drop position without clearing the queue', () => {
+    assert.deepEqual(
+        insertQueueIdsAtTarget(
+            ['song-1', 'song-2', 'song-3', 'song-4', 'song-5', 'song-6'],
+            ['search-song-6'],
+            'song-2',
+            'top',
+        ),
+        ['song-1', 'search-song-6', 'song-2', 'song-3', 'song-4', 'song-5', 'song-6'],
+    );
+});
