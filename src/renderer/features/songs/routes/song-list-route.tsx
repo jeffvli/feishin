@@ -11,8 +11,8 @@ import { usePageSidebar } from '/@/renderer/store/app.store';
 import { SongListQuery } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
-const getPageKey = (options: { albumArtistId?: string; genreId?: string }) => {
-    if (options.albumArtistId) {
+const getPageKey = (options: { artistId?: string; genreId?: string }) => {
+    if (options.artistId) {
         return ItemListKey.ALBUM_ARTIST_SONG;
     }
 
@@ -24,16 +24,17 @@ const getPageKey = (options: { albumArtistId?: string; genreId?: string }) => {
 };
 
 const SongListRoute = () => {
-    const { albumArtistId, genreId } = useParams();
-    const pageKey = getPageKey({ albumArtistId, genreId });
+    const { albumArtistId, artistId, genreId } = useParams();
+    const artistRouteId = albumArtistId || artistId;
+    const pageKey = getPageKey({ artistId: artistRouteId, genreId });
 
     const [itemCount, setItemCount] = useState<number | undefined>(undefined);
     const [isSidebarOpen, setIsSidebarOpen] = usePageSidebar(pageKey);
 
     const customFilters: Partial<SongListQuery> = useMemo(() => {
-        if (albumArtistId) {
+        if (artistRouteId) {
             return {
-                artistIds: [albumArtistId],
+                artistIds: [artistRouteId],
             };
         }
 
@@ -44,12 +45,12 @@ const SongListRoute = () => {
         }
 
         return {};
-    }, [albumArtistId, genreId]);
+    }, [artistRouteId, genreId]);
 
     const providerValue = useMemo(() => {
         return {
             customFilters,
-            id: albumArtistId ?? genreId,
+            id: artistRouteId ?? genreId,
             isSidebarOpen,
             itemCount,
             pageKey,
@@ -57,7 +58,7 @@ const SongListRoute = () => {
             setItemCount,
         };
     }, [
-        albumArtistId,
+        artistRouteId,
         customFilters,
         genreId,
         isSidebarOpen,

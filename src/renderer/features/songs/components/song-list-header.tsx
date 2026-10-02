@@ -57,7 +57,7 @@ const SongListHeaderBadge = () => {
 };
 
 const PlayButton = () => {
-    const { customFilters } = useListContext();
+    const { customFilters, pageKey } = useListContext();
     const { query } = useSongListFilters();
 
     const mergedQuery = useMemo(() => {
@@ -66,6 +66,8 @@ const PlayButton = () => {
             ...(customFilters ?? {}),
         };
     }, [query, customFilters]);
+
+    if (pageKey === ItemListKey.ALBUM_ARTIST_SONG) return null;
 
     return <LibraryHeaderBar.PlayButton itemType={LibraryItem.SONG} listQuery={mergedQuery} />;
 };
