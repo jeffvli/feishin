@@ -270,7 +270,11 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 <PasswordInput
                     data-autofocus
                     label={t('form.addServer.input', {
-                        context: 'password',
+                        context:
+                            form.values.type === ServerType.SUBSONIC &&
+                            form.values.auth === AuthMode.API_KEY
+                                ? 'apiKey'
+                                : 'password',
                     })}
                     required={
                         form.values.type === ServerType.SUBSONIC &&

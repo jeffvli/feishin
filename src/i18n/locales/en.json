@@ -358,6 +358,7 @@
             "input_legacyAuthentication": "Enable legacy authentication",
             "input_name": "Server Name",
             "input_password": "Password",
+            "input_apiKey": "API Key",
             "input_passwordNoSSO": "Reverse proxy (SSO) authentication is not supported. Only username/password authentication and Subsonic authentication are supported",
             "input_preferInstantMix": "Prefer Instant Mix",
             "input_preferInstantMixDescription": "Only use instant mix to get similar songs. Useful if you have plugins that modify this behavior",

@@ -390,7 +390,11 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                                     t('form.addServer.input', { context: 'passwordNoSSO' })
                                 }
                                 label={t('form.addServer.input', {
-                                    context: 'password',
+                                    context:
+                                        form.values.type === ServerType.SUBSONIC &&
+                                        form.values.auth === AuthMode.API_KEY
+                                            ? 'apiKey'
+                                            : 'password',
                                 })}
                                 required={
                                     form.values.type === ServerType.SUBSONIC &&
