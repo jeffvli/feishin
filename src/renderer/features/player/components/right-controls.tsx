@@ -357,6 +357,7 @@ const QueueButton = () => {
     if (sideQueueType === 'sideQueue') {
         return (
             <ActionIcon
+                aria-label={t('player.viewQueue')}
                 icon={isSidebarRightExpanded ? 'panelRightClose' : 'panelRightOpen'}
                 iconProps={{ size: 'lg' }}
                 onClick={(e) => {

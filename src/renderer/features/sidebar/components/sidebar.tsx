@@ -11,6 +11,7 @@ import {
     useIsRadioActive,
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
+import { focusGlobalSearch } from '/@/renderer/features/search/components/global-search-bar';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
 import { SidebarAlbumList } from '/@/renderer/features/sidebar/components/sidebar-album-list';
 import { SidebarCollectionList } from '/@/renderer/features/sidebar/components/sidebar-collection-list';
@@ -127,7 +128,13 @@ export const Sidebar = () => {
                         <Accordion.Panel>
                             {libraryItemsWithRoute.map((item) => {
                                 return (
-                                    <SidebarItem key={`sidebar-${item.route}`} to={item.route}>
+                                    <SidebarItem
+                                        key={`sidebar-${item.route}`}
+                                        onClick={
+                                            item.id === 'Search' ? focusGlobalSearch : undefined
+                                        }
+                                        to={item.route}
+                                    >
                                         <Group gap="md">
                                             <SidebarIcon route={item.route} />
                                             {item.label}

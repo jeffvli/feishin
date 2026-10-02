@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './mobile-sidebar.module.css';
 
+import { focusGlobalSearch } from '/@/renderer/features/search/components/global-search-bar';
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
@@ -96,7 +97,13 @@ export const MobileSidebar = () => {
                         <Accordion.Panel>
                             {sidebarItemsWithRoute.map((item) => {
                                 return (
-                                    <SidebarItem key={`sidebar-${item.route}`} to={item.route}>
+                                    <SidebarItem
+                                        key={`sidebar-${item.route}`}
+                                        onClick={
+                                            item.id === 'Search' ? focusGlobalSearch : undefined
+                                        }
+                                        to={item.route}
+                                    >
                                         <Group gap="sm">
                                             <SidebarIcon route={item.route} />
                                             {item.label}

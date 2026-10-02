@@ -1,0 +1,126 @@
+.container {
+    position: relative;
+    z-index: 210;
+    display: flex;
+    flex: 0 0 65px;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    padding: 0 clamp(3.5rem, 8vw, 7rem) 0 var(--theme-spacing-xl);
+    background: color-mix(in srgb, var(--theme-colors-background) 94%, transparent);
+    border-bottom: 1px solid alpha(var(--theme-colors-border), 0.45);
+    backdrop-filter: blur(16px);
+}
+
+.search-wrapper {
+    position: relative;
+    width: min(100%, 520px);
+    min-width: 0;
+    -webkit-app-region: no-drag;
+}
+
+.input input {
+    font-weight: 500;
+    background: var(--theme-colors-surface);
+    border-color: alpha(var(--theme-colors-border), 0.8);
+    border-radius: 999px;
+}
+
+.input input:focus {
+    border-color: var(--theme-colors-primary-filled);
+}
+
+.results {
+    position: absolute;
+    top: calc(100% + var(--theme-spacing-xs));
+    right: 0;
+    left: 0;
+    max-height: min(560px, calc(100dvh - 180px));
+    padding: var(--theme-spacing-sm);
+    overflow-y: auto;
+    background: var(--theme-colors-surface);
+    border: 1px solid var(--theme-colors-border);
+    border-radius: var(--theme-card-default-radius);
+    box-shadow: var(--theme-shadow-xl);
+}
+
+.section-heading {
+    padding: var(--theme-spacing-xs) var(--theme-spacing-sm);
+    font-size: var(--theme-font-size-xs);
+    font-weight: 700;
+    color: var(--theme-colors-subdued);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.artist-result,
+.song-result {
+    width: 100%;
+    padding: var(--theme-spacing-xs);
+    color: inherit;
+    background: transparent;
+    border: 0;
+    border-radius: var(--theme-radius-sm);
+}
+
+.artist-result {
+    display: flex;
+    gap: var(--theme-spacing-sm);
+    align-items: center;
+    text-align: left;
+    cursor: pointer;
+}
+
+.artist-result:hover,
+.artist-result:focus-visible,
+.song-result:hover {
+    background: var(--theme-colors-surface-hover);
+}
+
+.artist-image-container {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: 999px;
+}
+
+.artist-image {
+    border-radius: 999px;
+}
+
+.artist-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 72px;
+    color: var(--theme-colors-subdued);
+    text-align: center;
+}
+
+.view-all {
+    width: 100%;
+    margin-top: var(--theme-spacing-xs);
+}
+
+@media (width <= 720px) {
+    .container {
+        padding-right: var(--theme-spacing-xl);
+        padding-left: calc(var(--theme-spacing-xl) + 2.75rem);
+    }
+}
+
+@media (width <= 480px) {
+    .container {
+        padding-right: var(--theme-spacing-md);
+        padding-left: calc(var(--theme-spacing-md) + 2.75rem);
+    }
+}

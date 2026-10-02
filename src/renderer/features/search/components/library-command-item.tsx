@@ -42,6 +42,7 @@ interface LibraryCommandItemProps {
     imageUrl: null | string;
     isHighlighted?: boolean;
     itemType: LibraryItem;
+    showPlaybackControls?: boolean;
     song?: Song;
     subtitle?: string;
     title?: string;
@@ -55,6 +56,7 @@ export const LibraryCommandItem = ({
     imageUrl,
     isHighlighted,
     itemType,
+    showPlaybackControls = true,
     song,
     subtitle,
     title,
@@ -104,7 +106,7 @@ export const LibraryCommandItem = ({
 
     const [isHovered, setIsHovered] = useState(false);
 
-    const showControls = isHighlighted || isHovered;
+    const showControls = showPlaybackControls && (isHighlighted || isHovered);
 
     return (
         <Flex

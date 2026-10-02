@@ -6,6 +6,7 @@ import { Link, NavLink, useNavigate } from 'react-router';
 
 import styles from './collapsed-sidebar.module.css';
 
+import { focusGlobalSearch } from '/@/renderer/features/search/components/global-search-bar';
 import { useScanStatus } from '/@/renderer/features/shared/hooks/use-scan-status';
 import { CollapsedSidebarButton } from '/@/renderer/features/sidebar/components/collapsed-sidebar-button';
 import { CollapsedSidebarItem } from '/@/renderer/features/sidebar/components/collapsed-sidebar-item';
@@ -169,6 +170,7 @@ export const CollapsedSidebar = () => {
                             icon={<SidebarIcon route={item.route} size="25" />}
                             key={item.id}
                             label={item.label}
+                            onClick={item.id === 'Search' ? focusGlobalSearch : undefined}
                             route={item.route}
                             to={item.route}
                         />

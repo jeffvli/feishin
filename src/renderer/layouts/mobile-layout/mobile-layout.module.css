@@ -40,10 +40,19 @@
 
 .main-content {
     position: relative;
+    display: flex;
+    flex-direction: column;
     grid-area: main-content;
+    min-height: 0;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+.main-content > :last-child {
+    flex: 1;
+    min-height: 0;
     overflow-x: hidden;
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 .full-screen-player-overlay {
