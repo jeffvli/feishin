@@ -1109,6 +1109,8 @@
         "playerFilters_description": "Omit songs from being added to the queue based on the following criteria",
         "confirmQueueChanges": "Confirm queue changes",
         "confirmQueueChanges_description": "Ask for confirmation before discarding the current queue",
+        "discardQueueSkipsCurrentTrack": "Discarding queue skips current track",
+        "discardQueueSkipsCurrentTrack_description": "Skips the current playing track when the queue is discarded. Disable to keep the current track playing when clearing the queue",
         "playbackStyle_description": "Select the playback style to use for the audio player",
         "playbackStyle_optionCrossFade": "Crossfade",
         "playbackStyle_optionNormal": "Normal",
