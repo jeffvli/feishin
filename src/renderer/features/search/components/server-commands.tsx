@@ -1,11 +1,10 @@
-import { openModal } from '@mantine/modals';
 import { Dispatch, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import { Command, CommandPalettePages } from '/@/renderer/features/search/components/command';
-import { ServerList } from '/@/renderer/features/servers/components/server-list';
+import { openManageServersModal } from '/@/renderer/features/servers/utils/open-manage-servers-modal';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAuthStoreActions, useServerList } from '/@/renderer/store';
 import { ServerListItemWithCredential } from '/@/shared/types/domain-types';
@@ -23,14 +22,11 @@ export const ServerCommands = ({ handleClose, setPages, setQuery }: ServerComman
     const { setCurrentServer } = useAuthStoreActions();
 
     const handleManageServersModal = useCallback(() => {
-        openModal({
-            children: <ServerList />,
-            title: t('page.appMenu.manageServers'),
-        });
         handleClose();
         setQuery('');
         setPages([CommandPalettePages.HOME]);
-    }, [handleClose, setPages, setQuery, t]);
+        openManageServersModal();
+    }, [handleClose, setPages, setQuery]);
 
     const handleSelectServer = useCallback(
         (server: ServerListItemWithCredential) => {

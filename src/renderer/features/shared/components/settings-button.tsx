@@ -9,6 +9,7 @@ export const SettingsButton = ({ ...props }: SettingsButtonProps) => {
 
     return (
         <ActionIcon
+            aria-label={t('common.configure')}
             icon="settings"
             iconProps={{
                 size: 'lg',

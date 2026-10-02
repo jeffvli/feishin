@@ -13,6 +13,7 @@ import {
 } from 'electron';
 import Store from 'electron-store';
 import { promises as fs, watch as fsWatch } from 'fs';
+import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
 import path from 'path';
 
 import log from '/@/main/logger';
@@ -130,6 +131,73 @@ export const store = new Store<any>({
         },
     },
 });
+
+const ADMIN_PASSWORD_KEY = 'admin_password';
+const ADMIN_PASSWORD_MIN_LENGTH = 6;
+const ADMIN_PASSWORD_MAX_LENGTH = 128;
+
+type AdminPasswordRecord = {
+    hash: string;
+    salt: string;
+};
+
+const isValidAdminPassword = (password: unknown): password is string =>
+    typeof password === 'string' &&
+    password.length >= ADMIN_PASSWORD_MIN_LENGTH &&
+    password.length <= ADMIN_PASSWORD_MAX_LENGTH;
+
+const setAdminPassword = (password: string) => {
+    const salt = randomBytes(16);
+    const hash = scryptSync(password, salt, 32);
+    store.set(ADMIN_PASSWORD_KEY, {
+        hash: hash.toString('hex'),
+        salt: salt.toString('hex'),
+    } satisfies AdminPasswordRecord);
+};
+
+const verifyAdminPassword = (password: unknown) => {
+    if (!isValidAdminPassword(password)) return false;
+
+    const record = store.get(ADMIN_PASSWORD_KEY) as AdminPasswordRecord | undefined;
+    if (!record?.hash || !record.salt) return false;
+
+    try {
+        const expected = Buffer.from(record.hash, 'hex');
+        const actual = scryptSync(password, Buffer.from(record.salt, 'hex'), expected.length);
+        return expected.length > 0 && timingSafeEqual(actual, expected);
+    } catch (error) {
+        log.warn('Unable to verify administrator password', error);
+        return false;
+    }
+};
+
+ipcMain.handle('admin-password-is-set', () => {
+    const record = store.get(ADMIN_PASSWORD_KEY) as AdminPasswordRecord | undefined;
+    return Boolean(record?.hash && record.salt);
+});
+
+ipcMain.handle('admin-password-set', (_event, password: unknown) => {
+    if (!isValidAdminPassword(password)) return false;
+
+    setAdminPassword(password);
+    return true;
+});
+
+ipcMain.handle('admin-password-verify', (_event, password: unknown) =>
+    verifyAdminPassword(password),
+);
+
+ipcMain.handle(
+    'admin-password-change',
+    (_event, currentPassword: unknown, newPassword: unknown) => {
+        if (!verifyAdminPassword(currentPassword) || !isValidAdminPassword(newPassword)) {
+            return false;
+        }
+
+        setAdminPassword(newPassword);
+        return true;
+    },
+);
 
 ipcMain.handle('settings-get', (_event, data: { property: string }) => {
     return store.get(`${data.property}`);

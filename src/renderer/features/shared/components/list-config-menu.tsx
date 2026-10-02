@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import styles from './list-config-menu.module.css';
 
 import i18n from '/@/i18n/i18n';
+import { requestAdministratorAccess } from '/@/renderer/features/settings/components/administrator-access-modal';
 import { SettingsButton } from '/@/renderer/features/shared/components/settings-button';
 import { ActionIconProps } from '/@/shared/components/action-icon/action-icon';
 import { Divider } from '/@/shared/components/divider/divider';
@@ -119,11 +120,13 @@ export const ListConfigMenu = ({ buttonProps, ...formProps }: ListConfigMenuProp
         <SettingsButton
             {...buttonProps}
             onClick={() => {
-                openContextModal({
-                    innerProps: formProps,
-                    modal: 'listConfigSettings',
-                    size: 'xl',
-                    withCloseButton: false,
+                requestAdministratorAccess(() => {
+                    openContextModal({
+                        innerProps: formProps,
+                        modal: 'listConfigSettings',
+                        size: 'xl',
+                        withCloseButton: false,
+                    });
                 });
             }}
         />

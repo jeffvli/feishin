@@ -44,6 +44,25 @@ const passwordSet = async (password: string, server: string): Promise<boolean> =
     return ipcRenderer.invoke('password-set', password, server);
 };
 
+const adminPasswordIsSet = async (): Promise<boolean> => {
+    return ipcRenderer.invoke('admin-password-is-set');
+};
+
+const adminPasswordSet = async (password: string): Promise<boolean> => {
+    return ipcRenderer.invoke('admin-password-set', password);
+};
+
+const adminPasswordVerify = async (password: string): Promise<boolean> => {
+    return ipcRenderer.invoke('admin-password-verify', password);
+};
+
+const adminPasswordChange = async (
+    currentPassword: string,
+    newPassword: string,
+): Promise<boolean> => {
+    return ipcRenderer.invoke('admin-password-change', currentPassword, newPassword);
+};
+
 const setZoomFactor = (zoomFactor: number) => {
     webFrame.setZoomFactor(zoomFactor / 100);
 };
@@ -95,6 +114,10 @@ get('maximized').then((value) => {
 });
 
 export const localSettings = {
+    adminPasswordChange,
+    adminPasswordIsSet,
+    adminPasswordSet,
+    adminPasswordVerify,
     disableMediaKeys,
     enableMediaKeys,
     env,

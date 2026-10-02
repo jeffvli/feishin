@@ -15,7 +15,7 @@ const packageVersion = JSON.parse(
 ).version;
 
 export const test = base.extend({
-    electronApp: async ({ mockJellyfin }, use) => {
+    electronApp: async ({ mockJellyfin, serverLock }, use) => {
         const userDataDirectory = await mkdtemp(path.join(os.tmpdir(), 'katiesamp-ui-'));
         const electronApp = await electron.launch({
             args: [`--user-data-dir=${userDataDirectory}`, repositoryRoot],
@@ -23,7 +23,7 @@ export const test = base.extend({
                 ...process.env,
                 APPDATA: userDataDirectory,
                 DISABLE_AUTO_UPDATES: '1',
-                SERVER_LOCK: 'true',
+                SERVER_LOCK: serverLock,
                 SERVER_NAME: 'KATIESMUSICSERVER',
                 SERVER_TYPE: 'jellyfin',
                 SERVER_URL: mockJellyfin.url,
@@ -83,6 +83,7 @@ export const test = base.extend({
             contentType: 'application/json',
         });
     },
+    serverLock: ['true', { option: true }],
 });
 
 export { expect };

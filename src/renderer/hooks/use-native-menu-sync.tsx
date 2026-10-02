@@ -1,11 +1,10 @@
-import { openModal } from '@mantine/modals';
 import isElectron from 'is-electron';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import packageJson from '../../../package.json';
 
-import { ServerList } from '/@/renderer/features/servers/components/server-list';
+import { openManageServersModal } from '/@/renderer/features/servers/utils/open-manage-servers-modal';
 import { openSettingsModal } from '/@/renderer/features/settings/utils/open-settings-modal';
 import { openReleaseNotesModal } from '/@/renderer/release-notes-modal';
 import {
@@ -73,16 +72,13 @@ export const useNativeMenuSync = () => {
         }
 
         window.api.utils.rendererOpenManageServers(() => {
-            openModal({
-                children: <ServerList />,
-                title: t('page.manageServers.title'),
-            });
+            openManageServersModal();
         });
 
         return () => {
             ipc?.removeAllListeners('renderer-open-manage-servers');
         };
-    }, [t]);
+    }, []);
 
     useEffect(() => {
         if (!isElectron() || !PRODUCT_FEATURES.privateMode) {
