@@ -164,6 +164,27 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
         [queryClient, server],
     );
 
+    const playlistMapQuery = useQuery({
+        enabled: !!playlists && !!serverId && items.length > 0,
+        queryFn: async () => {
+            const playlistMap = await Promise.all(
+                (playlists ?? []).map(async (playlist) => {
+                    const playlistSongs = await getSongsByPlaylist(playlist.id);
+
+                    return [
+                        playlist.id,
+                        items.some((songId) =>
+                            playlistSongs?.items?.some((song) => song.id === songId),
+                        ),
+                    ] as const;
+                }),
+            );
+
+            return new Map(playlistMap);
+        },
+        queryKey: ['context-menu-playlist-membership', serverId, itemType, items, playlists],
+    });
+
     const handleAddToPlaylist = useCallback(
         async (playlistId: string, playlistName: string) => {
             if (items.length === 0 || !serverId) return;
@@ -400,9 +421,20 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                 {recentPlaylist && (
                     <>
                         <ContextMenu.Item
+                            disabled={
+                                playlistMapQuery.data?.get(recentPlaylist.id) && skipDuplicates
+                            }
                             key={recentPlaylist.id}
                             onSelect={() =>
                                 handleAddToPlaylist(recentPlaylist.id, recentPlaylist.name)
+                            }
+                            rightIcon={
+                                playlistMapQuery.data?.get(recentPlaylist.id) ? 'check' : undefined
+                            }
+                            tooltip={
+                                playlistMapQuery.data?.get(recentPlaylist.id)
+                                    ? t('form.addToPlaylist.alreadyInPlaylist')
+                                    : undefined
                             }
                         >
                             {recentPlaylist.name}
@@ -415,8 +447,15 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                 )}
                 {filteredPlaylists.map((playlist) => (
                     <ContextMenu.Item
+                        disabled={playlistMapQuery.data?.get(playlist.id) && skipDuplicates}
                         key={playlist.id}
                         onSelect={() => handleAddToPlaylist(playlist.id, playlist.name)}
+                        rightIcon={playlistMapQuery.data?.get(playlist.id) ? 'check' : undefined}
+                        tooltip={
+                            playlistMapQuery.data?.get(playlist.id)
+                                ? t('form.addToPlaylist.alreadyInPlaylist')
+                                : undefined
+                        }
                     >
                         {playlist.name}
                     </ContextMenu.Item>

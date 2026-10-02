@@ -36,6 +36,7 @@ import { Table } from '/@/shared/components/table/table';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
+import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { useForm } from '/@/shared/hooks/use-form';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { LibraryItem, Playlist, PlaylistListSort, SortOrder } from '/@/shared/types/domain-types';
@@ -75,10 +76,6 @@ export const AddToPlaylistContextModal = ({
         },
     });
 
-    form.watch('skipDuplicates', (event) => {
-        setSkipDuplicates(event.value);
-    });
-
     const addToPlaylistMutation = useAddToPlaylist({});
 
     const playlistList = useQuery(
@@ -93,17 +90,28 @@ export const AddToPlaylistContextModal = ({
         }),
     );
 
-    const [playlistSelect, playlistMap] = useMemo(() => {
-        const existingPlaylists = new Array<Playlist & { label: string; value: string }>();
-        const playlistMap = new Map<string, string>();
+    const playlistOptions = useQuery({
+        enabled: !!playlistList.data,
+        queryFn: async () => {
+            const playlists = await Promise.all(
+                (playlistList.data?.items ?? []).map(async (playlist) => {
+                    const songs = await getSongsByPlaylist(playlist.id);
+                    return {
+                        ...playlist,
+                        alreadyInPlaylist:
+                            songId?.some((id) => songs?.items?.some((song) => song.id === id)) ??
+                            false,
+                        label: playlist.name,
+                        value: playlist.id,
+                    };
+                }),
+            );
 
-        for (const playlist of playlistList.data?.items ?? []) {
-            existingPlaylists.push({ ...playlist, label: playlist.name, value: playlist.id });
-            playlistMap.set(playlist.id, playlist.name);
-        }
-
-        return [existingPlaylists, playlistMap];
-    }, [playlistList.data]);
+            return [playlists, new Map(playlists.map(({ id, name }) => [id, name]))] as const;
+        },
+        queryKey: ['add-to-playlist-options', serverId, playlistList.data?.items, songId],
+    });
+    const [playlistSelect, playlistMap] = playlistOptions.data ?? [[], new Map<string, string>()];
 
     const filteredItems = useMemo(() => {
         if (search) {
@@ -328,7 +336,21 @@ export const AddToPlaylistContextModal = ({
     });
 
     const handleSelectItem = useCallback(
-        (item: { value: string }) => {
+        (item: { alreadyInPlaylist: boolean; value: string }) => {
+            if (skipDuplicates && item.alreadyInPlaylist) {
+                toast.info({
+                    message: t(
+                        'form.addToPlaylist.disableSkipDuplicatesForAddingExistingInPlaylist',
+                        {
+                            skipDuplicates: t('form.addToPlaylist.input', {
+                                context: 'skipDuplicates',
+                            }),
+                        },
+                    ),
+                });
+                return;
+            }
+
             const currentIds = form.values.selectedPlaylistIds;
             if (currentIds.includes(item.value)) {
                 form.setFieldValue(
@@ -339,7 +361,7 @@ export const AddToPlaylistContextModal = ({
                 form.setFieldValue('selectedPlaylistIds', [...currentIds, item.value]);
             }
         },
-        [form],
+        [form, skipDuplicates, t],
     );
 
     const handleCheckboxChange = useCallback(
@@ -386,7 +408,7 @@ export const AddToPlaylistContextModal = ({
         (
             event: React.KeyboardEvent<HTMLTableRowElement>,
             index: number,
-            item: { value: string },
+            item: { alreadyInPlaylist: boolean; value: string },
         ) => {
             const totalRows = filteredItems.length;
 
@@ -465,6 +487,8 @@ export const AddToPlaylistContextModal = ({
                                                     ? 'var(--theme-colors-surface)'
                                                     : 'transparent',
                                             cursor: 'pointer',
+                                            opacity:
+                                                item.alreadyInPlaylist && skipDuplicates ? 0.5 : 1,
                                             outline: 'none',
                                         }}
                                         tabIndex={index === 0 ? 0 : -1}
@@ -474,6 +498,7 @@ export const AddToPlaylistContextModal = ({
                                                 checked={form.values.selectedPlaylistIds.includes(
                                                     item.value,
                                                 )}
+                                                disabled={item.alreadyInPlaylist && skipDuplicates}
                                                 onChange={(event) => {
                                                     handleCheckboxChange(
                                                         item.value,
@@ -529,10 +554,27 @@ export const AddToPlaylistContextModal = ({
                         ))}
                     </Pill.Group>
                     <Switch
+                        checked={skipDuplicates}
                         label={t('form.addToPlaylist.input', {
                             context: 'skipDuplicates',
                         })}
-                        {...form.getInputProps('skipDuplicates', { type: 'checkbox' })}
+                        onChange={(event) => {
+                            const checked = event.currentTarget.checked;
+                            setSkipDuplicates(checked);
+                            form.setFieldValue('skipDuplicates', checked);
+
+                            if (checked) {
+                                const filteredSelectedIds = form.values.selectedPlaylistIds.filter(
+                                    (id) => {
+                                        const playlist = playlistSelect.find(
+                                            (item) => item.value === id,
+                                        );
+                                        return playlist && !playlist.alreadyInPlaylist;
+                                    },
+                                );
+                                form.setFieldValue('selectedPlaylistIds', filteredSelectedIds);
+                            }
+                        }}
                     />
                     <Group justify="flex-end">
                         <ModalButton
@@ -565,7 +607,11 @@ export const AddToPlaylistContextModal = ({
 };
 
 const PlaylistTableItem = memo(
-    ({ item }: { item: Playlist & { label: string; value: string } }) => {
+    ({
+        item,
+    }: {
+        item: Playlist & { alreadyInPlaylist: boolean; label: string; value: string };
+    }) => {
         const { t } = useTranslation();
 
         return (
@@ -606,10 +652,18 @@ const PlaylistTableItem = memo(
                                         </Text>
                                     </Group>
                                 </Group>
-
-                                <Text className={styles.statusText} isMuted size="sm">
-                                    {item.public ? t('common.public') : t('common.private')}
-                                </Text>
+                                <Stack align="center" className={styles.statusText} gap={0}>
+                                    {item.alreadyInPlaylist && (
+                                        <Tooltip label={t('form.addToPlaylist.alreadyInPlaylist')}>
+                                            <span>
+                                                <Icon color="default" icon="check" />
+                                            </span>
+                                        </Tooltip>
+                                    )}
+                                    <Text isMuted size="sm">
+                                        {item.public ? t('common.public') : t('common.private')}
+                                    </Text>
+                                </Stack>
                             </Group>
                         </Stack>
                     </Grid.Col>
