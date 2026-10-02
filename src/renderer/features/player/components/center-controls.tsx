@@ -124,7 +124,7 @@ const StopButton = ({ disabled }: { disabled?: boolean }) => {
     );
 };
 
-const ShuffleButton = ({ disabled }: { disabled?: boolean }) => {
+export const ShuffleButton = ({ disabled }: { disabled?: boolean }) => {
     const { t } = useTranslation();
     const buttonSize = useButtonSize();
     const shuffle = usePlayerShuffle();
@@ -269,7 +269,7 @@ export const NextButton = ({ disabled }: { disabled?: boolean }) => {
     );
 };
 
-const RepeatButton = ({ disabled }: { disabled?: boolean }) => {
+export const RepeatButton = ({ disabled }: { disabled?: boolean }) => {
     const { t } = useTranslation();
     const buttonSize = useButtonSize();
     const repeat = usePlayerRepeat();
