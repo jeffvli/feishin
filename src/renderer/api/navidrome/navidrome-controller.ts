@@ -6,11 +6,22 @@ import { ndApiClient } from '/@/renderer/api/navidrome/navidrome-api';
 import { ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
 import { SubsonicController } from '/@/renderer/api/subsonic/subsonic-controller';
 import { ndNormalize } from '/@/shared/api/navidrome/navidrome-normalize';
-import { NDRadioListSort, NDSongListSort } from '/@/shared/api/navidrome/navidrome-types';
+import {
+    NDAlbumListSort,
+    NDRadioListSort,
+    NDSongListSort,
+} from '/@/shared/api/navidrome/navidrome-types';
 import { ssNormalize } from '/@/shared/api/subsonic/subsonic-normalize';
-import { getFeatures, hasFeature, hasFeatureWithVersion, VersionInfo } from '/@/shared/api/utils';
+import {
+    getFeatures,
+    hasFeature,
+    hasFeatureWithVersion,
+    sortAlbumList,
+    VersionInfo,
+} from '/@/shared/api/utils';
 import {
     albumArtistListSortMap,
+    AlbumListSort,
     albumListSortMap,
     DeleteArtistImageArgs,
     DeleteArtistImageResponse,
@@ -436,7 +447,13 @@ export const NavidromeController: InternalControllerEndpoint = {
             query: {
                 _end: query.startIndex + (query.limit || 0),
                 _order: sortOrderMap.navidrome[query.sortOrder],
-                _sort: albumListSortMap.navidrome[query.sortBy],
+                // The compound artist/year/album sort has no server-side
+                // equivalent: pre-sort by album artist so page boundaries
+                // stay aligned, then refine client-side below.
+                _sort:
+                    query.sortBy === AlbumListSort.ALBUM_ARTIST_YEAR_ALBUM
+                        ? NDAlbumListSort.ALBUM_ARTIST
+                        : albumListSortMap.navidrome[query.sortBy],
                 _start: query.startIndex,
                 artist_id: artistIds,
                 compilation: query.compilation,
@@ -456,8 +473,13 @@ export const NavidromeController: InternalControllerEndpoint = {
             throw new Error('Failed to get album list');
         }
 
+        const items = res.body.data.map((album) => ndNormalize.album(album, apiClientProps.server));
+
         return {
-            items: res.body.data.map((album) => ndNormalize.album(album, apiClientProps.server)),
+            items:
+                query.sortBy === AlbumListSort.ALBUM_ARTIST_YEAR_ALBUM
+                    ? sortAlbumList(items, query.sortBy, query.sortOrder)
+                    : items,
             startIndex: query?.startIndex || 0,
             totalRecordCount: Number(res.body.headers.get('x-total-count') || 0),
         };
