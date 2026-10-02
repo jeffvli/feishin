@@ -18,6 +18,24 @@ test('@full loads songs from Jellyfin', async ({ page }) => {
     });
 });
 
+test('@full shows an artist as a tracks-only screen', async ({ page }) => {
+    await navigateTo(page, '/library/album-artists/artist-1');
+
+    const content = page.locator('#main-content');
+    await expect(content.getByRole('heading', { name: 'Automation Artist' })).toBeVisible({
+        timeout: 15_000,
+    });
+    await expect(getSongCell(content, 'Automation Track 1')).toBeVisible();
+
+    for (const label of ['View discography', 'View all tracks', 'Artist radio']) {
+        await expect(content.getByText(label, { exact: true })).toHaveCount(0);
+    }
+    await expect(content.getByRole('heading', { exact: true, name: 'Albums' })).toHaveCount(0);
+    await expect(content.getByRole('button', { exact: true, name: 'Play' })).toHaveCount(0);
+    await expect(content.getByRole('button', { exact: true, name: 'Next' })).toHaveCount(0);
+    await expect(content.getByRole('button', { exact: true, name: 'Last' })).toHaveCount(0);
+});
+
 test('@full loads playlists from Jellyfin', async ({ page }) => {
     await navigateTo(page, '/playlists');
     await expect(page.getByText('Automation Playlist', { exact: true }).first()).toBeVisible({

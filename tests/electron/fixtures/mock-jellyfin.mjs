@@ -78,6 +78,14 @@ const createSong = (index, albumId = 'album-1') => ({
 
 const createLibrary = (songCount = 6) => {
     const songs = Array.from({ length: songCount }, (_, index) => createSong(index + 1));
+    const artist = {
+        Id: 'artist-1',
+        ImageBlurHashes: {},
+        ImageTags: {},
+        Name: 'Automation Artist',
+        Type: 'MusicArtist',
+        UserData: { IsFavorite: false },
+    };
     const album = {
         AlbumArtist: 'Automation Artist',
         AlbumArtists: [{ Id: 'artist-1', Name: 'Automation Artist' }],
@@ -111,7 +119,7 @@ const createLibrary = (songCount = 6) => {
         UserData: { IsFavorite: false, PlayCount: 0, Played: false },
     };
 
-    return { album, playlist, songs };
+    return { album, artist, playlist, songs };
 };
 
 const getQuery = (url, name) => {
@@ -315,6 +323,7 @@ export const startMockJellyfin = async ({ songCount = 6 } = {}) => {
             const item =
                 state.library.songs.find((song) => song.Id === id) ||
                 (state.library.album.Id === id ? state.library.album : undefined) ||
+                (state.library.artist.Id === id ? state.library.artist : undefined) ||
                 (state.library.playlist.Id === id ? state.library.playlist : undefined);
             sendJson(response, item ? 200 : 404, item || { error: 'Item not found' });
             return;
@@ -334,16 +343,7 @@ export const startMockJellyfin = async ({ songCount = 6 } = {}) => {
             (pathname === '/artists/albumartists' || pathname === '/artists')
         ) {
             const searchTerm = getQuery(url, 'SearchTerm')?.toLowerCase();
-            let artists = [
-                {
-                    Id: 'artist-1',
-                    ImageBlurHashes: {},
-                    ImageTags: {},
-                    Name: 'Automation Artist',
-                    Type: 'MusicArtist',
-                    UserData: { IsFavorite: false },
-                },
-            ];
+            let artists = [state.library.artist];
             if (searchTerm) {
                 artists = artists.filter((artist) =>
                     artist.Name.toLowerCase().includes(searchTerm),
