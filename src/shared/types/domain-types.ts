@@ -91,6 +91,7 @@ export interface SavedCollection {
 
 export type ServerListItem = {
     auth?: AuthMode;
+    enableAudiobooks?: boolean;
     features?: ServerFeatures;
     id: string;
     isAdmin?: boolean;
@@ -206,7 +207,7 @@ export type Album = {
     missing: boolean | null;
     name: string;
     originalDate: null | PartialIsoDateString;
-    originalYear: number;
+    originalYear: null | number;
     participants: null | Record<string, RelatedArtist[]>;
     peak: GainInfo | null;
     playCount: null | number;
@@ -429,6 +430,7 @@ export type Song = {
     id: string;
     imageId: null | string;
     imageUrl: null | string;
+    isResumable?: boolean;
     lastPlayedAt: null | string;
     libraryId: null | number;
     libraryName: null | string;
@@ -449,6 +451,7 @@ export type Song = {
     playlistItemId?: string;
     releaseDate: null | PartialIsoDateString;
     releaseYear: null | number;
+    resumePositionMs?: number;
     sampleRate: null | number;
     size: number;
     sortName: string;
@@ -1469,7 +1472,7 @@ export type ScrobbleArgs = BaseEndpointArgs & {
 
 export type ScrobbleQuery = {
     albumId?: string;
-    event?: 'pause' | 'start' | 'stop' | 'unpause';
+    event?: 'pause' | 'start' | 'stop' | 'timeupdate' | 'unpause';
     id: string;
     mediaType: 'podcast' | 'song';
     playbackRate: number;

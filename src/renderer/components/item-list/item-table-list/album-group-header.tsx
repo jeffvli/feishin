@@ -174,9 +174,9 @@ export const AlbumGroupHeader = ({
                     enableViewport={false}
                     id={song?.imageId}
                     itemType={LibraryItem.SONG}
+                    size={albumImageSize}
                     src={song?.imageUrl}
                     thumbHash={song?.thumbHash}
-                    type="table"
                 />
                 {isImageHovered && onPlay && (
                     <div className={imageColumnStyles.playButtonOverlay}>

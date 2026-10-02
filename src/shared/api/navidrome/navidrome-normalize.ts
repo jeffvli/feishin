@@ -44,7 +44,7 @@ const normalizeNavidromeReleaseDate = (item: {
     date?: string;
     minYear?: number;
     releaseDate?: string;
-}): { date: null | string; year: number } => {
+}): { date: null | string; year: null | number } => {
     const fromRelease = parsePartialIsoDate(item.releaseDate);
     if (fromRelease.date) {
         return fromRelease;
@@ -56,11 +56,11 @@ const normalizeNavidromeReleaseDate = (item: {
     }
 
     const y = coerceYear(item.minYear);
-    if (y > 0) {
+    if (y) {
         return { date: String(y), year: y };
     }
 
-    return { date: null, year: 0 };
+    return { date: null, year: null };
 };
 
 const normalizeNavidromeOriginalDate = (item: {
@@ -69,7 +69,7 @@ const normalizeNavidromeOriginalDate = (item: {
     minYear?: number;
     originalDate?: string;
     releaseDate?: string;
-}): { date: null | string; year: number } => {
+}): { date: null | string; year: null | number } => {
     const fromOriginal = parsePartialIsoDate(item.originalDate);
     if (fromOriginal.date) {
         return fromOriginal;
@@ -86,11 +86,39 @@ const normalizeNavidromeOriginalDate = (item: {
     }
 
     const y = coerceYear(item.minOriginalYear ?? item.minYear);
-    if (y > 0) {
+    if (y) {
         return { date: String(y), year: y };
     }
 
-    return { date: null, year: 0 };
+    return { date: null, year: null };
+};
+
+const normalizeNavidromeSongReleaseDate = (item: {
+    date?: string;
+    releaseDate?: string;
+    releaseYear?: number;
+    year?: number;
+}): { date: null | string; year: null | number } => {
+    const fromRelease = parsePartialIsoDate(item.releaseDate);
+    const releaseYear = coerceYear(item.releaseYear);
+
+    if (releaseYear && releaseYear > 0) {
+        return { date: fromRelease.date ?? String(releaseYear), year: releaseYear };
+    }
+    if (fromRelease.date) {
+        return fromRelease;
+    }
+
+    const fromDate = parsePartialIsoDate(item.date);
+    const year = coerceYear(item.year);
+    if (year) {
+        return { date: fromDate.date ?? String(year), year };
+    }
+    if (fromDate.date) {
+        return fromDate;
+    }
+
+    return { date: null, year: null };
 };
 
 const getArtists = (
@@ -211,25 +239,18 @@ const normalizeSong = (
     }
 
     const fromSongDate = parsePartialIsoDate(item.date);
-    const fromSongRelease = parsePartialIsoDate(item.releaseDate);
     const fromSongOriginal = parsePartialIsoDate(item.originalDate);
     const songYear = coerceYear(item.year);
-    const songReleaseYear = coerceYear(item.releaseYear);
     const songOriginalYear = coerceYear(item.originalYear);
-    const releaseYear =
-        songReleaseYear > 0
-            ? songReleaseYear
-            : fromSongRelease.year > 0
-              ? fromSongRelease.year
-              : null;
-    const releaseDate =
-        fromSongRelease.date ?? (songReleaseYear > 0 ? String(songReleaseYear) : null);
-    const date = fromSongDate.date ?? (songYear > 0 ? String(songYear) : null);
-    const year = songYear > 0 ? songYear : fromSongDate.year > 0 ? fromSongDate.year : null;
+    const date = fromSongDate.date ?? (songYear && songYear > 0 ? String(songYear) : null);
+    const year =
+        songYear && songYear > 0 ? songYear : fromSongDate.year > 0 ? fromSongDate.year : null;
+    const { date: releaseDate, year: releaseYear } = normalizeNavidromeSongReleaseDate(item);
     const originalDate =
-        fromSongOriginal.date ?? (songOriginalYear > 0 ? String(songOriginalYear) : null);
+        fromSongOriginal.date ??
+        (songOriginalYear && songOriginalYear > 0 ? String(songOriginalYear) : null);
     const originalYear =
-        songOriginalYear > 0
+        songOriginalYear && songOriginalYear > 0
             ? songOriginalYear
             : fromSongOriginal.year > 0
               ? fromSongOriginal.year
@@ -419,7 +440,7 @@ const normalizeAlbum = (
         ratedAt: item.ratedAt || null,
         releaseDate: releaseDate.date,
         releaseType: item.mbzAlbumType || null,
-        releaseYear: releaseDate.year > 0 ? releaseDate.year : null,
+        releaseYear: releaseDate.year,
         size: item.size,
         songCount: item.songCount,
         songs: item.songs ? item.songs.map((song) => normalizeSong(song, server)) : undefined,

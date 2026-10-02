@@ -1123,7 +1123,9 @@
             "input_jellyfinSignInMethod": "Iniciar sesión con",
             "input_jellyfinSignInMethodPassword": "Contraseña",
             "input_jellyfinSignInMethodQuickConnect": "Conexión rápida",
-            "input_remoteUrlDescription": "Usado en lugar de la URL para características externas, como enlaces compartidos. Dejar esto en blanco a menos que tu servidor sea alcanzable a través de una dirección diferente desde fuera de tu red."
+            "input_remoteUrlDescription": "Usado en lugar de la URL para características externas, como enlaces compartidos. Dejar esto en blanco a menos que tu servidor sea alcanzable a través de una dirección diferente desde fuera de tu red.",
+            "input_enableAudiobooks": "Activar audiolibros",
+            "input_enableAudiobooksDescription": "Muestra contenido de audiolibros desde las bibliotecas \"Libros\""
         },
         "addToPlaylist": {
             "success": "Añadido $t(entity.trackWithCount, {\"count\": {{message}} }) a $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",

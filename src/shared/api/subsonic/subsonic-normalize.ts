@@ -153,7 +153,7 @@ const subsonicReleaseFields = (item: {
     }
 
     const y = coerceYear(item.year);
-    if (y > 0) {
+    if (y) {
         return { releaseDate: String(y), releaseYear: y };
     }
 
@@ -163,7 +163,7 @@ const subsonicTrackYearField = (item: {
     year?: number;
 }): { date: null | string; year: null | number } => {
     const y = coerceYear(item.year);
-    if (y > 0) {
+    if (y) {
         return { date: String(y), year: y };
     }
 
@@ -376,7 +376,7 @@ const normalizeAlbum = (
         missing: null,
         name: item.name,
         originalDate: releaseDate,
-        originalYear: releaseYear ?? 0,
+        originalYear: releaseYear,
         participants: getParticipants(item),
         peak: null,
         playCount: null,
