@@ -12,6 +12,10 @@ const minimize = () => {
     ipcRenderer.send('window-minimize');
 };
 
+const setMiniPlayer = (enabled: boolean, alwaysOnTop: boolean) => {
+    ipcRenderer.send('window-mini-player', enabled, alwaysOnTop);
+};
+
 const unmaximize = () => {
     ipcRenderer.send('window-unmaximize');
 };
@@ -35,6 +39,7 @@ export const browser = {
     maximize,
     minimize,
     quit,
+    setMiniPlayer,
     unmaximize,
 };
 
