@@ -4,7 +4,11 @@ import { AxiosError } from 'axios';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { MutationOptions } from '/@/renderer/lib/react-query';
-import { RemoveFromPlaylistArgs, RemoveFromPlaylistResponse } from '/@/shared/types/domain-types';
+import {
+    RemoveFromPlaylistArgs,
+    RemoveFromPlaylistResponse,
+    SongIdListResponse,
+} from '/@/shared/types/domain-types';
 
 export const useRemoveFromPlaylist = (options?: MutationOptions) => {
     const queryClient = useQueryClient();
@@ -31,6 +35,14 @@ export const useRemoveFromPlaylist = (options?: MutationOptions) => {
             queryClient.invalidateQueries({
                 queryKey: queryKeys.playlists.songList(serverId, variables.query.id),
             });
+            queryClient.setQueryData<SongIdListResponse>(
+                queryKeys.playlists.songListIds(serverId, variables.query.id),
+                (prev) =>
+                    prev && {
+                        ...prev,
+                        items: prev.items.filter((id) => !variables.query.songId.includes(id)),
+                    },
+            );
         },
         ...options,
     });

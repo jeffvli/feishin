@@ -6,7 +6,11 @@ import { queryKeys } from '/@/renderer/api/query-keys';
 import { useRecentPlaylists } from '/@/renderer/features/playlists/hooks/use-recent-playlists';
 import { MutationHookArgs } from '/@/renderer/lib/react-query';
 import { useCurrentServerId } from '/@/renderer/store';
-import { AddToPlaylistArgs, AddToPlaylistResponse } from '/@/shared/types/domain-types';
+import {
+    AddToPlaylistArgs,
+    AddToPlaylistResponse,
+    SongIdListResponse,
+} from '/@/shared/types/domain-types';
 
 export const useAddToPlaylist = (args: MutationHookArgs) => {
     const { options } = args || {};
@@ -38,6 +42,11 @@ export const useAddToPlaylist = (args: MutationHookArgs) => {
             queryClient.invalidateQueries({
                 queryKey: queryKeys.playlists.songList(serverId, variables.query.id),
             });
+
+            queryClient.setQueryData<SongIdListResponse>(
+                queryKeys.playlists.songListIds(serverId, variables.query.id),
+                (prev) => prev && { ...prev, items: [...prev.items, ...variables.body.songId] },
+            );
 
             addRecentPlaylist(variables.query.id);
 

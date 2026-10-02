@@ -16,6 +16,7 @@ import {
     getSongsByFolder,
 } from '/@/renderer/features/player/utils';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
+import { usePlaylistsContainingSongs } from '/@/renderer/features/playlists/hooks/use-playlists-containing-songs';
 import { useAddToPlaylist } from '/@/renderer/features/playlists/mutations/add-to-playlist-mutation';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { useCurrentServerId } from '/@/renderer/store';
@@ -30,6 +31,7 @@ import { Icon } from '/@/shared/components/icon/icon';
 import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { Pill } from '/@/shared/components/pill/pill';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
+import { Spinner } from '/@/shared/components/spinner/spinner';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
 import { Table } from '/@/shared/components/table/table';
@@ -90,28 +92,26 @@ export const AddToPlaylistContextModal = ({
         }),
     );
 
-    const playlistOptions = useQuery({
-        enabled: !!playlistList.data,
-        queryFn: async () => {
-            const playlists = await Promise.all(
-                (playlistList.data?.items ?? []).map(async (playlist) => {
-                    const songs = await getSongsByPlaylist(playlist.id);
-                    return {
-                        ...playlist,
-                        alreadyInPlaylist:
-                            songId?.some((id) => songs?.items?.some((song) => song.id === id)) ??
-                            false,
-                        label: playlist.name,
-                        value: playlist.id,
-                    };
-                }),
-            );
+    const playlists = useMemo(() => playlistList.data?.items ?? [], [playlistList.data?.items]);
 
-            return [playlists, new Map(playlists.map(({ id, name }) => [id, name]))] as const;
-        },
-        queryKey: ['add-to-playlist-options', serverId, playlistList.data?.items, songId],
+    const { inPlaylist, isReady } = usePlaylistsContainingSongs({
+        playlists,
+        serverId,
+        songIds: songId,
     });
-    const [playlistSelect, playlistMap] = playlistOptions.data ?? [[], new Map<string, string>()];
+
+    const isPlaylistsReady = !!playlistList.data && isReady;
+
+    const [playlistSelect, playlistMap] = useMemo(() => {
+        const options = playlists.map((playlist, index) => ({
+            ...playlist,
+            alreadyInPlaylist: inPlaylist[index] ?? false,
+            label: playlist.name,
+            value: playlist.id,
+        }));
+
+        return [options, new Map(options.map(({ id, name }) => [id, name]))] as const;
+    }, [playlists, inPlaylist]);
 
     const filteredItems = useMemo(() => {
         if (search) {
@@ -469,7 +469,13 @@ export const AddToPlaylistContextModal = ({
                         placeholder={t('form.addToPlaylist.searchOrCreate')}
                         value={search}
                     />
-                    <ScrollArea style={{ maxHeight: '18rem' }}>
+                    {!isPlaylistsReady && <Spinner container />}
+                    <ScrollArea
+                        style={{
+                            display: isPlaylistsReady ? undefined : 'none',
+                            maxHeight: '18rem',
+                        }}
+                    >
                         <Table styles={{ td: { padding: 'var(--theme-spacing-sm)' } }}>
                             <Table.Tbody>
                                 {filteredItems.map((item, index) => (
@@ -588,6 +594,7 @@ export const AddToPlaylistContextModal = ({
                         <ModalButton
                             disabled={
                                 isLoading ||
+                                !isPlaylistsReady ||
                                 addToPlaylistMutation.isPending ||
                                 (form.values.selectedPlaylistIds.length === 0 &&
                                     form.values.newPlaylists.length === 0)
