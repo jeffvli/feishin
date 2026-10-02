@@ -137,12 +137,16 @@ test('@full drags a search result into a specific queue position', async ({ page
     await search.fill('Automation Track 6');
     await search.press('Enter');
 
-    const source = getSongCell(page.getByRole('main'), 'Automation Track 6');
-    const target = getSongCell(queue, 'Automation Track 2');
-    await source.dragTo(target, {
-        sourcePosition: { x: 20, y: 10 },
-        targetPosition: { x: 20, y: 2 },
-    });
+    const source = page.getByRole('main').getByText('Automation Track 6', { exact: true });
+    const target = queue.getByText('Automation Track 2', { exact: true });
+    const sourceBox = await source.boundingBox();
+    const targetBox = await target.boundingBox();
+    if (!sourceBox || !targetBox) throw new Error('Search result or queue target is not visible');
+
+    await page.mouse.move(sourceBox.x + 10, sourceBox.y + sourceBox.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(targetBox.x + 10, targetBox.y + 1, { steps: 12 });
+    await page.mouse.up();
 
     await expect(queueTrackNames).toHaveCount(7);
     await expect
