@@ -518,8 +518,7 @@ export const useScrobble = () => {
     );
 
     const handleScrobbleFromSeek = useCallback(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        (properties: { timestamp: number }, _prev: { timestamp: number }) => {
+        (properties: { timestamp: number }) => {
             if (!isScrobbleEnabled || isPrivateModeEnabled) {
                 return;
             }

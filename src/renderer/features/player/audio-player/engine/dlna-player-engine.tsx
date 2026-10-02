@@ -857,16 +857,12 @@ export const DlnaPlayerEngine = (props: DlnaPlayerEngineProps) => {
                     suppressDeviceSeekRef.current = false;
                     return;
                 }
-                // mediaStop resets the timestamp to 0 in the same store update that sets
-                // STOPPED; forwarding that as a seek would restart the track on the renderer.
+                // mediaStop emits a zero seek after setting STOPPED; forwarding that as
+                // a seek would restart the track on the renderer.
                 if (usePlayerStore.getState().player.status === PlayerStatus.STOPPED) {
                     return;
                 }
                 const currentId = usePlayerStore.getState().getPlayerData().currentSong?.id;
-                // useUpdateCurrentSong clears a stale local seek by emitting zero when the
-                // song changes. A gapless renderer has already started that song, so do not
-                // restart it with a device seek.
-                if (properties.timestamp === 0 && currentId !== lastSentSongIdRef.current) return;
                 if (
                     lastSentRawUrlRef.current &&
                     isChunkedTranscodeUrl(lastSentRawUrlRef.current) &&

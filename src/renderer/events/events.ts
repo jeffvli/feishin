@@ -14,6 +14,7 @@ export type EventMap = {
     PLAYER_LYRICS_FETCHED: PlayerLyricsFetchedEventPayload;
     PLAYER_PLAY: PlayerPlayEventPayload;
     PLAYER_REPEATED: PlayerRepeatedEventPayload;
+    PLAYER_SEEK_TO_TIMESTAMP: PlayerSeekToTimestampEventPayload;
     PLAYER_STOP: PlayerStopEventPayload;
     PLAYLIST_MOVE_DOWN: PlaylistMoveEventPayload;
     PLAYLIST_MOVE_TO_BOTTOM: PlaylistMoveEventPayload;
@@ -61,6 +62,10 @@ export type PlayerPlayEventPayload = {
 
 export type PlayerRepeatedEventPayload = {
     index: number;
+};
+
+export type PlayerSeekToTimestampEventPayload = {
+    timestamp: number;
 };
 
 export type PlayerStopEventPayload = {

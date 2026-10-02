@@ -8,7 +8,6 @@ import {
     subscribePlayerProgress,
     subscribePlayerQueue,
     subscribePlayerRepeat,
-    subscribePlayerSeekToTimestamp,
     subscribePlayerShuffle,
     subscribePlayerSpeed,
     subscribePlayerStatus,
@@ -47,11 +46,7 @@ interface PlayerEventsCallbacks {
     onPlayerQueueChange?: (queue: QueueData, prev: QueueData) => void;
     onPlayerRepeat?: (properties: { repeat: PlayerRepeat }, prev: { repeat: PlayerRepeat }) => void;
     onPlayerRepeated?: (properties: { index: number }) => void;
-    onPlayerSeek?: (properties: { seconds: number }, prev: { seconds: number }) => void;
-    onPlayerSeekToTimestamp?: (
-        properties: { timestamp: number },
-        prev: { timestamp: number },
-    ) => void;
+    onPlayerSeekToTimestamp?: (properties: { timestamp: number }) => void;
     onPlayerShuffle?: (
         properties: { shuffle: PlayerShuffle },
         prev: { shuffle: PlayerShuffle },
@@ -120,12 +115,6 @@ function createPlayerEvents(callbacks: PlayerEventsCallbacks): PlayerEvents {
         unsubscribers.push(unsubscribe);
     }
 
-    // Subscribe to seek events
-    if (callbacks.onPlayerSeekToTimestamp) {
-        const unsubscribe = subscribePlayerSeekToTimestamp(callbacks.onPlayerSeekToTimestamp);
-        unsubscribers.push(unsubscribe);
-    }
-
     // Subscribe to player status changes
     if (callbacks.onPlayerStatus) {
         const unsubscribe = subscribePlayerStatus(callbacks.onPlayerStatus);
@@ -170,6 +159,10 @@ function createPlayerEvents(callbacks: PlayerEventsCallbacks): PlayerEvents {
         eventEmitter.on('MEDIA_PREV', callbacks.onMediaPrev);
     }
 
+    if (callbacks.onPlayerSeekToTimestamp) {
+        eventEmitter.on('PLAYER_SEEK_TO_TIMESTAMP', callbacks.onPlayerSeekToTimestamp);
+    }
+
     if (callbacks.onPlayerPlay) {
         eventEmitter.on('PLAYER_PLAY', callbacks.onPlayerPlay);
     }
@@ -202,6 +195,10 @@ function createPlayerEvents(callbacks: PlayerEventsCallbacks): PlayerEvents {
             }
             if (callbacks.onMediaPrev) {
                 eventEmitter.off('MEDIA_PREV', callbacks.onMediaPrev);
+            }
+
+            if (callbacks.onPlayerSeekToTimestamp) {
+                eventEmitter.off('PLAYER_SEEK_TO_TIMESTAMP', callbacks.onPlayerSeekToTimestamp);
             }
             if (callbacks.onPlayerPlay) {
                 eventEmitter.off('PLAYER_PLAY', callbacks.onPlayerPlay);
