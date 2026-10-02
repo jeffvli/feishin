@@ -32,7 +32,7 @@ import { shutdownServer } from './features/core/remote';
 import { store } from './features/core/settings';
 import { canHandleVisualizerDisplayMedia } from './features/core/visualizer';
 import log, { autoUpdaterLogInterface } from './logger';
-import MenuBuilder, { MenuPlaybackState } from './menu';
+import MenuBuilder, { isMenuLanguage, MenuPlaybackState } from './menu';
 import './features';
 import { hotkeyToElectronAccelerator } from './utils';
 
@@ -370,6 +370,8 @@ let currentPrivateMode = false;
 let currentRepeatMode: PlayerRepeat = PlayerRepeat.NONE;
 let currentSidebarCollapsed = false;
 let currentShuffleEnabled = false;
+let currentMenuLanguage: string | undefined;
+let menuRebuildPromise = Promise.resolve();
 
 app.on('before-quit', () => {
     forceQuit = true;
@@ -385,6 +387,20 @@ ipcMain.on('input-focus-state', (_event, focused: boolean) => {
     if (isMacOS()) {
         updateMainMenu();
     }
+});
+
+ipcMain.on('update-menu-language', (_event, language: unknown) => {
+    if (typeof language !== 'string' || !isMenuLanguage(language)) {
+        log.warn('Ignoring invalid menu language', { language });
+        return;
+    }
+
+    currentMenuLanguage = language;
+    store.set('menu_language', language);
+
+    menuRebuildPromise = menuRebuildPromise
+        .then(() => rebuildMainMenu(language))
+        .catch((error) => log.error('Failed to rebuild application menu', error));
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -476,14 +492,10 @@ const getMainMenuState = (): MenuPlaybackState => ({
     sidebarCollapsed: currentSidebarCollapsed,
 });
 
-const rebuildMainMenu = () => {
-    if (!menuBuilder || !mainWindow) return;
+const rebuildMainMenu = async (language = currentMenuLanguage) => {
+    if (!menuBuilder || !mainWindow || !language) return;
 
-    menuBuilder.buildMenu(getMainMenuState());
-
-    if (process.platform !== 'darwin') {
-        Menu.setApplicationMenu(null);
-    }
+    await menuBuilder.buildMenu(getMainMenuState(), language);
 };
 
 const updateMainMenu = () => {
@@ -859,7 +871,11 @@ async function createWindow(first = true): Promise<void> {
     }
 
     menuBuilder = new MenuBuilder(mainWindow, showMainWindow);
-    rebuildMainMenu();
+    const storedMenuLanguage = store.get('menu_language');
+    if (typeof storedMenuLanguage === 'string' && isMenuLanguage(storedMenuLanguage)) {
+        currentMenuLanguage = storedMenuLanguage;
+        await rebuildMainMenu(storedMenuLanguage);
+    }
 
     // Open URLs in the user's browser
     mainWindow.webContents.setWindowOpenHandler((edata) => {
@@ -1056,7 +1072,7 @@ ipcMain.on(
         };
 
         if (isMacOS()) {
-            rebuildMainMenu();
+            void rebuildMainMenu();
         }
 
         const globalMediaKeysEnabled = store.get('global_media_hotkeys', true) as boolean;
