@@ -15,6 +15,7 @@ import { useCurrentServer } from '/@/renderer/store';
 import { ActionIcon, ActionIconGroup } from '/@/shared/components/action-icon/action-icon';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Text } from '/@/shared/components/text/text';
+import { ExternalItemBadge } from '/@/shared/components/external-item-badge/external-item-badge';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { ExplicitStatus, LibraryItem, Song } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
@@ -43,6 +44,7 @@ interface LibraryCommandItemProps {
     id: string;
     imageId: null | string;
     imageUrl: null | string;
+    isExternal?: boolean;
     isHighlighted?: boolean;
     itemType: LibraryItem;
     song?: Song;
@@ -56,6 +58,7 @@ export const LibraryCommandItem = ({
     id,
     imageId,
     imageUrl,
+    isExternal,
     isHighlighted,
     itemType,
     song,
@@ -169,7 +172,10 @@ export const LibraryCommandItem = ({
                     />
                 </div>
                 <div className={styles.metadataWrapper}>
-                    <Text overflow="hidden">{title}</Text>
+                    <Text overflow="hidden">
+                        {title}
+                        {(isExternal ?? song?.isExternal) === true && <ExternalItemBadge />}
+                    </Text>
                     <Text isMuted overflow="hidden" size="sm">
                         {subtitle}
                     </Text>

@@ -194,6 +194,7 @@ export type Album = {
     imageId: null | string;
     imageUrl: null | string;
     isCompilation: boolean | null;
+    isExternal?: boolean;
     lastPlayedAt: null | string;
     mbzId: null | string;
     mbzReleaseGroupId: null | string;
@@ -235,6 +236,7 @@ export type AlbumArtist = {
     duration: null | number;
     genres: Genre[];
     id: string;
+    isExternal?: boolean;
     imageId: null | string;
     imageUrl: null | string;
     lastPlayedAt: null | string;
@@ -421,6 +423,7 @@ export type Song = {
     gain: GainInfo | null;
     genres: Genre[];
     id: string;
+    isExternal?: boolean;
     imageId: null | string;
     imageUrl: null | string;
     isResumable?: boolean;

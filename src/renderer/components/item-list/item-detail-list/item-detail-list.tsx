@@ -71,6 +71,7 @@ import { useSettingsStore, useShowFavorites, useShowRatings } from '/@/renderer/
 import { formatDurationString, formatPartialIsoDateUTC } from '/@/renderer/utils';
 import { SEPARATOR_STRING } from '/@/shared/api/utils';
 import { ExplicitIndicator } from '/@/shared/components/explicit-indicator/explicit-indicator';
+import { ExternalItemBadge } from '/@/shared/components/external-item-badge/external-item-badge';
 import { Skeleton } from '/@/shared/components/skeleton/skeleton';
 import { useDoubleClick } from '/@/shared/hooks/use-double-click';
 import { useFocusWithin } from '/@/shared/hooks/use-focus-within';
@@ -406,6 +407,9 @@ const TrackRow = memo(
                             style={style}
                         >
                             {content}
+                            {col.id === TableColumn.TITLE && song.isExternal === true && (
+                                <ExternalItemBadge />
+                            )}
                         </div>
                     );
                 })}

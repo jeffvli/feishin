@@ -21,6 +21,7 @@ import {
 } from '/@/renderer/features/shared/components/play-button-group';
 import { usePlayButtonBehavior } from '/@/renderer/store';
 import { ExplicitIndicator } from '/@/shared/components/explicit-indicator/explicit-indicator';
+import { ExternalItemBadge } from '/@/shared/components/external-item-badge/external-item-badge';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 import { Folder, LibraryItem, QueueSong } from '/@/shared/types/domain-types';
@@ -334,6 +335,7 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
                     >
                         <ExplicitIndicator explicitStatus={song?.explicitStatus} />
                         {row.name as string}
+                        {song?.isExternal === true && <ExternalItemBadge />}
                         {song?.trackSubtitle && props.itemType !== LibraryItem.QUEUE_SONG && (
                             <span
                                 className={clsx(styles.trackSubtitle, {

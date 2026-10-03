@@ -13,6 +13,7 @@ import {
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { useIsActiveRow } from '/@/renderer/components/item-list/item-table-list/item-table-list-context';
 import { ExplicitIndicator } from '/@/shared/components/explicit-indicator/explicit-indicator';
+import { ExternalItemBadge } from '/@/shared/components/external-item-badge/external-item-badge';
 import { Text } from '/@/shared/components/text/text';
 import { LibraryItem, QueueSong } from '/@/shared/types/domain-types';
 
@@ -66,6 +67,7 @@ function DefaultTitleColumn(props: ItemTableListInnerColumn) {
                 >
                     <ExplicitIndicator explicitStatus={item?.explicitStatus} />
                     {row}
+                    {item?.isExternal === true && <ExternalItemBadge />}
                 </Text>
             </TableColumnContainer>
         );
@@ -116,6 +118,7 @@ function QueueSongTitleColumn(props: ItemTableListInnerColumn) {
                 >
                     <ExplicitIndicator explicitStatus={song?.explicitStatus} />
                     {row}
+                    {song?.isExternal === true && <ExternalItemBadge />}
                     {song?.trackSubtitle && props.itemType !== LibraryItem.QUEUE_SONG && (
                         <Text
                             className={clsx({

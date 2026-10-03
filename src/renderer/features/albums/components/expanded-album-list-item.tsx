@@ -30,6 +30,7 @@ import { Separator } from '/@/shared/components/separator/separator';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
 import { Text } from '/@/shared/components/text/text';
+import { ExternalItemBadge } from '/@/shared/components/external-item-badge/external-item-badge';
 import { useMergedRef } from '/@/shared/hooks/use-merged-ref';
 import { LibraryItem, RelatedArtist, Song } from '/@/shared/types/domain-types';
 import { DragOperation, DragTarget, DragTargetMap } from '/@/shared/types/drag-and-drop';
@@ -56,6 +57,7 @@ interface AlbumTracksTableProps {
         discNumber: number;
         duration: number;
         id: string;
+        isExternal?: boolean;
         name: string;
         trackNumber: number;
     }>;
@@ -169,7 +171,10 @@ const TrackRow = ({ controls, internalState, player, serverId, song, songs }: Tr
             <span className={styles['track-number']}>
                 {song.discNumber} - {song.trackNumber}
             </span>
-            <span className={styles['track-name']}>{song.name}</span>
+            <span className={styles['track-name']}>
+                {song.name}
+                {song.isExternal === true && <ExternalItemBadge />}
+            </span>
             <span className={styles['track-duration']}>{formatDuration(song.duration)}</span>
         </Text>
     );
