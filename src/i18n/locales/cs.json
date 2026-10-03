@@ -1241,7 +1241,9 @@
             "input_jellyfinSignInMethod": "Přihlásit se přes",
             "input_jellyfinSignInMethodPassword": "Heslo",
             "input_jellyfinSignInMethodQuickConnect": "Rychlé připojení",
-            "input_remoteUrlDescription": "Použito jako adresa URL pro externí funkce, jako jsou sdílené odkazy. Ponechte prázdné, pokud není váš server dosažitelný z jiné adresy mimo vaši síť."
+            "input_remoteUrlDescription": "Použito jako adresa URL pro externí funkce, jako jsou sdílené odkazy. Ponechte prázdné, pokud není váš server dosažitelný z jiné adresy mimo vaši síť.",
+            "input_enableAudiobooks": "Povolit audioknihy",
+            "input_enableAudiobooksDescription": "Zobrazit audioknihy z knihoven „Knihy“"
         },
         "addToPlaylist": {
             "success": "$t(entity.trackWithCount, {\"count\": {{message}} }) přidáno do $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",

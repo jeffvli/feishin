@@ -228,7 +228,9 @@
         "settingsSyncError": "Ditemukan ketidaksesuaian antara pengaturan di perender dan proses utama. mulai ulang aplikasi untuk menerapkan perubahan",
         "invalidJson": "JSON tidak valid",
         "serverLockSingleServer": "Hanya satu server yang diizinkan ketika server dikunci",
-        "playbackPausedDueToError": "Pemutaran dijeda karena terjadi kesalahan"
+        "playbackPausedDueToError": "Pemutaran dijeda karena terjadi kesalahan",
+        "jellyfinQuickConnectDeactivated": "Permintaan Quick Connect telah kedaluwarsa",
+        "jellyfinQuickConnectNotActive": "Quick Connect tidak aktif di server ini"
     },
     "filter": {
         "album": "$t(entity.album, {\"count\": 1})",
@@ -298,7 +300,19 @@
             "input_preferRemoteUrl": "Utamakan URL publik",
             "input_remoteUrl": "Url publik",
             "input_remoteUrlPlaceholder": "Opsional: URL publik untuk fitur eksternal",
-            "input_passwordNoSSO": "Autentikasi proxy terbalik (SSO) tidak didukung. Hanya autentikasi nama pengguna/kata sandi dan autentikasi Subsonic yang didukung"
+            "input_passwordNoSSO": "Autentikasi proxy terbalik (SSO) tidak didukung. Hanya autentikasi nama pengguna/kata sandi dan autentikasi Subsonic yang didukung",
+            "input_enableAudiobooks": "Aktifkan Buku Audio",
+            "input_enableAudiobooksDescription": "Tampilkan konten buku audio dari pustaka \"Buku\"",
+            "input_jellyfinQuickConnect": "Quick Connect",
+            "input_jellyfinQuickConnectCode": "Masukkan kode ini di UI web Jellyfin Anda untuk memberikan otorisasi",
+            "input_jellyfinQuickConnectCodeCopied": "Disalin",
+            "input_jellyfinQuickConnectCodeCopy": "Salin kode",
+            "input_jellyfinQuickConnectOpen": "Buka Quick Connect",
+            "input_jellyfinQuickConnectWaiting": "Menunggu persetujuan di server Jellyfin Anda…",
+            "input_jellyfinSignInMethod": "Masuk dengan",
+            "input_jellyfinSignInMethodPassword": "Kata sandi",
+            "input_jellyfinSignInMethodQuickConnect": "Quick Connect",
+            "input_remoteUrlDescription": "Digunakan sebagai pengganti URL untuk fitur eksternal, seperti tautan yang dibagikan. Biarkan kosong kecuali server Anda dapat dijangkau melalui alamat yang berbeda dari luar jaringan."
         },
         "addToPlaylist": {
             "input_playlists": "$t(entity.playlist, {\"count\": 2})",
@@ -531,7 +545,13 @@
                 "lyricOpacityNonActive_description": "Opasitas baris lirik yang sedang tidak aktif",
                 "lyricScaleNonActive_description": "Skala baris lirik yang sedang tidak aktif",
                 "showLyricMatch_description": "Tampilkan nama lagu dan artis dari lirik yang cocok",
-                "showLyricProvider_description": "Tampilkan penyedia yang menyediakan lirik saat ini"
+                "showLyricProvider_description": "Tampilkan penyedia yang menyediakan lirik saat ini",
+                "coverArtSize": "Ukuran gambar sampul",
+                "playerItemAlignment": "Perataan item pemutar",
+                "titleDisplayType": "Gaya tampilan judul",
+                "titleDisplayType_optionMultiLine": "Multi-baris",
+                "titleDisplayType_optionScroll": "Gulir",
+                "titleLineCount": "Jumlah baris judul"
             },
             "lyrics": "Lirik",
             "related": "Terkait",
@@ -563,7 +583,8 @@
             "recentlyPlayed": "Baru saja diputar",
             "title": "$t(common.home)",
             "genres": "$t(entity.genre, {\"count\": 2})",
-            "recentlyReleased": "Baru dirilis"
+            "recentlyReleased": "Baru dirilis",
+            "playlists": "Daftar putar"
         },
         "itemDetail": {
             "copyPath": "Salin jalur ke papan klip",
@@ -959,7 +980,7 @@
         "discordDisplayType_description": "Mengubah apa yang Anda dengarkan di status Anda",
         "discordDisplayType_songname": "Nama lagu",
         "discordDisplayType": "Jenis tampilan presence {{discord}}",
-        "discordLinkType_description": "Menambahkan tautan eksternal ke {{lastfm}} atau {{musicbrainz}} pada kolom lagu dan artis di rich presence {{discord}}. {{musicbrainz}} paling akurat tetapi memerlukan tag dan tidak menyediakan tautan artis, sedangkan {{lastfm}} seharusnya selalu menyediakan tautan. tidak membuat permintaan jaringan tambahan",
+        "discordLinkType_description": "Menambahkan tautan {{lastfm}} atau {{musicbrainz}} ke rich presence {{discord}}. {{musicbrainz}} paling akurat, tetapi memerlukan tag dan tidak menyediakan tautan artis, sedangkan {{lastfm}} seharusnya selalu menyediakan tautan. Tidak melakukan permintaan jaringan tambahan",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}} dengan fallback {{lastfm}}",
         "discordLinkType_none": "$t(common.none)",
         "discordLinkType": "Tautan presence {{discord}}",
@@ -1049,8 +1070,8 @@
         "preservePitch": "Pertahankan pitch",
         "audioFadeOnStatusChange": "Fade audio saat status berubah",
         "audioFadeOnStatusChange_description": "Mengaktifkan fade out dan fade in saat status putar/jeda berubah",
-        "preventSleepOnPlayback_description": "Cegah layar tidur saat musik diputar",
-        "preventSleepOnPlayback": "Cegah tidur saat pemutaran",
+        "preventSleepOnPlayback_description": "Mencegah layar mati saat musik diputar",
+        "preventSleepOnPlayback": "Cegah layar mati saat pemutaran",
         "sidebarPlaylistSorting_description": "Memungkinkan pengurutan playlist secara manual di bilah samping dengan drag dan drop alih-alih urutan default server",
         "sidebarPlaylistSorting": "Pengurutan playlist bilah samping",
         "mediaSession_description": "Mengaktifkan integrasi sesi media, menampilkan kontrol media dan metadata di overlay volume sistem dan layar kunci. Memerlukan Pemutar Audio Web.",
@@ -1094,8 +1115,8 @@
         "nativeSpotify": "Gunakan aplikasi Spotify",
         "playerbarWaveformStretch": "Peregangan bentuk gelombang",
         "playerbarWaveformStretch_description": "Meregangkan bentuk gelombang untuk memenuhi ruang yang tersedia",
-        "preventSuspendOnPlayback_description": "Cegah aplikasi ditangguhkan saat musik diputar",
-        "preventSuspendOnPlayback": "Cegah penangguhan saat pemutaran",
+        "preventSuspendOnPlayback_description": "Mencegah sistem masuk ke mode tidur saat musik diputar",
+        "preventSuspendOnPlayback": "Cegah sistem tidur saat pemutaran",
         "sidebarPlaylistFolders_description": "Buat tampilan folder untuk daftar putar yang menyertakan pemisah yang dikonfigurasi dalam namanya",
         "sidebarPlaylistFolders": "Aktifkan folder",
         "sidebarPlaylistFolderSeparator_description": "Karakter (atau string) yang memisahkan tingkat folder dalam nama daftar putar",
@@ -1195,7 +1216,25 @@
         "windowBarTrackinfo": "Info trek di Judul Jendela",
         "windowBarTrackinfo_description": "Tampilkan judul dan artis trek saat ini, posisi antrean, dan status Memutar/Jeda di Judul Jendela.",
         "microtonalPitchControls": "Kontrol pitch mikrotonal",
-        "microtonalPitchControls_description": "Tambahkan lebih banyak kontrol pitch untuk berpindah di antara semi-ton"
+        "microtonalPitchControls_description": "Tambahkan lebih banyak kontrol pitch untuk berpindah di antara semi-ton",
+        "fullscreenAutoOpenTimeout_description": "Secara otomatis membuka pemutar layar penuh setelah jumlah menit ini tanpa aktivitas saat lagu diputar. Atur ke 0 untuk menonaktifkan",
+        "fullscreenAutoOpenTimeout": "Batas waktu pembukaan otomatis pemutar layar penuh (menit)",
+        "imagePlaceholderPriority_description": "Menetapkan jenis placeholder gambar yang digunakan saat memuat, jika tersedia",
+        "imagePlaceholderPriority": "Prioritas placeholder gambar",
+        "imagePlaceholderPriority_optionBlurhash": "BlurHash",
+        "imagePlaceholderPriority_optionDominantColor": "Warna dominan",
+        "imagePlaceholderPriority_optionOff": "Nonaktif",
+        "imagePlaceholderPriority_optionThumbhash": "ThumbHash",
+        "scrobbleMinimumMode_description": "Melakukan scrobble setelah persentase tertentu dari lagu, sejumlah detik tertentu, atau salah satunya telah terlewati",
+        "scrobbleMinimumMode_optionBoth": "Keduanya",
+        "scrobbleMinimumMode_optionSeconds": "Detik",
+        "scrobbleMinimumMode_optionPercentage": "Persentase",
+        "scrobbleMinimumMode": "Atur mode minimum scrobble",
+        "transcodeNote": "Transcoding dilakukan oleh server dan berlaku mulai trek berikutnya",
+        "transcodeSampleRate_description": "Laju sampel maksimum dalam Hz untuk audio yang ditranskode, misalnya 192000. Biarkan kosong untuk mempertahankan laju sumber. Khusus Jellyfin",
+        "transcodeSampleRate": "Laju sampel maksimum untuk transcoding",
+        "sidebarImageEnabled": "Tombol perluas gambar album",
+        "sidebarImageEnabled_description": "Tampilkan tombol pada gambar album di bilah pemutar untuk memperluasnya ke panel samping. Menonaktifkan opsi ini juga menyembunyikan tombol dan menutup gambar album jika sedang diperluas"
     },
     "table": {
         "column": {
@@ -1538,5 +1577,53 @@
         "systemAudioCaptureFailed": "Tidak dapat memulai pengambilan: {{message}}",
         "systemAudioNoAudioTrack": "Tidak ada trek audio yang dikembalikan. Pastikan pengambilan audio diaktifkan saat diminta.",
         "systemAudioExclusiveModeNotSupported": "Visualizer tidak tersedia saat mode audio eksklusif diaktifkan. Nonaktifkan Mode Audio Eksklusif di pengaturan MPV lalu coba lagi."
+    },
+    "dlna": {
+        "castToDevice": "Cast ke perangkat DLNA",
+        "castingToDevice": "Melakukan cast ke {{name}}",
+        "castingToGroup": "Melakukan cast ke grup ({{count}})",
+        "connected": "terhubung",
+        "connecting": "Menghubungkan…",
+        "createGroup": "Buat Grup",
+        "devices": "Perangkat DLNA",
+        "disconnect": "Putuskan koneksi",
+        "disconnectAndContinue": "Putuskan Koneksi dan Lanjutkan",
+        "noDevicesFound": "Tidak ada perangkat DLNA yang ditemukan",
+        "nowCasting": "Sedang melakukan cast",
+        "searching": "Mencari perangkat…",
+        "shiftDisconnectHint": "Tahan Shift lalu tekan Putuskan Koneksi untuk tetap memutar di speaker",
+        "group": {
+            "add": "Tambahkan",
+            "addSpeaker": "Tambahkan Speaker",
+            "addSpeakers": "Tambahkan Speaker",
+            "addToGroup": "Tambahkan ke Grup",
+            "cancel": "Batal",
+            "connect": "Hubungkan",
+            "coordinator": "koordinator",
+            "failedToAddMessage": "Tidak dapat menambahkan {{name}}. Perangkat mungkin tidak berada dalam sistem Sonos yang sama.",
+            "failedToAddTitle": "Gagal Menambahkan Speaker",
+            "firstSelectedIsCoordinator": "Pilihan pertama = koordinator",
+            "noSonosFound": "Tidak ada perangkat Sonos yang ditemukan",
+            "refresh": "Muat ulang",
+            "remove": "Hapus",
+            "searching": "Mencari…",
+            "selectSpeakers": "Pilih Speaker Grup",
+            "title": "Grup ({{count}} speaker)"
+        },
+        "speakerProperties": {
+            "bass": "Bass",
+            "crossfade": "Crossfade",
+            "ledState": "Lampu Status",
+            "loadFailed": "Tidak dapat memuat properti",
+            "loading": "Memuat…",
+            "longPressHint": "Tekan lama untuk melihat properti speaker",
+            "loudness": "Loudness",
+            "touchControls": "Kontrol Sentuh",
+            "treble": "Treble"
+        },
+        "volume": {
+            "groupControl": "Tahan Shift untuk mengubah volume masing-masing speaker",
+            "individualControl": "Lepaskan Shift untuk mengubah volume semua speaker"
+        }
     }
 }
