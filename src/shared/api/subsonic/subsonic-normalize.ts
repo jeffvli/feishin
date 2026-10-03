@@ -136,7 +136,7 @@ const getGenres = (
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
-const normalizeIsExternal = (value?: boolean | 'false' | 'true'): boolean | undefined => {
+const normalizeIsExternal = (value?: 'false' | 'true' | boolean): boolean | undefined => {
     if (value === undefined) return undefined;
     return value === true || value === 'true';
 };
@@ -299,9 +299,9 @@ const normalizeAlbumArtist = (
         duration: null,
         genres: [],
         id: item.id.toString(),
-        isExternal: normalizeIsExternal(item.isExternal),
         imageId: item.coverArt?.toString() || null,
         imageUrl: null,
+        isExternal: normalizeIsExternal(item.isExternal),
         lastPlayedAt: null,
         mbz: null,
         missing: null,
@@ -376,8 +376,8 @@ const normalizeAlbum = (
         id: item.id.toString(),
         imageId: item.coverArt?.toString() || null,
         imageUrl: null,
-        isExternal: normalizeIsExternal(item.isExternal),
         isCompilation: null,
+        isExternal: normalizeIsExternal(item.isExternal),
         lastPlayedAt: null,
         mbzId: null,
         mbzReleaseGroupId: null,

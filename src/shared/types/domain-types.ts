@@ -236,9 +236,9 @@ export type AlbumArtist = {
     duration: null | number;
     genres: Genre[];
     id: string;
-    isExternal?: boolean;
     imageId: null | string;
     imageUrl: null | string;
+    isExternal?: boolean;
     lastPlayedAt: null | string;
     mbz: null | string;
     missing: boolean | null;
@@ -423,9 +423,9 @@ export type Song = {
     gain: GainInfo | null;
     genres: Genre[];
     id: string;
-    isExternal?: boolean;
     imageId: null | string;
     imageUrl: null | string;
+    isExternal?: boolean;
     isResumable?: boolean;
     lastPlayedAt: null | string;
     libraryId: null | number;
