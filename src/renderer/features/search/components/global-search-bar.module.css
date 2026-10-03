@@ -1,6 +1,6 @@
 .container {
     position: relative;
-    z-index: 210;
+    z-index: calc(var(--mantine-z-index-modal) - 1);
     display: flex;
     flex: 0 0 65px;
     align-items: center;
