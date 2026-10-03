@@ -66,7 +66,12 @@ export const ServerSelector = () => {
     return (
         <DropdownMenu offset={0} position="right-start" withinPortal={false}>
             <DropdownMenu.Target>
-                <div className={styles.popoverTarget}>
+                <div
+                    aria-label={t('page.appMenu.manageServers')}
+                    className={styles.popoverTarget}
+                    role="button"
+                    tabIndex={0}
+                >
                     <Box className={styles.buttonContainer}>
                         <Group className={styles.buttonGroup} gap="sm">
                             <img className={styles.logo} src={logo} />

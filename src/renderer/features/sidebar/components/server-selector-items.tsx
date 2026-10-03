@@ -9,7 +9,7 @@ import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
 import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
-import { ServerList } from '/@/renderer/features/servers/components/server-list';
+import { openManageServersModal } from '/@/renderer/features/servers/utils/open-manage-servers-modal';
 import { useServerLibraryControls } from '/@/renderer/features/shared/hooks/use-server-library-controls';
 import { AppRoute } from '/@/renderer/router/routes';
 import { useAuthStoreActions, useCurrentServer, useServerList } from '/@/renderer/store';
@@ -75,13 +75,6 @@ export const ServerSelectorItems = () => {
         return null;
     }
 
-    const handleManageServersModal = () => {
-        openModal({
-            children: <ServerList />,
-            title: t('page.manageServers.title'),
-        });
-    };
-
     const handleLogout = async () => {
         const serverId = currentServer.id;
 
@@ -140,7 +133,7 @@ export const ServerSelectorItems = () => {
                     <DropdownMenu.Divider />
                     <DropdownMenu.Item
                         leftSection={<Icon icon="edit" />}
-                        onClick={handleManageServersModal}
+                        onClick={openManageServersModal}
                     >
                         {t('page.appMenu.manageServers')}
                     </DropdownMenu.Item>

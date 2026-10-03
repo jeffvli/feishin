@@ -1,6 +1,7 @@
 import { memo, useMemo } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 
+import { AdministratorAccessSettings } from '/@/renderer/features/settings/components/general/administrator-access-settings';
 import { ApplicationSettings } from '/@/renderer/features/settings/components/general/application-settings';
 import { ControlSettings } from '/@/renderer/features/settings/components/general/control-settings';
 import { ExternalLinksSettings } from '/@/renderer/features/settings/components/general/external-links-settings';
@@ -23,6 +24,7 @@ export const GeneralTab = memo(() => {
         const baseSections = [
             { component: ThemeSettings, key: 'theme' },
             { component: ApplicationSettings, key: 'application' },
+            { component: AdministratorAccessSettings, key: 'administratorAccess' },
             { component: ExternalLinksSettings, key: 'externalLinks' },
             { component: ControlSettings, key: 'control' },
             { component: SidebarSettings, key: 'sidebar' },

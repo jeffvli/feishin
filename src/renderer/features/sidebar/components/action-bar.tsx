@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import styles from './action-bar.module.css';
@@ -10,6 +11,7 @@ import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 
 export const ActionBar = () => {
+    const { t } = useTranslation();
     const { isScanning } = useScanStatus();
 
     return (
@@ -17,7 +19,7 @@ export const ActionBar = () => {
             <Group gap="sm" grow px="md" w="100%" wrap="nowrap">
                 <DropdownMenu position="bottom-start">
                     <DropdownMenu.Target>
-                        <Button p="0">
+                        <Button aria-label={t('common.menu')} p="0">
                             <Icon
                                 animate={isScanning ? 'spin' : undefined}
                                 icon={isScanning ? 'spinner' : 'menu'}

@@ -1,4 +1,3 @@
-import { openModal } from '@mantine/modals';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 
@@ -9,7 +8,7 @@ import { ServerRequired } from '/@/renderer/features/action-required/components/
 import styles from '/@/renderer/features/action-required/routes/action-required-route.module.css';
 import { isServerLock } from '/@/renderer/features/action-required/utils/window-properties';
 import LoginRoute from '/@/renderer/features/login/routes/login-route';
-import { ServerList } from '/@/renderer/features/servers/components/server-list';
+import { openManageServersModal } from '/@/renderer/features/servers/utils/open-manage-servers-modal';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -44,13 +43,6 @@ const ActionRequiredRoute = () => {
     const canReturnHome = checks.every((c) => c.valid);
     const displayedCheck = checks.find((c) => !c.valid);
 
-    const handleManageServersModal = () => {
-        openModal({
-            children: <ServerList />,
-            title: t('page.appMenu.manageServers'),
-        });
-    };
-
     if (isLoginRequired) {
         return <LoginRoute />;
     }
@@ -76,7 +68,7 @@ const ActionRequiredRoute = () => {
                                     <Button
                                         fullWidth
                                         leftSection={<Icon icon="edit" />}
-                                        onClick={handleManageServersModal}
+                                        onClick={openManageServersModal}
                                         variant="filled"
                                     >
                                         {t('page.appMenu.manageServers')}

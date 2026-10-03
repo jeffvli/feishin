@@ -12,3 +12,4 @@
 - [x] Fix the shuffle button in the playback bar and the queue list order becoming inconsistent.
 - [x] Fix repeat-off playback so a playlist stops at the end instead of repeating.
 - [ ] Set the new default application settings on installation.
+- [ ] Add administrator password protection for Application Settings, Manage Servers, and column/layout configuration, while leaving music-folder selection unlocked.
