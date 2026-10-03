@@ -12,7 +12,7 @@ on:
                     - beta
                     - release
             version:
-                description: Optional base version, for example 0.1.4
+                description: Optional base or exact version, for example 0.1.4-beta.14
                 required: false
                 type: string
 
@@ -66,29 +66,40 @@ jobs:
                   $requestedVersion = '${{ inputs.version }}'.Trim()
                   $channel = '${{ inputs.channel }}'
                   $currentVersion = (Get-Content package.json | ConvertFrom-Json).version
-                  $baseVersion = if ($requestedVersion) {
-                      $requestedVersion
-                  } else {
-                      $currentVersion -replace '-.*$', ''
-                  }
-
-                  if ($baseVersion -notmatch '^\d+\.\d+\.\d+$') {
-                      throw "Invalid base version: $baseVersion"
-                  }
-
                   $releases = @(gh release list --limit 100 --json tagName | ConvertFrom-Json)
 
                   if ($channel -eq 'beta') {
-                      $maxBeta = 0
-                      foreach ($release in $releases) {
-                          if ($release.tagName -match "^v$([regex]::Escape($baseVersion))-beta\.(\d+)$") {
-                              $maxBeta = [Math]::Max($maxBeta, [int]$matches[1])
+                      if ($requestedVersion -match '^\d+\.\d+\.\d+-beta\.\d+$') {
+                          $resolvedVersion = $requestedVersion
+                      } else {
+                          $baseVersion = if ($requestedVersion) {
+                              $requestedVersion
+                          } else {
+                              $currentVersion -replace '-.*$', ''
                           }
+
+                          if ($baseVersion -notmatch '^\d+\.\d+\.\d+$') {
+                              throw "Invalid beta base or exact version: $baseVersion"
+                          }
+
+                          $maxBeta = 0
+                          foreach ($release in $releases) {
+                              if ($release.tagName -match "^v$([regex]::Escape($baseVersion))-beta\.(\d+)$") {
+                                  $maxBeta = [Math]::Max($maxBeta, [int]$matches[1])
+                              }
+                          }
+                          $resolvedVersion = "$baseVersion-beta.$($maxBeta + 1)"
                       }
-                      $resolvedVersion = "$baseVersion-beta.$($maxBeta + 1)"
                       $manifest = 'beta.yml'
                   } else {
-                      $resolvedVersion = $baseVersion
+                      $resolvedVersion = if ($requestedVersion) {
+                          $requestedVersion
+                      } else {
+                          $currentVersion -replace '-.*$', ''
+                      }
+                      if ($resolvedVersion -notmatch '^\d+\.\d+\.\d+$') {
+                          throw "Invalid release version: $resolvedVersion"
+                      }
                       $manifest = 'latest.yml'
                   }
 
