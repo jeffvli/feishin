@@ -199,10 +199,7 @@ const song = z.object({
     genres: z.array(genreItem).optional(),
     id,
     isDir: z.boolean(),
-    isExternal: z
-        .union([z.boolean(), z.enum(['false', 'true'])])
-        .transform((value) => value === true || value === 'true')
-        .optional(),
+    isExternal: z.union([z.boolean(), z.enum(['false', 'true'])]).optional(),
     isVideo: z.boolean(),
     musicBrainzId: z.string().optional(),
     parent: z.string(),
@@ -247,10 +244,7 @@ const album = z.object({
     id,
     isCompilation: z.boolean().optional(),
     isDir: z.boolean(),
-    isExternal: z
-        .union([z.boolean(), z.enum(['false', 'true'])])
-        .transform((value) => value === true || value === 'true')
-        .optional(),
+    isExternal: z.union([z.boolean(), z.enum(['false', 'true'])]).optional(),
     isVideo: z.boolean(),
     name: z.string(),
     parent: z.string(),
@@ -288,10 +282,7 @@ const albumArtist = z.object({
     artistImageUrl: z.string().optional(),
     coverArt: z.string().optional(),
     id,
-    isExternal: z
-        .union([z.boolean(), z.enum(['false', 'true'])])
-        .transform((value) => value === true || value === 'true')
-        .optional(),
+    isExternal: z.union([z.boolean(), z.enum(['false', 'true'])]).optional(),
     name: z.string(),
     roles: z.array(z.string()).optional(),
     starred: z.string().optional(),
