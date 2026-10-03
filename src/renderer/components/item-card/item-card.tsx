@@ -29,6 +29,7 @@ import {
 } from '/@/renderer/utils/format';
 import { SEPARATOR_STRING } from '/@/shared/api/utils';
 import { ExplicitIndicator } from '/@/shared/components/explicit-indicator/explicit-indicator';
+import { ExternalItemBadge } from '/@/shared/components/external-item-badge/external-item-badge';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Separator } from '/@/shared/components/separator/separator';
@@ -1487,6 +1488,9 @@ const ItemCardRow = memo(
                 size={index > 0 ? 'sm' : 'md'}
             >
                 {formattedContent}
+                {'isExternal' in data && data.isExternal === true && index === 0 && (
+                    <ExternalItemBadge />
+                )}
             </Text>
         );
     },

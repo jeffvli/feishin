@@ -194,6 +194,7 @@ export type Album = {
     imageId: null | string;
     imageUrl: null | string;
     isCompilation: boolean | null;
+    isExternal?: boolean;
     lastPlayedAt: null | string;
     mbzId: null | string;
     mbzReleaseGroupId: null | string;
@@ -237,6 +238,7 @@ export type AlbumArtist = {
     id: string;
     imageId: null | string;
     imageUrl: null | string;
+    isExternal?: boolean;
     lastPlayedAt: null | string;
     mbz: null | string;
     missing: boolean | null;
@@ -423,6 +425,7 @@ export type Song = {
     id: string;
     imageId: null | string;
     imageUrl: null | string;
+    isExternal?: boolean;
     isResumable?: boolean;
     lastPlayedAt: null | string;
     libraryId: null | number;

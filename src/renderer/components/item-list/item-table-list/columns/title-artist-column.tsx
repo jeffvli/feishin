@@ -14,6 +14,7 @@ import {
 import { useIsActiveRow } from '/@/renderer/components/item-list/item-table-list/item-table-list-context';
 import { JoinedArtists } from '/@/renderer/features/albums/components/joined-artists';
 import { ExplicitIndicator } from '/@/shared/components/explicit-indicator/explicit-indicator';
+import { ExternalItemBadge } from '/@/shared/components/external-item-badge/external-item-badge';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 import { Folder, LibraryItem, QueueSong } from '/@/shared/types/domain-types';
@@ -63,6 +64,7 @@ export const DefaultTitleArtistColumn = (props: ItemTableListInnerColumn) => {
                     >
                         <ExplicitIndicator explicitStatus={item?.explicitStatus} />
                         {item.name as string}
+                        {item.isExternal === true && <ExternalItemBadge />}
                     </Text>
                     <div className={styles.artists}>
                         <JoinedArtists
@@ -139,6 +141,7 @@ export const QueueSongTitleArtistColumn = (props: ItemTableListInnerColumn) => {
                     >
                         <ExplicitIndicator explicitStatus={song?.explicitStatus} />
                         {row.name as string}
+                        {song?.isExternal === true && <ExternalItemBadge />}
                         {song?.trackSubtitle && props.itemType !== LibraryItem.QUEUE_SONG && (
                             <Text
                                 className={clsx({

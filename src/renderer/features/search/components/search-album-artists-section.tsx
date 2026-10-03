@@ -121,6 +121,7 @@ export function SearchAlbumArtistsSection({
                                     id={artist.id}
                                     imageId={artist.imageId}
                                     imageUrl={artist.imageUrl}
+                                    isExternal={artist.isExternal}
                                     isHighlighted={isHighlighted}
                                     itemType={LibraryItem.ALBUM_ARTIST}
                                     subtitle={

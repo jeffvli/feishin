@@ -136,6 +136,11 @@ const getGenres = (
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
+const normalizeIsExternal = (value?: 'false' | 'true' | boolean): boolean | undefined => {
+    if (value === undefined) return undefined;
+    return value === true || value === 'true';
+};
+
 const subsonicReleaseFields = (item: {
     releaseDate?: { day?: number; month?: number; year?: number };
     year?: number;
@@ -228,6 +233,7 @@ const normalizeSong = (
         id: item.id.toString(),
         imageId: item.coverArt?.toString() || null,
         imageUrl: null,
+        isExternal: normalizeIsExternal(item.isExternal),
         lastPlayedAt: null,
         libraryId: null,
         libraryName: null,
@@ -295,6 +301,7 @@ const normalizeAlbumArtist = (
         id: item.id.toString(),
         imageId: item.coverArt?.toString() || null,
         imageUrl: null,
+        isExternal: normalizeIsExternal(item.isExternal),
         lastPlayedAt: null,
         mbz: null,
         missing: null,
@@ -370,6 +377,7 @@ const normalizeAlbum = (
         imageId: item.coverArt?.toString() || null,
         imageUrl: null,
         isCompilation: null,
+        isExternal: normalizeIsExternal(item.isExternal),
         lastPlayedAt: null,
         mbzId: null,
         mbzReleaseGroupId: null,
