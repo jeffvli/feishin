@@ -1,6 +1,6 @@
 import { useMove } from '@mantine/hooks';
 import isElectron from 'is-electron';
-import { memo, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -9,7 +9,6 @@ import {
     type EqSettings as EqSettingsType,
 } from './mpv-audio-filters';
 
-import { WebAudioContext } from '/@/renderer/features/player/context/webaudio-context';
 import {
     SettingOption,
     SettingsSection,
@@ -262,15 +261,6 @@ export const EqSettings = memo(() => {
     const settings = usePlaybackSettings();
     const { setSettings } = useSettingsStoreActions();
 
-    // Ref pattern to avoid stale closure when reading webAudio DSP nodes.
-    // webAudio?.dsp is undefined at callback creation time; the closure
-    // would capture that undefined even after AudioContext initialises.
-    const webAudioContext = useContext(WebAudioContext);
-    const webAudioContextRef = useRef(webAudioContext);
-    useEffect(() => {
-        webAudioContextRef.current = webAudioContext;
-    }, [webAudioContext]);
-
     // Custom preset state — stored in localStorage separately from main store
     const [customEqPresets, setCustomEqPresets] = useState<Record<string, number[]>>(() =>
         loadCustomPresets<number[]>(LS_EQ_PRESETS),
@@ -283,58 +273,13 @@ export const EqSettings = memo(() => {
 
     const applyFilters = useCallback(
         (eq: EqSettingsType, compressor: CompressorSettings) => {
-            // ── MPV player ────────────────────────────────────────────────
             if (settings.type === PlayerType.LOCAL) {
-                const filterStr = buildMpvAudioFilters(eq, compressor);
+                const filterStr = buildMpvAudioFilters(eq, compressor, settings.volumeLevelingMode);
                 mpvPlayer?.setProperties({ af: filterStr });
-                return;
-            }
-
-            // ── Web Audio player ──────────────────────────────────────────
-            // Read from ref so we always get the current AudioContext state,
-            // not the stale value captured when this callback was created.
-            const dsp = webAudioContextRef.current.webAudio?.dsp;
-            if (!dsp) return;
-
-            // Mutations to Web Audio API AudioParam values are intentional
-            // side effects on the live audio graph, not React state mutations.
-            // eslint-disable-next-line react-hooks/immutability
-            dsp.preampGain.gain.value = eq.enabled ? Math.pow(10, eq.preamp / 20) : 1;
-
-            dsp.eqFilters.forEach((filter, i) => {
-                const band = eq.bands[i];
-                if (band) {
-                    filter.gain.value = eq.enabled ? band.gain : 0;
-                }
-            });
-
-            if (compressor.enabled) {
-                dsp.compressor.threshold.value = compressor.threshold;
-                dsp.compressor.ratio.value = compressor.ratio;
-                dsp.compressor.attack.value = compressor.attack / 1000;
-                dsp.compressor.release.value = compressor.release / 1000;
-                dsp.compressor.knee.value = compressor.knee;
-            } else {
-                dsp.compressor.threshold.value = 0;
-                dsp.compressor.ratio.value = 1;
-                dsp.compressor.attack.value = 0;
-                dsp.compressor.release.value = 0.25;
-                dsp.compressor.knee.value = 0;
             }
         },
-        // settings.type is the only reactive dep — webAudioContextRef is a
-        // stable ref that always holds the latest context value.
-        [settings.type],
+        [settings.type, settings.volumeLevelingMode],
     );
-
-    // Re-apply filters when switching to Web Audio so DSP nodes reflect
-    // persisted settings immediately without requiring a slider interaction.
-    useEffect(() => {
-        if (settings.type === PlayerType.WEB) {
-            applyFilters(settings.equalizer, settings.compressor);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [settings.type]);
 
     // ── EQ handlers ──────────────────────────────────────────────────────────
     const handleEqToggle = (enabled: boolean) => {

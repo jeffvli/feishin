@@ -23,6 +23,10 @@ import {
     PLAYLIST_TABLE_COLUMNS,
     SONG_TABLE_COLUMNS,
 } from '/@/renderer/components/item-list/item-table-list/default-columns';
+import {
+    migrateVolumeLevelingSettings,
+    VOLUME_LEVELING_MIGRATION_VERSION,
+} from '/@/renderer/features/player/audio-player/utils/volume-leveling';
 import { audiomotionanalyzerPresets } from '/@/renderer/features/visualizer/components/audiomotionanalyzer/presets';
 import { AppRoute } from '/@/renderer/router/routes';
 import { getEnvSettingsOverrides } from '/@/renderer/store/env-settings-overrides';
@@ -726,6 +730,7 @@ const PlaybackSettingsSchema = z.object({
     scrobble: ScrobbleSettingsSchema,
     transcode: TranscodingConfigSchema,
     type: z.nativeEnum(PlayerType),
+    volumeLevelingMode: z.enum(['natural', 'off', 'tavern']).default('natural'),
     webAudio: z.boolean(),
 });
 
@@ -2119,7 +2124,7 @@ const initialState: SettingsState = {
             gaplessAudio: 'weak',
             replayGainClip: true,
             replayGainFallbackDB: undefined,
-            replayGainMode: 'no',
+            replayGainMode: 'track',
             replayGainPreampDB: 0,
         },
         preservePitch: true,
@@ -2136,6 +2141,7 @@ const initialState: SettingsState = {
             enabled: false,
         },
         type: PlayerType.WEB,
+        volumeLevelingMode: 'natural',
         webAudio: true,
     },
     queryBuilder: {
@@ -2947,10 +2953,12 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     state.window.releaseChannel = 'beta';
                 }
 
+                migrateVolumeLevelingSettings(state, version);
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 36,
+            version: VOLUME_LEVELING_MIGRATION_VERSION,
         },
     ),
 );

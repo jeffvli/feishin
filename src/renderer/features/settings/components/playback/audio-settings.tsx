@@ -144,6 +144,7 @@ export const AudioSettings = memo(() => {
             control: (
                 <Group gap="xs" wrap="nowrap">
                     <Select
+                        aria-label={t('setting.audioPlayer')}
                         data={selectData}
                         defaultValue={settings.type}
                         disabled={status === PlayerStatus.PLAYING || isCasting}
