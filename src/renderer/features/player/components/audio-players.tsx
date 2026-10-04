@@ -8,6 +8,13 @@ import { DlnaPlayer } from '/@/renderer/features/player/audio-player/dlna-player
 import { MainPlayerListenerHook } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
 import { JukeboxPlayer } from '/@/renderer/features/player/audio-player/jukebox-player';
 import { MpvPlayer } from '/@/renderer/features/player/audio-player/mpv-player';
+import {
+    configureCompressorNode,
+    decibelsToLinear,
+    getVolumeLevelerParameters,
+    OUTPUT_LIMITER,
+    shouldEnableOutputLimiter,
+} from '/@/renderer/features/player/audio-player/utils/volume-leveling';
 import { WebPlayer } from '/@/renderer/features/player/audio-player/web-player';
 import { AutoDJHook } from '/@/renderer/features/player/hooks/use-auto-dj';
 import { AutosaveHook } from '/@/renderer/features/player/hooks/use-autosave';
@@ -39,6 +46,7 @@ import { ComponentErrorBoundary } from '/@/renderer/features/shared/components/c
 import { VisualizerSystemAudioBridgeHook } from '/@/renderer/features/visualizer/components/visualizer-system-audio-bridge';
 import { useSettingsStore } from '/@/renderer/store';
 import {
+    type SettingsState,
     updateQueueFavorites,
     updateQueueRatings,
     useCurrentServerId,
@@ -49,7 +57,7 @@ import {
 import { logger } from '/@/renderer/utils/logger';
 import { toast } from '/@/shared/components/toast/toast';
 import { LibraryItem } from '/@/shared/types/domain-types';
-import { PlayerType } from '/@/shared/types/types';
+import { PlayerType, type WebAudio } from '/@/shared/types/types';
 const CODEC_PROBES = [
     { codec: 'mp3', container: 'mp3', mime: 'audio/mpeg' },
 
@@ -83,6 +91,32 @@ const DIRECT_PLAY_PROFILES: {
     containers: string[];
     protocols: string[];
 }[] = [];
+
+const applyWebAudioDspSettings = (
+    dsp: NonNullable<WebAudio['dsp']>,
+    compressor: SettingsState['playback']['compressor'],
+    equalizer: SettingsState['playback']['equalizer'],
+    volumeLevelingMode: SettingsState['playback']['volumeLevelingMode'],
+) => {
+    dsp.preampGain.gain.value = equalizer.enabled ? decibelsToLinear(equalizer.preamp) : 1;
+    dsp.eqFilters.forEach((filter, index) => {
+        filter.gain.value = equalizer.enabled ? (equalizer.bands[index]?.gain ?? 0) : 0;
+    });
+
+    configureCompressorNode(dsp.compressor, compressor.enabled ? compressor : null);
+    dsp.compressorMakeup.gain.value = compressor.enabled ? decibelsToLinear(compressor.makeup) : 1;
+
+    const levelerParameters = getVolumeLevelerParameters(volumeLevelingMode);
+    configureCompressorNode(dsp.leveler, levelerParameters);
+    dsp.levelerMakeup.gain.value = levelerParameters
+        ? decibelsToLinear(levelerParameters.makeup)
+        : 1;
+
+    configureCompressorNode(
+        dsp.limiter,
+        shouldEnableOutputLimiter(volumeLevelingMode, compressor.enabled) ? OUTPUT_LIMITER : null,
+    );
+};
 
 export function getDefaultTranscodingProfiles() {
     return isSafari() ? SAFARI_TRANSCODING_PROFILES : DEFAULT_TRANSCODING_PROFILES;
@@ -188,6 +222,7 @@ const AudioPlayersContent = ({
     webAudio: boolean;
 }) => {
     const isRadioActive = useIsRadioActive();
+    const { compressor, equalizer, volumeLevelingMode } = usePlaybackSettings();
 
     useEffect(() => {
         logger.info('Playback engine', { playbackType });
@@ -232,7 +267,7 @@ const AudioPlayersContent = ({
         // Build DSP chain from persisted settings so EQ/compressor
         // are active immediately on first playback, not just after
         // the user opens the settings panel.
-        const { compressor, equalizer } = useSettingsStore.getState().playback;
+        const { compressor, equalizer, volumeLevelingMode } = useSettingsStore.getState().playback;
 
         // Preamp gain — converts dB to linear
         const preampGain = context.createGain();
@@ -249,24 +284,30 @@ const AudioPlayersContent = ({
             return filter;
         });
 
-        // DynamicsCompressorNode — always present, pass-through when disabled
-        // (ratio=1, threshold=0 = mathematically transparent)
+        // The manual compressor remains independent from automatic volume levelling.
         const compressorNode = context.createDynamicsCompressor();
-        if (compressor.enabled) {
-            compressorNode.threshold.value = compressor.threshold;
-            compressorNode.ratio.value = compressor.ratio;
-            compressorNode.attack.value = compressor.attack / 1000;
-            compressorNode.release.value = compressor.release / 1000;
-            compressorNode.knee.value = compressor.knee;
-        } else {
-            compressorNode.threshold.value = 0;
-            compressorNode.ratio.value = 1;
-            compressorNode.attack.value = 0;
-            compressorNode.release.value = 0.25;
-            compressorNode.knee.value = 0;
-        }
+        configureCompressorNode(compressorNode, compressor.enabled ? compressor : null);
+        const compressorMakeup = context.createGain();
+        compressorMakeup.gain.value = compressor.enabled ? decibelsToLinear(compressor.makeup) : 1;
 
-        // Wire: each gain → preamp → eq[0] → eq[1] → ... → compressor → destination
+        const levelerNode = context.createDynamicsCompressor();
+        const levelerParameters = getVolumeLevelerParameters(volumeLevelingMode);
+        configureCompressorNode(levelerNode, levelerParameters);
+        const levelerMakeup = context.createGain();
+        levelerMakeup.gain.value = levelerParameters
+            ? decibelsToLinear(levelerParameters.makeup)
+            : 1;
+
+        const limiterNode = context.createDynamicsCompressor();
+        configureCompressorNode(
+            limiterNode,
+            shouldEnableOutputLimiter(volumeLevelingMode, compressor.enabled)
+                ? OUTPUT_LIMITER
+                : null,
+        );
+
+        // Wire both player slots through one output chain so crossfades receive
+        // the same EQ, manual compression, levelling, and peak protection.
         for (const gain of gains) {
             gain.connect(preampGain);
         }
@@ -281,11 +322,23 @@ const AudioPlayersContent = ({
             preampGain.connect(compressorNode);
         }
 
-        compressorNode.connect(context.destination);
+        compressorNode.connect(compressorMakeup);
+        compressorMakeup.connect(levelerNode);
+        levelerNode.connect(levelerMakeup);
+        levelerMakeup.connect(limiterNode);
+        limiterNode.connect(context.destination);
 
         setWebAudio?.({
             context,
-            dsp: { compressor: compressorNode, eqFilters, preampGain },
+            dsp: {
+                compressor: compressorNode,
+                compressorMakeup,
+                eqFilters,
+                leveler: levelerNode,
+                levelerMakeup,
+                limiter: limiterNode,
+                preampGain,
+            },
             gains,
         });
 
@@ -297,6 +350,13 @@ const AudioPlayersContent = ({
         // Intentionally ignore the sample rate dependency, as it makes things really messy
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [playbackType, webAudio]);
+
+    useEffect(() => {
+        const dsp = audioContext?.dsp;
+        if (!dsp) return;
+
+        applyWebAudioDspSettings(dsp, compressor, equalizer, volumeLevelingMode);
+    }, [audioContext, compressor, equalizer, volumeLevelingMode]);
 
     useEffect(() => {
         if (!audioContext?.context) return undefined;

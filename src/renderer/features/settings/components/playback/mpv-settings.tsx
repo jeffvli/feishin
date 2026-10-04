@@ -2,9 +2,15 @@ import isElectron from 'is-electron';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { buildMpvAudioFilters } from './mpv-audio-filters';
 import { getMpvSetting } from './mpv-properties';
 
 import { eventEmitter } from '/@/renderer/events/event-emitter';
+import {
+    getReplayGainMode,
+    VOLUME_LEVELING_MODE,
+    type VolumeLevelingMode,
+} from '/@/renderer/features/player/audio-player/utils/volume-leveling';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     SettingOption,
@@ -82,6 +88,31 @@ export const MpvSettings = memo(() => {
         const mpvSetting = getMpvSetting(setting, value);
 
         mpvPlayer?.setProperties(mpvSetting);
+    };
+
+    const handleVolumeLevelingMode = (mode: VolumeLevelingMode) => {
+        const replayGainMode = getReplayGainMode(mode);
+
+        setSettings({
+            playback: {
+                mpvProperties: {
+                    replayGainClip: true,
+                    replayGainMode,
+                },
+                volumeLevelingMode: mode,
+            },
+        });
+
+        mpvPlayer?.setProperties({
+            ...getMpvSetting('replayGainMode', replayGainMode),
+            ...getMpvSetting('replayGainClip', true),
+        });
+
+        if (settings.type === PlayerType.LOCAL) {
+            mpvPlayer?.setProperties({
+                af: buildMpvAudioFilters(settings.equalizer, settings.compressor, mode),
+            });
+        }
     };
 
     const player = usePlayer();
@@ -253,38 +284,54 @@ export const MpvSettings = memo(() => {
     const replayGainOptions: SettingOption[] = [
         {
             control: (
-                <Select
-                    data={[
-                        {
-                            label: t('setting.replayGainMode', {
-                                context: 'optionNone',
-                            }),
-                            value: 'no',
-                        },
-                        {
-                            label: t('setting.replayGainMode', {
-                                context: 'optionTrack',
-                            }),
-                            value: 'track',
-                        },
-                        {
-                            label: t('setting.replayGainMode', {
-                                context: 'optionAlbum',
-                            }),
-                            value: 'album',
-                        },
-                    ]}
-                    defaultValue={settings.mpvProperties.replayGainMode}
-                    onChange={(e) => handleSetMpvProperty('replayGainMode', e)}
+                <Switch
+                    aria-label={t('setting.automaticVolumeLeveling')}
+                    checked={settings.volumeLevelingMode !== VOLUME_LEVELING_MODE.OFF}
+                    onChange={(event) =>
+                        handleVolumeLevelingMode(
+                            event.currentTarget.checked
+                                ? VOLUME_LEVELING_MODE.NATURAL
+                                : VOLUME_LEVELING_MODE.OFF,
+                        )
+                    }
                 />
             ),
-            description: t('setting.replayGainMode', {
+            description: t('setting.automaticVolumeLeveling', {
                 context: 'description',
-
-                ReplayGain: 'ReplayGain',
             }),
-            note: t('common.restartRequired'),
-            title: t('setting.replayGainMode', { ReplayGain: 'ReplayGain' }),
+            title: t('setting.automaticVolumeLeveling'),
+        },
+        {
+            control: (
+                <Select
+                    aria-label={t('setting.volumeLevelingProfile')}
+                    data={[
+                        {
+                            label: t('setting.volumeLevelingProfile', {
+                                context: 'optionNatural',
+                            }),
+                            value: VOLUME_LEVELING_MODE.NATURAL,
+                        },
+                        {
+                            label: t('setting.volumeLevelingProfile', {
+                                context: 'optionTavern',
+                            }),
+                            value: VOLUME_LEVELING_MODE.TAVERN,
+                        },
+                    ]}
+                    onChange={(value) => {
+                        if (value) {
+                            handleVolumeLevelingMode(value as VolumeLevelingMode);
+                        }
+                    }}
+                    value={settings.volumeLevelingMode}
+                />
+            ),
+            description: t('setting.volumeLevelingProfile', {
+                context: 'description',
+            }),
+            isHidden: settings.volumeLevelingMode === VOLUME_LEVELING_MODE.OFF,
+            title: t('setting.volumeLevelingProfile'),
         },
         {
             control: (
@@ -299,6 +346,7 @@ export const MpvSettings = memo(() => {
 
                 ReplayGain: 'ReplayGain',
             }),
+            isHidden: settings.volumeLevelingMode === VOLUME_LEVELING_MODE.OFF,
             title: t('setting.replayGainPreamp', { ReplayGain: 'ReplayGain' }),
         },
         {
@@ -315,6 +363,7 @@ export const MpvSettings = memo(() => {
 
                 ReplayGain: 'ReplayGain',
             }),
+            isHidden: settings.volumeLevelingMode === VOLUME_LEVELING_MODE.OFF,
             title: t('setting.replayGainClipping', { ReplayGain: 'ReplayGain' }),
         },
         {
@@ -328,6 +377,7 @@ export const MpvSettings = memo(() => {
                 />
             ),
             description: t('setting.replayGainFallback', { ReplayGain: 'ReplayGain' }),
+            isHidden: settings.volumeLevelingMode === VOLUME_LEVELING_MODE.OFF,
             title: t('setting.replayGainFallback', { ReplayGain: 'ReplayGain' }),
         },
     ];

@@ -7,7 +7,7 @@ The UI suite deliberately separates quick pull request confidence from slower be
 | Launch and sign-in | App identity, configured server form, successful login | Invalid credentials | Server loss and recovery | Quick Connect |
 | Home | Brand, support details, user, version, connected server | Narrow-window layout and music-folder selector | Repeated resize stress | Offline status transition |
 | Library | - | Albums, songs, and playlists load from Jellyfin | Large fixture library | Search, sorting, filtering, metadata refresh |
-| Playback | - | - | Synthetic track starts and requests media | Pause, stop, seek, crossfade, volume levelling |
+| Playback | - | Volume levelling defaults, profiles, persistence, and Web/MPV availability | Synthetic track starts and requests media | Pause, stop, seek, crossfade, perceptual loudness validation |
 | Queue | - | - | Foundation supplied by playback fixture | Manual insertion, skip removal, shuffle order, repeat-all refill |
 | Downloads | - | - | Offline download action is available | Progress, cancellation, retry, restoration, sync |
 | Product policy | - | Radio and playlist-creation entry points stay hidden | - | Native application-menu restrictions |

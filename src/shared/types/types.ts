@@ -295,7 +295,11 @@ export type WebAudio = {
     context: AudioContext;
     dsp: null | {
         compressor: DynamicsCompressorNode;
+        compressorMakeup: GainNode;
         eqFilters: BiquadFilterNode[];
+        leveler: DynamicsCompressorNode;
+        levelerMakeup: GainNode;
+        limiter: DynamicsCompressorNode;
         preampGain: GainNode;
     };
     gains: GainNode[];

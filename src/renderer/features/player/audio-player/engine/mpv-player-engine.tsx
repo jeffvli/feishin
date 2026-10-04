@@ -137,13 +137,12 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
             });
 
             // Apply EQ and compressor filters after MPV has initialized
-            const { compressor, equalizer } = useSettingsStore.getState().playback;
+            const { compressor, equalizer, volumeLevelingMode } =
+                useSettingsStore.getState().playback;
             const { buildMpvAudioFilters } =
                 await import('/@/renderer/features/settings/components/playback/mpv-audio-filters');
-            const filterStr = buildMpvAudioFilters(equalizer, compressor);
-            if (filterStr) {
-                mpvPlayer?.setProperties({ af: filterStr });
-            }
+            const filterStr = buildMpvAudioFilters(equalizer, compressor, volumeLevelingMode);
+            mpvPlayer?.setProperties({ af: filterStr });
 
             // After initialization, populate the queue if currentSrc is available
             // Don't override queue if radio is active
