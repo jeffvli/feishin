@@ -1111,7 +1111,7 @@ const AlbumArtistMetadataExternalLinks = ({
                             component="a"
                             href={
                                 nativeSpotify
-                                    ? `spotify:search:${encodeURIComponent(artistName || '')}`
+                                    ? `spotify:search:${encodeURIComponent(artistName || '').replaceAll('%20', '+')}`
                                     : `https://open.spotify.com/search/${encodeURIComponent(artistName || '')}`
                             }
                             icon="brandSpotify"
