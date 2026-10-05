@@ -1,0 +1,47 @@
+# Builds the Hermes Music edition of Feishin for Windows on every push to this branch
+# and publishes the installer as a GitHub release (downloadable without a GitHub account).
+name: Hermes build (Windows)
+
+on:
+    push:
+        branches:
+            - hermes-music-video
+    workflow_dispatch:
+
+permissions:
+    contents: write
+
+jobs:
+    windows:
+        runs-on: windows-latest
+        env:
+            NODE_OPTIONS: --max-old-space-size=4096
+        steps:
+            - name: Checkout git repo
+              uses: actions/checkout@v6
+
+            - name: Install Node and PNPM
+              uses: pnpm/action-setup@v4
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Build for Windows
+              run: pnpm run package:win:pr
+
+            - name: Upload installer
+              uses: actions/upload-artifact@v7
+              with:
+                  name: feishin-hermes-windows
+                  path: dist/*.exe
+
+            - name: Publish release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: hermes-${{ github.run_number }}
+                  name: Feishin (Hermes Music edition) build ${{ github.run_number }}
+                  body: |
+                      Feishin with the Hermes Music video button.
+                      Download the `x64` setup .exe (most PCs). Windows may warn that the app is unrecognised:
+                      click More info > Run anyway. In Feishin: Settings > General > Music videos > Hermes Music address.
+                  files: dist/*.exe
