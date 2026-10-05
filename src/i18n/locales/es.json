@@ -31,9 +31,9 @@
         "pause": "Pausa",
         "playSimilarSongs": "Reproducir canciones similares",
         "viewQueue": "Ver cola",
-        "addLastShuffled": "Al final (mezclado)",
-        "addNextShuffled": "Siguiente (mezclado)",
-        "holdToShuffle": "Mantener para mezclar",
+        "addLastShuffled": "Al final (aleatorizado)",
+        "addNextShuffled": "Siguiente (aleatorizado)",
+        "holdToShuffle": "Mantén pulsado para aleatorizar",
         "lyrics": "Letras",
         "restoreQueueFromServer": "Restaurar cola del servidor",
         "saveQueueToServer": "Guardar cola en el servidor",
@@ -572,9 +572,9 @@
         "moveToNext": "Pasar al siguiente",
         "downloadStarted": "Iniciada descarga de {{count}} elementos",
         "moveItems": "Mover elementos",
-        "shuffle": "Mezclar",
-        "shuffleAll": "Mezclar todo",
-        "shuffleSelected": "Mezclar seleccionados",
+        "shuffle": "Aleatorizar",
+        "shuffleAll": "Aleatorizar todo",
+        "shuffleSelected": "Aleatorizar seleccionados",
         "viewMore": "Ver más",
         "holdToMoveToBottom": "Mantener pulsado para desplazar hacia abajo",
         "holdToMoveToTop": "Mantener pulsado para desplazar hacia arriba",
@@ -1425,7 +1425,7 @@
             "remix": "Remix",
             "soundtrack": "Banda sonora",
             "spokenWord": "Palabra Hablada",
-            "demo": "Maqueta"
+            "demo": "Demo"
         }
     },
     "queryBuilder": {

@@ -251,7 +251,9 @@
         "serverRequired": "Vajalik on server",
         "sessionExpiredError": "Su seanss on aegunud",
         "systemFontError": "Süsteemifontide hankimisel ilmnes viga",
-        "settingsSyncError": "Esitaja (renderer) ja peaprotsessi seadete vahel leiti lahknevusi. Muudatuste rakendamiseks taaskäivita rakendus"
+        "settingsSyncError": "Esitaja (renderer) ja peaprotsessi seadete vahel leiti lahknevusi. Muudatuste rakendamiseks taaskäivita rakendus",
+        "jellyfinQuickConnectDeactivated": "Kiirühenduse taotlus on aegunud",
+        "jellyfinQuickConnectNotActive": "Kiirühendus pole selles serveris aktiivne"
     },
     "filter": {
         "album": "$t(entity.album, {\"count\": 1})",
@@ -344,7 +346,19 @@
             "error_savePassword": "Parooli salvestamisel ilmnes viga",
             "ignoreCors": "Eira CORS-i ($t(common.restartRequired))",
             "ignoreSsl": "Eira SSL-i ($t(common.restartRequired))",
-            "input_passwordNoSSO": "Pöördproksi (SSO) autentimine ei ole toetatud. Toetatud on ainult kasutajanime/parooliga autentimine ja Subsonic-autentimine"
+            "input_passwordNoSSO": "Pöördproksi (SSO) autentimine ei ole toetatud. Toetatud on ainult kasutajanime/parooliga autentimine ja Subsonic-autentimine",
+            "input_enableAudiobooks": "Luba heliraamatud",
+            "input_enableAudiobooksDescription": "Kuva heliraamatute sisu jaotisest \"Raamatud\"",
+            "input_jellyfinQuickConnect": "Kiirühendus",
+            "input_jellyfinQuickConnectCode": "Sisesta autentimiseks see kood Jellyfini veebiliideses",
+            "input_jellyfinQuickConnectCodeCopied": "Kopeeritud",
+            "input_jellyfinQuickConnectCodeCopy": "Kopeeri kood",
+            "input_jellyfinQuickConnectOpen": "Ava kiirühendus",
+            "input_jellyfinQuickConnectWaiting": "Ootab Jellyfini serveri kinnitust…",
+            "input_jellyfinSignInMethod": "Logi sisse kasutades",
+            "input_jellyfinSignInMethodPassword": "Parool",
+            "input_jellyfinSignInMethodQuickConnect": "Kiirühendus",
+            "input_remoteUrlDescription": "Asendab väliste funktsioonide (nt jagatavate linkide) jaoks tavapärast URL-i. Jäta tühjaks, kui server pole väljastpoolt sisevõrku kättesaadav teisel aadressil."
         },
         "largeFetchConfirmation": {
             "title": "Lisa üksused järjekorda",
@@ -595,7 +609,10 @@
                 "showLyricProvider_description": "Kuva praeguste laulusõnade allikas",
                 "coverArtSize": "Kaanepildi suurus",
                 "playerItemAlignment": "Pleieri elementide paigutus",
-                "titleDisplayType_optionMultiLine": "Mitu rida"
+                "titleDisplayType_optionMultiLine": "Mitu rida",
+                "titleDisplayType": "Pealkirja kuvamisstiil",
+                "titleDisplayType_optionScroll": "Keri",
+                "titleLineCount": "Pealkirja ridade arv"
             },
             "lyrics": "Laulusõnad",
             "related": "Seotud",
@@ -630,7 +647,8 @@
             "newlyAdded": "Hiljuti lisatud albumid",
             "recentlyPlayed": "Hiljuti esitatud",
             "recentlyReleased": "Hiljuti avaldatud",
-            "title": "$t(common.home)"
+            "title": "$t(common.home)",
+            "playlists": "Esitusloendid"
         },
         "itemDetail": {
             "copyPath": "Kopeeri tee lõikelauale",
@@ -887,7 +905,7 @@
         "discordDisplayType": "{{discord}} kohaloleku kuvamise tüüp",
         "discordIdleStatus_description": "Kui see on lubatud, uuendatakse olekut siis, kui pleier on tegevuseta",
         "discordIdleStatus": "Kuva tegevuseta olekut",
-        "discordLinkType_description": "Lisab platvormide {{lastfm}} või {{musicbrainz}} välised lingid laulu ja esitaja väljadele keskkonnas {{discord}}. {{musicbrainz}} on kõige täpsem, kuid nõuab siltide olemasolu ega paku esitajate linke, samas kui {{lastfm}} peaks lingi alati tagama. Ei tee täiendavaid võrgupäringuid",
+        "discordLinkType_description": "Lisab {{discord}} olekuteabele {{lastfm}} või {{musicbrainz}} lingid. {{musicbrainz}} on kõige täpsem, kuid eeldab siltide olemasolu ega esita esitaja linke, samas kui {{lastfm}} annab lingi alati. Ei tee täiendavaid võrgupäringuid",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}}, vajadusel varulahendusena {{lastfm}}",
         "discordLinkType_none": "$t(common.none)",
         "discordLinkType": "{{discord}} olekuteabe lingid",
@@ -1093,9 +1111,9 @@
         "audioFadeOnStatusChange": "Heli hääbumine oleku muutumisel",
         "audioFadeOnStatusChange_description": "Lülitab sisse heli sujuva vaibumise ja sissetulemise, kui muusika pannakse mängima või pausile",
         "preventSleepOnPlayback_description": "Keela ekraani välja lülitamine muusika esitamisel",
-        "preventSleepOnPlayback": "Keela unerežiim taasesituse ajal",
-        "preventSuspendOnPlayback_description": "Keela rakenduse ooterežiim muusika esitamisel",
-        "preventSuspendOnPlayback": "Keela ooterežiim taasesituse ajal",
+        "preventSleepOnPlayback": "Keela ekraani väljalülitamine taasesituse ajal",
+        "preventSuspendOnPlayback_description": "Väldi arvuti unerežiimi minemist muusika taasesitusel",
+        "preventSuspendOnPlayback": "Keela unežiim taasesituse ajal",
         "remotePassword_description": "Määrab parooli kaugjuhtimisserveri jaoks. Need sisselogimisandmed edastatakse vaikimisi krüpteerimata, seega on soovitatav valida unikaalne parool, millest pole sul kahju",
         "remotePassword": "Kaugjuhtimisserveri parool",
         "remotePort_description": "Määrab kaugjuhtimisserveri pordi",
@@ -1271,7 +1289,23 @@
         "customThemes_description": "Lohista kohandatud teemade lisamiseks sellesse kausta .json teemafailid. Need tuvastatakse automaatselt iga kord, kui faile lisad, muudad või eemaldad.",
         "customThemes": "Kohandatud teemad",
         "confirmQueueChanges": "Kinnita järjekorra muudatused",
-        "confirmQueueChanges_description": "Küsi enne praeguse järjekorra tühistamist kinnitust"
+        "confirmQueueChanges_description": "Küsi enne praeguse järjekorra tühistamist kinnitust",
+        "fullscreenAutoOpenTimeout_description": "Avab mängiva loo ajal täisekraani mängija pärast määratud tegevusetuse minuteid. Väljalülitamiseks sisesta 0",
+        "fullscreenAutoOpenTimeout": "Täisekraanimängija automaatse avamise aegumisaeg (minutid)",
+        "imagePlaceholderPriority_description": "Valib piltide laadimise ajal kuvatava kohatäite tüübi (kui see on saadaval)",
+        "imagePlaceholderPriority": "Pildi asendaja prioriteet",
+        "imagePlaceholderPriority_optionBlurhash": "BlurHash",
+        "imagePlaceholderPriority_optionDominantColor": "Põhivärv",
+        "imagePlaceholderPriority_optionOff": "Väljas",
+        "imagePlaceholderPriority_optionThumbhash": "ThumbHash",
+        "scrobbleMinimumMode_optionBoth": "Mõlemad",
+        "transcodeNote": "Transkodeerimise viib läbi server ja see rakendub alates järgmisest palast",
+        "transcodeSampleRate_description": "Transkodeeritud heli maksimaalne diskreetimissagedus (Hz), nt 192000. Algse sageduse säilitamiseks jäta väli tühjaks. Kehtib ainult Jellyfinile",
+        "transcodeSampleRate": "Transkodeerimise maksimaalne diskreetimissagedus",
+        "sidebarImageEnabled": "Plaadiümbrise suurendamise nupp",
+        "sidebarImageEnabled_description": "Kuvab pleieririba plaadiümbrisel nuppu selle laiendamiseks külgribale. Funktsiooni väljalülitamisel peidetakse nupp ning ahendatakse kaanepilt, kui see oli varem laiendatud",
+        "scrobbleMinimumMode_optionSeconds": "Sekundit",
+        "scrobbleMinimumMode_optionPercentage": "Protsent"
     },
     "datetime": {
         "minuteShort": "m",
@@ -1564,5 +1598,53 @@
         "error_oneFileOnly": "Vali ainult üks fail",
         "error_readingFile": "Faili lugemisel tekkis viga: {{errorMessage}}",
         "mainText": "Lohista fail siia"
+    },
+    "dlna": {
+        "castToDevice": "Esita DLNA-seadmes",
+        "castingToDevice": "Esitamine seadmes {{name}}",
+        "castingToGroup": "Esitamine grupis ({{count}})",
+        "connected": "ühendatud",
+        "connecting": "Ühendamine…",
+        "createGroup": "Loo grupp",
+        "devices": "DLNA-seadmed",
+        "disconnect": "Katkesta ühendus",
+        "disconnectAndContinue": "Katkesta ühendus ja jätka",
+        "noDevicesFound": "DLNA-seadmeid ei leitud",
+        "nowCasting": "Aktiivne ülekanne",
+        "searching": "Seadmete otsimine…",
+        "shiftDisconnectHint": "Et heli mängiks kõlaris edasi, hoia all Shift-klahvi ja klõpsa \"Katkesta ühendus\"",
+        "group": {
+            "add": "Lisa",
+            "addSpeaker": "Lisa kõlar",
+            "addSpeakers": "Lisa kõlarid",
+            "addToGroup": "Lisa gruppi",
+            "cancel": "Tühista",
+            "connect": "Ühenda",
+            "coordinator": "juhtseade",
+            "failedToAddMessage": "Seadet {{name}} ei saa lisada. See ei pruugi olla samas Sonos-süsteemis.",
+            "failedToAddTitle": "Kõlari lisamine nurjus",
+            "firstSelectedIsCoordinator": "Esimesena valitud = juhtseade",
+            "noSonosFound": "Sonos-seadmeid ei leitud",
+            "refresh": "Värskenda",
+            "remove": "Eemalda",
+            "searching": "Otsimine…",
+            "selectSpeakers": "Vali grupi kõlarid",
+            "title": "Kõlarigrupp ({{count}})"
+        },
+        "speakerProperties": {
+            "bass": "Bass",
+            "crossfade": "Sujuv üleminek",
+            "ledState": "Olekutuli",
+            "loadFailed": "Kõlari omaduste laadimine nurjus",
+            "loading": "Laadimine…",
+            "longPressHint": "Kõlari omaduste laadimiseks vajuta pikalt",
+            "loudness": "Loudness",
+            "touchControls": "Puutenupud",
+            "treble": "Kõrged toonid"
+        },
+        "volume": {
+            "groupControl": "Iga kõlari helitugevuse eraldi muutmiseks hoia klahvi Shift",
+            "individualControl": "Kõigi kõlarite helitugevuse muutmiseks vabasta Shift-klahv"
+        }
     }
 }
