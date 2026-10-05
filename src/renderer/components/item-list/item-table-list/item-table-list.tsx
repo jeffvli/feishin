@@ -363,7 +363,7 @@ const VirtualizedTableGrid = ({
             const groupHeadersBefore = lo;
 
             const dataIndex = rowIndex - headerOffset - groupHeadersBefore;
-            return getItem ? getItem(dataIndex) : undefined;
+            return getItem ? getItem(dataIndex) : dataWithGroups[rowIndex];
         },
         [
             dataWithGroups,
