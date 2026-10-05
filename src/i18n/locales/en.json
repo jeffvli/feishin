@@ -700,6 +700,7 @@
         },
         "setting": {
             "advanced": "Advanced",
+            "musicVideos": "Music videos",
             "analytics": "Analytics",
             "generalTab": "General",
             "hotkeysTab": "Hotkeys",
@@ -751,6 +752,7 @@
     },
     "player": {
         "addLast": "Last",
+        "musicVideo": "Music video",
         "addNext": "Next",
         "addLastShuffled": "Last (shuffled)",
         "addNextShuffled": "Next (shuffled)",
@@ -835,6 +837,8 @@
     },
     "setting": {
         "autoDJ": "Auto DJ",
+        "hermesMusicUrl": "Hermes Music address",
+        "hermesMusicUrl_description": "Address of your Hermes Music app (for example http://umbrel.local:3340). Songs that have a music video there (added with /video) get a video button in the player bar. Videos stream from YouTube; nothing is downloaded.",
         "autoDJ_itemCount": "Item count",
         "autoDJ_itemCount_description": "The number of items attempted to be added to the queue",
         "autoDJ_timing": "Timing",

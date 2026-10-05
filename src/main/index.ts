@@ -1197,12 +1197,31 @@ if (!singleInstance) {
                 });
             });
 
+            // Music videos (Hermes Music): YouTube's embedded player refuses to play without a Referer,
+            // and pages loaded from file:// don't send one, so identify the app like a mobile webview does.
+            session.defaultSession.webRequest.onBeforeSendHeaders(
+                { urls: ['https://www.youtube-nocookie.com/embed/*', 'https://www.youtube.com/embed/*'] },
+                (details, callback) => {
+                    callback({
+                        requestHeaders: {
+                            ...details.requestHeaders,
+                            Referer: details.requestHeaders.Referer || 'https://org.jeffvli.feishin/',
+                        },
+                    });
+                },
+            );
+
             session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+                // YouTube's player page keeps its own headers (Feishin's policy would block its scripts)
+                if (/^https:\/\/www\.youtube(-nocookie)?\.com\//.test(details.url)) {
+                    callback({ responseHeaders: details.responseHeaders });
+                    return;
+                }
                 callback({
                     responseHeaders: {
                         ...details.responseHeaders,
                         'Content-Security-Policy': [
-                            "script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://umami.jeffvli.org; style-src 'self' 'unsafe-inline'; media-src 'self' http: https: data: blob:; img-src 'self' http: https: data: blob:; connect-src 'self' http: https: ws: wss:; default-src 'self';",
+                            "script-src 'self' 'wasm-unsafe-eval' 'unsafe-inline' https://umami.jeffvli.org; style-src 'self' 'unsafe-inline'; media-src 'self' http: https: data: blob:; img-src 'self' http: https: data: blob:; connect-src 'self' http: https: ws: wss:; frame-src https://www.youtube-nocookie.com https://www.youtube.com; default-src 'self';",
                         ],
                     },
                 });
