@@ -3,12 +3,16 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './music-video-button.module.css';
 
-import { type MusicVideo, useMusicVideo } from '/@/renderer/features/hermes-video/hooks/use-music-video';
+import {
+    type MusicVideo,
+    useMusicVideo,
+} from '/@/renderer/features/hermes-video/hooks/use-music-video';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { usePlayerSong } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 
-// Streams the video with YouTube's official embedded player (privacy-enhanced domain). Nothing is downloaded.
+// Streams the video with YouTube's official embedded player (privacy-enhanced domain).
+// Nothing is downloaded.
 const MusicVideoPlayer = ({ video }: { video: MusicVideo }) => (
     <div className={styles.frame}>
         <iframe

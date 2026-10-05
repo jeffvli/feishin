@@ -1197,22 +1197,23 @@ if (!singleInstance) {
                 });
             });
 
-            // Music videos (Hermes Music): YouTube's embedded player refuses to play without a Referer,
-            // and pages loaded from file:// don't send one, so identify the app like a mobile webview does.
+            // Music videos (Hermes Music): YouTube's embedded player refuses to play without a
+            // Referer, and pages loaded from file:// don't send one, so identify the app the way a
+            // mobile webview does.
+            const youtubeEmbeds = [
+                'https://www.youtube-nocookie.com/embed/*',
+                'https://www.youtube.com/embed/*',
+            ];
             session.defaultSession.webRequest.onBeforeSendHeaders(
-                { urls: ['https://www.youtube-nocookie.com/embed/*', 'https://www.youtube.com/embed/*'] },
+                { urls: youtubeEmbeds },
                 (details, callback) => {
-                    callback({
-                        requestHeaders: {
-                            ...details.requestHeaders,
-                            Referer: details.requestHeaders.Referer || 'https://org.jeffvli.feishin/',
-                        },
-                    });
+                    const ref = details.requestHeaders.Referer || 'https://org.jeffvli.feishin/';
+                    callback({ requestHeaders: { ...details.requestHeaders, Referer: ref } });
                 },
             );
 
             session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
-                // YouTube's player page keeps its own headers (Feishin's policy would block its scripts)
+                // YouTube's player page keeps its own headers (Feishin's policy blocks its scripts)
                 if (/^https:\/\/www\.youtube(-nocookie)?\.com\//.test(details.url)) {
                     callback({ responseHeaders: details.responseHeaders });
                     return;

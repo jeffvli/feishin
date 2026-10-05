@@ -8,7 +8,8 @@ export interface MusicVideo {
     videoId: string;
 }
 
-// Asks Hermes Music whether the song has a music video (added there with /video). Returns null if not.
+// Asks Hermes Music whether the song has a music video (added there with /video).
+// Returns null if not.
 export const useMusicVideo = (artist?: string, title?: string) => {
     const url = useHermesUrl();
     return useQuery({
