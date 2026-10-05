@@ -24,6 +24,7 @@ import { useFastAverageColor } from '/@/renderer/hooks';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { useSetGlobalExpanded } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { ExternalItemBadge } from '/@/shared/components/external-item-badge/external-item-badge';
 import { Group } from '/@/shared/components/group/group';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Separator } from '/@/shared/components/separator/separator';
@@ -56,6 +57,7 @@ interface AlbumTracksTableProps {
         discNumber: number;
         duration: number;
         id: string;
+        isExternal?: boolean;
         name: string;
         trackNumber: number;
     }>;
@@ -169,7 +171,10 @@ const TrackRow = ({ controls, internalState, player, serverId, song, songs }: Tr
             <span className={styles['track-number']}>
                 {song.discNumber} - {song.trackNumber}
             </span>
-            <span className={styles['track-name']}>{song.name}</span>
+            <span className={styles['track-name']}>
+                {song.name}
+                {song.isExternal === true && <ExternalItemBadge />}
+            </span>
             <span className={styles['track-duration']}>{formatDuration(song.duration)}</span>
         </Text>
     );
