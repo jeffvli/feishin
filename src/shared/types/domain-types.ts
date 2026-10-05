@@ -20,6 +20,11 @@ import {
 import { ServerFeatures } from '/@/shared/types/features-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
+export enum AuthMode {
+    API_KEY = 'apiKey',
+    LEGACY = 'legacy',
+}
+
 export enum LibraryItem {
     ALBUM = 'album',
     ALBUM_ARTIST = 'albumArtist',
@@ -85,10 +90,12 @@ export interface SavedCollection {
 }
 
 export type ServerListItem = {
+    auth?: AuthMode;
     enableAudiobooks?: boolean;
     features?: ServerFeatures;
     id: string;
     isAdmin?: boolean;
+    legacyAuth?: boolean;
     musicFolderId?: string[];
     name: string;
     preferInstantMix?: boolean;
