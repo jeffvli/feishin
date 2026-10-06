@@ -43,6 +43,7 @@ const SyncedVideo = ({ artist, title, video }: SyncedVideoProps) => {
     const offsetRef = useRef(video.offset ?? 0);
     const [nudge, setNudge] = useState(0);
     const [saving, setSaving] = useState(false);
+    const [skipping, setSkipping] = useState(false);
     const offset = (video.offset ?? 0) + nudge;
 
     useEffect(() => {
@@ -135,6 +136,31 @@ const SyncedVideo = ({ artist, title, video }: SyncedVideoProps) => {
         }
     };
 
+    // not the right video: Hermes Music moves on to the next candidate and checks it by sound
+    const wrongVideo = async () => {
+        if (!url) return;
+        setSkipping(true);
+        try {
+            const res = await fetch(`${url}/api/videos/wrong`, {
+                body: JSON.stringify({ artist, title }),
+                headers: { 'content-type': 'application/json' },
+                method: 'POST',
+            });
+            if (!res.ok) throw new Error(`Hermes Music returned ${res.status}`);
+            const result = (await res.json()) as { removed?: boolean };
+            toast.info({
+                message: result.removed
+                    ? 'No other video matches this song, so it was removed'
+                    : 'Trying the next video',
+            });
+            await queryClient.invalidateQueries({ queryKey: ['hermes-video', url, artist, title] });
+        } catch (error) {
+            toast.error({ message: (error as Error).message });
+        } finally {
+            setSkipping(false);
+        }
+    };
+
     const params = 'enablejsapi=1&mute=1&autoplay=1&controls=0&rel=0&playsinline=1&disablekb=1';
 
     return (
@@ -154,6 +180,9 @@ const SyncedVideo = ({ artist, title, video }: SyncedVideoProps) => {
                     {`${artist} - ${title} - timing ${offset >= 0 ? '+' : ''}${offset.toFixed(1)}s`}
                 </Text>
                 <Group gap="xs">
+                    <Button disabled={skipping} onClick={wrongVideo} size="compact-sm">
+                        Wrong video
+                    </Button>
                     <Button onClick={() => setNudge((n) => n - 0.5)} size="compact-sm">
                         -0.5s
                     </Button>

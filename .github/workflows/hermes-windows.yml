@@ -26,6 +26,9 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
+            - name: Set the version (each build is newer, so installed copies update themselves)
+              run: npm pkg set version=1.17.${{ github.run_number }}
+
             - name: Build for Windows
               run: pnpm run package:win:pr
 
@@ -33,7 +36,10 @@ jobs:
               uses: actions/upload-artifact@v7
               with:
                   name: feishin-hermes-windows
-                  path: dist/*.exe
+                  path: |
+                      dist/*.exe
+                      dist/*.exe.blockmap
+                      dist/latest.yml
 
     linux:
         runs-on: ubuntu-latest
@@ -49,6 +55,9 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
+            - name: Set the version (each build is newer, so installed copies update themselves)
+              run: npm pkg set version=1.17.${{ github.run_number }}
+
             - name: Build for Linux
               run: pnpm run package:linux:pr
 
@@ -60,6 +69,7 @@ jobs:
                       dist/*.AppImage
                       dist/*.deb
                       dist/*.tar.xz
+                      dist/latest-linux.yml
 
     lint-report:
         # Runs Feishin's checks and posts any problems as annotations (readable without signing in).
@@ -98,13 +108,17 @@ jobs:
             - name: Publish release
               uses: softprops/action-gh-release@v2
               with:
-                  tag_name: hermes-${{ github.run_number }}
-                  name: Feishin (Hermes Music edition) build ${{ github.run_number }}
+                  tag_name: v1.17.${{ github.run_number }}
+                  name: Feishin (Hermes Music edition) 1.17.${{ github.run_number }}
+                  make_latest: true
                   body: |
                       Feishin with Hermes Music video sync and Group Play.
 
-                      **Windows:** download `Feishin-1.17.0-win-x64.exe` (most PCs). If Windows warns that the app is
-                      unrecognised, click More info > Run anyway.
+                      **Already installed?** Feishin updates itself: it downloads this version
+                      in the background and installs it the next time you close Feishin.
+
+                      **Windows:** download the file ending in `-win-x64.exe` (most PCs). If Windows warns that the app
+                      is unrecognised, click More info > Run anyway.
 
                       **Linux:**
                       - Any distro: `Feishin-linux-x86_64.AppImage` - make it executable

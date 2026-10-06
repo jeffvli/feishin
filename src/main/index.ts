@@ -56,8 +56,9 @@ const ALPHA_UPDATER_CONFIG: {
     provider: 's3',
 };
 
+// Hermes Music edition: updates come from this fork's releases, never from upstream Feishin
 const GITHUB_UPDATER_CONFIG = {
-    owner: 'jeffvli',
+    owner: 'Urmomnumber1',
     provider: 'github' as const,
     repo: 'feishin',
 };
@@ -66,6 +67,8 @@ type UpdaterInstance = AppImageUpdater | MacUpdater | NsisUpdater | typeof autoU
 
 class AppUpdater {
     constructor() {
+        // this edition only publishes the latest channel (no alpha/beta builds)
+        if (store.get('release_channel') !== 'latest') store.set('release_channel', 'latest');
         const effectiveChannel = store.get('release_channel') as string;
         log.info('Effective update channel:', effectiveChannel);
         if (effectiveChannel === 'alpha') {
