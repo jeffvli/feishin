@@ -5,6 +5,7 @@ import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-vid
 export interface MusicVideo {
     channel?: string;
     offset?: number; // seconds into the video where the song starts
+    pending?: boolean; // Hermes Music is still lining the video up with the song
     title?: string;
     videoId: string;
 }
@@ -24,6 +25,8 @@ export const useMusicVideo = (artist?: string, title?: string) => {
             return /^[\w-]{11}$/.test(video.videoId) ? video : null;
         },
         queryKey: ['hermes-video', url, artist, title],
+        // while the timing is still being measured, check back until it's ready
+        refetchInterval: (query) => (query.state.data?.pending ? 5000 : false),
         retry: false,
         staleTime: 5 * 60 * 1000,
     });
