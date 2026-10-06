@@ -98,7 +98,10 @@ export const GroupPlaySync = () => {
             const player = usePlayerStoreBase.getState();
             const items = player.getQueue().items;
             const currentId = player.getCurrentSong()?._uniqueId;
-            const index = Math.max(0, items.findIndex((item) => item._uniqueId === currentId));
+            const index = Math.max(
+                0,
+                items.findIndex((item) => item._uniqueId === currentId),
+            );
             const playing = player.player.status === PlayerStatus.PLAYING;
             const position = useTimestampStoreBase.getState().timestamp;
             const ids = items.map((item) => item.id).join(',');

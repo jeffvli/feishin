@@ -12,8 +12,8 @@ import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-vid
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Stack } from '/@/shared/components/stack/stack';
-import { Text } from '/@/shared/components/text/text';
 import { TextInput } from '/@/shared/components/text-input/text-input';
+import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 
 // Create or join a group, and see who is in it and what is queued.
@@ -88,7 +88,9 @@ export const GroupPlayPanel = () => {
                 </Stack>
                 <Stack gap="xs">
                     <Text fw={600}>Join a group</Text>
-                    <Text isMuted size="sm">You can add songs; only the host can skip.</Text>
+                    <Text isMuted size="sm">
+                        You can add songs; only the host can skip.
+                    </Text>
                     <Group gap="xs" wrap="nowrap">
                         <TextInput
                             flex={1}
@@ -135,15 +137,21 @@ export const GroupPlayPanel = () => {
             <Group justify="space-between">
                 <Stack gap={0}>
                     <Text fw={600}>{state?.name || 'Group Play'}</Text>
-                    <Text isMuted size="sm">{who}</Text>
+                    <Text isMuted size="sm">
+                        {who}
+                    </Text>
                 </Stack>
                 <Stack align="flex-end" gap={0}>
-                    <Text isMuted size="xs">Code</Text>
+                    <Text isMuted size="xs">
+                        Code
+                    </Text>
                     <Text className={styles.code}>{code}</Text>
                 </Stack>
             </Group>
             {!!state?.members.length && (
-                <Text isMuted size="sm">With: {state.members.join(', ')}</Text>
+                <Text isMuted size="sm">
+                    With: {state.members.join(', ')}
+                </Text>
             )}
             <Text isMuted size="sm">
                 {isHost
@@ -164,7 +172,9 @@ export const GroupPlayPanel = () => {
                     </div>
                 ))}
                 {!state?.queue.length && (
-                    <Text isMuted p="sm" size="sm">Nothing queued yet.</Text>
+                    <Text isMuted p="sm" size="sm">
+                        Nothing queued yet.
+                    </Text>
                 )}
             </div>
             <Group justify="flex-end">
