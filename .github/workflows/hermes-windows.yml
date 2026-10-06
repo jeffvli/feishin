@@ -1,6 +1,6 @@
-# Builds the Hermes Music edition of Feishin for Windows on every push to this branch
-# and publishes the installer as a GitHub release (downloadable without a GitHub account).
-name: Hermes build (Windows)
+# Builds the Hermes Music edition of Feishin for Windows and Linux on every push to this branch
+# and publishes the downloads as one GitHub release (no GitHub account needed to download).
+name: Hermes build (Windows + Linux)
 
 on:
     push:
@@ -29,11 +29,47 @@ jobs:
             - name: Build for Windows
               run: pnpm run package:win:pr
 
-            - name: Upload installer
+            - name: Upload Windows build
               uses: actions/upload-artifact@v7
               with:
                   name: feishin-hermes-windows
                   path: dist/*.exe
+
+    linux:
+        runs-on: ubuntu-latest
+        env:
+            NODE_OPTIONS: --max-old-space-size=4096
+        steps:
+            - name: Checkout git repo
+              uses: actions/checkout@v6
+
+            - name: Install Node and PNPM
+              uses: pnpm/action-setup@v4
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Build for Linux
+              run: pnpm run package:linux:pr
+
+            - name: Upload Linux build
+              uses: actions/upload-artifact@v7
+              with:
+                  name: feishin-hermes-linux
+                  path: |
+                      dist/*.AppImage
+                      dist/*.deb
+                      dist/*.tar.xz
+
+    release:
+        needs: [windows, linux]
+        runs-on: ubuntu-latest
+        steps:
+            - name: Collect the builds
+              uses: actions/download-artifact@v5
+              with:
+                  path: dist
+                  merge-multiple: true
 
             - name: Publish release
               uses: softprops/action-gh-release@v2
@@ -41,7 +77,17 @@ jobs:
                   tag_name: hermes-${{ github.run_number }}
                   name: Feishin (Hermes Music edition) build ${{ github.run_number }}
                   body: |
-                      Feishin with the Hermes Music video button.
-                      Download the `x64` setup .exe (most PCs). Windows may warn that the app is unrecognised:
-                      click More info > Run anyway. In Feishin: Settings > General > Music videos > Hermes Music address.
-                  files: dist/*.exe
+                      Feishin with Hermes Music video sync and Group Play.
+
+                      **Windows:** download `Feishin-1.17.0-win-x64.exe` (most PCs). If Windows warns that the app is
+                      unrecognised, click More info > Run anyway.
+
+                      **Linux:**
+                      - Any distro: `Feishin-linux-x86_64.AppImage` - make it executable
+                        (`chmod +x Feishin-linux-x86_64.AppImage`) and run it.
+                      - Ubuntu / Debian / Mint: `Feishin-linux-amd64.deb` - install with
+                        `sudo apt install ./Feishin-linux-amd64.deb`.
+                      - Or unpack `Feishin-linux-x64.tar.xz` and run `feishin` inside.
+
+                      Then in Feishin: Settings > General > Music videos > Hermes Music address.
+                  files: dist/*
