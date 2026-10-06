@@ -4,6 +4,7 @@ import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-vid
 
 export interface MusicVideo {
     channel?: string;
+    offset?: number; // seconds into the video where the song starts
     title?: string;
     videoId: string;
 }

@@ -1,0 +1,36 @@
+.code {
+    font-family: monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+}
+
+.queue {
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid var(--theme-colors-border, rgb(255 255 255 / 10%));
+    border-radius: 6px;
+}
+
+.row,
+.current {
+    display: flex;
+    gap: 10px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+}
+
+.current {
+    font-weight: 600;
+    background: var(--theme-colors-surface, rgb(255 255 255 / 6%));
+}
+
+.num {
+    min-width: 2ch;
+    color: var(--theme-colors-foreground-muted, gray);
+    text-align: right;
+}
+
+.artist {
+    color: var(--theme-colors-foreground-muted, gray);
+}
