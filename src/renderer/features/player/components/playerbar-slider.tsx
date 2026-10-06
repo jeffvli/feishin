@@ -59,7 +59,10 @@ export const PlayerbarSlider = () => {
                         fw={600}
                         isMuted
                         isNoSelect
-                        onClick={() => setShowTimeRemaining(!showTimeRemaining)}
+                        onClick={(e) => {
+                            setShowTimeRemaining(!showTimeRemaining);
+                            e.stopPropagation();
+                        }}
                         role="button"
                         size="xs"
                         style={{ cursor: 'pointer', userSelect: 'none' }}
