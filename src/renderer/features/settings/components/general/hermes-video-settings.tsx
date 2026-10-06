@@ -22,7 +22,7 @@ export const HermesVideoSettings = memo(() => {
                 <TextInput
                     aria-label="Hermes Music address"
                     defaultValue={url}
-                    onBlur={(e) => setUrl(e.currentTarget.value)}
+                    onChange={(e) => setUrl(e.currentTarget.value)}
                     placeholder="http://umbrel.local:3340"
                     w={260}
                 />
