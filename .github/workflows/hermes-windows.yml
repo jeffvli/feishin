@@ -61,6 +61,29 @@ jobs:
                       dist/*.deb
                       dist/*.tar.xz
 
+    lint-report:
+        # Runs Feishin's checks and posts any problems as annotations (readable without signing in).
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout git repo
+              uses: actions/checkout@v6
+
+            - name: Install Node and PNPM
+              uses: pnpm/action-setup@v4
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Check and report
+              shell: bash
+              run: |
+                  for check in typecheck lint-code lint-styles; do
+                      pnpm run "$check" > "$check.txt" 2>&1 || true
+                      grep -E "error|warning|TS[0-9]{4}|\.tsx?[:(]|\.css" "$check.txt" | grep -v "^>" | head -40 | while IFS= read -r line; do
+                          echo "::warning title=$check::$line"
+                      done
+                  done
+
     release:
         needs: [windows, linux]
         runs-on: ubuntu-latest
