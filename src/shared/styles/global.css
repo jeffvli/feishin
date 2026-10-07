@@ -411,8 +411,8 @@ body.sour-disco {
    Only some Sour Player profiles may use it (for their name and their playlists); everyone sees it there. */
 @font-face {
     font-family: Determination;
-    font-display: swap;
     src: url('../../../assets/fonts/determination/determination.ttf');
+    font-display: swap;
 }
 
 .sour-font-determination h1 {
