@@ -41,6 +41,22 @@ export const GroupPlaySync = () => {
     const applied = useRef<string[]>([]);
     const adding = useRef<Promise<unknown>>(Promise.resolve());
 
+    // closing Sour Player leaves the group straight away (otherwise Hermes Music only notices
+    // minutes later and you'd show up twice when you join again); a host closing ends the group
+    useEffect(() => {
+        if (!url || !code) return undefined;
+        const onClose = () => {
+            const { hostKey } = useGroupPlayStore.getState();
+            if (role === 'host' && hostKey) {
+                navigator.sendBeacon(`${url}/api/group/${code}/end`, JSON.stringify({ hostKey }));
+            } else if (member) {
+                navigator.sendBeacon(`${url}/api/group/${code}/leave`, JSON.stringify({ member }));
+            }
+        };
+        window.addEventListener('beforeunload', onClose);
+        return () => window.removeEventListener('beforeunload', onClose);
+    }, [code, member, role, url]);
+
     // live group state
     useEffect(() => {
         if (!url || !code) return;

@@ -294,7 +294,12 @@ export const GroupPlayPanel = () => {
     const index = state?.index ?? 0;
     const nowPlaying = queue[index];
     const upNext = queue.slice(index + 1).map((song, i) => ({ at: index + 1 + i, song }));
-    const listening = (state?.members.length ?? 0) + (isRadio ? 0 : 1);
+    // one entry per person: an old connection that hasn't timed out yet doesn't count twice
+    const person = (m: GroupMember) => m.profile || m.name;
+    const members = (state?.members ?? []).filter(
+        (m, i, all) => !all.slice(i + 1).some((later) => person(later) === person(m)),
+    );
+    const listening = members.length + (isRadio ? 0 : 1);
     const pictureOf = (id: string, version?: number) =>
         version ? `${url}/api/group/${code}/avatar?id=${id}&v=${version}` : null;
     // profile pictures first (they can be GIFs), then pictures set only for this group
@@ -305,7 +310,7 @@ export const GroupPlayPanel = () => {
     // whoever added a song, by name (names are what the group shows)
     const pictureByName = (name: string) => {
         if (name === hostName && !isRadio) return hostPicture;
-        const m = state?.members.find((x) => x.name === name);
+        const m = members.find((x) => x.name === name);
         return m ? memberPicture(m) : null;
     };
     const showProfile = (id?: null | string) => {
@@ -399,7 +404,7 @@ export const GroupPlayPanel = () => {
                                         <Avatar host name={hostName} src={hostPicture} />
                                     </button>
                                 )}
-                                {(state?.members ?? []).map((m) => (
+                                {members.map((m) => (
                                     <button
                                         className={styles.avatarButton}
                                         key={m.id}
@@ -560,9 +565,9 @@ export const GroupPlayPanel = () => {
                         label="Show in the group list"
                         onChange={(e) => setListed(e.currentTarget.checked)}
                     />
-                    {!!state?.members.length && (
+                    {!!members.length && (
                         <Group gap="xs">
-                            {state.members.map((m) => (
+                            {members.map((m) => (
                                 <span className={styles.person} key={m.id}>
                                     <Avatar name={m.name} small src={memberPicture(m)} />
                                     {m.name}

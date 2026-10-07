@@ -6,7 +6,10 @@ import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 
 export const GroupPlayButton = () => {
     const code = useGroupPlayStore((state) => state.code);
-    const listening = useGroupPlayStore((state) => (state.state?.members.length ?? 0) + 1);
+    const listening = useGroupPlayStore((state) => {
+        const people = new Set((state.state?.members ?? []).map((m) => m.profile || m.name));
+        return people.size + (state.state?.radio ? 0 : 1);
+    });
     const label = code ? `Group Play (${code}) - ${listening} listening` : 'Group Play';
 
     return (
