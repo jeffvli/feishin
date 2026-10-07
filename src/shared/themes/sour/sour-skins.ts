@@ -130,7 +130,7 @@ export const sourGlass = skin({
     background: [16, 18, 28],
     css: `
 #main-content { background: radial-gradient(circle at 15% 10%, rgb(120 90 255 / 22%), transparent 45%), radial-gradient(circle at 85% 90%, rgb(242 193 78 / 16%), transparent 45%), var(--theme-colors-background); }
-.mantine-Popover-dropdown, .mantine-Menu-dropdown, .mantine-Modal-content, .mantine-Drawer-content { background: rgb(28 30 44 / 70%) !important; backdrop-filter: blur(18px) saturate(1.4); }
+[class*='mantine-Popover-dropdown'], [class*='mantine-Menu-dropdown'], [class*='mantine-Modal-content'], [class*='mantine-Drawer-content'] { background: rgb(28 30 44 / 70%) !important; backdrop-filter: blur(18px) saturate(1.4); }
 #player-bar { background: rgb(20 22 34 / 75%) !important; backdrop-filter: blur(20px); }`,
     foreground: 'rgb(236, 238, 255)',
     muted: 'rgb(164, 168, 200)',

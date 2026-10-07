@@ -2,10 +2,16 @@ import { useQuery } from '@tanstack/react-query';
 import { persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
-import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { type GroupSong } from '/@/renderer/features/group-play/store/group-play.store';
+import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { type Me, sourApi } from '/@/renderer/features/sour/api/sour-api';
 import { type Song } from '/@/shared/types/domain-types';
+
+// a song played on this computer (queue history, "on repeat")
+export interface HistoryEntry {
+    at: number;
+    song: GroupSong;
+}
 
 export interface Pin {
     id: string;
@@ -20,8 +26,6 @@ export interface SavedGroup {
     listed: boolean;
     name: string;
 }
-
-export type VisualizerStyle = 'bars' | 'glow' | 'halo' | 'orbit' | 'pulp' | 'river' | 'soul';
 
 // Sour Player's look and comfort switches (Settings > Sour Player and the Sour Studio)
 export interface SourLook {
@@ -53,11 +57,7 @@ export interface SourLook {
     visualizer: VisualizerStyle;
 }
 
-// a song played on this computer (queue history, "on repeat")
-export interface HistoryEntry {
-    at: number;
-    song: GroupSong;
-}
+export type VisualizerStyle = 'bars' | 'glow' | 'halo' | 'orbit' | 'pulp' | 'river' | 'soul';
 
 export const DEFAULT_LOOK: SourLook = {
     albumAccent: false,
@@ -109,8 +109,8 @@ interface SourStore {
     me: Me | null;
     notes: Record<string, string>;
     pins: Pin[];
-    savedGroups: SavedGroup[];
     repeatNotified: Record<string, string>;
+    savedGroups: SavedGroup[];
     seenMilestones: string[];
     set: (changes: Partial<Omit<SourStore, 'block' | 'set' | 'setLook' | 'unblock'>>) => void;
     setLook: (changes: Partial<SourLook>) => void;

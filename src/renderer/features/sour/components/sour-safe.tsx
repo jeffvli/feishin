@@ -8,7 +8,9 @@ import { logger } from '/@/renderer/utils/logger';
 export const SourSafe = ({ children, name }: { children: ReactNode; name: string }) => (
     <ErrorBoundary
         fallback={null}
-        onError={(error) => logger.warn(`Sour Player: ${name} stopped working`, { error: String(error) })}
+        onError={(error) =>
+            logger.warn(`Sour Player: ${name} stopped working`, { error: String(error) })
+        }
     >
         {children}
     </ErrorBoundary>

@@ -703,65 +703,71 @@ export const ProfileEditor = ({
                 <>
                     <Text fw={700}>Your account</Text>
                     <Text size="sm">
-                        Signed in with your Navidrome account <b>{me.account}</b>. Log into the
-                        same account in Sour Player on any computer and your profile comes with it -
-                        no codes needed.
+                        Signed in with your Navidrome account <b>{me.account}</b>. Log into the same
+                        account in Sour Player on any computer and your profile comes with it - no
+                        codes needed.
                     </Text>
                 </>
             ) : (
                 <>
-            <Text fw={700}>Use your profile on another computer</Text>
-            <Group gap="xs">
-                <Button
-                    onClick={() =>
-                        me &&
-                        sourApi
-                            .link(url, me)
-                            .then((r) => setLinkCode(r.code))
-                            .catch((error: Error) => toast.error({ message: error.message }))
-                    }
-                    size="xs"
-                    variant="default"
-                >
-                    Get a code
-                </Button>
-                {linkCode && (
-                    <Text className={styles.linkCode}>
-                        {linkCode}{' '}
-                        <span className={styles.muted}>
-                            (type it on the other computer, works for 10 min)
-                        </span>
-                    </Text>
-                )}
-            </Group>
-            <Group gap="xs">
-                <TextInput
-                    onChange={(e) => setClaimCode(e.currentTarget.value.toUpperCase())}
-                    placeholder="Code from your other computer"
-                    value={claimCode}
-                />
-                <Button
-                    disabled={claimCode.length < 6}
-                    onClick={() =>
-                        sourApi
-                            .claim(url, claimCode)
-                            .then((r) => {
-                                setStore({ me: { id: r.id, key: r.key } });
-                                useGroupPlayStore.getState().actions.setUserName(r.profile.name);
-                                toast.success({
-                                    message: `This computer now uses ${r.profile.name}'s profile`,
-                                });
-                                refresh();
-                                onDone();
-                            })
-                            .catch((error: Error) => toast.error({ message: error.message }))
-                    }
-                    size="xs"
-                    variant="default"
-                >
-                    Use this code
-                </Button>
-            </Group>
+                    <Text fw={700}>Use your profile on another computer</Text>
+                    <Group gap="xs">
+                        <Button
+                            onClick={() =>
+                                me &&
+                                sourApi
+                                    .link(url, me)
+                                    .then((r) => setLinkCode(r.code))
+                                    .catch((error: Error) =>
+                                        toast.error({ message: error.message }),
+                                    )
+                            }
+                            size="xs"
+                            variant="default"
+                        >
+                            Get a code
+                        </Button>
+                        {linkCode && (
+                            <Text className={styles.linkCode}>
+                                {linkCode}{' '}
+                                <span className={styles.muted}>
+                                    (type it on the other computer, works for 10 min)
+                                </span>
+                            </Text>
+                        )}
+                    </Group>
+                    <Group gap="xs">
+                        <TextInput
+                            onChange={(e) => setClaimCode(e.currentTarget.value.toUpperCase())}
+                            placeholder="Code from your other computer"
+                            value={claimCode}
+                        />
+                        <Button
+                            disabled={claimCode.length < 6}
+                            onClick={() =>
+                                sourApi
+                                    .claim(url, claimCode)
+                                    .then((r) => {
+                                        setStore({ me: { id: r.id, key: r.key } });
+                                        useGroupPlayStore
+                                            .getState()
+                                            .actions.setUserName(r.profile.name);
+                                        toast.success({
+                                            message: `This computer now uses ${r.profile.name}'s profile`,
+                                        });
+                                        refresh();
+                                        onDone();
+                                    })
+                                    .catch((error: Error) =>
+                                        toast.error({ message: error.message }),
+                                    )
+                            }
+                            size="xs"
+                            variant="default"
+                        >
+                            Use this code
+                        </Button>
+                    </Group>
                 </>
             )}
             <Text fw={700}>Blocked from Auto DJ</Text>

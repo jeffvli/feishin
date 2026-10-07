@@ -1,5 +1,14 @@
 import { AppTheme } from '/@/shared/themes/app-theme-types';
 
+export interface Holiday {
+    emoji: string;
+    greeting: string;
+    id: string;
+    name: string;
+    particles: Particles;
+    theme: AppTheme;
+}
+
 export type Particles =
     | 'bats'
     | 'clovers'
@@ -11,15 +20,6 @@ export type Particles =
     | 'leaves'
     | 'snow'
     | 'suns';
-
-export interface Holiday {
-    emoji: string;
-    greeting: string;
-    id: string;
-    name: string;
-    particles: Particles;
-    theme: AppTheme;
-}
 
 const day = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
 const between = (d: Date, from: Date, to: Date) => day(d) >= day(from) && day(d) <= day(to);
@@ -74,8 +74,7 @@ const HOLIDAYS: Array<Holiday & { when: (d: Date) => boolean }> = [
         particles: 'fireworks',
         theme: AppTheme.SOUR_NEW_YEAR,
         when: (d) =>
-            (d.getMonth() === 11 && d.getDate() === 31) ||
-            (d.getMonth() === 0 && d.getDate() <= 2),
+            (d.getMonth() === 11 && d.getDate() === 31) || (d.getMonth() === 0 && d.getDate() <= 2),
     },
     {
         emoji: '\u{1F3EE}',

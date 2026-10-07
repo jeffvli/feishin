@@ -26,6 +26,20 @@ import {
     hermesOcean,
     hermesSunset,
 } from '/@/shared/themes/hermes/hermes-themes';
+import { highContrastDark } from '/@/shared/themes/high-contrast-dark/high-contrast-dark';
+import { highContrastLight } from '/@/shared/themes/high-contrast-light/high-contrast-light';
+import { materialDark } from '/@/shared/themes/material-dark/material-dark';
+import { materialLight } from '/@/shared/themes/material-light/material-light';
+import { monokai } from '/@/shared/themes/monokai/monokai';
+import { nightOwl } from '/@/shared/themes/night-owl/night-owl';
+import { nord } from '/@/shared/themes/nord/nord';
+import { oneDark } from '/@/shared/themes/one-dark/one-dark';
+import { rosePineDawn } from '/@/shared/themes/rose-pine-dawn/rose-pine-dawn';
+import { rosePineMoon } from '/@/shared/themes/rose-pine-moon/rose-pine-moon';
+import { rosePine } from '/@/shared/themes/rose-pine/rose-pine';
+import { shadesOfPurple } from '/@/shared/themes/shades-of-purple/shades-of-purple';
+import { solarizedDark } from '/@/shared/themes/solarized-dark/solarized-dark';
+import { solarizedLight } from '/@/shared/themes/solarized-light/solarized-light';
 import {
     sourAutumn,
     sourBlueberry,
@@ -55,20 +69,6 @@ import {
     sourVinyl,
     sourWinter,
 } from '/@/shared/themes/sour/sour-skins';
-import { highContrastDark } from '/@/shared/themes/high-contrast-dark/high-contrast-dark';
-import { highContrastLight } from '/@/shared/themes/high-contrast-light/high-contrast-light';
-import { materialDark } from '/@/shared/themes/material-dark/material-dark';
-import { materialLight } from '/@/shared/themes/material-light/material-light';
-import { monokai } from '/@/shared/themes/monokai/monokai';
-import { nightOwl } from '/@/shared/themes/night-owl/night-owl';
-import { nord } from '/@/shared/themes/nord/nord';
-import { oneDark } from '/@/shared/themes/one-dark/one-dark';
-import { rosePineDawn } from '/@/shared/themes/rose-pine-dawn/rose-pine-dawn';
-import { rosePineMoon } from '/@/shared/themes/rose-pine-moon/rose-pine-moon';
-import { rosePine } from '/@/shared/themes/rose-pine/rose-pine';
-import { shadesOfPurple } from '/@/shared/themes/shades-of-purple/shades-of-purple';
-import { solarizedDark } from '/@/shared/themes/solarized-dark/solarized-dark';
-import { solarizedLight } from '/@/shared/themes/solarized-light/solarized-light';
 import { tokyoNight } from '/@/shared/themes/tokyo-night/tokyo-night';
 import { vscodeDarkPlus } from '/@/shared/themes/vscode-dark-plus/vscode-dark-plus';
 import { vscodeLightPlus } from '/@/shared/themes/vscode-light-plus/vscode-light-plus';

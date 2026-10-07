@@ -11,6 +11,7 @@ import { useGroupPlayStore } from '/@/renderer/features/group-play/store/group-p
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { openPeople, openProfile } from '/@/renderer/features/sour/components/people';
 import { ProfileAvatar } from '/@/renderer/features/sour/components/profile-bits';
+import { currentHoliday } from '/@/renderer/features/sour/skins/holidays';
 import { useSourProfiles, useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { playSound } from '/@/renderer/features/sour/utils/sounds';
 import { useFastAverageColor } from '/@/renderer/hooks';
@@ -64,7 +65,8 @@ export const LookEffects = () => {
         if (started.current) return;
         started.current = true;
         if (look.startupSound) window.setTimeout(() => playSound('lemon'), 800);
-        if (look.seasonal) {
+        // holiday skins (Sour Studio) win over the seasonal Hermes themes while a holiday is on
+        if (look.seasonal && !(look.holidays && currentHoliday())) {
             const month = new Date().getMonth() + 1;
             const theme =
                 month === 10
@@ -78,7 +80,7 @@ export const LookEffects = () => {
                           : AppTheme.HERMES_MIDNIGHT;
             setSettings({ general: { theme } });
         }
-    }, [look.seasonal, look.startupSound, setSettings]);
+    }, [look.holidays, look.seasonal, look.startupSound, setSettings]);
 
     return null;
 };

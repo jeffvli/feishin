@@ -8,6 +8,7 @@ import { sourApi } from '/@/renderer/features/sour/api/sour-api';
 import { deviceId } from '/@/renderer/features/sour/components/social';
 import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { useCurrentServer } from '/@/renderer/store';
+import { useAuthStore } from '/@/renderer/store/auth.store';
 import { usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { useTimestampStoreBase } from '/@/renderer/store/timestamp.store';
 import { toast } from '/@/shared/components/toast/toast';
@@ -25,7 +26,8 @@ export const SourPresence = () => {
     const me = useSourStore((state) => state.me);
     const server = useCurrentServer();
     const account = server?.username?.trim().toLowerCase() || '';
-    const credential = server?.credential || '';
+    // the login token the app already uses for the music server (Hermes Music checks it with Navidrome)
+    const credential = useAuthStore((state) => state.currentServer?.credential) || '';
     const canLink = !!credential && server?.type !== ServerType.JELLYFIN;
     const warned = useRef('');
 
@@ -34,7 +36,8 @@ export const SourPresence = () => {
         if (!canLink) {
             // Jellyfin logins can't be checked by Hermes Music: a profile just for this computer
             if (!me) {
-                const name = useGroupPlayStore.getState().userName.trim() || server.username || 'Listener';
+                const name =
+                    useGroupPlayStore.getState().userName.trim() || server.username || 'Listener';
                 sourApi
                     .register(url, name)
                     .then((res) => useSourStore.getState().setMe({ id: res.id, key: res.key }))
@@ -56,7 +59,9 @@ export const SourPresence = () => {
                 })
                 .then((res) => {
                     if (stopped) return;
-                    useSourStore.getState().setMe({ account: res.account, id: res.id, key: res.key });
+                    useSourStore
+                        .getState()
+                        .setMe({ account: res.account, id: res.id, key: res.key });
                     useGroupPlayStore.getState().actions.setUserName(res.profile.name);
                     if (res.merged || (before && !before.account)) {
                         toast.success({
@@ -71,10 +76,15 @@ export const SourPresence = () => {
                     if (/not found|no such profile|returned 404/i.test(error.message)) {
                         // Hermes Music from before accounts: keep (or make) a profile for this computer
                         if (!before) {
-                            const name = useGroupPlayStore.getState().userName.trim() || server.username || 'Listener';
+                            const name =
+                                useGroupPlayStore.getState().userName.trim() ||
+                                server.username ||
+                                'Listener';
                             sourApi
                                 .register(url, name)
-                                .then((res) => useSourStore.getState().setMe({ id: res.id, key: res.key }))
+                                .then((res) =>
+                                    useSourStore.getState().setMe({ id: res.id, key: res.key }),
+                                )
                                 .catch(() => {});
                         }
                         return;

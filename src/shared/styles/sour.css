@@ -72,10 +72,10 @@
 }
 
 /* glass: see-through menus and popups */
-.sour-glass .mantine-Popover-dropdown,
-.sour-glass .mantine-Menu-dropdown,
-.sour-glass .mantine-Modal-content,
-.sour-glass .mantine-Drawer-content {
+.sour-glass [class*='mantine-Popover-dropdown'],
+.sour-glass [class*='mantine-Menu-dropdown'],
+.sour-glass [class*='mantine-Modal-content'],
+.sour-glass [class*='mantine-Drawer-content'] {
     background: alpha(var(--theme-colors-surface), 0.72) !important;
     backdrop-filter: blur(18px) saturate(1.4);
 }

@@ -4,6 +4,7 @@ import isElectron from 'is-electron';
 import styles from './default-layout.module.css';
 
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
+import { SourRoot } from '/@/renderer/features/sour/components/sour-root';
 import { MainContent } from '/@/renderer/layouts/default-layout/main-content';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
 import { WindowBar } from '/@/renderer/layouts/window-bar';
@@ -39,6 +40,7 @@ export const DefaultLayout = ({ shell }: DefaultLayoutProps) => {
                 <PlayerBar />
             </div>
             <ContextMenuController.Root />
+            <SourRoot />
         </>
     );
 };

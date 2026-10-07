@@ -114,50 +114,68 @@ const calculateVolumeDown = (volume: number, volumeWheelStep: number) => {
     return volumeToSet;
 };
 
+// Two tidy rows: the extras (cast, sleep timer, player settings, mini player, video, rating, Auto DJ)
+// on top and the everyday buttons with the volume below. The invisible Sour Player helpers live in
+// SourWatchers so they keep running whatever buttons are hidden.
 export const RightControls = () => {
     const showRatings = useShowRatings();
     const showFavorites = useShowFavorites();
     const playbackType = usePlaybackType();
     const hidden = useSourStore((state) => state.look.hiddenButtons);
+    const roomy = useMediaQuery('(min-width: 1180px)');
     const show = (id: string) => !hidden.includes(id);
     return (
-        <Flex align="flex-end" direction="column" h="100%" px="1rem" py="0.5rem">
-            <Group h="calc(100% / 3)">
-                {showRatings && <RatingButton />}
-                <AutoDJButton />
-            </Group>
-            <Group align="center" gap="xs" wrap="nowrap">
+        <Flex
+            align="flex-end"
+            direction="column"
+            gap={2}
+            h="100%"
+            justify="center"
+            px="1rem"
+            py="0.25rem"
+            wrap="nowrap"
+        >
+            <SourWatchers />
+            <Group gap={2} justify="flex-end" wrap="nowrap">
                 <PlayCounter />
                 <HermesUpdateButton />
                 <DlnaCastButton />
                 <SleepTimerButton />
                 <PlayerConfig />
-                <GroupPlaySync />
-                <SourPresence />
-                <SocialWatcher />
-                <LookEffects />
-                <Shortcuts onRequest={openRequestWindow} />
-                <CrossfadeWatcher />
-                <AutoVideo />
-                <FloatingVideo />
-                <FloatingReactions />
-                <GroupPlayDrawer />
-                <ListenAlong />
+                {show('mini') && <MiniPlayerButton />}
+                {show('video') && <MusicVideoButton />}
+                {showRatings && roomy && <RatingButton />}
+                <AutoDJButton />
+            </Group>
+            <Group align="center" gap="xs" justify="flex-end" wrap="nowrap">
                 <FriendChips />
                 {show('people') && <PeopleButton />}
                 {show('request') && <RequestButton />}
-                {show('mini') && <MiniPlayerButton />}
                 {show('group') && <GroupPlayButton />}
-                {show('video') && <MusicVideoButton />}
                 <LyricsButton />
                 {showFavorites && <FavoriteButton />}
                 <QueueButton />
                 {playbackType === PlayerType.DLNA ? <DlnaVolumeButton /> : <VolumeButton />}
             </Group>
-            <Group h="calc(100% / 3)" />
         </Flex>
     );
 };
+
+const SourWatchers = () => (
+    <>
+        <GroupPlaySync />
+        <SourPresence />
+        <SocialWatcher />
+        <LookEffects />
+        <Shortcuts onRequest={openRequestWindow} />
+        <CrossfadeWatcher />
+        <AutoVideo />
+        <FloatingVideo />
+        <FloatingReactions />
+        <GroupPlayDrawer />
+        <ListenAlong />
+    </>
+);
 
 const AutoDJButton = () => {
     const { t } = useTranslation();
