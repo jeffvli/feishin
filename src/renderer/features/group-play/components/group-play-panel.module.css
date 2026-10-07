@@ -79,8 +79,8 @@
 
 .code-box {
     display: flex;
-    flex-direction: column;
     flex-shrink: 0;
+    flex-direction: column;
     gap: 4px;
     align-items: flex-end;
 }
@@ -137,9 +137,9 @@
     max-width: 140px;
     padding: 2px 8px 2px 2px;
     overflow: hidden;
+    text-overflow: ellipsis;
     font-size: 0.75rem;
     color: var(--theme-colors-foreground-muted, #aaa);
-    text-overflow: ellipsis;
     white-space: nowrap;
     background: rgb(255 255 255 / 6%);
     border-radius: 999px;

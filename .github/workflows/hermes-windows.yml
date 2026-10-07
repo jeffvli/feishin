@@ -90,7 +90,7 @@ jobs:
                   for check in typecheck lint-code lint-styles; do
                       pnpm run "$check" > "$check.txt" 2>&1 || true
                       echo "::notice title=$check::$(tail -n 1 "$check.txt")"
-                      { grep -E "error|warning|TS[0-9]{4}|\.tsx?[:(]|\.css" "$check.txt" || true; } | grep -v "^>" | head -40 | while IFS= read -r line; do
+                      { grep -E "error|warning|TS[0-9]{4}|\.tsx?[:(]|\.css|^ +[0-9]+:[0-9]+" "$check.txt" || true; } | grep -v "^>" | head -40 | while IFS= read -r line; do
                           echo "::warning title=$check::$line"
                       done || true
                   done

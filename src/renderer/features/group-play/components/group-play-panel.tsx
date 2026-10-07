@@ -265,9 +265,7 @@ export const GroupPlayPanel = () => {
             <div className={styles.nowPlaying}>
                 <Cover className={styles.coverLarge} song={nowPlaying} />
                 <Stack flex={1} gap={4} miw={0}>
-                    <Text className={styles.eyebrow}>
-                        {status}
-                    </Text>
+                    <Text className={styles.eyebrow}>{status}</Text>
                     {nowPlaying ? (
                         <>
                             <Text fw={700} size="lg" truncate>
