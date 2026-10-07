@@ -1,4 +1,5 @@
 import { closeAllModals } from '@mantine/modals';
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import styles from './group-play-panel.module.css';
@@ -7,6 +8,7 @@ import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { groupApi } from '/@/renderer/features/group-play/api/group-play-api';
 import {
     type GroupControl,
+    type GroupListing,
     type GroupSong,
     useGroupPlayActions,
     useGroupPlayStore,
@@ -17,6 +19,7 @@ import { usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { CopyButton } from '/@/shared/components/copy-button/copy-button';
+import { FileButton } from '/@/shared/components/file-button/file-button';
 import { Group } from '/@/shared/components/group/group';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
@@ -29,16 +32,58 @@ import { LibraryItem } from '/@/shared/types/domain-types';
 const hue = (name: string) =>
     [...name].reduce((sum, char) => (sum * 31 + char.charCodeAt(0)) % 360, 7);
 
-const Avatar = ({ host, name, small }: { host?: boolean; name: string; small?: boolean }) => (
+interface AvatarProps {
+    host?: boolean;
+    large?: boolean;
+    name: string;
+    small?: boolean;
+    src?: null | string;
+}
+
+const Avatar = ({ host, large, name, small, src }: AvatarProps) => (
     <span
-        className={small ? styles.avatarSmall : styles.avatar}
+        className={large ? styles.avatarLarge : small ? styles.avatarSmall : styles.avatar}
         style={{ background: `hsl(${hue(name)} 60% 42%)` }}
         title={host ? `${name} (host)` : name}
     >
-        {(name.trim()[0] || '?').toUpperCase()}
+        {src ? (
+            <img alt="" className={styles.avatarImage} src={src} />
+        ) : (
+            (name.trim()[0] || '?').toUpperCase()
+        )}
         {host && <span className={styles.crown}>&#9733;</span>}
     </span>
 );
+
+// shrinks a chosen picture to a 96px square so it is small enough to share with the group
+const toAvatar = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+            const size = 96;
+            const side = Math.min(img.width, img.height);
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            canvas
+                .getContext('2d')
+                ?.drawImage(
+                    img,
+                    (img.width - side) / 2,
+                    (img.height - side) / 2,
+                    side,
+                    side,
+                    0,
+                    0,
+                    size,
+                    size,
+                );
+            URL.revokeObjectURL(img.src);
+            resolve(canvas.toDataURL('image/jpeg', 0.85));
+        };
+        img.onerror = () => reject(new Error("That picture couldn't be opened"));
+        img.src = URL.createObjectURL(file);
+    });
 
 // album cover from the shared music server (each person's Feishin loads it from its own login)
 const Cover = ({ className, song }: { className: string; song?: GroupSong }) => {
@@ -59,9 +104,21 @@ const Cover = ({ className, song }: { className: string; song?: GroupSong }) => 
     );
 };
 
-const AddedBy = ({ me, name }: { me: string; name: string }) => (
+// what an open group is playing, shown in the list of groups
+const listingCover = (g: GroupListing): GroupSong | undefined => {
+    if (!g.nowPlaying) return undefined;
+    const { artist, imageId, title } = g.nowPlaying;
+    return { album: '', artist, duration: 0, id: g.code, imageId, title };
+};
+
+const listingText = (g: GroupListing) => {
+    const playing = g.nowPlaying ? ` - ${g.nowPlaying.title} by ${g.nowPlaying.artist}` : '';
+    return `Hosted by ${g.host} - ${g.listening} listening${playing}`;
+};
+
+const AddedBy = ({ me, name, src }: { me: string; name: string; src?: null | string }) => (
     <span className={styles.addedBy}>
-        <Avatar name={name} small />
+        <Avatar name={name} small src={src} />
         {name === me ? 'You' : name}
     </span>
 );
@@ -71,11 +128,34 @@ const AddedBy = ({ me, name }: { me: string; name: string }) => (
 // playback.
 export const GroupPlayPanel = () => {
     const url = useHermesUrl();
-    const { code, hostKey, member, role, state, userName } = useGroupPlayStore();
+    const { avatar, code, hostKey, member, role, state, userName } = useGroupPlayStore();
     const actions = useGroupPlayActions();
     const [joinCode, setJoinCode] = useState('');
     const [groupName, setGroupName] = useState('');
     const [busy, setBusy] = useState(false);
+    const openGroups = useQuery({
+        enabled: !!url && !code,
+        queryFn: () => groupApi.list(url),
+        queryKey: ['group-play-list', url],
+        refetchInterval: 5000,
+    });
+
+    // your picture: remembered on this computer, and sent to the group you're in
+    const pickAvatar = (file: File | null) => {
+        if (!file) return;
+        toAvatar(file)
+            .then((picture) => {
+                actions.setAvatar(picture);
+                if (url && code) {
+                    groupApi.profile(url, code, { hostKey, member }, picture).catch(() => {});
+                }
+            })
+            .catch((error: Error) => toast.error({ message: error.message }));
+    };
+    const removeAvatar = () => {
+        actions.setAvatar(null);
+        if (url && code) groupApi.profile(url, code, { hostKey, member }, null).catch(() => {});
+    };
 
     if (!url) {
         return (
@@ -101,7 +181,7 @@ export const GroupPlayPanel = () => {
         const name = userName.trim() || 'Guest';
         const start = () =>
             run(async () => {
-                const res = await groupApi.create(url, groupName, name);
+                const res = await groupApi.create(url, groupName, name, avatar);
                 // a group starts with an empty queue; the first song anyone adds starts it
                 const player = usePlayerStoreBase.getState();
                 player.mediaStop();
@@ -109,10 +189,10 @@ export const GroupPlayPanel = () => {
                 actions.setSession({ code: res.code, hostKey: res.hostKey, role: 'host' });
                 actions.setState(res.state);
             });
-        const join = () =>
+        const join = (groupCode: string) =>
             run(async () => {
-                const res = await groupApi.join(url, joinCode.trim(), name);
-                actions.setSession({ code: joinCode.trim(), member: res.member, role: 'member' });
+                const res = await groupApi.join(url, groupCode, name, avatar);
+                actions.setSession({ code: groupCode, member: res.member, role: 'member' });
                 actions.setState(res.state);
             });
         return (
@@ -127,12 +207,60 @@ export const GroupPlayPanel = () => {
                         queue.
                     </Text>
                 </div>
-                <TextInput
-                    label="Your name"
-                    onChange={(e) => actions.setUserName(e.currentTarget.value)}
-                    placeholder="Shown to the others"
-                    value={userName}
-                />
+                <div className={styles.profile}>
+                    <Avatar large name={name} src={avatar} />
+                    <Stack flex={1} gap={6}>
+                        <TextInput
+                            label="Your name"
+                            onChange={(e) => actions.setUserName(e.currentTarget.value)}
+                            placeholder="Shown to the others"
+                            value={userName}
+                        />
+                        <Group gap="xs">
+                            <FileButton
+                                accept="image/png,image/jpeg,image/webp"
+                                onChange={pickAvatar}
+                            >
+                                {(props) => (
+                                    <Button {...props} size="compact-xs" variant="default">
+                                        {avatar ? 'Change picture' : 'Add a picture'}
+                                    </Button>
+                                )}
+                            </FileButton>
+                            {avatar && (
+                                <Button onClick={removeAvatar} size="compact-xs" variant="subtle">
+                                    Remove
+                                </Button>
+                            )}
+                        </Group>
+                    </Stack>
+                </div>
+                {!!openGroups.data?.length && (
+                    <Stack gap={8}>
+                        <Text fw={700}>Groups playing now</Text>
+                        {openGroups.data.map((g) => (
+                            <div className={styles.lobby} key={g.code}>
+                                <Cover className={styles.coverSmall} song={listingCover(g)} />
+                                <div className={styles.songText}>
+                                    <Text fw={700} size="sm" truncate>
+                                        {g.name}
+                                    </Text>
+                                    <Text isMuted size="xs" truncate>
+                                        {listingText(g)}
+                                    </Text>
+                                </div>
+                                <Button
+                                    disabled={busy}
+                                    onClick={() => join(g.code)}
+                                    size="xs"
+                                    variant="filled"
+                                >
+                                    Join
+                                </Button>
+                            </div>
+                        ))}
+                    </Stack>
+                )}
                 <div className={styles.choices}>
                     <div className={styles.choice}>
                         <Text fw={700}>Start a group</Text>
@@ -163,7 +291,7 @@ export const GroupPlayPanel = () => {
                         <Button
                             disabled={busy || joinCode.trim().length !== 5}
                             fullWidth
-                            onClick={join}
+                            onClick={() => join(joinCode.trim())}
                             variant="filled"
                         >
                             Join
@@ -183,6 +311,15 @@ export const GroupPlayPanel = () => {
     const nowPlaying = queue[index];
     const upNext = queue.slice(index + 1).map((song, i) => ({ at: index + 1 + i, song }));
     const listening = (state?.members.length ?? 0) + 1;
+    const pictureOf = (id: string, version?: number) =>
+        version ? `${url}/api/group/${code}/avatar?id=${id}&v=${version}` : null;
+    const hostPicture = pictureOf('host', state?.hostAvatar);
+    // whoever added a song, by name (names are what the group shows)
+    const pictureByName = (name: string) => {
+        if (name === hostName) return hostPicture;
+        const m = state?.members.find((x) => x.name === name);
+        return m ? pictureOf(m.id, m.avatar) : null;
+    };
     const status = !nowPlaying ? 'Waiting for songs' : state?.playing ? 'Now playing' : 'Paused';
 
     // the host's own controls act on its player right away; guests' go through Hermes Music
@@ -215,7 +352,14 @@ export const GroupPlayPanel = () => {
     const setGuestControl = (on: boolean) => {
         if (!hostKey) return;
         groupApi
-            .settings(url, code, hostKey, on)
+            .settings(url, code, hostKey, { guestControl: on })
+            .catch((error: Error) => toast.error({ message: error.message }));
+    };
+
+    const setListed = (on: boolean) => {
+        if (!hostKey) return;
+        groupApi
+            .settings(url, code, hostKey, { listed: on })
             .catch((error: Error) => toast.error({ message: error.message }));
     };
 
@@ -240,9 +384,13 @@ export const GroupPlayPanel = () => {
                         </Text>
                         <Group gap={6}>
                             <span className={styles.avatars}>
-                                <Avatar host name={hostName} />
+                                <Avatar host name={hostName} src={hostPicture} />
                                 {(state?.members ?? []).map((m) => (
-                                    <Avatar key={m.id} name={m.name} />
+                                    <Avatar
+                                        key={m.id}
+                                        name={m.name}
+                                        src={pictureOf(m.id, m.avatar)}
+                                    />
                                 ))}
                             </span>
                             <Text size="sm">{listening} listening</Text>
@@ -275,7 +423,11 @@ export const GroupPlayPanel = () => {
                                 {nowPlaying.artist}
                                 {nowPlaying.album ? ` - ${nowPlaying.album}` : ''}
                             </Text>
-                            <AddedBy me={me} name={nowPlaying.by || hostName} />
+                            <AddedBy
+                                me={me}
+                                name={nowPlaying.by || hostName}
+                                src={pictureByName(nowPlaying.by || hostName)}
+                            />
                         </>
                     ) : (
                         <Text isMuted size="sm">
@@ -328,7 +480,11 @@ export const GroupPlayPanel = () => {
                                     {song.artist}
                                 </Text>
                             </div>
-                            <AddedBy me={me} name={song.by || hostName} />
+                            <AddedBy
+                                me={me}
+                                name={song.by || hostName}
+                                src={pictureByName(song.by || hostName)}
+                            />
                             <span className={styles.rowActions}>
                                 {canControl && (
                                     <ActionIcon
@@ -376,11 +532,21 @@ export const GroupPlayPanel = () => {
                         label="Let guests control playback"
                         onChange={(e) => setGuestControl(e.currentTarget.checked)}
                     />
+                    <Switch
+                        checked={!!state?.listed}
+                        description="Anyone with Feishin can see it under Groups playing now and join. Turn off to need the code."
+                        label="Show in the group list"
+                        onChange={(e) => setListed(e.currentTarget.checked)}
+                    />
                     {!!state?.members.length && (
                         <Group gap="xs">
                             {state.members.map((m) => (
                                 <span className={styles.person} key={m.id}>
-                                    <Avatar name={m.name} small />
+                                    <Avatar
+                                        name={m.name}
+                                        small
+                                        src={pictureOf(m.id, m.avatar)}
+                                    />
                                     {m.name}
                                     <ActionIcon
                                         icon="x"
@@ -401,7 +567,14 @@ export const GroupPlayPanel = () => {
                 </Text>
             )}
 
-            <Group justify="flex-end">
+            <Group justify="space-between">
+                <FileButton accept="image/png,image/jpeg,image/webp" onChange={pickAvatar}>
+                    {(props) => (
+                        <Button {...props} size="xs" variant="subtle">
+                            {avatar ? 'Change my picture' : 'Add my picture'}
+                        </Button>
+                    )}
+                </FileButton>
                 <Button color="red" disabled={busy} onClick={leave} variant="light">
                     {isHost ? 'End group' : 'Leave group'}
                 </Button>

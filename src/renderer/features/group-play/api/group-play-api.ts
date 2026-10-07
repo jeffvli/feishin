@@ -1,5 +1,6 @@
 import {
     type GroupControl,
+    type GroupListing,
     type GroupSong,
     type GroupState,
 } from '/@/renderer/features/group-play/store/group-play.store';
@@ -47,18 +48,35 @@ export const groupApi = {
         cmd: GroupControl,
         target: { index?: number; position?: number; songId?: string } = {},
     ) => post<{ ok: boolean }>(`${base}/api/group/${code}/control`, { cmd, member, ...target }),
-    create: (base: string, name: string, user: string) =>
-        post<Created>(`${base}/api/group/create`, { name, user }),
+    create: (base: string, name: string, user: string, avatar: null | string) =>
+        post<Created>(`${base}/api/group/create`, { avatar, name, user }),
     end: (base: string, code: string, hostKey: string) =>
         post<{ ok: boolean }>(`${base}/api/group/${code}/end`, { hostKey }),
-    join: (base: string, code: string, user: string) =>
-        post<Joined>(`${base}/api/group/${code}/join`, { user }),
+    join: (base: string, code: string, user: string, avatar: null | string) =>
+        post<Joined>(`${base}/api/group/${code}/join`, { avatar, user }),
     kick: (base: string, code: string, hostKey: string, target: string) =>
         post<{ ok: boolean }>(`${base}/api/group/${code}/kick`, { hostKey, target }),
     leave: (base: string, code: string, member: string) =>
         post<{ ok: boolean }>(`${base}/api/group/${code}/leave`, { member }),
+    // groups that are open to join (the host can hide theirs)
+    list: async (base: string) => {
+        const res = await fetch(`${base}/api/group/list`);
+        if (!res.ok) throw new Error(`Hermes Music returned ${res.status}`);
+        return (await res.json()) as GroupListing[];
+    },
+    // change your picture while in a group
+    profile: (
+        base: string,
+        code: string,
+        who: { hostKey?: null | string; member?: null | string },
+        avatar: null | string,
+    ) => post<{ ok: boolean }>(`${base}/api/group/${code}/profile`, { avatar, ...who }),
     report: (base: string, code: string, body: Record<string, unknown>) =>
         post<{ ok: boolean }>(`${base}/api/group/${code}/report`, body),
-    settings: (base: string, code: string, hostKey: string, guestControl: boolean) =>
-        post<{ ok: boolean }>(`${base}/api/group/${code}/settings`, { guestControl, hostKey }),
+    settings: (
+        base: string,
+        code: string,
+        hostKey: string,
+        changes: { guestControl?: boolean; listed?: boolean },
+    ) => post<{ ok: boolean }>(`${base}/api/group/${code}/settings`, { hostKey, ...changes }),
 };

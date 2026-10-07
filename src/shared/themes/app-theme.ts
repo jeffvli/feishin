@@ -18,6 +18,14 @@ import { githubLight } from '/@/shared/themes/github-light/github-light';
 import { glassyDark } from '/@/shared/themes/glassy-dark/glassy-dark';
 import { gruvboxDark } from '/@/shared/themes/gruvbox-dark/gruvbox-dark';
 import { gruvboxLight } from '/@/shared/themes/gruvbox-light/gruvbox-light';
+import {
+    hermesBlue,
+    hermesCherry,
+    hermesForest,
+    hermesMidnight,
+    hermesOcean,
+    hermesSunset,
+} from '/@/shared/themes/hermes/hermes-themes';
 import { highContrastDark } from '/@/shared/themes/high-contrast-dark/high-contrast-dark';
 import { highContrastLight } from '/@/shared/themes/high-contrast-light/high-contrast-light';
 import { materialDark } from '/@/shared/themes/material-dark/material-dark';
@@ -52,6 +60,12 @@ export const appTheme: Record<AppTheme, AppThemeConfiguration> = {
     [AppTheme.GLASSY_DARK]: glassyDark,
     [AppTheme.GRUVBOX_DARK]: gruvboxDark,
     [AppTheme.GRUVBOX_LIGHT]: gruvboxLight,
+    [AppTheme.HERMES_BLUE]: hermesBlue,
+    [AppTheme.HERMES_CHERRY]: hermesCherry,
+    [AppTheme.HERMES_FOREST]: hermesForest,
+    [AppTheme.HERMES_MIDNIGHT]: hermesMidnight,
+    [AppTheme.HERMES_OCEAN]: hermesOcean,
+    [AppTheme.HERMES_SUNSET]: hermesSunset,
     [AppTheme.HIGH_CONTRAST_DARK]: highContrastDark,
     [AppTheme.HIGH_CONTRAST_LIGHT]: highContrastLight,
     [AppTheme.MATERIAL_DARK]: materialDark,

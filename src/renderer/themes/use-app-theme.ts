@@ -17,6 +17,12 @@ import { AppTheme, AppThemeConfiguration } from '/@/shared/themes/app-theme-type
 import { FontType } from '/@/shared/types/types';
 
 export const THEME_DATA = [
+    { label: 'Hermes Blue', type: 'dark', value: AppTheme.HERMES_BLUE },
+    { label: 'Hermes Midnight', type: 'dark', value: AppTheme.HERMES_MIDNIGHT },
+    { label: 'Hermes Ocean', type: 'dark', value: AppTheme.HERMES_OCEAN },
+    { label: 'Hermes Forest', type: 'dark', value: AppTheme.HERMES_FOREST },
+    { label: 'Hermes Sunset', type: 'dark', value: AppTheme.HERMES_SUNSET },
+    { label: 'Hermes Cherry', type: 'dark', value: AppTheme.HERMES_CHERRY },
     { label: 'Default Dark', type: 'dark', value: AppTheme.DEFAULT_DARK },
     { label: 'Default Light', type: 'light', value: AppTheme.DEFAULT_LIGHT },
     { label: 'Nord', type: 'dark', value: AppTheme.NORD },

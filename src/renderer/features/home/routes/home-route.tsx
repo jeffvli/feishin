@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useGridCarouselContainerQuery } from '/@/renderer/components/grid-carousel/grid-carousel-v2';
 import { NativeScrollArea } from '/@/renderer/components/native-scroll-area/native-scroll-area';
 import { AlbumInfiniteCarousel } from '/@/renderer/features/albums/components/album-infinite-carousel';
+import { YourMostPlayed } from '/@/renderer/features/hermes-plays/components/your-most-played';
 import { AlbumInfiniteFeatureCarousel } from '/@/renderer/features/home/components/album-infinite-feature-carousel';
 import { AlbumInfiniteSingleFeatureCarousel } from '/@/renderer/features/home/components/album-infinite-single-feature-carousel';
 import { FeaturedGenres } from '/@/renderer/features/home/components/featured-genres';
@@ -125,6 +126,11 @@ const HomeRoute = () => {
                             <AlbumInfiniteFeatureCarousel />
                         )}
                         {sortedItems.map((item) => {
+                            // Hermes Music edition: your own most played songs (counted locally)
+                            if (item.id === HomeItem.MOST_PLAYED) {
+                                return <YourMostPlayed key="your-most-played" />;
+                            }
+
                             if (item.id === HomeItem.GENRES) {
                                 return <FeaturedGenres key="featured-genres" />;
                             }

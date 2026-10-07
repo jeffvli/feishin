@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next';
 
 import { GroupPlayButton } from '/@/renderer/features/group-play/components/group-play-button';
 import { GroupPlaySync } from '/@/renderer/features/group-play/components/group-play-sync';
+import { PlayCounter } from '/@/renderer/features/hermes-plays/components/play-counter';
+import { RequestButton } from '/@/renderer/features/hermes-request/components/request-button';
 import { HermesUpdateButton } from '/@/renderer/features/hermes-update/components/hermes-update-button';
 import { MusicVideoButton } from '/@/renderer/features/hermes-video/components/music-video-button';
 import { PopoverPlayQueue } from '/@/renderer/features/now-playing/components/popover-play-queue';
@@ -100,11 +102,13 @@ export const RightControls = () => {
                 <AutoDJButton />
             </Group>
             <Group align="center" gap="xs" wrap="nowrap">
+                <PlayCounter />
                 <HermesUpdateButton />
                 <DlnaCastButton />
                 <SleepTimerButton />
                 <PlayerConfig />
                 <GroupPlaySync />
+                <RequestButton />
                 <GroupPlayButton />
                 <MusicVideoButton />
                 <LyricsButton />

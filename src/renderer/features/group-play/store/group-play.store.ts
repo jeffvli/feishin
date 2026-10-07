@@ -20,7 +20,17 @@ export type GroupControl =
     | 'remove'
     | 'seek';
 
+export interface GroupListing {
+    code: string;
+    host: string;
+    listening: number;
+    name: string;
+    nowPlaying: null | { artist: string; imageId: null | string; title: string };
+    playing: boolean;
+}
+
 export interface GroupMember {
+    avatar: number;
     id: string;
     name: string;
 }
@@ -47,7 +57,9 @@ export interface GroupState {
     ended: boolean;
     guestControl: boolean;
     host: string;
+    hostAvatar: number;
     index: number;
+    listed: boolean;
     members: GroupMember[];
     name: string;
     playing: boolean;
@@ -59,10 +71,11 @@ export interface GroupState {
 }
 
 // Group Play session (like a Spotify Jam). Hermes Music runs the group; the host's player is the
-// source of truth and members follow it. Only the display name is remembered between restarts.
+// source of truth and members follow it. Your name and picture are remembered between restarts.
 interface GroupPlayStore {
     actions: {
         leave: () => void;
+        setAvatar: (avatar: null | string) => void;
         setSession: (session: {
             code: string;
             hostKey?: string;
@@ -72,6 +85,7 @@ interface GroupPlayStore {
         setState: (state: GroupState) => void;
         setUserName: (userName: string) => void;
     };
+    avatar: null | string;
     clockOffset: number;
     code: null | string;
     hostKey: null | string;
@@ -87,11 +101,13 @@ export const useGroupPlayStore = createWithEqualityFn<GroupPlayStore>()(
             actions: {
                 leave: () =>
                     set({ code: null, hostKey: null, member: null, role: null, state: null }),
+                setAvatar: (avatar) => set({ avatar }),
                 setSession: ({ code, hostKey, member, role }) =>
                     set({ code, hostKey: hostKey ?? null, member: member ?? null, role }),
                 setState: (state) => set({ clockOffset: state.serverNow - Date.now(), state }),
                 setUserName: (userName) => set({ userName: userName.slice(0, 40) }),
             },
+            avatar: null,
             clockOffset: 0,
             code: null,
             hostKey: null,
@@ -102,7 +118,7 @@ export const useGroupPlayStore = createWithEqualityFn<GroupPlayStore>()(
         }),
         {
             name: 'group-play',
-            partialize: (state) => ({ userName: state.userName }),
+            partialize: (state) => ({ avatar: state.avatar, userName: state.userName }),
         },
     ),
 );
