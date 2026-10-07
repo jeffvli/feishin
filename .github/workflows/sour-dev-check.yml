@@ -42,3 +42,16 @@ jobs:
               with:
                   name: check-reports
                   path: '*.txt'
+
+            # A web build of the current code, so it can be clicked through locally before a release
+            - name: Web build
+              shell: bash
+              run: |
+                  git checkout -- . && pnpm run build:web > build-web.log 2>&1 || { tail -n 60 build-web.log; exit 1; }
+                  rm -f out/web/assets/*.map
+
+            - name: Keep the web build
+              uses: actions/upload-artifact@v7
+              with:
+                  name: web-build
+                  path: out/web
