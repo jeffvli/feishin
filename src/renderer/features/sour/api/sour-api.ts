@@ -21,6 +21,8 @@ export interface LeaderboardRow {
 }
 
 export interface Me {
+    // the Navidrome account this profile belongs to (older Hermes Music versions don't have accounts)
+    account?: null | string;
     id: string;
     key: string;
 }
@@ -89,6 +91,7 @@ export interface ProfileStats {
 }
 
 export interface SourProfile {
+    account?: null | string;
     avatar: number;
     avatarHistory?: number[];
     away: string;
@@ -199,6 +202,19 @@ export const sourApi = {
     me: (base: string, me: Me) =>
         call<SourProfile>(`${base}/api/profiles/${me.id}/me`, { key: me.key }),
     milestones: (base: string) => callList<Milestone>(`${base}/api/milestones`),
+    // sign in with the Navidrome account Sour Player is logged into: Hermes Music checks the login with
+    // Navidrome and answers with that account's profile (an older profile from this computer joins it)
+    navidrome: (
+        base: string,
+        body: { credential: string; key?: string; name?: string; profile?: string },
+    ) =>
+        call<{
+            account: string;
+            id: string;
+            key: string;
+            merged: null | string;
+            profile: SourProfile;
+        }>(`${base}/api/profiles/navidrome`, body),
     nickname: (base: string, me: Me, profileId: string, nick: string) =>
         call<SourProfile>(`${base}/api/profiles/${profileId}/nickname`, {
             from: me.id,

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { toGroupSong } from '/@/renderer/features/group-play/api/group-play-api';
 import { useGroupPlayStore } from '/@/renderer/features/group-play/store/group-play.store';
@@ -7,26 +7,93 @@ import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-vid
 import { sourApi } from '/@/renderer/features/sour/api/sour-api';
 import { deviceId } from '/@/renderer/features/sour/components/social';
 import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
+import { useCurrentServer } from '/@/renderer/store';
 import { usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { useTimestampStoreBase } from '/@/renderer/store/timestamp.store';
+import { toast } from '/@/shared/components/toast/toast';
+import { ServerType } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
-// Sets up this computer's profile on Hermes Music the first time, then tells it every 15 seconds that
+// Your profile is your Navidrome account: Sour Player signs in to Hermes Music with the music server login
+// (Hermes Music checks it with Navidrome), so every computer you log into gets the same profile. An older
+// profile made on this computer joins the account's profile. Then it tells Hermes Music every 15 seconds that
 // you're online, what you're listening to and where (for listen along and resume), and which group
 // you're in. Songs you hid from your activity are never sent. Every 10 minutes your recent plays
 // are shown on your profile.
 export const SourPresence = () => {
     const url = useHermesUrl();
     const me = useSourStore((state) => state.me);
+    const server = useCurrentServer();
+    const account = server?.username?.trim().toLowerCase() || '';
+    const credential = server?.credential || '';
+    const canLink = !!credential && server?.type !== ServerType.JELLYFIN;
+    const warned = useRef('');
 
     useEffect(() => {
-        if (!url || me) return;
-        const name = useGroupPlayStore.getState().userName.trim() || 'Listener';
-        sourApi
-            .register(url, name)
-            .then((res) => useSourStore.getState().setMe({ id: res.id, key: res.key }))
-            .catch(() => {});
-    }, [me, url]);
+        if (!url || !server) return undefined;
+        if (!canLink) {
+            // Jellyfin logins can't be checked by Hermes Music: a profile just for this computer
+            if (!me) {
+                const name = useGroupPlayStore.getState().userName.trim() || server.username || 'Listener';
+                sourApi
+                    .register(url, name)
+                    .then((res) => useSourStore.getState().setMe({ id: res.id, key: res.key }))
+                    .catch(() => {});
+            }
+            return undefined;
+        }
+        if (me && me.account === account) return undefined;
+        let stopped = false;
+        let retry: ReturnType<typeof setTimeout> | undefined;
+        const signIn = () => {
+            const before = useSourStore.getState().me;
+            sourApi
+                .navidrome(url, {
+                    credential,
+                    key: before?.key,
+                    name: useGroupPlayStore.getState().userName.trim() || server.username,
+                    profile: before?.id,
+                })
+                .then((res) => {
+                    if (stopped) return;
+                    useSourStore.getState().setMe({ account: res.account, id: res.id, key: res.key });
+                    useGroupPlayStore.getState().actions.setUserName(res.profile.name);
+                    if (res.merged || (before && !before.account)) {
+                        toast.success({
+                            message: `Your Sour profile is now tied to your Navidrome account (${res.account}) and works on every computer you sign in to`,
+                        });
+                    } else if (before && before.id !== res.id) {
+                        toast.info({ message: `Signed in to Sour as ${res.profile.name}` });
+                    }
+                })
+                .catch((error: Error) => {
+                    if (stopped) return;
+                    if (/not found|no such profile|returned 404/i.test(error.message)) {
+                        // Hermes Music from before accounts: keep (or make) a profile for this computer
+                        if (!before) {
+                            const name = useGroupPlayStore.getState().userName.trim() || server.username || 'Listener';
+                            sourApi
+                                .register(url, name)
+                                .then((res) => useSourStore.getState().setMe({ id: res.id, key: res.key }))
+                                .catch(() => {});
+                        }
+                        return;
+                    }
+                    if (warned.current !== error.message) {
+                        warned.current = error.message;
+                        toast.warn({ message: `Sour profile: ${error.message}` });
+                    }
+                    retry = setTimeout(signIn, 120000);
+                });
+        };
+        signIn();
+        return () => {
+            stopped = true;
+            if (retry) clearTimeout(retry);
+        };
+        // me?.account / me?.id are what matter; the whole object changes on every key refresh
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [account, canLink, credential, me?.account, me?.id, server?.id, url]);
 
     useEffect(() => {
         if (!url || !me) return undefined;

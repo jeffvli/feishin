@@ -699,6 +699,17 @@ export const ProfileEditor = ({
 
     const account = (
         <Stack gap="sm">
+            {me?.account ? (
+                <>
+                    <Text fw={700}>Your account</Text>
+                    <Text size="sm">
+                        Signed in with your Navidrome account <b>{me.account}</b>. Log into the
+                        same account in Sour Player on any computer and your profile comes with it -
+                        no codes needed.
+                    </Text>
+                </>
+            ) : (
+                <>
             <Text fw={700}>Use your profile on another computer</Text>
             <Group gap="xs">
                 <Button
@@ -751,6 +762,8 @@ export const ProfileEditor = ({
                     Use this code
                 </Button>
             </Group>
+                </>
+            )}
             <Text fw={700}>Blocked from Auto DJ</Text>
             <Group gap="xs">
                 {blocked.map((artist) => (
