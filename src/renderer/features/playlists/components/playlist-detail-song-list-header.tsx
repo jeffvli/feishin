@@ -19,6 +19,7 @@ import {
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { ListSearchInput } from '/@/renderer/features/shared/components/list-search-input';
 import { getPlaylistLeafName } from '/@/renderer/features/sidebar/components/playlist-folder-tree';
+import { openPlaylistTheme } from '/@/renderer/features/sour/components/playlist-theme';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     useCurrentServer,
@@ -29,6 +30,7 @@ import { formatDurationString } from '/@/renderer/utils';
 import { replaceURLWithHTMLLinks } from '/@/renderer/utils/linkify';
 import { hasFeature } from '/@/shared/api/utils';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
+import { Button } from '/@/shared/components/button/button';
 import { FileButton } from '/@/shared/components/file-button/file-button';
 import { Group } from '/@/shared/components/group/group';
 import { Spoiler } from '/@/shared/components/spoiler/spoiler';
@@ -236,10 +238,19 @@ export const PlaylistDetailSongListHeader = ({
                                 </Text>
                             </Spoiler>
                         ) : null}
-                        <LibraryHeaderMenu
-                            onPlay={(type) => handlePlay(type)}
-                            onShuffle={() => handlePlay(Play.SHUFFLE)}
-                        />
+                        <Group gap="sm" wrap="nowrap">
+                            <LibraryHeaderMenu
+                                onPlay={(type) => handlePlay(type)}
+                                onShuffle={() => handlePlay(Play.SHUFFLE)}
+                            />
+                            <Button
+                                onClick={() => openPlaylistTheme(playlistId)}
+                                size="compact-sm"
+                                variant="default"
+                            >
+                                Theme
+                            </Button>
+                        </Group>
                     </Stack>
                 </LibraryHeader>
             )}

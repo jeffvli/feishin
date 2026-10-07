@@ -5,6 +5,7 @@ import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { runAutoDjAlbumIds } from '/@/renderer/features/player/auto-dj/auto-dj-albums';
 import { runAutoDjSongs } from '/@/renderer/features/player/auto-dj/auto-dj-songs';
 import { useIsPlayerFetching, usePlayer } from '/@/renderer/features/player/context/player-context';
+import { isBlockedSong } from '/@/renderer/features/sour/store/sour.store';
 import {
     AUTO_DJ_STRATEGY,
     isShuffleEnabled,
@@ -116,6 +117,19 @@ export const useAutoDJ = () => {
                                 Play.LAST,
                             );
 
+                            // Sour Player: take out songs by artists you blocked
+                            const added = new Set(albumsToAdd);
+                            const store = usePlayerStoreBase.getState();
+                            const blocked = store
+                                .getQueue()
+                                .items.filter(
+                                    (item) =>
+                                        !!item.albumId &&
+                                        added.has(item.albumId) &&
+                                        isBlockedSong(item),
+                                );
+                            if (blocked.length) store.clearSelected(blocked);
+
                             eventEmitter.emit('AUTODJ_QUEUE_ADDED', {
                                 songCount: albumsToAdd.length,
                             });
@@ -130,12 +144,15 @@ export const useAutoDJ = () => {
 
                     const queueSongIdSet = new Set(queue.items.map((item) => item.id));
 
-                    const songsToAdd = await runAutoDjSongs({
-                        ...runnerDepsBase,
-                        currentSong: properties.song,
-                        queueSongIdSet,
-                        songStrategy,
-                    });
+                    // Sour Player: artists you blocked never come from Auto DJ
+                    const songsToAdd = (
+                        await runAutoDjSongs({
+                            ...runnerDepsBase,
+                            currentSong: properties.song,
+                            queueSongIdSet,
+                            songStrategy,
+                        })
+                    ).filter((song) => !isBlockedSong(song));
 
                     if (songsToAdd.length > 0) {
                         player.addToQueueByData(songsToAdd, Play.LAST);

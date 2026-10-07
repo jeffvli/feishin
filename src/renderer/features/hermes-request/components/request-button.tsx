@@ -6,6 +6,7 @@ import styles from './request-button.module.css';
 
 import { useGroupPlayStore } from '/@/renderer/features/group-play/store/group-play.store';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
+import { usePlayerSong } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
@@ -37,8 +38,77 @@ const statusText = (r: HermesRequest) => {
     return r.status;
 };
 
-// Ask Hermes Music for a song, album or artist without leaving Feishin; it downloads it into the
-// music folder and it shows up in the library after the next scan.
+const post = async <T,>(url: string, body: unknown) => {
+    const res = await fetch(url, {
+        body: JSON.stringify(body),
+        headers: { 'content-type': 'application/json' },
+        method: 'POST',
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(json.error || `Hermes Music returned ${res.status}`);
+    return json as T;
+};
+
+// /video from Hermes Music: find (or replace) the music video for the song that's playing.
+const MusicVideoTools = () => {
+    const url = useHermesUrl();
+    const song = usePlayerSong();
+    const queryClient = useQueryClient();
+    const [busy, setBusy] = useState(false);
+
+    if (!song) return null;
+
+    const run = (work: () => Promise<string>) => {
+        setBusy(true);
+        work()
+            .then((message) => {
+                toast.success({ message });
+                queryClient.invalidateQueries({ queryKey: ['hermes-video'] });
+            })
+            .catch((error: Error) => toast.error({ message: error.message }))
+            .finally(() => setBusy(false));
+    };
+
+    const find = () =>
+        run(async () => {
+            const r = await post<{ title: string }>(`${url}/api/videos`, {
+                query: `${song.artistName} - ${song.name}`,
+            });
+            return `Found: ${r.title}. It lines up with the song in the background.`;
+        });
+
+    const wrong = () =>
+        run(async () => {
+            const r = await post<{ removed?: boolean; title?: string }>(
+                `${url}/api/videos/wrong`,
+                { artist: song.artistName, title: song.name },
+            );
+            if (r.removed) return 'No other video matches, so it was removed';
+            return 'Trying the next video';
+        });
+
+    return (
+        <div className={styles.tools}>
+            <div className={styles.text}>
+                <Text fw={700} size="sm">
+                    Music video
+                </Text>
+                <Text isMuted size="xs" truncate>
+                    {`${song.name} - ${song.artistName}`}
+                </Text>
+            </div>
+            <Button disabled={busy} onClick={find} size="xs" variant="default">
+                Find video
+            </Button>
+            <Button disabled={busy} onClick={wrong} size="xs" variant="subtle">
+                Wrong video
+            </Button>
+        </div>
+    );
+};
+
+// Ask Hermes Music for a song, album or artist without leaving Sour Player; it downloads it into
+// the music folder and it shows up in the library after the next scan.
 const RequestPanel = () => {
     const url = useHermesUrl();
     const userName = useGroupPlayStore((state) => state.userName);
@@ -88,6 +158,17 @@ const RequestPanel = () => {
         }
     };
 
+    // /bump from Hermes Music: move a queued request to the front
+    const bump = (r: HermesRequest) => {
+        if (!r.pos) return;
+        post<{ name: string }>(`${url}/api/now`, { pos: r.pos })
+            .then((res) => {
+                toast.success({ message: `${res.name} is next` });
+                queryClient.invalidateQueries({ queryKey: ['hermes-requests', url] });
+            })
+            .catch((error: Error) => toast.error({ message: error.message }));
+    };
+
     const placeholder =
         type === 'song'
             ? 'Song and artist, e.g. mr brightside the killers'
@@ -125,6 +206,7 @@ const RequestPanel = () => {
                 You can also paste a Spotify link. Downloaded songs show up in your library after
                 Navidrome&#39;s next scan.
             </Text>
+            <MusicVideoTools />
             <Stack gap={4}>
                 <Text fw={700} size="sm">
                     Recent requests
@@ -146,6 +228,15 @@ const RequestPanel = () => {
                             <span className={styles[r.status] || styles.status}>
                                 {statusText(r)}
                             </span>
+                            {r.status === 'pending' && !!r.pos && r.pos > 1 && (
+                                <ActionIcon
+                                    icon="arrowUpToLine"
+                                    onClick={() => bump(r)}
+                                    size="sm"
+                                    tooltip={{ label: 'Move to the front' }}
+                                    variant="subtle"
+                                />
+                            )}
                         </div>
                     ))}
                     {requests.isError && (

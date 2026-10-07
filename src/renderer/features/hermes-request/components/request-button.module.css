@@ -55,3 +55,12 @@
 .failed {
     color: rgb(248 113 113);
 }
+
+.tools {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 10px;
+    background: var(--theme-colors-surface, rgb(255 255 255 / 5%));
+    border-radius: 10px;
+}

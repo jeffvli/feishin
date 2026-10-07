@@ -5,7 +5,7 @@ import log from './logger';
 
 // Hermes Music edition (Windows, Linux AppImage/deb): updates download in the background and
 // the app shows an Update button; clicking it restarts into the new version. Otherwise the update
-// installs when Feishin closes. Checks again every 30 minutes while Feishin is open.
+// installs when Sour Player closes. Checks again every 30 minutes while it is open.
 interface HermesUpdate {
     percent?: number;
     state: 'downloading' | 'ready';

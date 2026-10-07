@@ -8,10 +8,12 @@ import {
 } from '/@/renderer/features/group-play/store/group-play.store';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { getSongById } from '/@/renderer/features/player/utils';
+import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { useCurrentServer } from '/@/renderer/store';
 import { addToQueueByData, usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { useTimestampStoreBase } from '/@/renderer/store/timestamp.store';
 import { toast } from '/@/shared/components/toast/toast';
+import { Played } from '/@/shared/types/domain-types';
 import { Play, PlayerStatus } from '/@/shared/types/types';
 
 // seconds the group's song has played, as of now
@@ -28,6 +30,9 @@ export const GroupPlaySync = () => {
     const member = useGroupPlayStore((state) => state.member);
     const requests = useGroupPlayStore((state) => state.state?.requests);
     const commands = useGroupPlayStore((state) => state.state?.commands);
+    const radioNeedsSongs = useGroupPlayStore(
+        (state) => !!state.state?.radio && !!state.state?.needSongs,
+    );
     const queryClient = useQueryClient();
     const serverId = useCurrentServer()?.id;
     const loading = useRef<null | string>(null);
@@ -159,6 +164,30 @@ export const GroupPlaySync = () => {
                     .finally(() => applied.current.push(request.rid));
             });
     }, [queryClient, requests, role, serverId]);
+
+    // Sour Radio: when it's running low, send random songs from this library
+    useEffect(() => {
+        if (!radioNeedsSongs || !url || !code || !member || !serverId) return undefined;
+        let stopped = false;
+        const fill = () =>
+            queryClient
+                .fetchQuery({
+                    ...songsQueries.random({ query: { limit: 10, played: Played.All }, serverId }),
+                    queryKey: ['group-radio-fill', Date.now()],
+                })
+                .then((res) => {
+                    if (stopped) return undefined;
+                    return groupApi.fill(url, code, member, res.items.map(toGroupSong));
+                })
+                .catch(() => {});
+        const first = setTimeout(fill, Math.random() * 3000); // so listeners don't all send at once
+        const retry = setInterval(fill, 20000);
+        return () => {
+            stopped = true;
+            clearTimeout(first);
+            clearInterval(retry);
+        };
+    }, [code, member, queryClient, radioNeedsSongs, serverId, url]);
 
     // host: carry out what guests did with the group's controls
     useEffect(() => {

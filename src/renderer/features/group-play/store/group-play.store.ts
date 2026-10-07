@@ -27,12 +27,14 @@ export interface GroupListing {
     name: string;
     nowPlaying: null | { artist: string; imageId: null | string; title: string };
     playing: boolean;
+    radio?: boolean;
 }
 
 export interface GroupMember {
     avatar: number;
     id: string;
     name: string;
+    profile?: null | string;
 }
 
 export interface GroupRequest {
@@ -58,16 +60,20 @@ export interface GroupState {
     guestControl: boolean;
     host: string;
     hostAvatar: number;
+    hostProfile?: null | string;
     index: number;
     listed: boolean;
     members: GroupMember[];
     name: string;
+    needSongs?: boolean;
     playing: boolean;
     position: number;
     queue: GroupSong[];
+    radio?: boolean;
     requests: GroupRequest[];
     serverNow: number;
     updatedAt: number;
+    votes?: number;
 }
 
 // Group Play session (like a Spotify Jam). Hermes Music runs the group; the host's player is the

@@ -47,7 +47,7 @@ export const HermesUpdateButton = () => {
 
     if (update.state === 'downloading') {
         return (
-            <Tooltip label={`Downloading Feishin ${update.version} (${update.percent ?? 0}%)`}>
+            <Tooltip label={`Downloading Sour Player ${update.version} (${update.percent ?? 0}%)`}>
                 <span style={{ display: 'inline-flex', opacity: 0.6 }}>
                     <Icon icon="download" size="md" />
                 </span>
@@ -57,7 +57,7 @@ export const HermesUpdateButton = () => {
 
     return (
         <>
-            <Tooltip label={`Feishin ${update.version} is ready - click to restart and update`}>
+            <Tooltip label={`Sour Player ${update.version} is ready - click to restart and update`}>
                 <Button
                     leftSection={<Icon icon="download" size="sm" />}
                     onClick={(e) => {
@@ -79,10 +79,10 @@ export const HermesUpdateButton = () => {
                 withCloseButton
             >
                 <Stack gap="sm">
-                    <Text fw={700}>Update ready: Feishin {update.version}</Text>
+                    <Text fw={700}>Update ready: Sour Player {update.version}</Text>
                     <Text isMuted size="sm">
                         Restart now to get the newest Hermes Music features. Or keep listening - it
-                        installs the next time you close Feishin.
+                        installs the next time you close Sour Player.
                     </Text>
                     <Group justify="flex-end">
                         <Button

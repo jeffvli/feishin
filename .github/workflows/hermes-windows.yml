@@ -1,4 +1,4 @@
-# Builds the Hermes Music edition of Feishin for Windows and Linux on every push to this branch
+# Builds Sour Player (the Hermes Music edition of Feishin) for Windows and Linux on every push to this branch
 # and publishes the downloads as one GitHub release (no GitHub account needed to download).
 name: Hermes build (Windows + Linux)
 
@@ -26,8 +26,9 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
-            - name: Set the version (each build is newer, so installed copies update themselves)
-              run: npm pkg set version=1.17.${{ github.run_number }}
+            - name: Set the version (Sour Lemon 0.1.x; each build is newer, so installed copies update themselves)
+              shell: bash
+              run: npm pkg set version=0.1.$(( ${{ github.run_number }} - 18 ))
 
             - name: Build for Windows
               run: pnpm run package:win:pr
@@ -55,8 +56,9 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
-            - name: Set the version (each build is newer, so installed copies update themselves)
-              run: npm pkg set version=1.17.${{ github.run_number }}
+            - name: Set the version (Sour Lemon 0.1.x; each build is newer, so installed copies update themselves)
+              shell: bash
+              run: npm pkg set version=0.1.$(( ${{ github.run_number }} - 18 ))
 
             - name: Build for Linux
               run: pnpm run package:linux:pr
@@ -105,29 +107,32 @@ jobs:
                   path: dist
                   merge-multiple: true
 
+            - name: Work out the version
+              id: version
+              run: echo "v=0.1.$(( ${{ github.run_number }} - 18 ))" >> "$GITHUB_OUTPUT"
+
             - name: Publish release
               uses: softprops/action-gh-release@v2
               with:
-                  tag_name: v1.17.${{ github.run_number }}
-                  name: Feishin (Hermes Music edition) 1.17.${{ github.run_number }}
+                  tag_name: v${{ steps.version.outputs.v }}
+                  name: Sour Player - Sour Lemon v${{ steps.version.outputs.v }}
                   make_latest: true
                   body: |
-                      Feishin with Hermes Music video sync and Group Play.
+                      Sour Player: the music player for Hermes Music (built on Feishin).
 
-                      **Already installed?** Feishin downloads this version in the background and
-                      shows an **Update** button in the player bar - click it to restart into the new
-                      version (or it installs the next time you close Feishin). Works on Windows and on
-                      Linux with the AppImage or the .deb (the .tar.xz has to be updated by hand).
+                      **Already have Sour Player?** It downloads this version in the background and shows an
+                      **Update** button in the player bar - click it to restart into the new version.
 
-                      **Windows:** download the file ending in `-win-x64.exe` (most PCs). If Windows warns that the app
+                      **Windows:** download `Sour-Player-win-x64.exe` (almost every PC). If Windows says the app
                       is unrecognised, click More info > Run anyway.
 
                       **Linux:**
-                      - Any distro: `Feishin-linux-x86_64.AppImage` - make it executable
-                        (`chmod +x Feishin-linux-x86_64.AppImage`) and run it.
-                      - Ubuntu / Debian / Mint: `Feishin-linux-amd64.deb` - install with
-                        `sudo apt install ./Feishin-linux-amd64.deb`.
-                      - Or unpack `Feishin-linux-x64.tar.xz` and run `feishin` inside.
+                      - Any distro: `Sour-Player-linux-x86_64.AppImage` - make it executable
+                        (`chmod +x Sour-Player-linux-x86_64.AppImage`) and run it. Updates itself.
+                      - Ubuntu / Debian / Mint: `Sour-Player-linux-amd64.deb` - install with
+                        `sudo apt install ./Sour-Player-linux-amd64.deb`. Updates itself.
+                      - Or unpack `Sour-Player-linux-x64.tar.xz` and run `sour-player` inside (no updates).
 
-                      Then in Feishin: Settings > General > Music videos > Hermes Music address.
+                      Coming from Feishin? Sour Player copies your Feishin settings the first time it starts.
+                      Then: Settings > General > Music videos > Hermes Music address.
                   files: dist/*

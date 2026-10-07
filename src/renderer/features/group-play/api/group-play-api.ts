@@ -48,12 +48,15 @@ export const groupApi = {
         cmd: GroupControl,
         target: { index?: number; position?: number; songId?: string } = {},
     ) => post<{ ok: boolean }>(`${base}/api/group/${code}/control`, { cmd, member, ...target }),
-    create: (base: string, name: string, user: string, avatar: null | string) =>
-        post<Created>(`${base}/api/group/create`, { avatar, name, user }),
+    create: (base: string, name: string, user: string, profile: null | string) =>
+        post<Created>(`${base}/api/group/create`, { name, profile, user }),
     end: (base: string, code: string, hostKey: string) =>
         post<{ ok: boolean }>(`${base}/api/group/${code}/end`, { hostKey }),
-    join: (base: string, code: string, user: string, avatar: null | string) =>
-        post<Joined>(`${base}/api/group/${code}/join`, { avatar, user }),
+    // Sour Radio: random songs from this computer's library when it runs low
+    fill: (base: string, code: string, member: string, songs: GroupSong[]) =>
+        post<{ added: number }>(`${base}/api/group/${code}/fill`, { member, songs }),
+    join: (base: string, code: string, user: string, profile: null | string) =>
+        post<Joined>(`${base}/api/group/${code}/join`, { profile, user }),
     kick: (base: string, code: string, hostKey: string, target: string) =>
         post<{ ok: boolean }>(`${base}/api/group/${code}/kick`, { hostKey, target }),
     leave: (base: string, code: string, member: string) =>

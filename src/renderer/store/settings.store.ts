@@ -1365,10 +1365,10 @@ const initialState: SettingsState = {
         imagePlaceholderPriority: 'thumbhash',
         imageRes: {
             fullScreenPlayer: 0,
-            header: 300,
-            itemCard: 300,
-            sidebar: 400,
-            table: 80,
+            header: 1000,
+            itemCard: 600,
+            sidebar: 600,
+            table: 160,
         },
         language: 'en',
         lastFM: true,
@@ -2931,10 +2931,19 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     });
                 }
 
+                if (version < 35) {
+                    // Sour Player: sharper covers (the old sizes looked blurry on big and HiDPI screens)
+                    const res = state.general.imageRes;
+                    res.header = res.header && Math.max(res.header, 1000);
+                    res.itemCard = res.itemCard && Math.max(res.itemCard, 600);
+                    res.sidebar = res.sidebar && Math.max(res.sidebar, 600);
+                    res.table = res.table && Math.max(res.table, 160);
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 34,
+            version: 35,
         },
     ),
 );

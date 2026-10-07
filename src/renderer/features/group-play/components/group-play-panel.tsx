@@ -1,5 +1,5 @@
 import { closeAllModals } from '@mantine/modals';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import styles from './group-play-panel.module.css';
@@ -9,11 +9,15 @@ import { groupApi } from '/@/renderer/features/group-play/api/group-play-api';
 import {
     type GroupControl,
     type GroupListing,
+    type GroupMember,
     type GroupSong,
     useGroupPlayActions,
     useGroupPlayStore,
 } from '/@/renderer/features/group-play/store/group-play.store';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
+import { avatarUrl, readPicture, sourApi } from '/@/renderer/features/sour/api/sour-api';
+import { openProfile } from '/@/renderer/features/sour/components/people';
+import { useSourProfiles, useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { useCurrentServer } from '/@/renderer/store';
 import { usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
@@ -55,36 +59,6 @@ const Avatar = ({ host, large, name, small, src }: AvatarProps) => (
     </span>
 );
 
-// shrinks a chosen picture to a 96px square so it is small enough to share with the group
-const toAvatar = (file: File) =>
-    new Promise<string>((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => {
-            const size = 96;
-            const side = Math.min(img.width, img.height);
-            const canvas = document.createElement('canvas');
-            canvas.width = size;
-            canvas.height = size;
-            canvas
-                .getContext('2d')
-                ?.drawImage(
-                    img,
-                    (img.width - side) / 2,
-                    (img.height - side) / 2,
-                    side,
-                    side,
-                    0,
-                    0,
-                    size,
-                    size,
-                );
-            URL.revokeObjectURL(img.src);
-            resolve(canvas.toDataURL('image/jpeg', 0.85));
-        };
-        img.onerror = () => reject(new Error("That picture couldn't be opened"));
-        img.src = URL.createObjectURL(file);
-    });
-
 // album cover from the shared music server (each person's Feishin loads it from its own login)
 const Cover = ({ className, song }: { className: string; song?: GroupSong }) => {
     const serverId = useCurrentServer()?.id;
@@ -113,7 +87,8 @@ const listingCover = (g: GroupListing): GroupSong | undefined => {
 
 const listingText = (g: GroupListing) => {
     const playing = g.nowPlaying ? ` - ${g.nowPlaying.title} by ${g.nowPlaying.artist}` : '';
-    return `Hosted by ${g.host} - ${g.listening} listening${playing}`;
+    const who = g.radio ? 'Always on' : `Hosted by ${g.host}`;
+    return `${who} - ${g.listening} listening${playing}`;
 };
 
 const AddedBy = ({ me, name, src }: { me: string; name: string; src?: null | string }) => (
@@ -128,8 +103,14 @@ const AddedBy = ({ me, name, src }: { me: string; name: string; src?: null | str
 // playback.
 export const GroupPlayPanel = () => {
     const url = useHermesUrl();
-    const { avatar, code, hostKey, member, role, state, userName } = useGroupPlayStore();
+    const { code, hostKey, member, role, state, userName } = useGroupPlayStore();
     const actions = useGroupPlayActions();
+    const queryClient = useQueryClient();
+    const sourMe = useSourStore((s) => s.me);
+    const profiles = useSourProfiles().data ?? [];
+    const profileById = (id?: null | string) => profiles.find((x) => x.id === id);
+    const myProfile = profileById(sourMe?.id);
+    const myPicture = avatarUrl(url, myProfile);
     const [joinCode, setJoinCode] = useState('');
     const [groupName, setGroupName] = useState('');
     const [busy, setBusy] = useState(false);
@@ -140,21 +121,22 @@ export const GroupPlayPanel = () => {
         refetchInterval: 5000,
     });
 
-    // your picture: remembered on this computer, and sent to the group you're in
+    // your picture is your Sour Player profile picture (PNG, JPEG, WebP or an animated GIF)
+    const refreshProfiles = () =>
+        queryClient.invalidateQueries({ queryKey: ['sour-profiles', url] });
     const pickAvatar = (file: File | null) => {
-        if (!file) return;
-        toAvatar(file)
-            .then((picture) => {
-                actions.setAvatar(picture);
-                if (url && code) {
-                    groupApi.profile(url, code, { hostKey, member }, picture).catch(() => {});
-                }
-            })
+        if (!file || !sourMe) return;
+        readPicture(file, 512, 3000000)
+            .then((data) => sourApi.setImage(url, sourMe, 'avatar', data))
+            .then(refreshProfiles)
             .catch((error: Error) => toast.error({ message: error.message }));
     };
     const removeAvatar = () => {
-        actions.setAvatar(null);
-        if (url && code) groupApi.profile(url, code, { hostKey, member }, null).catch(() => {});
+        if (!sourMe) return;
+        sourApi
+            .setImage(url, sourMe, 'avatar', null)
+            .then(refreshProfiles)
+            .catch((error: Error) => toast.error({ message: error.message }));
     };
 
     if (!url) {
@@ -181,7 +163,7 @@ export const GroupPlayPanel = () => {
         const name = userName.trim() || 'Guest';
         const start = () =>
             run(async () => {
-                const res = await groupApi.create(url, groupName, name, avatar);
+                const res = await groupApi.create(url, groupName, name, sourMe?.id ?? null);
                 // a group starts with an empty queue; the first song anyone adds starts it
                 const player = usePlayerStoreBase.getState();
                 player.mediaStop();
@@ -191,7 +173,7 @@ export const GroupPlayPanel = () => {
             });
         const join = (groupCode: string) =>
             run(async () => {
-                const res = await groupApi.join(url, groupCode, name, avatar);
+                const res = await groupApi.join(url, groupCode, name, sourMe?.id ?? null);
                 actions.setSession({ code: groupCode, member: res.member, role: 'member' });
                 actions.setState(res.state);
             });
@@ -208,7 +190,7 @@ export const GroupPlayPanel = () => {
                     </Text>
                 </div>
                 <div className={styles.profile}>
-                    <Avatar large name={name} src={avatar} />
+                    <Avatar large name={name} src={myPicture} />
                     <Stack flex={1} gap={6}>
                         <TextInput
                             label="Your name"
@@ -218,16 +200,16 @@ export const GroupPlayPanel = () => {
                         />
                         <Group gap="xs">
                             <FileButton
-                                accept="image/png,image/jpeg,image/webp"
+                                accept="image/png,image/jpeg,image/webp,image/gif"
                                 onChange={pickAvatar}
                             >
                                 {(props) => (
                                     <Button {...props} size="compact-xs" variant="default">
-                                        {avatar ? 'Change picture' : 'Add a picture'}
+                                        {myPicture ? 'Change picture' : 'Add a picture'}
                                     </Button>
                                 )}
                             </FileButton>
-                            {avatar && (
+                            {myPicture && (
                                 <Button onClick={removeAvatar} size="compact-xs" variant="subtle">
                                     Remove
                                 </Button>
@@ -244,6 +226,7 @@ export const GroupPlayPanel = () => {
                                 <div className={styles.songText}>
                                     <Text fw={700} size="sm" truncate>
                                         {g.name}
+                                        {g.radio && <span className={styles.badge}>Always on</span>}
                                     </Text>
                                     <Text isMuted size="xs" truncate>
                                         {listingText(g)}
@@ -303,22 +286,45 @@ export const GroupPlayPanel = () => {
     }
 
     const isHost = role === 'host';
+    const isRadio = !!state?.radio;
     const hostName = state?.host ?? 'Host';
     const me = isHost ? hostName : userName.trim() || 'Guest';
-    const canControl = isHost || !!state?.guestControl;
+    const canControl = !isRadio && (isHost || !!state?.guestControl);
     const queue = state?.queue ?? [];
     const index = state?.index ?? 0;
     const nowPlaying = queue[index];
     const upNext = queue.slice(index + 1).map((song, i) => ({ at: index + 1 + i, song }));
-    const listening = (state?.members.length ?? 0) + 1;
+    const listening = (state?.members.length ?? 0) + (isRadio ? 0 : 1);
     const pictureOf = (id: string, version?: number) =>
         version ? `${url}/api/group/${code}/avatar?id=${id}&v=${version}` : null;
-    const hostPicture = pictureOf('host', state?.hostAvatar);
+    // profile pictures first (they can be GIFs), then pictures set only for this group
+    const memberPicture = (m: GroupMember) =>
+        avatarUrl(url, profileById(m.profile)) ?? pictureOf(m.id, m.avatar);
+    const hostPicture =
+        avatarUrl(url, profileById(state?.hostProfile)) ?? pictureOf('host', state?.hostAvatar);
     // whoever added a song, by name (names are what the group shows)
     const pictureByName = (name: string) => {
-        if (name === hostName) return hostPicture;
+        if (name === hostName && !isRadio) return hostPicture;
         const m = state?.members.find((x) => x.name === name);
-        return m ? pictureOf(m.id, m.avatar) : null;
+        return m ? memberPicture(m) : null;
+    };
+    const showProfile = (id?: null | string) => {
+        const profile = profileById(id);
+        if (profile) openProfile(profile);
+    };
+    const voteSkip = () => {
+        if (!member) return;
+        groupApi
+            .control(url, code, member, 'next')
+            .then((res) => {
+                const vote = res as { needed?: number; skipped?: boolean; votes?: number };
+                toast.info({
+                    message: vote.skipped
+                        ? 'Skipped'
+                        : `Vote counted (${vote.votes} of ${vote.needed} needed)`,
+                });
+            })
+            .catch((error: Error) => toast.error({ message: error.message }));
     };
     const status = !nowPlaying ? 'Waiting for songs' : state?.playing ? 'Now playing' : 'Paused';
 
@@ -384,13 +390,24 @@ export const GroupPlayPanel = () => {
                         </Text>
                         <Group gap={6}>
                             <span className={styles.avatars}>
-                                <Avatar host name={hostName} src={hostPicture} />
+                                {!isRadio && (
+                                    <button
+                                        className={styles.avatarButton}
+                                        onClick={() => showProfile(state?.hostProfile)}
+                                        type="button"
+                                    >
+                                        <Avatar host name={hostName} src={hostPicture} />
+                                    </button>
+                                )}
                                 {(state?.members ?? []).map((m) => (
-                                    <Avatar
+                                    <button
+                                        className={styles.avatarButton}
                                         key={m.id}
-                                        name={m.name}
-                                        src={pictureOf(m.id, m.avatar)}
-                                    />
+                                        onClick={() => showProfile(m.profile)}
+                                        type="button"
+                                    >
+                                        <Avatar name={m.name} src={memberPicture(m)} />
+                                    </button>
                                 ))}
                             </span>
                             <Text size="sm">{listening} listening</Text>
@@ -436,6 +453,11 @@ export const GroupPlayPanel = () => {
                         </Text>
                     )}
                 </Stack>
+                {isRadio && nowPlaying && (
+                    <Button onClick={voteSkip} size="xs" variant="default">
+                        {`Vote to skip${state?.votes ? ` (${state.votes})` : ''}`}
+                    </Button>
+                )}
                 {canControl && nowPlaying && (
                     <Group gap={4} wrap="nowrap">
                         <ActionIcon
@@ -504,7 +526,7 @@ export const GroupPlayPanel = () => {
                                         variant="subtle"
                                     />
                                 )}
-                                {(canControl || (song.by || hostName) === me) && (
+                                {(canControl || (!isRadio && (song.by || hostName) === me)) && (
                                     <ActionIcon
                                         icon="x"
                                         onClick={() => control('remove', at, song)}
@@ -542,7 +564,7 @@ export const GroupPlayPanel = () => {
                         <Group gap="xs">
                             {state.members.map((m) => (
                                 <span className={styles.person} key={m.id}>
-                                    <Avatar name={m.name} small src={pictureOf(m.id, m.avatar)} />
+                                    <Avatar name={m.name} small src={memberPicture(m)} />
                                     {m.name}
                                     <ActionIcon
                                         icon="x"
@@ -557,22 +579,32 @@ export const GroupPlayPanel = () => {
                     )}
                 </div>
             )}
-            {!isHost && !state?.guestControl && (
+            {isRadio && (
+                <Text isMuted size="xs">
+                    Sour Radio is always on: random songs from the library, plus anything people
+                    add (right-click a song &gt; Add to group queue). Half the listeners voting
+                    skips a song.
+                </Text>
+            )}
+            {!isRadio && !isHost && !state?.guestControl && (
                 <Text isMuted size="xs">
                     The host controls playback. You can add songs and remove the ones you added.
                 </Text>
             )}
 
             <Group justify="space-between">
-                <FileButton accept="image/png,image/jpeg,image/webp" onChange={pickAvatar}>
+                <FileButton
+                    accept="image/png,image/jpeg,image/webp,image/gif"
+                    onChange={pickAvatar}
+                >
                     {(props) => (
                         <Button {...props} size="xs" variant="subtle">
-                            {avatar ? 'Change my picture' : 'Add my picture'}
+                            {myPicture ? 'Change my picture' : 'Add my picture'}
                         </Button>
                     )}
                 </FileButton>
                 <Button color="red" disabled={busy} onClick={leave} variant="light">
-                    {isHost ? 'End group' : 'Leave group'}
+                    {isHost ? 'End group' : isRadio ? 'Leave radio' : 'Leave group'}
                 </Button>
             </Group>
         </Stack>

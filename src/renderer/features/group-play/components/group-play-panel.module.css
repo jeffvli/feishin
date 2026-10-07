@@ -240,3 +240,22 @@
     background: rgb(255 255 255 / 6%);
     border-radius: 999px;
 }
+
+.avatar-button {
+    display: inline-flex;
+    padding: 0;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.badge {
+    padding: 1px 8px;
+    margin-left: 8px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+    background: var(--theme-colors-primary, #6d28d9);
+    border-radius: 999px;
+}

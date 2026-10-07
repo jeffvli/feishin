@@ -26,6 +26,7 @@ import { access, constants } from 'fs';
 import path, { join } from 'path';
 import semver from 'semver';
 
+import './sour-player-migrate'; // must run before anything reads the settings folder
 import packageJson from '../../package.json';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { shutdownServer } from './features/core/remote';
@@ -608,7 +609,7 @@ const createTray = () => {
         });
     }
 
-    tray.setToolTip('Feishin');
+    tray.setToolTip('Sour Player');
     tray.setContextMenu(contextMenu);
 };
 
@@ -864,7 +865,7 @@ async function createWindow(first = true): Promise<void> {
     });
 
     if (isWindows()) {
-        app.setAppUserModelId('org.jeffvli.feishin');
+        app.setAppUserModelId('com.urmomnumber1.sourplayer');
     }
 
     menuBuilder = new MenuBuilder(mainWindow, showMainWindow);

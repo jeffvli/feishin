@@ -23,6 +23,8 @@ import {
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
+import { PeopleButton } from '/@/renderer/features/sour/components/people';
+import { SourPresence } from '/@/renderer/features/sour/components/sour-presence';
 import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import {
     AUTO_DJ_MODE,
@@ -108,6 +110,8 @@ export const RightControls = () => {
                 <SleepTimerButton />
                 <PlayerConfig />
                 <GroupPlaySync />
+                <SourPresence />
+                <PeopleButton />
                 <RequestButton />
                 <GroupPlayButton />
                 <MusicVideoButton />

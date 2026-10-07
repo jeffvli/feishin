@@ -180,7 +180,7 @@ export default class MenuBuilder {
             submenu: [
                 {
                     click: this.showMainWindow,
-                    label: 'Show Feishin',
+                    label: 'Show Sour Player',
                 },
             ],
         };

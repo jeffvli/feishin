@@ -1,0 +1,31 @@
+.themed {
+    position: relative;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+.picture {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 0;
+    height: 520px;
+    pointer-events: none;
+    background-position: center;
+    background-size: cover;
+    mask-image: linear-gradient(to bottom, black 0%, rgb(0 0 0 / 60%) 45%, transparent 100%);
+    transition: opacity 0.2s;
+}
+
+.content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+}

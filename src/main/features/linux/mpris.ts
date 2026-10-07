@@ -7,10 +7,10 @@ import { QueueSong } from '/@/shared/types/domain-types';
 import { PlayerRepeat, PlayerStatus } from '/@/shared/types/types';
 
 const mprisPlayer = Player({
-    identity: 'Feishin',
+    identity: 'Sour Player',
     maximumRate: 1.0,
     minimumRate: 1.0,
-    name: 'Feishin',
+    name: 'Sour Player',
     rate: 1.0,
     supportedInterfaces: ['player'],
     supportedMimeTypes: ['audio/mpeg', 'application/ogg'],
