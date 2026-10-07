@@ -7,6 +7,16 @@ import styles from './group-play-panel.module.css';
 import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { groupApi } from '/@/renderer/features/group-play/api/group-play-api';
 import {
+    CatchUp,
+    GroupChat,
+    HostTools,
+    ReactionBar,
+    RoomAndSaved,
+    saveGroupSettings,
+    StationTools,
+    VoteBar,
+} from '/@/renderer/features/group-play/components/group-extras';
+import {
     type GroupControl,
     type GroupListing,
     type GroupMember,
@@ -161,9 +171,9 @@ export const GroupPlayPanel = () => {
 
     if (!code) {
         const name = userName.trim() || 'Guest';
-        const start = () =>
+        const start = (savedName?: string) =>
             run(async () => {
-                const res = await groupApi.create(url, groupName, name, sourMe?.id ?? null);
+                const res = await groupApi.create(url, savedName ?? groupName, name, sourMe?.id ?? null);
                 // a group starts with an empty queue; the first song anyone adds starts it
                 const player = usePlayerStoreBase.getState();
                 player.mediaStop();
@@ -244,6 +254,7 @@ export const GroupPlayPanel = () => {
                         ))}
                     </Stack>
                 )}
+                <RoomAndSaved onStart={(saved) => start(saved)} />
                 <div className={styles.choices}>
                     <div className={styles.choice}>
                         <Text fw={700}>Start a group</Text>
@@ -255,7 +266,7 @@ export const GroupPlayPanel = () => {
                             placeholder="Group name (optional)"
                             value={groupName}
                         />
-                        <Button disabled={busy} fullWidth onClick={start} variant="filled">
+                        <Button disabled={busy} fullWidth onClick={() => start()} variant="filled">
                             Start
                         </Button>
                     </div>
@@ -316,6 +327,28 @@ export const GroupPlayPanel = () => {
     const showProfile = (id?: null | string) => {
         const profile = profileById(id);
         if (profile) openProfile(profile);
+    };
+    const myProfileId = sourMe?.id;
+    const canSkipNow =
+        !!myProfileId &&
+        (state?.station?.owner === myProfileId || state?.show?.profile === myProfileId);
+    const likeSong = (song: GroupSong) => {
+        if (!sourMe) return;
+        sourApi
+            .profile(url, sourMe.id)
+            .then((p) =>
+                p.favorites.some((f) => f.id === song.id)
+                    ? p
+                    : sourApi.update(url, sourMe, { favorites: [...p.favorites, song] }),
+            )
+            .then(() => toast.success({ message: `${song.title} is on your profile` }))
+            .catch((error: Error) => toast.error({ message: error.message }));
+    };
+    const upvote = (song: GroupSong) => {
+        const { hostKey: hk } = useGroupPlayStore.getState();
+        groupApi
+            .upvote(url, code, isHost ? { hostKey: hk } : { member }, song.id)
+            .catch((error: Error) => toast.error({ message: error.message }));
     };
     const voteSkip = () => {
         if (!member) return;
@@ -459,9 +492,14 @@ export const GroupPlayPanel = () => {
                     )}
                 </Stack>
                 {isRadio && nowPlaying && (
-                    <Button onClick={voteSkip} size="xs" variant="default">
-                        {`Vote to skip${state?.votes ? ` (${state.votes})` : ''}`}
-                    </Button>
+                    <Stack gap={4}>
+                        <Button onClick={voteSkip} size="xs" variant="default">
+                            {canSkipNow ? 'Skip' : `Vote to skip${state?.votes ? ` (${state.votes})` : ''}`}
+                        </Button>
+                        <Button onClick={() => likeSong(nowPlaying)} size="xs" variant="subtle">
+                            Like
+                        </Button>
+                    </Stack>
                 )}
                 {canControl && nowPlaying && (
                     <Group gap={4} wrap="nowrap">
@@ -488,6 +526,21 @@ export const GroupPlayPanel = () => {
                 )}
             </div>
 
+            {state?.birthday && (
+                <Text className={styles.banner}>
+                    &#127874; It&#39;s {state.birthday}&#39;s birthday - playing their favourites
+                </Text>
+            )}
+            {state?.show && <Text className={styles.banner}>DJ {state.show.name} is live</Text>}
+            {state?.djRotation && state.dj && (
+                <Text className={styles.banner}>
+                    {state.dj.name === me ? "It's your turn to pick the next song" : `${state.dj.name} picks the next song`}
+                </Text>
+            )}
+            {isRadio && state && <VoteBar state={state} />}
+            <ReactionBar />
+            {state && <CatchUp state={state} />}
+
             <Stack gap={8}>
                 <Group justify="space-between">
                     <Text fw={700}>Up next</Text>
@@ -512,6 +565,14 @@ export const GroupPlayPanel = () => {
                                 name={song.by || hostName}
                                 src={pictureByName(song.by || hostName)}
                             />
+                            <button
+                                className={styles.upvote}
+                                onClick={() => upvote(song)}
+                                title="Upvote: most-voted songs play first"
+                                type="button"
+                            >
+                                &#9650; {state?.upvotes?.[song.id] ?? 0}
+                            </button>
                             <span className={styles.rowActions}>
                                 {canControl && (
                                     <ActionIcon
@@ -551,8 +612,20 @@ export const GroupPlayPanel = () => {
                 </div>
             </Stack>
 
+            {state && <GroupChat state={state} />}
+            {isRadio && state && (
+                <div className={styles.settings}>
+                    <StationTools state={state} />
+                </div>
+            )}
             {isHost && (
                 <div className={styles.settings}>
+                    {state && <HostTools state={state} />}
+                    {state && (
+                        <Button onClick={() => saveGroupSettings(state)} size="xs" variant="default" w="fit-content">
+                            Save this group for later
+                        </Button>
+                    )}
                     <Switch
                         checked={!!state?.guestControl}
                         description="Guests can play, pause, skip, reorder and remove any song. They can always add songs and remove their own."
@@ -586,9 +659,9 @@ export const GroupPlayPanel = () => {
             )}
             {isRadio && (
                 <Text isMuted size="xs">
-                    Sour Radio is always on: random songs from the library, plus anything people add
-                    (right-click a song &gt; Add to group queue). Half the listeners voting skips a
-                    song.
+                    {state?.name} is always on: random songs from the library, plus anything people
+                    add (right-click a song &gt; Add to group queue, 3 at a time). Half the
+                    listeners voting skips a song.
                 </Text>
             )}
             {!isRadio && !isHost && !state?.guestControl && (

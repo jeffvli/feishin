@@ -9,6 +9,7 @@ import { LyricSettings } from '/@/renderer/features/settings/components/general/
 import { QueryBuilderSettings } from '/@/renderer/features/settings/components/general/query-builder-settings';
 import { ScrobbleSettings } from '/@/renderer/features/settings/components/general/scrobble-settings';
 import { SidebarSettings } from '/@/renderer/features/settings/components/general/sidebar-settings';
+import { SourSettings } from '/@/renderer/features/settings/components/general/sour-settings';
 import { ThemeSettings } from '/@/renderer/features/settings/components/general/theme-settings';
 import { useCurrentServer } from '/@/renderer/store';
 import { hasFeature } from '/@/shared/api/utils';
@@ -30,6 +31,7 @@ export const GeneralTab = memo(() => {
             { component: ScrobbleSettings, key: 'scrobble' },
             { component: LyricSettings, key: 'lyrics' },
             { component: HermesVideoSettings, key: 'musicVideos' },
+            { component: SourSettings, key: 'sourPlayer' },
         ];
 
         if (supportsSmartPlaylists) {

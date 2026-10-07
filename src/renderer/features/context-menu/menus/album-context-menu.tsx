@@ -11,7 +11,10 @@ import { SetFavoriteAction } from '/@/renderer/features/context-menu/actions/set
 import { SetRatingAction } from '/@/renderer/features/context-menu/actions/set-rating-action';
 import { ShareAction } from '/@/renderer/features/context-menu/actions/share-action';
 import { ContextMenuPreview } from '/@/renderer/features/context-menu/components/context-menu-preview';
-import { AddAlbumToProfileAction } from '/@/renderer/features/sour/components/song-actions';
+import {
+    AddAlbumToProfileAction,
+    PinAction,
+} from '/@/renderer/features/sour/components/song-actions';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { Album, LibraryItem } from '/@/shared/types/domain-types';
 
@@ -35,6 +38,7 @@ export const AlbumContextMenu = ({ items, type }: AlbumContextMenuProps) => {
             <ContextMenu.Divider />
             <AddToPlaylistAction items={ids} itemType={LibraryItem.ALBUM} />
             <AddAlbumToProfileAction albums={items} />
+            <PinAction item={items[0]} kind="album" />
             <ContextMenu.Divider />
             <SetFavoriteAction ids={ids} itemType={LibraryItem.ALBUM} />
             <SetRatingAction ids={ids} itemType={LibraryItem.ALBUM} />

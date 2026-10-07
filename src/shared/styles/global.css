@@ -336,3 +336,73 @@ button {
         --theme-colors-border: rgb(255 255 255 / 10%);
     }
 }
+
+/* Sour Player: look settings and little effects */
+.sour-reduced-motion *,
+.sour-reduced-motion *::before,
+.sour-reduced-motion *::after {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+}
+
+.sour-animated-bg #main-content {
+    background: linear-gradient(
+        135deg,
+        var(--sour-album-color, var(--theme-colors-primary)) 0%,
+        var(--theme-colors-background) 45%,
+        var(--theme-colors-background) 100%
+    );
+    background-size: 200% 200%;
+    animation: sour-drift 18s ease-in-out infinite alternate;
+}
+
+body.sour-shake {
+    animation: sour-shake 0.9s;
+}
+
+body.sour-disco {
+    animation: sour-disco 1.2s linear infinite;
+}
+
+.sour-mini #left-sidebar,
+.sour-mini #main-content,
+.sour-mini #right-sidebar {
+    display: none !important;
+}
+
+@keyframes sour-drift {
+    0% {
+        background-position: 0% 0%;
+    }
+
+    100% {
+        background-position: 100% 100%;
+    }
+}
+
+@keyframes sour-shake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    20%,
+    60% {
+        transform: translateX(-8px) rotate(-0.5deg);
+    }
+
+    40%,
+    80% {
+        transform: translateX(8px) rotate(0.5deg);
+    }
+}
+
+@keyframes sour-disco {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+
+    100% {
+        filter: hue-rotate(360deg);
+    }
+}

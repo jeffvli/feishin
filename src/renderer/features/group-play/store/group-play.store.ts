@@ -1,6 +1,14 @@
 import { persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
+export interface GroupChat {
+    at: number;
+    by: string;
+    id: string;
+    profile: null | string;
+    text: string;
+}
+
 export interface GroupCommand {
     by: string;
     cid: string;
@@ -11,6 +19,7 @@ export interface GroupCommand {
 }
 
 export type GroupControl =
+    | 'guess'
     | 'next'
     | 'pause'
     | 'play'
@@ -28,6 +37,7 @@ export interface GroupListing {
     nowPlaying: null | { artist: string; imageId: null | string; title: string };
     playing: boolean;
     radio?: boolean;
+    station?: null | { kind: string; ownerName: null | string };
 }
 
 export interface GroupMember {
@@ -53,10 +63,24 @@ export interface GroupSong {
     title: string;
 }
 
+export interface GroupShow {
+    end: number;
+    id: string;
+    name: string;
+    profile: string;
+    start: number;
+}
+
 export interface GroupState {
+    birthday?: null | string;
+    chat?: GroupChat[];
     code: string;
     commands: GroupCommand[];
+    dj?: null | { id: string; name: string; profile: null | string };
+    djRotation?: boolean;
     ended: boolean;
+    guess?: boolean;
+    guessScores?: Record<string, number>;
     guestControl: boolean;
     host: string;
     hostAvatar: number;
@@ -71,9 +95,21 @@ export interface GroupState {
     queue: GroupSong[];
     radio?: boolean;
     requests: GroupRequest[];
+    schedule?: GroupShow[];
     serverNow: number;
+    show?: GroupShow | null;
+    station?: null | {
+        fill: null | { genres?: string[]; toYear?: number };
+        kind: string;
+        owner: null | string;
+        ownerName: null | string;
+        sleep: boolean;
+    };
     updatedAt: number;
+    upvotes?: Record<string, number>;
     votes?: number;
+    votesNeeded?: number;
+    watchVideo?: boolean;
 }
 
 // Group Play session (like a Spotify Jam). Hermes Music runs the group; the host's player is the
@@ -91,6 +127,9 @@ interface GroupPlayStore {
         setState: (state: GroupState) => void;
         setUserName: (userName: string) => void;
     };
+    panelOpen: boolean;
+    played: GroupSong[];
+    sleepAt: null | number;
     avatar: null | string;
     clockOffset: number;
     code: null | string;
@@ -115,6 +154,9 @@ export const useGroupPlayStore = createWithEqualityFn<GroupPlayStore>()(
             },
             avatar: null,
             clockOffset: 0,
+            panelOpen: false,
+            played: [],
+            sleepAt: null,
             code: null,
             hostKey: null,
             member: null,

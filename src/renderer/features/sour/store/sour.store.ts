@@ -11,12 +11,47 @@ interface BlockedArtist {
     name: string;
 }
 
-// This computer's Sour Player profile (the key is what lets it change the profile) and the artists
-// you don't want Auto DJ to play. Both stay on this computer.
+export interface Pin {
+    id: string;
+    imageId: null | string;
+    kind: 'album' | 'playlist' | 'profile';
+    name: string;
+}
+
+export interface SavedGroup {
+    djRotation: boolean;
+    guestControl: boolean;
+    listed: boolean;
+    name: string;
+}
+
+// Sour Player's look and comfort switches (Settings > Sour Player)
+export interface SourLook {
+    albumAccent: boolean;
+    animatedBackground: boolean;
+    autoVideo: boolean;
+    hiddenButtons: string[];
+    reducedMotion: boolean;
+    seasonal: boolean;
+    startupSound: boolean;
+}
+
+// This computer's Sour Player state: the profile key (what lets it change the profile), blocked
+// artists, private song notes, pinned sidebar items, saved groups and look settings.
 interface SourStore {
     block: (artist: BlockedArtist) => void;
     blocked: BlockedArtist[];
+    crossfade: Record<string, number>;
+    lastInbox: number;
+    listenAlong: null | string;
+    look: SourLook;
     me: Me | null;
+    notes: Record<string, string>;
+    pins: Pin[];
+    savedGroups: SavedGroup[];
+    seenMilestones: string[];
+    set: (changes: Partial<Omit<SourStore, 'block' | 'set' | 'setLook' | 'unblock'>>) => void;
+    setLook: (changes: Partial<SourLook>) => void;
     setMe: (me: Me | null) => void;
     unblock: (name: string) => void;
 }
@@ -31,7 +66,25 @@ export const useSourStore = createWithEqualityFn<SourStore>()(
                         : { blocked: [...state.blocked, artist] },
                 ),
             blocked: [],
+            crossfade: {},
+            lastInbox: 0,
+            listenAlong: null,
+            look: {
+                albumAccent: false,
+                animatedBackground: false,
+                autoVideo: false,
+                hiddenButtons: [],
+                reducedMotion: false,
+                seasonal: false,
+                startupSound: false,
+            },
             me: null,
+            notes: {},
+            pins: [],
+            savedGroups: [],
+            seenMilestones: [],
+            set: (changes) => set(changes),
+            setLook: (changes) => set((state) => ({ look: { ...state.look, ...changes } })),
             setMe: (me) => set({ me }),
             unblock: (name) =>
                 set((state) => ({
@@ -40,7 +93,13 @@ export const useSourStore = createWithEqualityFn<SourStore>()(
                     ),
                 })),
         }),
-        { name: 'sour-player' },
+        {
+            merge: (persisted, current) => {
+                const saved = (persisted || {}) as Partial<SourStore>;
+                return { ...current, ...saved, look: { ...current.look, ...(saved.look || {}) } };
+            },
+            name: 'sour-player',
+        },
     ),
 );
 
@@ -65,5 +124,17 @@ export const useSourProfiles = () => {
         queryFn: () => sourApi.list(url),
         queryKey: ['sour-profiles', url],
         refetchInterval: 15000,
+    });
+};
+
+// your own profile, with the private bits (picture history, resume point)
+export const useMyProfile = () => {
+    const url = useHermesUrl();
+    const me = useSourStore((state) => state.me);
+    return useQuery({
+        enabled: !!url && !!me,
+        queryFn: () => sourApi.me(url, me as Me),
+        queryKey: ['sour-me', url, me?.id],
+        refetchInterval: 60000,
     });
 };

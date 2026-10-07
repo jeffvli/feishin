@@ -259,3 +259,22 @@
     background: var(--theme-colors-primary, #6d28d9);
     border-radius: 999px;
 }
+
+.banner {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: var(--theme-colors-surface, rgb(255 255 255 / 6%));
+    border-radius: 8px;
+}
+
+.upvote {
+    flex-shrink: 0;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    color: inherit;
+    cursor: pointer;
+    background: rgb(255 255 255 / 6%);
+    border: none;
+    border-radius: 999px;
+}

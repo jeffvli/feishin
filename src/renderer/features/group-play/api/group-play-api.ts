@@ -17,6 +17,8 @@ interface Joined {
     state: GroupState;
 }
 
+type Who = { hostKey?: null | string; member?: null | string };
+
 const post = async <T>(url: string, body: unknown): Promise<T> => {
     const res = await fetch(url, {
         body: JSON.stringify(body),
@@ -40,6 +42,8 @@ export const toGroupSong = (song: Song): GroupSong => ({
 export const groupApi = {
     add: (base: string, code: string, user: string, songs: GroupSong[], member?: null | string) =>
         post<{ added: number }>(`${base}/api/group/${code}/add`, { member, songs, user }),
+    chat: (base: string, code: string, who: Who, text: string) =>
+        post<{ ok: boolean }>(`${base}/api/group/${code}/chat`, { text, ...who }),
     // a guest using the group's controls (the host's Feishin carries it out)
     control: (
         base: string,
@@ -55,6 +59,8 @@ export const groupApi = {
     // Sour Radio: random songs from this computer's library when it runs low
     fill: (base: string, code: string, member: string, songs: GroupSong[]) =>
         post<{ added: number }>(`${base}/api/group/${code}/fill`, { member, songs }),
+    guess: (base: string, code: string, member: string, songId: string, name: string) =>
+        post<{ ok: boolean }>(`${base}/api/group/${code}/guess`, { member, name, songId }),
     join: (base: string, code: string, user: string, profile: null | string) =>
         post<Joined>(`${base}/api/group/${code}/join`, { profile, user }),
     kick: (base: string, code: string, hostKey: string, target: string) =>
@@ -70,6 +76,8 @@ export const groupApi = {
         if (!Array.isArray(list)) throw new Error("That address doesn't answer like Hermes Music");
         return list as GroupListing[];
     },
+    ping: (base: string, code: string, who: Who) =>
+        post<{ ok: boolean }>(`${base}/api/group/${code}/ping`, who),
     // change your picture while in a group
     profile: (
         base: string,
@@ -77,12 +85,34 @@ export const groupApi = {
         who: { hostKey?: null | string; member?: null | string },
         avatar: null | string,
     ) => post<{ ok: boolean }>(`${base}/api/group/${code}/profile`, { avatar, ...who }),
+    react: (base: string, code: string, who: Who, emoji: string) =>
+        post<{ ok: boolean }>(`${base}/api/group/${code}/react`, { emoji, ...who }),
     report: (base: string, code: string, body: Record<string, unknown>) =>
         post<{ ok: boolean }>(`${base}/api/group/${code}/report`, body),
+    // your own always-on room (one per person)
+    room: (base: string, profile: string, key: string, name: string, remove?: boolean) =>
+        post<{ code: string; name: string }>(`${base}/api/group/rooms`, { key, name, profile, remove }),
+    // book a DJ show on a station (start in ms, length in minutes), or cancel one
+    schedule: (
+        base: string,
+        code: string,
+        body: { cancel?: string; key: string; member?: null | string; minutes?: number; profile: string; start?: number },
+    ) => post<{ ok: boolean }>(`${base}/api/group/${code}/schedule`, body),
     settings: (
         base: string,
         code: string,
         hostKey: string,
-        changes: { guestControl?: boolean; listed?: boolean },
+        changes: { djRotation?: boolean; guestControl?: boolean; listed?: boolean; watchVideo?: boolean },
     ) => post<{ ok: boolean }>(`${base}/api/group/${code}/settings`, { hostKey, ...changes }),
+    stats: async (base: string, code: string) => {
+        const res = await fetch(`${base}/api/group/${code}/stats`);
+        if (!res.ok) throw new Error(`Hermes Music returned ${res.status}`);
+        return (await res.json()) as {
+            adders: { name: string; songs: number }[];
+            history: (GroupSong & { by: string })[];
+            songs: { artist: string; id: string; plays: number; title: string }[];
+        };
+    },
+    upvote: (base: string, code: string, who: Who, songId: string) =>
+        post<{ votes: number }>(`${base}/api/group/${code}/upvote`, { songId, ...who }),
 };

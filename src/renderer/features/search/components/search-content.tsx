@@ -14,6 +14,7 @@ import {
     OverrideSongListQuery,
     SongListView,
 } from '/@/renderer/features/songs/components/song-list-content';
+import { SearchExtras } from '/@/renderer/features/sour/components/search-extras';
 import { useListSettings } from '/@/renderer/store';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import {
@@ -30,6 +31,7 @@ export const SearchContent = () => {
 
     return (
         <AnimatedPage>
+            <SearchExtras />
             <Suspense fallback={<Spinner container />}>
                 {itemType === LibraryItem.ALBUM && <AlbumSearch />}
                 {itemType === LibraryItem.SONG && <SongSearch />}

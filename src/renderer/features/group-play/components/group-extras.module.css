@@ -1,0 +1,63 @@
+.chat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 160px;
+    padding: 6px 8px;
+    overflow-y: auto;
+    background: var(--theme-colors-surface, rgb(255 255 255 / 5%));
+    border-radius: 8px;
+}
+
+.react-button {
+    padding: 2px 6px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    transition: transform 0.1s;
+}
+
+.react-button:hover {
+    transform: scale(1.25);
+}
+
+.vote-bar {
+    height: 6px;
+    overflow: hidden;
+    background: var(--theme-colors-surface, rgb(255 255 255 / 8%));
+    border-radius: 999px;
+}
+
+.vote-bar > div {
+    height: 100%;
+    background: rgb(74 222 128);
+    transition: width 0.3s;
+}
+
+.muted {
+    color: var(--theme-colors-foreground-muted, #aaa);
+}
+
+.party {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    text-align: center;
+}
+
+.party-code {
+    font-family: monospace;
+    font-size: 5rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+}
+
+.party-title {
+    margin-top: 32px;
+    font-size: 3rem;
+    font-weight: 800;
+}

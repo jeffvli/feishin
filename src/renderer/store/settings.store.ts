@@ -69,13 +69,23 @@ const deepMergeIntoState = <T extends Record<string, any>>(
 };
 
 const HomeItemSchema = z.enum([
+    'blend',
+    'friendsPlaying',
     'genres',
+    'groupTop',
+    'jumpBackIn',
+    'leaderboard',
     'mostPlayed',
     'playlists',
     'random',
     'recentlyAdded',
     'recentlyPlayed',
     'recentlyReleased',
+    'sharedFavorites',
+    'smartPlaylists',
+    'songOfTheDay',
+    'sourRadio',
+    'yourRequests',
 ]);
 
 const AlbumGroupItemSchema = z.enum([
@@ -975,13 +985,23 @@ export enum GenreTarget {
 }
 
 export enum HomeItem {
+    BLEND = 'blend',
+    FRIENDS_PLAYING = 'friendsPlaying',
     GENRES = 'genres',
+    GROUP_TOP = 'groupTop',
+    JUMP_BACK_IN = 'jumpBackIn',
+    LEADERBOARD = 'leaderboard',
     MOST_PLAYED = 'mostPlayed',
     PLAYLISTS = 'playlists',
     RANDOM = 'random',
     RECENTLY_ADDED = 'recentlyAdded',
     RECENTLY_PLAYED = 'recentlyPlayed',
     RECENTLY_RELEASED = 'recentlyReleased',
+    SHARED_FAVORITES = 'sharedFavorites',
+    SMART_PLAYLISTS = 'smartPlaylists',
+    SONG_OF_THE_DAY = 'songOfTheDay',
+    SOUR_RADIO = 'sourRadio',
+    YOUR_REQUESTS = 'yourRequests',
 }
 
 export enum PlayerbarSliderType {
@@ -1245,12 +1265,22 @@ export const sidebarItems: SidebarItemType[] = [
 ];
 
 const defaultHomeItemOrder: HomeItem[] = [
+    HomeItem.SOUR_RADIO,
+    HomeItem.FRIENDS_PLAYING,
+    HomeItem.YOUR_REQUESTS,
+    HomeItem.SONG_OF_THE_DAY,
+    HomeItem.JUMP_BACK_IN,
     HomeItem.GENRES,
     HomeItem.RANDOM,
     HomeItem.RECENTLY_ADDED,
     HomeItem.RECENTLY_RELEASED,
     HomeItem.RECENTLY_PLAYED,
     HomeItem.MOST_PLAYED,
+    HomeItem.BLEND,
+    HomeItem.LEADERBOARD,
+    HomeItem.GROUP_TOP,
+    HomeItem.SHARED_FAVORITES,
+    HomeItem.SMART_PLAYLISTS,
     HomeItem.PLAYLISTS,
 ];
 
@@ -2940,10 +2970,30 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     res.table = res.table && Math.max(res.table, 160);
                 }
 
+                if (version < 36) {
+                    // Sour Player 0.3: the friend-group sections on Home
+                    const have = new Set(state.general.homeItems.map((item) => item.id));
+                    const top = [HomeItem.SOUR_RADIO, HomeItem.FRIENDS_PLAYING, HomeItem.YOUR_REQUESTS];
+                    const rest = [
+                        HomeItem.SONG_OF_THE_DAY,
+                        HomeItem.JUMP_BACK_IN,
+                        HomeItem.BLEND,
+                        HomeItem.LEADERBOARD,
+                        HomeItem.GROUP_TOP,
+                        HomeItem.SHARED_FAVORITES,
+                        HomeItem.SMART_PLAYLISTS,
+                    ];
+                    state.general.homeItems = [
+                        ...top.filter((id) => !have.has(id)).map((id) => ({ disabled: false, id })),
+                        ...state.general.homeItems,
+                        ...rest.filter((id) => !have.has(id)).map((id) => ({ disabled: false, id })),
+                    ];
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 35,
+            version: 36,
         },
     ),
 );

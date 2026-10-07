@@ -1,0 +1,44 @@
+.shortcut {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.chips {
+    display: inline-flex;
+    gap: 2px;
+    align-items: center;
+}
+
+.chip {
+    display: inline-flex;
+    padding: 0;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.pin {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.pin-button {
+    display: flex;
+    flex: 1;
+    gap: 8px;
+    align-items: baseline;
+    min-width: 0;
+    padding: 4px 8px;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+}
+
+.pin-button:hover {
+    background: rgb(255 255 255 / 6%);
+}

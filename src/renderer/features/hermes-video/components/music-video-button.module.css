@@ -14,3 +14,46 @@
     height: 100%;
     border: 0;
 }
+
+.floating {
+    position: fixed;
+    right: 16px;
+    bottom: 104px;
+    z-index: 900;
+    width: 340px;
+    padding: 6px;
+    background: var(--theme-colors-surface, #222);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 45%);
+}
+
+.wall {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.wall-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    padding: 6px;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+}
+
+.wall-item:hover {
+    background: var(--theme-colors-surface, rgb(255 255 255 / 6%));
+}
+
+.wall-item img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 6px;
+}

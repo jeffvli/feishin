@@ -1,0 +1,37 @@
+# Checks (types + lint) for work in progress on the sour-dev branch. No builds, no releases.
+name: Sour Player checks (sour-dev)
+
+on:
+    push:
+        branches:
+            - sour-dev
+
+jobs:
+    check:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout git repo
+              uses: actions/checkout@v6
+
+            - name: Install Node and PNPM
+              uses: pnpm/action-setup@v4
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Check and report
+              shell: bash
+              run: |
+                  for check in typecheck lint-code lint-styles; do
+                      pnpm run "$check" > "$check.txt" 2>&1 || true
+                      echo "::notice title=$check::$(tail -n 1 "$check.txt")"
+                      { grep -E "error|warning|TS[0-9]{4}|\.tsx?[:(]|\.css|^ +[0-9]+:[0-9]+|^/" "$check.txt" || true; } | grep -v "^>" | head -300 | while IFS= read -r line; do
+                          echo "::warning title=$check::$line"
+                      done || true
+                  done
+
+            - name: Keep the full reports
+              uses: actions/upload-artifact@v7
+              with:
+                  name: check-reports
+                  path: '*.txt'

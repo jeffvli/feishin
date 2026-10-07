@@ -33,6 +33,7 @@ import { shutdownServer } from './features/core/remote';
 import { store } from './features/core/settings';
 import { canHandleVisualizerDisplayMedia } from './features/core/visualizer';
 import { startHermesUpdater } from './hermes-updater';
+import './sour-window';
 import log, { autoUpdaterLogInterface } from './logger';
 import MenuBuilder, { MenuPlaybackState } from './menu';
 import './features';

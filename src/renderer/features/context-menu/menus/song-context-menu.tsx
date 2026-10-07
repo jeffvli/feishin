@@ -16,6 +16,10 @@ import { AddToGroupAction } from '/@/renderer/features/group-play/components/add
 import {
     AddToProfileAction,
     BlockArtistAction,
+    HideFromActivityAction,
+    ShareSongAction,
+    SongNoteAction,
+    WhoElseLikesAction,
 } from '/@/renderer/features/sour/components/song-actions';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { LibraryItem, Song } from '/@/shared/types/domain-types';
@@ -41,6 +45,10 @@ export const SongContextMenu = ({ items, type }: SongContextMenuProps) => {
             <AddToPlaylistAction items={ids} itemType={LibraryItem.SONG} />
             <AddToGroupAction songs={items} />
             <AddToProfileAction songs={items} />
+            <ShareSongAction songs={items} />
+            <WhoElseLikesAction songs={items} />
+            <SongNoteAction songs={items} />
+            <HideFromActivityAction songs={items} />
             <BlockArtistAction songs={items} />
             <ContextMenu.Divider />
             <SetFavoriteAction ids={ids} itemType={LibraryItem.SONG} />

@@ -11,7 +11,9 @@ import { Button } from '/@/shared/components/button/button';
 import { ColorInput } from '/@/shared/components/color-input/color-input';
 import { FileButton } from '/@/shared/components/file-button/file-button';
 import { Group } from '/@/shared/components/group/group';
+import { Slider } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
+import { Switch } from '/@/shared/components/switch/switch';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 
@@ -32,6 +34,13 @@ const PlaylistThemeEditor = ({ playlistId }: { playlistId: string }) => {
     const me = useSourStore((state) => state.me);
     const queryClient = useQueryClient();
     const theme = usePlaylistTheme(playlistId);
+    const crossfade = useSourStore((state) => state.crossfade[playlistId]);
+    const setCrossfade = (seconds: number | undefined) => {
+        const all = { ...useSourStore.getState().crossfade };
+        if (seconds === undefined) delete all[playlistId];
+        else all[playlistId] = seconds;
+        useSourStore.getState().set({ crossfade: all });
+    };
     const [color, setColor] = useState(theme.data?.color || '');
     const [busy, setBusy] = useState(false);
 
@@ -86,6 +95,25 @@ const PlaylistThemeEditor = ({ playlistId }: { playlistId: string }) => {
                     </Button>
                 )}
             </Group>
+            <Stack gap={4}>
+                <Switch
+                    checked={crossfade !== undefined}
+                    description="Only on this computer. Your usual crossfade comes back when you play something else."
+                    label="Own crossfade for this playlist"
+                    onChange={(e) =>
+                        setCrossfade(e.currentTarget.checked ? 6 : undefined)
+                    }
+                />
+                {crossfade !== undefined && (
+                    <Slider
+                        label={(v) => `${v} seconds`}
+                        max={15}
+                        min={0}
+                        onChange={(v) => setCrossfade(v)}
+                        value={crossfade}
+                    />
+                )}
+            </Stack>
             <Group justify="space-between">
                 {theme.data ? (
                     <Button

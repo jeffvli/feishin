@@ -1,7 +1,8 @@
 import { closeAllModals, openModal } from '@mantine/modals';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { create } from 'zustand';
 
 import styles from './music-video-button.module.css';
 
@@ -10,18 +11,21 @@ import {
     useMusicVideo,
 } from '/@/renderer/features/hermes-video/hooks/use-music-video';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
+import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { usePlayerSong } from '/@/renderer/store';
 import { usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { useTimestampStoreBase } from '/@/renderer/store/timestamp.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
+import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { PlayerStatus } from '/@/shared/types/types';
 
 interface SyncedVideoProps {
     artist: string;
+    compact?: boolean;
     title: string;
     video: MusicVideo;
 }
@@ -35,7 +39,10 @@ interface YouTubeMessage {
 // playing from the music server and the video follows play, pause and seek. Streamed with
 // YouTube's embedded player (privacy-enhanced domain); nothing is downloaded.
 // "offset" = seconds into the video where the song starts.
-const SyncedVideo = ({ artist, title, video }: SyncedVideoProps) => {
+const SyncedVideo = ({ artist, compact, title, video: saved }: SyncedVideoProps) => {
+    // "Live version": a live performance instead of the official video (not synced to the song)
+    const [live, setLive] = useState<MusicVideo['live']>(null);
+    const video: MusicVideo = live ? { ...saved, offset: 0, videoId: live.videoId } : saved;
     const url = useHermesUrl();
     const queryClient = useQueryClient();
     const frame = useRef<HTMLIFrameElement>(null);
@@ -161,6 +168,29 @@ const SyncedVideo = ({ artist, title, video }: SyncedVideoProps) => {
         }
     };
 
+    const toggleLive = async () => {
+        if (live) {
+            setLive(null);
+            return;
+        }
+        if (saved.live) {
+            setLive(saved.live);
+            return;
+        }
+        try {
+            const res = await fetch(`${url}/api/videos/live`, {
+                body: JSON.stringify({ artist, title }),
+                headers: { 'content-type': 'application/json' },
+                method: 'POST',
+            });
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(json.error || 'No live performance found');
+            setLive(json);
+        } catch (error) {
+            toast.error({ message: (error as Error).message });
+        }
+    };
+
     const params = 'enablejsapi=1&mute=1&autoplay=1&controls=0&rel=0&playsinline=1&disablekb=1';
 
     return (
@@ -175,6 +205,7 @@ const SyncedVideo = ({ artist, title, video }: SyncedVideoProps) => {
                     title={video.title || 'Music video'}
                 />
             </div>
+            {!compact && (
             <Group justify="space-between" mt="sm">
                 <Text isMuted size="sm">
                     {`${artist} - ${title} - timing ${offset >= 0 ? '+' : ''}${offset.toFixed(1)}s`}
@@ -197,27 +228,169 @@ const SyncedVideo = ({ artist, title, video }: SyncedVideoProps) => {
                     >
                         Save timing
                     </Button>
+                    <Button onClick={toggleLive} size="compact-sm" variant={live ? 'filled' : 'default'}>
+                        {live ? 'Official video' : 'Live version'}
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            closeAllModals();
+                            useVideoWindow.setState({ floating: true, watch: null });
+                        }}
+                        size="compact-sm"
+                    >
+                        Pop out
+                    </Button>
                 </Group>
             </Group>
+            )}
         </>
     );
 };
 
+// the floating video window (pop out, auto-open, or a video picked on the video wall)
+export const useVideoWindow = create<{
+    floating: boolean;
+    watch: null | { title: string; videoId: string };
+}>(() => ({ floating: false, watch: null }));
+
 // Follows the player: switches video when the song changes, closes when the new song has none.
-const MusicVideoWindow = () => {
+const MusicVideoWindow = ({ compact }: { compact?: boolean }) => {
     const song = usePlayerSong();
     const { data: video, isFetching } = useMusicVideo(song?.artistName, song?.name);
 
     useEffect(() => {
-        if (!isFetching && !video) closeAllModals();
-    }, [isFetching, video]);
+        if (!isFetching && !video) {
+            if (compact) useVideoWindow.setState({ floating: false });
+            else closeAllModals();
+        }
+    }, [compact, isFetching, video]);
 
     if (!song || !video) return null;
 
     return (
-        <SyncedVideo artist={song.artistName} key={video.videoId} title={song.name} video={video} />
+        <SyncedVideo
+            artist={song.artistName}
+            compact={compact}
+            key={video.videoId}
+            title={song.name}
+            video={video}
+        />
     );
 };
+
+let videoOpen = false;
+// opens the music video for the song that's playing (once; used by the button and watch parties)
+export const openMusicVideo = () => {
+    if (videoOpen || useVideoWindow.getState().floating) return;
+    videoOpen = true;
+    openModal({
+        centered: true,
+        children: <MusicVideoWindow />,
+        onClose: () => {
+            videoOpen = false;
+        },
+        size: '80vw',
+        title: 'Music video',
+    });
+};
+
+// small always-visible video in the corner of the app
+export const FloatingVideo = () => {
+    const { floating, watch } = useVideoWindow();
+    if (!floating) return null;
+    return (
+        <div className={styles.floating}>
+            <Group gap={4} justify="flex-end">
+                {!watch && (
+                    <ActionIcon
+                        icon="expand"
+                        onClick={() => {
+                            useVideoWindow.setState({ floating: false });
+                            openMusicVideo();
+                        }}
+                        size="xs"
+                        tooltip={{ label: 'Make bigger' }}
+                        variant="subtle"
+                    />
+                )}
+                <ActionIcon
+                    icon="x"
+                    onClick={() => useVideoWindow.setState({ floating: false, watch: null })}
+                    size="xs"
+                    tooltip={{ label: 'Close' }}
+                    variant="subtle"
+                />
+            </Group>
+            {watch ? (
+                <div className={styles.frame}>
+                    <iframe
+                        allow="autoplay; encrypted-media; fullscreen"
+                        allowFullScreen
+                        referrerPolicy="strict-origin-when-cross-origin"
+                        src={`https://www.youtube-nocookie.com/embed/${watch.videoId}?autoplay=1&rel=0&playsinline=1`}
+                        title={watch.title}
+                    />
+                </div>
+            ) : (
+                <MusicVideoWindow compact />
+            )}
+        </div>
+    );
+};
+
+// opens the floating video by itself when a song with a video starts (Settings > Sour Player)
+export const AutoVideo = () => {
+    const song = usePlayerSong();
+    const auto = useSourStore((state) => state.look.autoVideo);
+    const { data: video } = useMusicVideo(song?.artistName, song?.name);
+    useEffect(() => {
+        if (auto && video && !videoOpen) useVideoWindow.setState({ floating: true, watch: null });
+    }, [auto, video]);
+    return null;
+};
+
+// every song that has a music video, to watch any of them
+const VideoWall = () => {
+    const url = useHermesUrl();
+    const list = useQuery({
+        enabled: !!url,
+        queryFn: async () => {
+            const res = await fetch(`${url}/api/videos`);
+            const json = await res.json().catch(() => null);
+            if (!Array.isArray(json)) throw new Error("That address doesn't answer like Hermes Music");
+            return json as { artist: string; song: string; title: string; videoId: string }[];
+        },
+        queryKey: ['video-wall', url],
+    });
+    if (!list.data?.length) return <Text isMuted>No music videos yet - add some with /video on the request page.</Text>;
+    return (
+        <div className={styles.wall}>
+            {list.data.map((v) => (
+                <button
+                    className={styles.wallItem}
+                    key={v.videoId}
+                    onClick={() => {
+                        closeAllModals();
+                        useVideoWindow.setState({ floating: true, watch: { title: v.title, videoId: v.videoId } });
+                    }}
+                    type="button"
+                >
+                    <img alt="" src={`https://i.ytimg.com/vi/${v.videoId}/mqdefault.jpg`} />
+                    <Stack gap={0}>
+                        <Text fw={600} size="sm" truncate>
+                            {v.song}
+                        </Text>
+                        <Text isMuted size="xs" truncate>
+                            {v.artist}
+                        </Text>
+                    </Stack>
+                </button>
+            ))}
+        </div>
+    );
+};
+export const openVideoWall = () =>
+    openModal({ children: <VideoWall />, size: 'xl', title: 'Video wall' });
 
 // Shows up in the player bar only when Hermes Music has a music video for the current song.
 export const MusicVideoButton = () => {
@@ -233,12 +406,7 @@ export const MusicVideoButton = () => {
             iconProps={{ size: 'lg' }}
             onClick={(e) => {
                 e.stopPropagation();
-                openModal({
-                    centered: true,
-                    children: <MusicVideoWindow />,
-                    size: '80vw',
-                    title: t('player.musicVideo'),
-                });
+                openMusicVideo();
             }}
             size="sm"
             tooltip={{ label: t('player.musicVideo'), openDelay: 0 }}

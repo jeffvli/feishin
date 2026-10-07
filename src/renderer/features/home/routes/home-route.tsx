@@ -15,6 +15,10 @@ import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { SongInfiniteCarousel } from '/@/renderer/features/songs/components/song-infinite-carousel';
 import {
+    SOUR_HOME_ITEMS,
+    SourHomeSection,
+} from '/@/renderer/features/sour/components/home-sections';
+import {
     HomeFeatureStyle,
     HomeItem,
     useCurrentServer,
@@ -91,9 +95,14 @@ const HomeRoute = () => {
     const sortedItems = homeItems.filter((item) => !item.disabled);
 
     const sortedCarousel = sortedItems
-        .filter((item) => item.id !== HomeItem.GENRES && item.id !== HomeItem.PLAYLISTS)
+        .filter(
+            (item) =>
+                item.id !== HomeItem.GENRES &&
+                item.id !== HomeItem.PLAYLISTS &&
+                !SOUR_HOME_ITEMS.has(item.id),
+        )
         .map((item) => ({
-            ...carousels[item.id],
+            ...carousels[item.id as keyof typeof carousels],
             uniqueId: item.id,
         }));
 
@@ -126,6 +135,11 @@ const HomeRoute = () => {
                             <AlbumInfiniteFeatureCarousel />
                         )}
                         {sortedItems.map((item) => {
+                            // Sour Player: friend-group sections (radio, friends, requests, ...)
+                            if (SOUR_HOME_ITEMS.has(item.id)) {
+                                return <SourHomeSection id={item.id} key={`sour-${item.id}`} />;
+                            }
+
                             // Hermes Music edition: your own most played songs (counted locally)
                             if (item.id === HomeItem.MOST_PLAYED) {
                                 return <YourMostPlayed key="your-most-played" />;

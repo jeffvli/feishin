@@ -1,0 +1,42 @@
+.layer {
+    position: fixed;
+    right: 24px;
+    bottom: 110px;
+    z-index: 1000;
+    width: 220px;
+    height: 320px;
+    pointer-events: none;
+}
+
+.reaction {
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 2rem;
+    animation: float-up 3s ease-out forwards;
+}
+
+.reaction small {
+    font-size: 0.65rem;
+    color: white;
+    text-shadow: 0 1px 3px rgb(0 0 0 / 80%);
+}
+
+@keyframes float-up {
+    0% {
+        opacity: 0;
+        transform: translateY(0) scale(0.6);
+    }
+
+    15% {
+        opacity: 1;
+        transform: translateY(-30px) scale(1.1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-300px) scale(1);
+    }
+}

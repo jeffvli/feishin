@@ -4,6 +4,7 @@ import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-vid
 
 export interface MusicVideo {
     channel?: string;
+    live?: null | { channel: string; title: string; videoId: string };
     offset?: number; // seconds into the video where the song starts
     pending?: boolean; // Hermes Music is still lining the video up with the song
     title?: string;

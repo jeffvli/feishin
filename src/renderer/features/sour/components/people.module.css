@@ -86,7 +86,11 @@
 }
 
 .banner {
+    position: relative;
     height: 140px;
+    overflow: hidden;
+    background-position: center;
+    background-size: cover;
 }
 
 .profile-head {
@@ -179,4 +183,259 @@
 
 .artist-cover {
     border-radius: 50%;
+}
+
+.avatar-rainbow {
+    position: relative;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+    border-radius: 50%;
+    animation: sour-rainbow-ring 4s linear infinite;
+}
+
+.dnd {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 28%;
+    height: 28%;
+    background: rgb(248 113 113);
+    border: 2px solid var(--theme-colors-background, #111);
+    border-radius: 50%;
+}
+
+.offline {
+    background: transparent;
+    border: 2px solid rgb(150 150 160);
+}
+
+.name-line {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: baseline;
+    min-width: 0;
+    font-weight: 800;
+}
+
+.name-shimmer {
+    color: transparent;
+    background: linear-gradient(90deg, #fff 0%, #facc15 50%, #fff 100%);
+    background-clip: text;
+    background-size: 200% 100%;
+    animation: sour-shimmer 2.5s linear infinite;
+}
+
+.name-rainbow {
+    color: #f87171;
+    animation: sour-rainbow-text 4s linear infinite;
+}
+
+.name-glow {
+    text-shadow: 0 0 12px var(--theme-colors-primary, #a78bfa);
+}
+
+.nickname {
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0.75;
+}
+
+.chip {
+    padding: 2px 10px;
+    font-size: 0.8rem;
+    background: rgb(255 255 255 / 6%);
+    border: 1px solid rgb(255 255 255 / 15%);
+    border-radius: 999px;
+}
+
+.match-bar {
+    flex: 1;
+    height: 8px;
+    overflow: hidden;
+    background: rgb(255 255 255 / 8%);
+    border-radius: 999px;
+}
+
+.match-bar > div {
+    height: 100%;
+}
+
+.top5 {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.rank {
+    font-size: 0.75rem;
+    font-weight: 800;
+    opacity: 0.7;
+}
+
+.note {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 8px 10px;
+    background: rgb(255 255 255 / 5%);
+    border-radius: 8px;
+}
+
+.muted {
+    color: var(--theme-colors-foreground-muted, #aaa);
+}
+
+.profile-page {
+    padding: 4px;
+    background-position: center;
+    background-size: cover;
+    border-radius: 12px;
+}
+
+.header {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    padding: 2px 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: white;
+    background: rgb(0 0 0 / 35%);
+    border-radius: 999px;
+}
+
+.sticker {
+    position: absolute;
+    font-size: 1.6rem;
+    filter: drop-shadow(0 2px 3px rgb(0 0 0 / 50%));
+    transform: translate(-50%, -50%);
+}
+
+.editor {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 20px;
+}
+
+.editor-form {
+    max-height: 72vh;
+    padding-right: 6px;
+    overflow-y: auto;
+}
+
+.editor-preview {
+    max-height: 72vh;
+    overflow-y: auto;
+    padding-left: 16px;
+    border-left: 1px solid rgb(255 255 255 / 10%);
+}
+
+.history-pic {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    overflow: hidden;
+    cursor: pointer;
+    background: none;
+    border: 2px solid transparent;
+    border-radius: 50%;
+}
+
+.history-pic:hover {
+    border-color: var(--theme-colors-primary, #a78bfa);
+}
+
+.history-pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.link-code {
+    font-family: monospace;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+}
+
+.group-hero {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.group-pic {
+    flex-shrink: 0;
+    width: 96px;
+    height: 96px;
+    object-fit: cover;
+    background: rgb(255 255 255 / 8%);
+    border-radius: 16px;
+}
+
+.recap-big {
+    font-size: 2.6rem;
+    font-weight: 900;
+    text-align: center;
+}
+
+.recap-slide {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--theme-colors-primary, #6d28d9), rgb(20 20 30) 120%);
+    border-radius: 14px;
+}
+
+@keyframes sour-rainbow-ring {
+    0% {
+        box-shadow: 0 0 0 3px #f87171;
+    }
+
+    33% {
+        box-shadow: 0 0 0 3px #facc15;
+    }
+
+    66% {
+        box-shadow: 0 0 0 3px #60a5fa;
+    }
+
+    100% {
+        box-shadow: 0 0 0 3px #f87171;
+    }
+}
+
+@keyframes sour-shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+@keyframes sour-rainbow-text {
+    0% {
+        color: #f87171;
+    }
+
+    33% {
+        color: #facc15;
+    }
+
+    66% {
+        color: #60a5fa;
+    }
+
+    100% {
+        color: #f87171;
+    }
 }

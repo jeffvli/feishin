@@ -2,19 +2,22 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 
 import { groupApi, toGroupSong } from '/@/renderer/features/group-play/api/group-play-api';
+import { useReactions } from '/@/renderer/features/group-play/components/group-reactions';
 import {
     type GroupState,
     useGroupPlayStore,
 } from '/@/renderer/features/group-play/store/group-play.store';
+import { openMusicVideo } from '/@/renderer/features/hermes-video/components/music-video-button';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { getSongById } from '/@/renderer/features/player/utils';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
-import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
+import { useSourProfiles, useSourStore } from '/@/renderer/features/sour/store/sour.store';
+import { playSound } from '/@/renderer/features/sour/utils/sounds';
 import { useCurrentServer } from '/@/renderer/store';
 import { addToQueueByData, usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { useTimestampStoreBase } from '/@/renderer/store/timestamp.store';
 import { toast } from '/@/shared/components/toast/toast';
-import { Played } from '/@/shared/types/domain-types';
+import { Played, type Song } from '/@/shared/types/domain-types';
 import { Play, PlayerStatus } from '/@/shared/types/types';
 
 // seconds the group's song has played, as of now
@@ -35,6 +38,7 @@ export const GroupPlaySync = () => {
         (state) => !!state.state?.radio && !!state.state?.needSongs,
     );
     const queryClient = useQueryClient();
+    const queryClientRef = useRef(queryClient);
     const serverId = useCurrentServer()?.id;
     const loading = useRef<null | string>(null);
     const failed = useRef<null | string>(null);
@@ -56,6 +60,16 @@ export const GroupPlaySync = () => {
         };
         window.addEventListener('beforeunload', onClose);
         return () => window.removeEventListener('beforeunload', onClose);
+    }, [code, member, role, url]);
+
+    useEffect(() => {
+        if (!url || !code) return undefined;
+        const ping = () => {
+            const { hostKey } = useGroupPlayStore.getState();
+            groupApi.ping(url, code, role === 'host' ? { hostKey } : { member }).catch(() => {});
+        };
+        const timer = setInterval(ping, 20000);
+        return () => clearInterval(timer);
     }, [code, member, role, url]);
 
     // older entries of you in this group (from a connection Hermes Music hasn't noticed closing)
@@ -92,6 +106,24 @@ export const GroupPlaySync = () => {
         events.addEventListener('kicked', () => {
             toast.info({ message: 'The host removed you from the group' });
             useGroupPlayStore.getState().actions.leave();
+        });
+        events.addEventListener('reaction', (event) => {
+            const r = JSON.parse((event as MessageEvent).data) as { by: string; emoji: string };
+            useReactions.getState().add(r.emoji, r.by);
+        });
+        events.addEventListener('joined', (event) => {
+            const j = JSON.parse((event as MessageEvent).data) as { profile: null | string };
+            const profiles = queryClientRef.current.getQueryData<{ custom?: { joinSound?: string }; id: string }[]>([
+                'sour-profiles',
+                url,
+            ]);
+            playSound(profiles?.find((p) => p.id === j.profile)?.custom?.joinSound);
+        });
+        events.addEventListener('reveal', (event) => {
+            const r = JSON.parse((event as MessageEvent).data) as { by: string; right: string[]; title: string };
+            toast.info({
+                message: `${r.title} was ${r.by}'s pick${r.right.length ? ` - ${r.right.join(', ')} guessed right` : ''}`,
+            });
         });
         return () => events.close();
     }, [code, member, url]);
@@ -202,17 +234,27 @@ export const GroupPlaySync = () => {
     useEffect(() => {
         if (!radioNeedsSongs || !url || !code || !member || !serverId) return undefined;
         let stopped = false;
-        const fill = () =>
-            queryClient
-                .fetchQuery({
-                    ...songsQueries.random({ query: { limit: 10, played: Played.All }, serverId }),
-                    queryKey: ['group-radio-fill', Date.now()],
-                })
-                .then((res) => {
-                    if (stopped) return undefined;
-                    return groupApi.fill(url, code, member, res.items.map(toGroupSong));
-                })
-                .catch(() => {});
+        const random = (extra: { genre?: string; maxYear?: number }) =>
+            queryClient.fetchQuery({
+                ...songsQueries.random({ query: { limit: 10, played: Played.All, ...extra }, serverId }),
+                queryKey: ['group-radio-fill', Date.now(), extra],
+            });
+        const fill = async () => {
+            const hint = useGroupPlayStore.getState().state?.station?.fill;
+            let items: Song[] = [];
+            try {
+                if (hint?.genres?.length) {
+                    const genre = hint.genres[Math.floor(Math.random() * hint.genres.length)];
+                    items = (await random({ genre })).items;
+                } else if (hint?.toYear) {
+                    items = (await random({ maxYear: hint.toYear })).items;
+                }
+                if (items.length < 3) items = (await random({})).items; // nothing with that genre: anything
+                if (!stopped) await groupApi.fill(url, code, member, items.map(toGroupSong));
+            } catch {
+                // try again in 20 seconds
+            }
+        };
         const first = setTimeout(fill, Math.random() * 3000); // so listeners don't all send at once
         const retry = setInterval(fill, 20000);
         return () => {
@@ -221,6 +263,41 @@ export const GroupPlaySync = () => {
             clearInterval(retry);
         };
     }, [code, member, queryClient, radioNeedsSongs, serverId, url]);
+
+    // when the song changes: watch-party video for guests, a popup for stations, the host's session list
+    const currentId = useGroupPlayStore((state) => state.state?.queue[state.state.index]?.id);
+    const profiles = useSourProfiles().data;
+    useEffect(() => {
+        const { panelOpen, state } = useGroupPlayStore.getState();
+        const song = state?.queue[state.index];
+        if (!state || !song) return;
+        if (state.watchVideo && role === 'member') window.setTimeout(() => openMusicVideo(), 1500);
+        const dnd = profiles?.find((p) => p.id === useSourStore.getState().me?.id)?.custom?.dnd;
+        if (state.radio && !panelOpen && !dnd) {
+            toast.info({ message: `${state.name}: ${song.title} - ${song.artist}` });
+        }
+        if (role === 'host') {
+            useGroupPlayStore.setState((s) =>
+                s.played[s.played.length - 1]?.id === song.id ? s : { played: [...s.played, song].slice(-200) },
+            );
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentId]);
+
+    // sleep timer: fades out, then pauses and leaves the station
+    useEffect(() => {
+        const timer = setInterval(() => {
+            const { sleepAt } = useGroupPlayStore.getState();
+            if (!sleepAt || Date.now() < sleepAt) return;
+            useGroupPlayStore.setState({ sleepAt: null });
+            usePlayerStoreBase.getState().mediaPause();
+            const { actions, code: c, member: m } = useGroupPlayStore.getState();
+            if (url && c && m) groupApi.leave(url, c, m).catch(() => {});
+            actions.leave();
+            toast.info({ message: 'Sleep timer: goodnight' });
+        }, 5000);
+        return () => clearInterval(timer);
+    }, [url]);
 
     // host: carry out what guests did with the group's controls
     useEffect(() => {

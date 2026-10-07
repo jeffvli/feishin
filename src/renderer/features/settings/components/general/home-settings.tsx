@@ -16,6 +16,16 @@ const HOME_ITEMS: Array<[string, string]> = [
     [HomeItem.RECENTLY_ADDED, 'page.home.newlyAdded'],
     [HomeItem.RECENTLY_RELEASED, 'page.home.recentlyReleased'],
     [HomeItem.MOST_PLAYED, 'page.home.mostPlayed'],
+    [HomeItem.SOUR_RADIO, 'Sour Radio (live)'],
+    [HomeItem.FRIENDS_PLAYING, 'Friends are playing'],
+    [HomeItem.YOUR_REQUESTS, 'Your requests'],
+    [HomeItem.SONG_OF_THE_DAY, 'Song of the day'],
+    [HomeItem.JUMP_BACK_IN, 'Jump back in'],
+    [HomeItem.BLEND, 'Blend'],
+    [HomeItem.LEADERBOARD, "This week's leaderboard"],
+    [HomeItem.GROUP_TOP, "The group's top songs"],
+    [HomeItem.SHARED_FAVORITES, 'Shared favourites'],
+    [HomeItem.SMART_PLAYLISTS, 'Smart playlists'],
 ];
 
 export const HomeSettings = memo(() => {

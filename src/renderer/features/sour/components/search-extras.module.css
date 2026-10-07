@@ -1,0 +1,18 @@
+.strip {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px 2rem 0;
+}
+
+.person {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    padding: 2px 8px 2px 2px;
+    color: inherit;
+    cursor: pointer;
+    background: rgb(255 255 255 / 6%);
+    border: none;
+    border-radius: 999px;
+}

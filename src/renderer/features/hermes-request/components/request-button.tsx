@@ -1,11 +1,16 @@
 import { openModal } from '@mantine/modals';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { type ClipboardEvent, useState } from 'react';
 
 import styles from './request-button.module.css';
 
+import { useReactions } from '/@/renderer/features/group-play/components/group-reactions';
 import { useGroupPlayStore } from '/@/renderer/features/group-play/store/group-play.store';
+import { openVideoWall } from '/@/renderer/features/hermes-video/components/music-video-button';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
+import { requestApi } from '/@/renderer/features/sour/api/sour-api';
+import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
+import { playSound } from '/@/renderer/features/sour/utils/sounds';
 import { usePlayerSong } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
@@ -22,11 +27,35 @@ interface HermesRequest {
     id: string;
     note?: string;
     pos?: number;
+    profile?: string;
     query: string;
     status: string;
     title?: string;
     type: string;
+    voters?: string[];
+    votes?: number;
 }
+
+// little surprises typed into the request box
+const SECRETS: Record<string, () => void> = {
+    '/disco': () => {
+        document.body.classList.add('sour-disco');
+        window.setTimeout(() => document.body.classList.remove('sour-disco'), 6000);
+    },
+    '/lemon': () => {
+        for (let i = 0; i < 18; i++) window.setTimeout(() => useReactions.getState().add('🍋', ''), i * 120);
+        playSound('lemon');
+    },
+    '/party': () => {
+        const all = ['🎉', '🥳', '🎊', '✨', '🔥'];
+        for (let i = 0; i < 24; i++) window.setTimeout(() => useReactions.getState().add(all[i % all.length], ''), i * 90);
+        playSound('airhorn');
+    },
+    '/sour': () => {
+        document.body.classList.add('sour-shake');
+        window.setTimeout(() => document.body.classList.remove('sour-shake'), 900);
+    },
+};
 
 type RequestType = 'album' | 'artist' | 'song';
 
@@ -113,6 +142,7 @@ const RequestPanel = () => {
     const url = useHermesUrl();
     const userName = useGroupPlayStore((state) => state.userName);
     const queryClient = useQueryClient();
+    const me = useSourStore((state) => state.me);
     const [type, setType] = useState<RequestType>('song');
     const [query, setQuery] = useState('');
     const [busy, setBusy] = useState(false);
@@ -142,11 +172,17 @@ const RequestPanel = () => {
     }
 
     const send = async () => {
+        const secret = SECRETS[query.trim().toLowerCase()];
+        if (secret) {
+            secret();
+            setQuery('');
+            return;
+        }
         if (query.trim().length < 2) return;
         setBusy(true);
         try {
             const res = await fetch(`${url}/api/requests`, {
-                body: JSON.stringify({ by: userName.trim() || undefined, query, type }),
+                body: JSON.stringify({ by: userName.trim() || undefined, profile: me?.id, query, type }),
                 headers: { 'content-type': 'application/json' },
                 method: 'POST',
             });
@@ -160,6 +196,36 @@ const RequestPanel = () => {
         } finally {
             setBusy(false);
         }
+    };
+
+    // upvote a waiting request: the most-wanted download first
+    const vote = (r: HermesRequest) => {
+        if (!me) return;
+        requestApi
+            .vote(url, me, r.id)
+            .then(() => queryClient.invalidateQueries({ queryKey: ['hermes-requests', url] }))
+            .catch((error: Error) => toast.error({ message: error.message }));
+    };
+
+    // paste a screenshot of a playlist: Hermes Music reads the songs and queues them all
+    const onPaste = (e: ClipboardEvent) => {
+        const file = [...e.clipboardData.files].find((f) => f.type.startsWith('image/'));
+        if (!file) return;
+        e.preventDefault();
+        const reader = new FileReader();
+        reader.onload = () => {
+            setBusy(true);
+            toast.info({ message: 'Reading the songs in that screenshot...' });
+            requestApi
+                .screenshot(url, String(reader.result), me, userName.trim() || 'Sour Player')
+                .then((r) => {
+                    toast.success({ message: `Queued ${r.queued} songs from the screenshot` });
+                    queryClient.invalidateQueries({ queryKey: ['hermes-requests', url] });
+                })
+                .catch((error: Error) => toast.error({ message: error.message }))
+                .finally(() => setBusy(false));
+        };
+        reader.readAsDataURL(file);
     };
 
     // /bump from Hermes Music: move a queued request to the front
@@ -181,7 +247,7 @@ const RequestPanel = () => {
               : 'Artist name, e.g. the killers';
 
     return (
-        <Stack gap="md">
+        <Stack gap="md" onPaste={onPaste}>
             <SegmentedControl
                 data={[
                     { label: 'Song', value: 'song' },
@@ -207,9 +273,12 @@ const RequestPanel = () => {
                 </Button>
             </Group>
             <Text isMuted size="xs">
-                You can also paste a Spotify link. Downloaded songs show up in your library after
-                Navidrome&#39;s next scan.
+                You can also paste a Spotify link, or paste a screenshot of a playlist (Ctrl+V) to
+                request every song in it. Downloaded songs show up after Navidrome&#39;s next scan.
             </Text>
+            <Button onClick={openVideoWall} size="xs" variant="default" w="fit-content">
+                Video wall
+            </Button>
             <MusicVideoTools />
             <Stack gap={4}>
                 <Text fw={700} size="sm">
@@ -232,6 +301,16 @@ const RequestPanel = () => {
                             <span className={styles[r.status] || styles.status}>
                                 {statusText(r)}
                             </span>
+                            {r.status === 'pending' && me && (
+                                <button
+                                    className={r.voters?.includes(me.id) ? styles.voted : styles.vote}
+                                    onClick={() => vote(r)}
+                                    title="Upvote: most-wanted downloads first"
+                                    type="button"
+                                >
+                                    &#9650; {r.votes ?? 0}
+                                </button>
+                            )}
                             {r.status === 'pending' && !!r.pos && r.pos > 1 && (
                                 <ActionIcon
                                     icon="arrowUpToLine"
@@ -254,6 +333,9 @@ const RequestPanel = () => {
     );
 };
 
+export const openRequestWindow = () =>
+    openModal({ children: <RequestPanel />, size: 'lg', title: 'Request music' });
+
 // Player bar: opens the request window.
 export const RequestButton = () => (
     <ActionIcon
@@ -261,7 +343,7 @@ export const RequestButton = () => (
         iconProps={{ size: 'lg' }}
         onClick={(e) => {
             e.stopPropagation();
-            openModal({ children: <RequestPanel />, size: 'lg', title: 'Request music' });
+            openRequestWindow();
         }}
         size="sm"
         tooltip={{ label: 'Request music (Hermes Music)', openDelay: 0 }}

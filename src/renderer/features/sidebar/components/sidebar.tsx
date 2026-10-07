@@ -21,6 +21,7 @@ import {
     SidebarSharedPlaylistList,
     useSidebarPlaylistAddDragMonitor,
 } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
+import { SidebarPins } from '/@/renderer/features/sour/components/look';
 import { SidebarFriends } from '/@/renderer/features/sour/components/sidebar-friends';
 import {
     useAppStore,
@@ -137,9 +138,10 @@ export const Sidebar = () => {
                         item: styles.accordionItem,
                         root: styles.accordionRoot,
                     }}
-                    defaultValue={['library', 'collections', 'playlists', 'friends']}
+                    defaultValue={['pins', 'library', 'collections', 'playlists', 'friends']}
                     multiple
                 >
+                    <SidebarPins />
                     <Accordion.Item value="library">
                         <Accordion.Control>
                             <Text fw={500} variant="secondary">

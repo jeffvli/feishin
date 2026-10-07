@@ -2,12 +2,23 @@ import { t } from 'i18next';
 import { useCallback, useEffect, useMemo, useState, WheelEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { GroupPlayButton } from '/@/renderer/features/group-play/components/group-play-button';
+import {
+    GroupPlayButton,
+    GroupPlayDrawer,
+} from '/@/renderer/features/group-play/components/group-play-button';
 import { GroupPlaySync } from '/@/renderer/features/group-play/components/group-play-sync';
+import { FloatingReactions } from '/@/renderer/features/group-play/components/group-reactions';
 import { PlayCounter } from '/@/renderer/features/hermes-plays/components/play-counter';
-import { RequestButton } from '/@/renderer/features/hermes-request/components/request-button';
+import {
+    openRequestWindow,
+    RequestButton,
+} from '/@/renderer/features/hermes-request/components/request-button';
 import { HermesUpdateButton } from '/@/renderer/features/hermes-update/components/hermes-update-button';
-import { MusicVideoButton } from '/@/renderer/features/hermes-video/components/music-video-button';
+import {
+    AutoVideo,
+    FloatingVideo,
+    MusicVideoButton,
+} from '/@/renderer/features/hermes-video/components/music-video-button';
 import { PopoverPlayQueue } from '/@/renderer/features/now-playing/components/popover-play-queue';
 import { DlnaCastButton } from '/@/renderer/features/player/components/dlna-cast-button';
 import { DlnaVolumeButton } from '/@/renderer/features/player/components/dlna/volume-button';
@@ -23,8 +34,18 @@ import {
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
+import {
+    CrossfadeWatcher,
+    FriendChips,
+    LookEffects,
+    MiniPlayerButton,
+    Shortcuts,
+    useQueuePeek,
+} from '/@/renderer/features/sour/components/look';
 import { PeopleButton } from '/@/renderer/features/sour/components/people';
+import { ListenAlong, SocialWatcher } from '/@/renderer/features/sour/components/social';
 import { SourPresence } from '/@/renderer/features/sour/components/sour-presence';
+import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import {
     AUTO_DJ_MODE,
@@ -97,6 +118,8 @@ export const RightControls = () => {
     const showRatings = useShowRatings();
     const showFavorites = useShowFavorites();
     const playbackType = usePlaybackType();
+    const hidden = useSourStore((state) => state.look.hiddenButtons);
+    const show = (id: string) => !hidden.includes(id);
     return (
         <Flex align="flex-end" direction="column" h="100%" px="1rem" py="0.5rem">
             <Group h="calc(100% / 3)">
@@ -111,10 +134,21 @@ export const RightControls = () => {
                 <PlayerConfig />
                 <GroupPlaySync />
                 <SourPresence />
-                <PeopleButton />
-                <RequestButton />
-                <GroupPlayButton />
-                <MusicVideoButton />
+                <SocialWatcher />
+                <LookEffects />
+                <Shortcuts onRequest={openRequestWindow} />
+                <CrossfadeWatcher />
+                <AutoVideo />
+                <FloatingVideo />
+                <FloatingReactions />
+                <GroupPlayDrawer />
+                <ListenAlong />
+                <FriendChips />
+                {show('people') && <PeopleButton />}
+                {show('request') && <RequestButton />}
+                {show('mini') && <MiniPlayerButton />}
+                {show('group') && <GroupPlayButton />}
+                {show('video') && <MusicVideoButton />}
                 <LyricsButton />
                 {showFavorites && <FavoriteButton />}
                 <QueueButton />
@@ -363,6 +397,7 @@ const QueueButton = () => {
     const sideQueueType = useSideQueueType();
     const { bindings } = useHotkeySettings();
     const [popoverOpened, setPopoverOpened] = useState(false);
+    const peek = useQueuePeek();
     const handleToggleQueue = () => {
         if (sideQueueType === 'sideQueue') setSideBar({ rightExpanded: !isSidebarRightExpanded });
         else setPopoverOpened((prev) => !prev);
@@ -381,7 +416,7 @@ const QueueButton = () => {
                 }}
                 size="sm"
                 tooltip={{
-                    label: t('player.viewQueue'),
+                    label: peek ? `${t('player.viewQueue')} - ${peek}` : t('player.viewQueue'),
                     openDelay: 0,
                 }}
                 variant="subtle"

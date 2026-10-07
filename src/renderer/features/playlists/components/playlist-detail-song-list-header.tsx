@@ -19,6 +19,7 @@ import {
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { ListSearchInput } from '/@/renderer/features/shared/components/list-search-input';
 import { getPlaylistLeafName } from '/@/renderer/features/sidebar/components/playlist-folder-tree';
+import { applyPlaylistCrossfade } from '/@/renderer/features/sour/components/look';
 import { openPlaylistTheme } from '/@/renderer/features/sour/components/playlist-theme';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
@@ -136,6 +137,8 @@ export const PlaylistDetailSongListHeader = ({
     const uploadPlaylistImageMutation = useUploadPlaylistImage({});
 
     const handlePlay = (type?: Play) => {
+        // Sour Player: this playlist's own crossfade, if it has one
+        applyPlaylistCrossfade(playlistId, (listData as Song[]).map((song) => song.id));
         player.addToQueueByData(listData as Song[], type || Play.NOW);
     };
 
