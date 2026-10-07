@@ -9,6 +9,7 @@ import {
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { getSongById } from '/@/renderer/features/player/utils';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
+import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { useCurrentServer } from '/@/renderer/store';
 import { addToQueueByData, usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { useTimestampStoreBase } from '/@/renderer/store/timestamp.store';
@@ -56,6 +57,22 @@ export const GroupPlaySync = () => {
         window.addEventListener('beforeunload', onClose);
         return () => window.removeEventListener('beforeunload', onClose);
     }, [code, member, role, url]);
+
+    // older entries of you in this group (from a connection Hermes Music hasn't noticed closing)
+    // are removed, so you count once (votes to skip need half the real listeners)
+    const members = useGroupPlayStore((state) => state.state?.members);
+    const myProfile = useSourStore((state) => state.me?.id);
+    const removedGhosts = useRef(new Set<string>());
+    useEffect(() => {
+        if (!url || !code || !myProfile || !members) return;
+        members
+            .filter((m) => m.profile === myProfile && m.id !== member)
+            .filter((m) => !removedGhosts.current.has(m.id))
+            .forEach((ghost) => {
+                removedGhosts.current.add(ghost.id);
+                groupApi.leave(url, code, ghost.id).catch(() => {});
+            });
+    }, [code, member, members, myProfile, url]);
 
     // live group state
     useEffect(() => {
