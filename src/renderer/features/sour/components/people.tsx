@@ -275,13 +275,13 @@ const ProfileView = ({ onBack, profile }: { onBack?: () => void; profile: SourPr
     const queryClient = useQueryClient();
     const playSong = usePlaySong();
     const [editing, setEditing] = useState(false);
+    const navigate = useNavigate();
     const isMe = me?.id === profile.id;
     const banner = bannerUrl(url, profile);
     const accent = profile.color || `hsl(${hue(profile.name)} 55% 40%)`;
 
     if (editing) return <ProfileEditor onDone={() => setEditing(false)} profile={profile} />;
 
-    const navigate = useNavigate();
     const albums = profile.favorites.filter((f) => favoriteKind(f) === 'album');
     const artists = profile.favorites.filter((f) => favoriteKind(f) === 'artist');
     const songs = profile.favorites.filter((f) => favoriteKind(f) === 'song');
