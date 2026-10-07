@@ -102,7 +102,7 @@ const HomeRoute = () => {
                 !SOUR_HOME_ITEMS.has(item.id),
         )
         .map((item) => ({
-            ...carousels[item.id as keyof typeof carousels],
+            ...(carousels[item.id as keyof typeof carousels] as (typeof carousels)[HomeItem.MOST_PLAYED]),
             uniqueId: item.id,
         }));
 

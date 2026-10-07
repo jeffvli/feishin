@@ -126,7 +126,7 @@ const FriendGroupPage = () => {
                     Edit the group page
                 </Button>
             )}
-            <Text fw={700}>The group's top songs this week</Text>
+            <Text fw={700}>The group&#39;s top songs this week</Text>
             {g.topSongs.map((s, i) => (
                 <button className={styles.favoriteSong} key={s.id} onClick={() => playSong(s)} type="button">
                     <Text w={18}>{i + 1}</Text>
@@ -376,7 +376,10 @@ export const SocialWatcher = () => {
     const current = usePlayerSong();
     const statuses = useRef(new Map<string, string>());
     const offeredResume = useRef(false);
-    (window as { __sourDnd?: boolean }).__sourDnd = !!mine?.custom?.dnd;
+    const dnd = !!mine?.custom?.dnd;
+    useEffect(() => {
+        (window as { __sourDnd?: boolean }).__sourDnd = dnd;
+    }, [dnd]);
 
     // pings and new wall notes
     useEffect(() => {

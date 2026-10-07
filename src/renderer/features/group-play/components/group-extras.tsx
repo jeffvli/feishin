@@ -367,7 +367,7 @@ export const RoomAndSaved = ({ onStart }: { onStart: (name: string) => void }) =
             <Text fw={700}>Your room</Text>
             <Text isMuted size="sm">
                 Your own always-on station: it keeps playing (random songs plus anything people add) even
-                when you're not there. You can skip and remove songs in it.
+                when you&#39;re not there. You can skip and remove songs in it.
             </Text>
             <Group gap="xs">
                 <TextInput onChange={(e) => setRoomName(e.currentTarget.value)} placeholder="Room name" size="xs" value={roomName} />

@@ -367,9 +367,10 @@ const SmartPlaylists = () => {
         );
         await addToQueueByData(Play.NOW, found.flatMap((r) => r?.items ?? []));
     };
+    const [now] = useState(() => Date.now());
     const onRepeat = playsSince(7).slice(0, 25).map((x) => x.entry.id);
     const forgotten = Object.values(plays)
-        .filter((p) => Date.now() - p.last > 30 * 86400000)
+        .filter((p) => now - p.last > 30 * 86400000)
         .sort((a, b) => b.count - a.count)
         .slice(0, 25)
         .map((p) => p.id);

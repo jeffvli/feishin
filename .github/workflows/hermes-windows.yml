@@ -1,4 +1,4 @@
-# Builds Sour Player (the Hermes Music edition of Feishin) for Windows and Linux on every push to this branch
+# Builds Sour Player (the Hermes Music edition of Feishin) for Windows, Linux and macOS on every push to this branch
 # and publishes the downloads as one GitHub release (no GitHub account needed to download).
 name: Hermes build (Windows + Linux)
 
@@ -28,7 +28,7 @@ jobs:
 
             - name: Set the version (Sour Lemon 0.x; each build is newer, so installed copies update themselves)
               shell: bash
-              run: npm pkg set version=0.2.$(( ${{ github.run_number }} - 20 ))
+              run: npm pkg set version=0.3.$(( ${{ github.run_number }} - 25 ))
 
             - name: Build for Windows
               run: pnpm run package:win:pr
@@ -58,7 +58,7 @@ jobs:
 
             - name: Set the version (Sour Lemon 0.x; each build is newer, so installed copies update themselves)
               shell: bash
-              run: npm pkg set version=0.2.$(( ${{ github.run_number }} - 20 ))
+              run: npm pkg set version=0.3.$(( ${{ github.run_number }} - 25 ))
 
             - name: Build for Linux
               run: pnpm run package:linux:pr
@@ -72,6 +72,37 @@ jobs:
                       dist/*.deb
                       dist/*.tar.xz
                       dist/latest-linux.yml
+
+    mac:
+        # macOS build (not signed by Apple: first open with right-click > Open). No automatic updates on Mac.
+        runs-on: macos-latest
+        continue-on-error: true
+        env:
+            NODE_OPTIONS: --max-old-space-size=4096
+        steps:
+            - name: Checkout git repo
+              uses: actions/checkout@v6
+
+            - name: Install Node and PNPM
+              uses: pnpm/action-setup@v4
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Set the version
+              shell: bash
+              run: npm pkg set version=0.3.$(( ${{ github.run_number }} - 25 ))
+
+            - name: Build for macOS
+              run: pnpm run package:mac:pr
+
+            - name: Upload macOS build
+              uses: actions/upload-artifact@v7
+              with:
+                  name: feishin-hermes-mac
+                  path: |
+                      dist/*.dmg
+                      dist/*-mac.zip
 
     lint-report:
         # Runs Feishin's checks and posts any problems as annotations (readable without signing in).
@@ -98,7 +129,8 @@ jobs:
                   done
 
     release:
-        needs: [windows, linux]
+        needs: [windows, linux, mac]
+        if: always() && needs.windows.result == 'success' && needs.linux.result == 'success'
         runs-on: ubuntu-latest
         steps:
             - name: Collect the builds
@@ -109,7 +141,7 @@ jobs:
 
             - name: Work out the version
               id: version
-              run: echo "v=0.2.$(( ${{ github.run_number }} - 20 ))" >> "$GITHUB_OUTPUT"
+              run: echo "v=0.3.$(( ${{ github.run_number }} - 25 ))" >> "$GITHUB_OUTPUT"
 
             - name: Publish release
               uses: softprops/action-gh-release@v2
@@ -132,6 +164,9 @@ jobs:
                       - Ubuntu / Debian / Mint: `Sour-Player-linux-amd64.deb` - install with
                         `sudo apt install ./Sour-Player-linux-amd64.deb`. Updates itself.
                       - Or unpack `Sour-Player-linux-x64.tar.xz` and run `sour-player` inside (no updates).
+
+                      **macOS (new, test):** download the `.dmg` - it isn't signed by Apple, so the first time
+                      right-click Sour Player > Open. Updates on Mac are a fresh download.
 
                       Coming from Feishin? Sour Player copies your Feishin settings the first time it starts.
                       Then: Settings > General > Music videos > Hermes Music address.

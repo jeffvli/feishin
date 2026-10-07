@@ -30,6 +30,13 @@ jobs:
                       done || true
                   done
 
+            - name: Make an auto-fix patch (formatting and sort order)
+              shell: bash
+              run: |
+                  pnpm exec eslint --fix src > /dev/null 2>&1 || true
+                  pnpm exec stylelint 'src/**/*.{css,scss}' --fix > /dev/null 2>&1 || true
+                  git diff > autofix.patch.txt
+
             - name: Keep the full reports
               uses: actions/upload-artifact@v7
               with:

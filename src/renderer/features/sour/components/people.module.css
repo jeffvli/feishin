@@ -32,7 +32,8 @@
 }
 
 .offline {
-    background: rgb(120 120 130);
+    background: var(--theme-colors-background, #111);
+    border-color: rgb(150 150 160);
 }
 
 .cover {
@@ -208,11 +209,6 @@
     border-radius: 50%;
 }
 
-.offline {
-    background: transparent;
-    border: 2px solid rgb(150 150 160);
-}
-
 .name-line {
     display: inline-flex;
     flex-wrap: wrap;
@@ -330,8 +326,8 @@
 
 .editor-preview {
     max-height: 72vh;
-    overflow-y: auto;
     padding-left: 16px;
+    overflow-y: auto;
     border-left: 1px solid rgb(255 255 255 / 10%);
 }
 

@@ -367,7 +367,7 @@ export const ArtistToRadioAction = ({ artists }: { artists: (AlbumArtist | Artis
                     const res = await queryClient.fetchQuery(
                         songsQueries.artistRadio({ query: { artistId: artist.id, count: 30 }, serverId }),
                     );
-                    const theirs = res.items
+                    const theirs = res
                         .filter((s) => s.artistName.toLowerCase().includes(artist.name.toLowerCase()))
                         .sort(() => Math.random() - 0.5)
                         .slice(0, 3);
