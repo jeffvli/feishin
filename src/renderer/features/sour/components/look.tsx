@@ -1,5 +1,4 @@
 import { openModal } from '@mantine/modals';
-import isElectron from 'is-electron';
 import { useEffect, useRef, useState } from 'react';
 import { generatePath, useNavigate } from 'react-router';
 
@@ -10,6 +9,7 @@ import { groupApi } from '/@/renderer/features/group-play/api/group-play-api';
 import { useGroupPlayStore } from '/@/renderer/features/group-play/store/group-play.store';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { openPeople, openProfile } from '/@/renderer/features/sour/components/people';
+import { toggleMiniPlayer } from '/@/renderer/features/sour/components/mini-player';
 import { ProfileAvatar } from '/@/renderer/features/sour/components/profile-bits';
 import { currentHoliday } from '/@/renderer/features/sour/skins/holidays';
 import { useSourProfiles, useSourStore } from '/@/renderer/features/sour/store/sour.store';
@@ -85,12 +85,8 @@ export const LookEffects = () => {
     return null;
 };
 
-// ---------- mini player: a small always-on-top window with just the player bar ----------
-export const toggleMiniPlayer = () => {
-    const on = !document.documentElement.classList.contains('sour-mini');
-    document.documentElement.classList.toggle('sour-mini', on);
-    if (isElectron()) window.api?.ipc?.send('sour-mini', on);
-};
+// ---------- mini player (the window itself is in mini-player.tsx) ----------
+export { toggleMiniPlayer };
 
 export const MiniPlayerButton = () => (
     <ActionIcon

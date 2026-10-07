@@ -1,0 +1,146 @@
+.mini {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px;
+    overflow: hidden;
+    color: var(--theme-colors-foreground);
+    user-select: none;
+    background: var(--theme-colors-background);
+    -webkit-app-region: drag;
+}
+
+.backdrop {
+    position: absolute;
+    inset: -40px;
+    z-index: 0;
+    background-position: center;
+    background-size: cover;
+    opacity: 0.35;
+    filter: blur(30px) saturate(1.4);
+}
+
+.cover {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    height: min(100%, 110px);
+    overflow: hidden;
+    background: alpha(var(--theme-colors-foreground), 0.08);
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgb(0 0 0 / 35%);
+}
+
+.cover img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.body {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    justify-content: center;
+    min-width: 0;
+}
+
+.top {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+}
+
+.titles {
+    flex: 1;
+    min-width: 0;
+}
+
+.title {
+    overflow: hidden;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.artist {
+    overflow: hidden;
+    font-size: 0.8rem;
+    color: var(--theme-colors-foreground-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.controls {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.icon,
+.play {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    border-radius: 999px;
+    -webkit-app-region: no-drag;
+}
+
+.icon {
+    width: 28px;
+    height: 28px;
+}
+
+.icon:hover {
+    background: alpha(var(--theme-colors-foreground), 0.12);
+}
+
+.play {
+    width: 34px;
+    height: 34px;
+    color: var(--theme-colors-background);
+    background: var(--theme-colors-primary);
+}
+
+.time {
+    margin-left: 6px;
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--theme-colors-foreground-muted);
+}
+
+.seek {
+    height: 5px;
+    overflow: hidden;
+    cursor: pointer;
+    background: alpha(var(--theme-colors-foreground), 0.15);
+    border-radius: 3px;
+    -webkit-app-region: no-drag;
+}
+
+.seek > div {
+    height: 100%;
+    background: var(--theme-colors-primary);
+}
+
+.viz {
+    position: relative;
+    z-index: 1;
+    grid-column: 1 / -1;
+    height: 26px;
+    opacity: 0.85;
+}

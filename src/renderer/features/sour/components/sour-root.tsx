@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { HolidayLayer } from '/@/renderer/features/sour/components/holiday-layer';
+import { MiniPlayer } from '/@/renderer/features/sour/components/mini-player';
 import { SourSafe } from '/@/renderer/features/sour/components/sour-safe';
 import { applyAppIcon } from '/@/renderer/features/sour/skins/app-icon';
 import { currentHoliday, holidayById } from '/@/renderer/features/sour/skins/holidays';
@@ -124,6 +125,9 @@ export const SourRoot = () => (
         </SourSafe>
         <SourSafe name="holiday layer">
             <HolidayLayer />
+        </SourSafe>
+        <SourSafe name="mini player">
+            <MiniPlayer />
         </SourSafe>
     </>
 );

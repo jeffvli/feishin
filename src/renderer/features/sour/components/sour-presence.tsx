@@ -130,8 +130,13 @@ export const SourPresence = () => {
                     position: useTimestampStoreBase.getState().timestamp,
                 })
                 .catch((error: Error) => {
-                    // Hermes Music was reset or this is a different one: make a new profile
-                    if (/unknown profile/.test(error.message)) useSourStore.getState().setMe(null);
+                    // Hermes Music was reset or this is a different one: sign in again (unless this
+                    // computer already switched profiles, e.g. it just joined its Navidrome account)
+                    if (
+                        /unknown profile/.test(error.message) &&
+                        useSourStore.getState().me?.id === me.id
+                    )
+                        useSourStore.getState().setMe(null);
                 });
         };
         // your last plays on your profile (merged into the latest profile so nothing else is lost)

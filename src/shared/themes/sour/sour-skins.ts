@@ -228,7 +228,7 @@ export const sourMatcha = skin({
 // ---------- holidays ----------
 export const sourHalloween = skin({
     background: [20, 10, 24],
-    css: `h1 { font-family: "Sour Creepster", var(--theme-content-font-family); letter-spacing: 0.03em; }`,
+    css: `h1 { font-family: "Sour Creepster", var(--theme-content-font-family) !important; letter-spacing: 0.03em; }`,
     foreground: 'rgb(255, 236, 220)',
     muted: 'rgb(200, 160, 190)',
     primary: 'rgb(255, 117, 24)',
@@ -238,7 +238,7 @@ export const sourHalloween = skin({
 
 export const sourWinter = skin({
     background: [10, 26, 20],
-    css: `h1 { font-family: "Sour Mountains of Christmas", var(--theme-content-font-family); }`,
+    css: `h1 { font-family: "Sour Mountains of Christmas", var(--theme-content-font-family) !important; }`,
     foreground: 'rgb(236, 250, 242)',
     muted: 'rgb(160, 200, 180)',
     primary: 'rgb(229, 56, 59)',
@@ -257,7 +257,7 @@ export const sourNewYear = skin({
 
 export const sourValentine = skin({
     background: [36, 10, 22],
-    css: `h1 { font-family: "Sour Pacifico", var(--theme-content-font-family); }`,
+    css: `h1 { font-family: "Sour Pacifico", var(--theme-content-font-family) !important; font-weight: 400 !important; }`,
     foreground: 'rgb(255, 230, 240)',
     muted: 'rgb(226, 160, 190)',
     primary: 'rgb(255, 77, 141)',
