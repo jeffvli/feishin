@@ -1,0 +1,119 @@
+/* Sour Player look switches, applied as classes on <html> by the Sour look effects
+   (src/renderer/features/sour/components/look.tsx). */
+
+/* corners */
+:root.sour-corners-sharp {
+    --mantine-radius-default: 0;
+    --mantine-radius-xs: 0;
+    --mantine-radius-sm: 0;
+    --mantine-radius-md: 0;
+    --mantine-radius-lg: 0;
+    --mantine-radius-xl: 0;
+    --theme-radius-xs: 0;
+    --theme-radius-sm: 0;
+    --theme-radius-md: 0;
+    --theme-radius-lg: 0;
+    --theme-radius-xl: 0;
+}
+
+:root.sour-corners-round {
+    --mantine-radius-default: 14px;
+    --mantine-radius-xs: 6px;
+    --mantine-radius-sm: 10px;
+    --mantine-radius-md: 14px;
+    --mantine-radius-lg: 20px;
+    --mantine-radius-xl: 28px;
+    --theme-radius-xs: 6px;
+    --theme-radius-sm: 10px;
+    --theme-radius-md: 14px;
+    --theme-radius-lg: 20px;
+    --theme-radius-xl: 28px;
+}
+
+/* little press animation on buttons */
+.sour-press button:not(:disabled) {
+    transition: transform 0.08s ease-out;
+}
+
+.sour-press button:not(:disabled):active {
+    transform: scale(0.95);
+}
+
+/* lemon cursor */
+.sour-cursor,
+.sour-cursor body {
+    cursor:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cellipse cx='13' cy='14' rx='9' ry='7' transform='rotate(-35 13 14)' fill='%23F2C14E' stroke='%23856b10' stroke-width='1.5'/%3E%3Cpath d='M19 6 l3 -3' stroke='%2365a30d' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='4' cy='4' r='2.5' fill='%23fff' stroke='%23333'/%3E%3C/svg%3E")
+            3 3,
+        auto;
+}
+
+.sour-cursor a,
+.sour-cursor button,
+.sour-cursor [role='button'] {
+    cursor:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 26 26'%3E%3Cellipse cx='13' cy='14' rx='9' ry='7' transform='rotate(-35 13 14)' fill='%239BD06B' stroke='%23365314' stroke-width='1.5'/%3E%3Cpath d='M19 6 l3 -3' stroke='%2365a30d' stroke-width='2.5' stroke-linecap='round'/%3E%3Ccircle cx='4' cy='4' r='2.5' fill='%23fff' stroke='%23333'/%3E%3C/svg%3E")
+            3 3,
+        pointer;
+}
+
+/* floating player bar: rounded and lifted off the bottom edge */
+.sour-bar-floating #player-bar {
+    padding: 0 12px 10px;
+    background: transparent !important;
+}
+
+.sour-bar-floating #player-bar > div {
+    overflow: hidden;
+    background: var(--theme-colors-surface);
+    border: 1px solid alpha(var(--theme-colors-border), 0.8);
+    border-radius: 16px;
+    box-shadow: 0 8px 28px rgb(0 0 0 / 35%);
+}
+
+/* glass: see-through menus and popups */
+.sour-glass .mantine-Popover-dropdown,
+.sour-glass .mantine-Menu-dropdown,
+.sour-glass .mantine-Modal-content,
+.sour-glass .mantine-Drawer-content {
+    background: alpha(var(--theme-colors-surface), 0.72) !important;
+    backdrop-filter: blur(18px) saturate(1.4);
+}
+
+/* sidebar on the right (its width stays as it is; drag it back on the left to resize) */
+.sour-sidebar-right #main-content {
+    direction: rtl;
+}
+
+.sour-sidebar-right #main-content > * {
+    direction: ltr;
+}
+
+.sour-sidebar-right #left-sidebar [class*='resize'] {
+    display: none;
+}
+
+/* the mini player covers the whole (small) window */
+.sour-mini #default-layout {
+    visibility: hidden;
+}
+
+/* covers fade in instead of popping */
+.sour-fade-covers img {
+    animation: sour-fade-in 0.35s ease-out;
+}
+
+/* hidden app chrome while the Sour Stage is open */
+.sour-stage-open #player-bar {
+    z-index: 0;
+}
+
+@keyframes sour-fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

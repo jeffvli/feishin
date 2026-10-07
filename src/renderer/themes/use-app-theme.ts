@@ -17,6 +17,33 @@ import { AppTheme, AppThemeConfiguration } from '/@/shared/themes/app-theme-type
 import { FontType } from '/@/shared/types/types';
 
 export const THEME_DATA = [
+    { label: 'Sour Lemon', type: 'dark', value: AppTheme.SOUR_LEMON },
+    { label: 'Sour Lime', type: 'dark', value: AppTheme.SOUR_LIME },
+    { label: 'Sour Grapefruit', type: 'dark', value: AppTheme.SOUR_GRAPEFRUIT },
+    { label: 'Sour Blueberry', type: 'dark', value: AppTheme.SOUR_BLUEBERRY },
+    { label: 'Sour Midnight', type: 'dark', value: AppTheme.SOUR_MIDNIGHT },
+    { label: 'Sour OLED Black', type: 'dark', value: AppTheme.SOUR_OLED },
+    { label: 'Sour Vinyl', type: 'dark', value: AppTheme.SOUR_VINYL },
+    { label: 'Sour Retro (Winamp)', type: 'dark', value: AppTheme.SOUR_RETRO },
+    { label: 'Sour Glass', type: 'dark', value: AppTheme.SOUR_GLASS },
+    { label: 'Sour Vaporwave', type: 'dark', value: AppTheme.SOUR_VAPORWAVE },
+    { label: 'Sour Cherry Soda', type: 'dark', value: AppTheme.SOUR_CHERRY_SODA },
+    { label: 'Sour Mono', type: 'dark', value: AppTheme.SOUR_MONO },
+    { label: 'Sour Sunset', type: 'dark', value: AppTheme.SOUR_SUNSET },
+    { label: 'Sour Ocean', type: 'dark', value: AppTheme.SOUR_OCEAN },
+    { label: 'Sour Terminal', type: 'dark', value: AppTheme.SOUR_TERMINAL },
+    { label: 'Sour Candy', type: 'light', value: AppTheme.SOUR_CANDY },
+    { label: 'Sour Lemonade', type: 'light', value: AppTheme.SOUR_LEMONADE },
+    { label: 'Sour Matcha', type: 'light', value: AppTheme.SOUR_MATCHA },
+    { label: 'Sour Halloween (holiday)', type: 'dark', value: AppTheme.SOUR_HALLOWEEN },
+    { label: 'Sour Autumn (holiday)', type: 'dark', value: AppTheme.SOUR_AUTUMN },
+    { label: 'Sour Winter (holiday)', type: 'dark', value: AppTheme.SOUR_WINTER },
+    { label: 'Sour New Year (holiday)', type: 'dark', value: AppTheme.SOUR_NEW_YEAR },
+    { label: 'Sour Lunar New Year (holiday)', type: 'dark', value: AppTheme.SOUR_LUNAR },
+    { label: 'Sour Valentine (holiday)', type: 'dark', value: AppTheme.SOUR_VALENTINE },
+    { label: 'Sour Shamrock (holiday)', type: 'dark', value: AppTheme.SOUR_SHAMROCK },
+    { label: 'Sour Easter (holiday)', type: 'light', value: AppTheme.SOUR_EASTER },
+    { label: 'Sour Summer (holiday)', type: 'dark', value: AppTheme.SOUR_SUMMER },
     { label: 'Hermes Blue', type: 'dark', value: AppTheme.HERMES_BLUE },
     { label: 'Hermes Midnight', type: 'dark', value: AppTheme.HERMES_MIDNIGHT },
     { label: 'Hermes Ocean', type: 'dark', value: AppTheme.HERMES_OCEAN },
@@ -120,7 +147,7 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
             const root = document.documentElement;
             root.style.setProperty(
                 '--theme-content-font-family',
-                'dynamic-font, "Noto Sans JP", "Noto Sans Hebrew", sans-serif',
+                'dynamic-font, "Sour Emoji", "Noto Sans JP", "Noto Sans Hebrew", sans-serif',
             );
 
             if (!textStyleRef.current) {
@@ -137,7 +164,7 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
             const root = document.documentElement;
             root.style.setProperty(
                 '--theme-content-font-family',
-                'dynamic-font, "Noto Sans JP", "Noto Sans Hebrew", sans-serif',
+                'dynamic-font, "Sour Emoji", "Noto Sans JP", "Noto Sans Hebrew", sans-serif',
             );
 
             if (!textStyleRef.current) {
@@ -159,7 +186,7 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
             const root = document.documentElement;
             root.style.setProperty(
                 '--theme-content-font-family',
-                `${builtIn}, "Noto Sans JP", "Noto Sans Hebrew", sans-serif`,
+                `${builtIn}, "Sour Emoji", "Noto Sans JP", "Noto Sans Hebrew", sans-serif`,
             );
         }
     }, [builtIn, custom, system, type]);

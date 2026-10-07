@@ -1,0 +1,195 @@
+/* Sour Player: bundled fonts, colour emoji and the look switches (Settings > Sour Player and the
+   Sour Studio). Font licences: assets/fonts/sour/readme.txt */
+
+/* Twemoji, so emoji look the same (and in colour) on Windows, Linux and macOS. Only emoji code
+   points use it; everything else keeps the app font. */
+@font-face {
+    font-family: 'Sour Emoji';
+    src: url('../../../assets/fonts/twemoji.woff2') format('woff2');
+    font-display: swap;
+    unicode-range:
+        U+00A9, U+00AE, U+203C, U+2049, U+2122, U+2139, U+2194-2199, U+21A9-21AA, U+231A-231B,
+        U+2328, U+23CF, U+23E9-23F3, U+23F8-23FA, U+24C2, U+25AA-25AB, U+25B6, U+25C0,
+        U+25FB-25FE, U+2600-27BF, U+2934-2935, U+2B05-2B07, U+2B1B-2B1C, U+2B50, U+2B55, U+3030,
+        U+303D, U+3297, U+3299, U+FE0F, U+200D, U+20E3, U+1F000-1FAFF, U+E0020-E007F;
+}
+
+@font-face {
+    font-family: 'Sour Pacifico';
+    src: url('../../../assets/fonts/sour/pacifico.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Lobster';
+    src: url('../../../assets/fonts/sour/lobster.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Satisfy';
+    src: url('../../../assets/fonts/sour/satisfy.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Caveat';
+    src: url('../../../assets/fonts/sour/caveat.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Permanent Marker';
+    src: url('../../../assets/fonts/sour/permanent-marker.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Bangers';
+    src: url('../../../assets/fonts/sour/bangers.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Bebas Neue';
+    src: url('../../../assets/fonts/sour/bebas-neue.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Righteous';
+    src: url('../../../assets/fonts/sour/righteous.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Fredoka';
+    src: url('../../../assets/fonts/sour/fredoka.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Comfortaa';
+    src: url('../../../assets/fonts/sour/comfortaa.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Bungee';
+    src: url('../../../assets/fonts/sour/bungee.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Shrikhand';
+    src: url('../../../assets/fonts/sour/shrikhand.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Abril Fatface';
+    src: url('../../../assets/fonts/sour/abril-fatface.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Playfair Display';
+    src: url('../../../assets/fonts/sour/playfair-display.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Cinzel';
+    src: url('../../../assets/fonts/sour/cinzel.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Rye';
+    src: url('../../../assets/fonts/sour/rye.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Special Elite';
+    src: url('../../../assets/fonts/sour/special-elite.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Space Mono';
+    src: url('../../../assets/fonts/sour/space-mono.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Major Mono Display';
+    src: url('../../../assets/fonts/sour/major-mono-display.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour VT323';
+    src: url('../../../assets/fonts/sour/vt323.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Press Start 2P';
+    src: url('../../../assets/fonts/sour/press-start-2p.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Silkscreen';
+    src: url('../../../assets/fonts/sour/silkscreen.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Orbitron';
+    src: url('../../../assets/fonts/sour/orbitron.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Audiowide';
+    src: url('../../../assets/fonts/sour/audiowide.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Zen Dots';
+    src: url('../../../assets/fonts/sour/zen-dots.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Monoton';
+    src: url('../../../assets/fonts/sour/monoton.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Black Ops One';
+    src: url('../../../assets/fonts/sour/black-ops-one.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Creepster';
+    src: url('../../../assets/fonts/sour/creepster.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Nosifer';
+    src: url('../../../assets/fonts/sour/nosifer.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Mountains of Christmas';
+    src: url('../../../assets/fonts/sour/mountains-of-christmas.woff2') format('woff2');
+    font-display: swap;
+}

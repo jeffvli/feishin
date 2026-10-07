@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
+import { type GroupSong } from '/@/renderer/features/group-play/store/group-play.store';
 import { type Me, sourApi } from '/@/renderer/features/sour/api/sour-api';
 import { type Song } from '/@/shared/types/domain-types';
 
@@ -20,16 +21,72 @@ export interface SavedGroup {
     name: string;
 }
 
-// Sour Player's look and comfort switches (Settings > Sour Player)
+export type VisualizerStyle = 'bars' | 'glow' | 'halo' | 'orbit' | 'pulp' | 'river' | 'soul';
+
+// Sour Player's look and comfort switches (Settings > Sour Player and the Sour Studio)
 export interface SourLook {
     albumAccent: boolean;
     animatedBackground: boolean;
     autoVideo: boolean;
+    barLayout: 'classic' | 'floating';
+    barVisualizer: boolean;
+    corners: 'normal' | 'round' | 'sharp';
+    cursor: boolean;
+    dailyTheme: boolean;
+    density: number;
+    fadeCovers: boolean;
+    glass: boolean;
     hiddenButtons: string[];
+    holidays: boolean;
+    hoverPreview: boolean;
+    iconPack: string;
+    lyricStyle: 'centered' | 'huge' | 'karaoke';
+    pressFx: boolean;
     reducedMotion: boolean;
     seasonal: boolean;
+    sidebarRight: boolean;
+    socialToasts: boolean;
+    splash: boolean;
+    stageScene: 'drive' | 'none' | 'rain' | 'snow' | 'stars';
+    stageVinyl: boolean;
     startupSound: boolean;
+    visualizer: VisualizerStyle;
 }
+
+// a song played on this computer (queue history, "on repeat")
+export interface HistoryEntry {
+    at: number;
+    song: GroupSong;
+}
+
+export const DEFAULT_LOOK: SourLook = {
+    albumAccent: false,
+    animatedBackground: false,
+    autoVideo: false,
+    barLayout: 'classic',
+    barVisualizer: true,
+    corners: 'normal',
+    cursor: false,
+    dailyTheme: false,
+    density: 1,
+    fadeCovers: true,
+    glass: false,
+    hiddenButtons: [],
+    holidays: true,
+    hoverPreview: false,
+    iconPack: 'classic',
+    lyricStyle: 'centered',
+    pressFx: true,
+    reducedMotion: false,
+    seasonal: false,
+    sidebarRight: false,
+    socialToasts: true,
+    splash: true,
+    stageScene: 'none',
+    stageVinyl: false,
+    startupSound: false,
+    visualizer: 'bars',
+};
 
 interface BlockedArtist {
     id: null | string;
@@ -42,13 +99,18 @@ interface SourStore {
     block: (artist: BlockedArtist) => void;
     blocked: BlockedArtist[];
     crossfade: Record<string, number>;
+    greeted: string;
+    history: HistoryEntry[];
+    holidayRestore: null | { holiday: string; theme: string };
     lastInbox: number;
+    lastSocial: number;
     listenAlong: null | string;
     look: SourLook;
     me: Me | null;
     notes: Record<string, string>;
     pins: Pin[];
     savedGroups: SavedGroup[];
+    repeatNotified: Record<string, string>;
     seenMilestones: string[];
     set: (changes: Partial<Omit<SourStore, 'block' | 'set' | 'setLook' | 'unblock'>>) => void;
     setLook: (changes: Partial<SourLook>) => void;
@@ -67,20 +129,17 @@ export const useSourStore = createWithEqualityFn<SourStore>()(
                 ),
             blocked: [],
             crossfade: {},
+            greeted: '',
+            history: [],
+            holidayRestore: null,
             lastInbox: 0,
+            lastSocial: 0,
             listenAlong: null,
-            look: {
-                albumAccent: false,
-                animatedBackground: false,
-                autoVideo: false,
-                hiddenButtons: [],
-                reducedMotion: false,
-                seasonal: false,
-                startupSound: false,
-            },
+            look: DEFAULT_LOOK,
             me: null,
             notes: {},
             pins: [],
+            repeatNotified: {},
             savedGroups: [],
             seenMilestones: [],
             set: (changes) => set(changes),
@@ -96,7 +155,16 @@ export const useSourStore = createWithEqualityFn<SourStore>()(
         {
             merge: (persisted, current) => {
                 const saved = (persisted || {}) as Partial<SourStore>;
-                return { ...current, ...saved, look: { ...current.look, ...(saved.look || {}) } };
+                const look = { ...current.look, ...(saved.look || {}) };
+                // older versions could leave odd values behind; keep the look within range
+                look.density = Math.min(1.25, Math.max(0.8, Number(look.density) || 1));
+                if (!Array.isArray(look.hiddenButtons)) look.hiddenButtons = [];
+                return {
+                    ...current,
+                    ...saved,
+                    history: Array.isArray(saved.history) ? saved.history.slice(0, 300) : [],
+                    look,
+                };
             },
             name: 'sour-player',
         },

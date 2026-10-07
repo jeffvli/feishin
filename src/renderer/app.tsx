@@ -28,6 +28,8 @@ import { useAppTheme } from '/@/renderer/themes/use-app-theme';
 import { sanitizeCss } from '/@/renderer/utils/sanitize';
 import { WebAudio } from '/@/shared/types/types';
 import '/@/shared/styles/global.css';
+import '/@/shared/styles/sour-fonts.css';
+import '/@/shared/styles/sour.css';
 import { PlayerProvider } from '/@/renderer/features/player/context/player-context';
 import { AudioPlayers } from '/@/renderer/features/player/components/audio-players';
 import { ReleaseNotesModal } from '/@/renderer/release-notes-modal';
