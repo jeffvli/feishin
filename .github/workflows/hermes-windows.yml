@@ -114,8 +114,10 @@ jobs:
                   body: |
                       Feishin with Hermes Music video sync and Group Play.
 
-                      **Already installed?** Feishin updates itself: it downloads this version
-                      in the background and installs it the next time you close Feishin.
+                      **Already installed?** Feishin downloads this version in the background and
+                      shows an **Update** button in the player bar - click it to restart into the new
+                      version (or it installs the next time you close Feishin). Works on Windows and on
+                      Linux with the AppImage or the .deb (the .tar.xz has to be updated by hand).
 
                       **Windows:** download the file ending in `-win-x64.exe` (most PCs). If Windows warns that the app
                       is unrecognised, click More info > Run anyway.

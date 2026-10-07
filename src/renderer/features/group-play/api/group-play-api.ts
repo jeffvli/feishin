@@ -32,6 +32,7 @@ export const toGroupSong = (song: Song): GroupSong => ({
     artist: song.artistName,
     duration: song.duration,
     id: song.id,
+    imageId: song.imageId ?? null,
     title: song.name,
 });
 

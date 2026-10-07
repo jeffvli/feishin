@@ -166,6 +166,26 @@ const rendererOpenReleaseNotes = (cb: () => void) => {
     ipcRenderer.on('renderer-open-release-notes', () => cb());
 };
 
+// Hermes Music edition: background update progress, and restarting into a downloaded update
+export interface HermesUpdate {
+    percent?: number;
+    state: 'downloading' | 'ready';
+    version: string;
+}
+
+const hermesUpdateListener = (cb: (update: HermesUpdate) => void) => {
+    const listener = (_: unknown, update: HermesUpdate) => cb(update);
+    ipcRenderer.on('hermes-update', listener);
+    return () => {
+        ipcRenderer.removeListener('hermes-update', listener);
+    };
+};
+
+const hermesUpdateState = (): Promise<HermesUpdate | null> =>
+    ipcRenderer.invoke('hermes-update-state');
+
+const hermesUpdateInstall = () => ipcRenderer.send('hermes-update-install');
+
 const rendererUpdateAvailable = (cb: (version: string) => void) => {
     ipcRenderer.on('update-available', (_, version) => cb(version));
 };
@@ -179,6 +199,9 @@ export const utils = {
     exportDiagnostics,
     forceGarbageCollection,
     getCustomCss,
+    hermesUpdateInstall,
+    hermesUpdateListener,
+    hermesUpdateState,
     isLinux,
     isMacOS,
     isWindows,

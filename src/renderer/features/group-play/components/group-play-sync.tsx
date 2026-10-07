@@ -34,6 +34,7 @@ export const GroupPlaySync = () => {
     const failed = useRef<null | string>(null);
     const applying = useRef(new Set<string>());
     const applied = useRef<string[]>([]);
+    const adding = useRef<Promise<unknown>>(Promise.resolve());
 
     // live group state
     useEffect(() => {
@@ -144,8 +145,13 @@ export const GroupPlaySync = () => {
             .filter((request) => !applying.current.has(request.rid))
             .forEach((request) => {
                 applying.current.add(request.rid);
-                getSongById({ id: request.song.id, queryClient, serverId })
-                    .then((res) => addToQueueByData(Play.LAST, res.items))
+                // one at a time, in order, so the first song into an empty group is the one that plays
+                adding.current = adding.current
+                    .then(() => getSongById({ id: request.song.id, queryClient, serverId }))
+                    .then((res) => {
+                        const empty = usePlayerStoreBase.getState().getQueue().items.length === 0;
+                        return addToQueueByData(empty ? Play.NOW : Play.LAST, res.items);
+                    })
                     .then(() =>
                         toast.info({ message: `${request.by} added ${request.song.title}` }),
                     )

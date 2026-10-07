@@ -12,7 +12,7 @@ import {
     useGroupPlayStore,
 } from '/@/renderer/features/group-play/store/group-play.store';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
-import { usePlayerSong } from '/@/renderer/store';
+import { useCurrentServer } from '/@/renderer/store';
 import { usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
@@ -32,7 +32,7 @@ const hue = (name: string) =>
 const Avatar = ({ host, name, small }: { host?: boolean; name: string; small?: boolean }) => (
     <span
         className={small ? styles.avatarSmall : styles.avatar}
-        style={{ background: `hsl(${hue(name)} 55% 45%)` }}
+        style={{ background: `hsl(${hue(name)} 60% 42%)` }}
         title={host ? `${name} (host)` : name}
     >
         {(name.trim()[0] || '?').toUpperCase()}
@@ -40,13 +40,39 @@ const Avatar = ({ host, name, small }: { host?: boolean; name: string; small?: b
     </span>
 );
 
-// Group Play, like a Spotify Jam: create or join a group, see who is listening, what is playing and
-// who added each song. Guests add songs and remove their own; the host can let them control playback.
+// album cover from the shared music server (each person's Feishin loads it from its own login)
+const Cover = ({ className, song }: { className: string; song?: GroupSong }) => {
+    const serverId = useCurrentServer()?.id;
+    return (
+        <div className={className}>
+            {song?.imageId && serverId && (
+                <ItemImage
+                    className={styles.coverImage}
+                    containerClassName={styles.coverImage}
+                    id={song.imageId}
+                    itemType={LibraryItem.SONG}
+                    serverId={serverId}
+                    type="table"
+                />
+            )}
+        </div>
+    );
+};
+
+const AddedBy = ({ me, name }: { me: string; name: string }) => (
+    <span className={styles.addedBy}>
+        <Avatar name={name} small />
+        {name === me ? 'You' : name}
+    </span>
+);
+
+// Group Play, like a Spotify Jam: create or join a group, see who is listening, what is playing
+// and who added each song. Guests add songs and remove their own; the host can let them control
+// playback.
 export const GroupPlayPanel = () => {
     const url = useHermesUrl();
     const { code, hostKey, member, role, state, userName } = useGroupPlayStore();
     const actions = useGroupPlayActions();
-    const current = usePlayerSong();
     const [joinCode, setJoinCode] = useState('');
     const [groupName, setGroupName] = useState('');
     const [busy, setBusy] = useState(false);
@@ -73,77 +99,77 @@ export const GroupPlayPanel = () => {
 
     if (!code) {
         const name = userName.trim() || 'Guest';
+        const start = () =>
+            run(async () => {
+                const res = await groupApi.create(url, groupName, name);
+                // a group starts with an empty queue; the first song anyone adds starts it
+                const player = usePlayerStoreBase.getState();
+                player.mediaStop();
+                player.clearQueue();
+                actions.setSession({ code: res.code, hostKey: res.hostKey, role: 'host' });
+                actions.setState(res.state);
+            });
+        const join = () =>
+            run(async () => {
+                const res = await groupApi.join(url, joinCode.trim(), name);
+                actions.setSession({ code: joinCode.trim(), member: res.member, role: 'member' });
+                actions.setState(res.state);
+            });
         return (
             <Stack gap="lg">
+                <div className={styles.hero}>
+                    <Text className={styles.eyebrow}>Group Play</Text>
+                    <Text fw={800} size="xl">
+                        Listen together
+                    </Text>
+                    <Text size="sm">
+                        Everyone hears the same song at the same moment and adds to one shared
+                        queue.
+                    </Text>
+                </div>
                 <TextInput
                     label="Your name"
                     onChange={(e) => actions.setUserName(e.currentTarget.value)}
                     placeholder="Shown to the others"
                     value={userName}
                 />
-                <Stack gap="xs">
-                    <Text fw={600}>Start a group</Text>
-                    <Text isMuted size="sm">
-                        Everyone listens to the same song at the same time and adds to one shared
-                        queue. Your Feishin plays the music.
-                    </Text>
-                    <Group gap="xs" wrap="nowrap">
+                <div className={styles.choices}>
+                    <div className={styles.choice}>
+                        <Text fw={700}>Start a group</Text>
+                        <Text isMuted size="sm">
+                            You host it: your Feishin plays the music.
+                        </Text>
                         <TextInput
-                            flex={1}
                             onChange={(e) => setGroupName(e.currentTarget.value)}
                             placeholder="Group name (optional)"
                             value={groupName}
                         />
-                        <Button
-                            disabled={busy}
-                            onClick={() =>
-                                run(async () => {
-                                    const res = await groupApi.create(url, groupName, name);
-                                    actions.setSession({
-                                        code: res.code,
-                                        hostKey: res.hostKey,
-                                        role: 'host',
-                                    });
-                                    actions.setState(res.state);
-                                })
-                            }
-                            variant="filled"
-                        >
+                        <Button disabled={busy} fullWidth onClick={start} variant="filled">
                             Start
                         </Button>
-                    </Group>
-                </Stack>
-                <Stack gap="xs">
-                    <Text fw={600}>Join a group</Text>
-                    <Text isMuted size="sm">
-                        Type the 5-letter code from the host.
-                    </Text>
-                    <Group gap="xs" wrap="nowrap">
+                    </div>
+                    <div className={styles.choice}>
+                        <Text fw={700}>Join a group</Text>
+                        <Text isMuted size="sm">
+                            Type the 5-letter code from the host.
+                        </Text>
                         <TextInput
-                            flex={1}
+                            classNames={{ input: styles.codeInput }}
+                            maxLength={5}
                             onChange={(e) => setJoinCode(e.currentTarget.value.toUpperCase())}
-                            placeholder="Group code"
+                            placeholder="ABCDE"
                             value={joinCode}
                         />
                         <Button
                             disabled={busy || joinCode.trim().length !== 5}
-                            onClick={() =>
-                                run(async () => {
-                                    const res = await groupApi.join(url, joinCode.trim(), name);
-                                    actions.setSession({
-                                        code: joinCode.trim(),
-                                        member: res.member,
-                                        role: 'member',
-                                    });
-                                    actions.setState(res.state);
-                                })
-                            }
+                            fullWidth
+                            onClick={join}
                             variant="filled"
                         >
                             Join
                         </Button>
-                    </Group>
-                </Stack>
+                    </div>
+                </div>
             </Stack>
         );
     }
@@ -157,7 +183,7 @@ export const GroupPlayPanel = () => {
     const nowPlaying = queue[index];
     const upNext = queue.slice(index + 1).map((song, i) => ({ at: index + 1 + i, song }));
     const listening = (state?.members.length ?? 0) + 1;
-    const showCover = !!current && !!nowPlaying && current.id === nowPlaying.id;
+    const status = !nowPlaying ? 'Waiting for songs' : state?.playing ? 'Now playing' : 'Paused';
 
     // the host's own controls act on its player right away; guests' go through Hermes Music
     const control = (cmd: GroupControl, at = -1, song?: GroupSong) => {
@@ -205,64 +231,63 @@ export const GroupPlayPanel = () => {
 
     return (
         <Stack gap="md">
-            <Group justify="space-between" wrap="nowrap">
-                <Stack gap={4}>
-                    <Text fw={700} size="lg">
-                        {state?.name || 'Group Play'}
-                    </Text>
-                    <Group gap={4}>
-                        <Avatar host name={hostName} />
-                        {(state?.members ?? []).map((m) => (
-                            <Avatar key={m.id} name={m.name} />
-                        ))}
-                        <Text isMuted ml={6} size="sm">
-                            {listening} listening
+            <div className={styles.hero}>
+                <Group align="flex-start" justify="space-between" wrap="nowrap">
+                    <Stack gap={6} miw={0}>
+                        <Text className={styles.eyebrow}>Group Play</Text>
+                        <Text fw={800} size="xl" truncate>
+                            {state?.name || 'Group Play'}
                         </Text>
-                    </Group>
-                </Stack>
-                <Stack align="flex-end" gap={4}>
-                    <Text className={styles.code}>{code}</Text>
-                    <CopyButton value={invite}>
-                        {({ copied, copy }) => (
-                            <Button onClick={copy} size="compact-xs" variant="default">
-                                {copied ? 'Copied' : 'Copy invite'}
-                            </Button>
-                        )}
-                    </CopyButton>
-                </Stack>
-            </Group>
+                        <Group gap={6}>
+                            <span className={styles.avatars}>
+                                <Avatar host name={hostName} />
+                                {(state?.members ?? []).map((m) => (
+                                    <Avatar key={m.id} name={m.name} />
+                                ))}
+                            </span>
+                            <Text size="sm">{listening} listening</Text>
+                        </Group>
+                    </Stack>
+                    <div className={styles.codeBox}>
+                        <Text className={styles.eyebrow}>Code</Text>
+                        <Text className={styles.code}>{code}</Text>
+                        <CopyButton value={invite}>
+                            {({ copied, copy }) => (
+                                <Button onClick={copy} size="compact-xs" variant="default">
+                                    {copied ? 'Copied!' : 'Copy invite'}
+                                </Button>
+                            )}
+                        </CopyButton>
+                    </div>
+                </Group>
+            </div>
 
             <div className={styles.nowPlaying}>
-                <div className={styles.cover}>
-                    {showCover && (
-                        <ItemImage
-                            className={styles.coverImage}
-                            containerClassName={styles.coverImage}
-                            id={current.imageId}
-                            itemType={LibraryItem.SONG}
-                            serverId={current._serverId}
-                            type="table"
-                        />
-                    )}
-                </div>
-                <Stack flex={1} gap={2} miw={0}>
-                    <Text isMuted size="xs">
-                        {state?.playing ? 'NOW PLAYING' : 'PAUSED'}
+                <Cover className={styles.coverLarge} song={nowPlaying} />
+                <Stack flex={1} gap={4} miw={0}>
+                    <Text className={styles.eyebrow}>
+                        {status}
                     </Text>
-                    <Text fw={600} truncate>
-                        {nowPlaying ? nowPlaying.title : 'Nothing playing yet'}
-                    </Text>
-                    {nowPlaying && (
-                        <Group gap={6} wrap="nowrap">
-                            <Avatar name={nowPlaying.by || hostName} small />
+                    {nowPlaying ? (
+                        <>
+                            <Text fw={700} size="lg" truncate>
+                                {nowPlaying.title}
+                            </Text>
                             <Text isMuted size="sm" truncate>
                                 {nowPlaying.artist}
+                                {nowPlaying.album ? ` - ${nowPlaying.album}` : ''}
                             </Text>
-                        </Group>
+                            <AddedBy me={me} name={nowPlaying.by || hostName} />
+                        </>
+                    ) : (
+                        <Text isMuted size="sm">
+                            Right-click any song &gt; Add to group queue. The first song added
+                            starts playing for everyone.
+                        </Text>
                     )}
                 </Stack>
-                {canControl && (
-                    <Group gap={2} wrap="nowrap">
+                {canControl && nowPlaying && (
+                    <Group gap={4} wrap="nowrap">
                         <ActionIcon
                             icon="mediaPrevious"
                             onClick={() => control('previous')}
@@ -272,7 +297,7 @@ export const GroupPlayPanel = () => {
                         <ActionIcon
                             icon={state?.playing ? 'mediaPause' : 'mediaPlay'}
                             onClick={() => control(state?.playing ? 'pause' : 'play')}
-                            size="lg"
+                            size="xl"
                             tooltip={{ label: state?.playing ? 'Pause' : 'Play' }}
                             variant="filled"
                         />
@@ -286,24 +311,32 @@ export const GroupPlayPanel = () => {
                 )}
             </div>
 
-            <Stack gap={6}>
-                <Text fw={600} size="sm">
-                    Up next
-                </Text>
+            <Stack gap={8}>
+                <Group justify="space-between">
+                    <Text fw={700}>Up next</Text>
+                    <Text isMuted size="sm">
+                        {upNext.length} {upNext.length === 1 ? 'song' : 'songs'}
+                    </Text>
+                </Group>
                 <div className={styles.queue}>
                     {upNext.map(({ at, song }) => (
                         <div className={styles.row} key={`${song.id}-${at}`}>
-                            <Avatar name={song.by || hostName} small />
-                            <span className={styles.title}>
-                                {song.title}
-                                <span className={styles.artist}> - {song.artist}</span>
-                            </span>
+                            <Cover className={styles.coverSmall} song={song} />
+                            <div className={styles.songText}>
+                                <Text fw={600} size="sm" truncate>
+                                    {song.title}
+                                </Text>
+                                <Text isMuted size="xs" truncate>
+                                    {song.artist}
+                                </Text>
+                            </div>
+                            <AddedBy me={me} name={song.by || hostName} />
                             <span className={styles.rowActions}>
                                 {canControl && (
                                     <ActionIcon
                                         icon="mediaPlay"
                                         onClick={() => control('playIndex', at, song)}
-                                        size="xs"
+                                        size="sm"
                                         tooltip={{ label: 'Play now' }}
                                         variant="subtle"
                                     />
@@ -312,7 +345,7 @@ export const GroupPlayPanel = () => {
                                     <ActionIcon
                                         icon="mediaPlayNext"
                                         onClick={() => control('playNext', at, song)}
-                                        size="xs"
+                                        size="sm"
                                         tooltip={{ label: 'Play next' }}
                                         variant="subtle"
                                     />
@@ -321,7 +354,7 @@ export const GroupPlayPanel = () => {
                                     <ActionIcon
                                         icon="x"
                                         onClick={() => control('remove', at, song)}
-                                        size="xs"
+                                        size="sm"
                                         tooltip={{ label: 'Remove' }}
                                         variant="subtle"
                                     />
@@ -330,15 +363,15 @@ export const GroupPlayPanel = () => {
                         </div>
                     ))}
                     {!upNext.length && (
-                        <Text isMuted p="sm" size="sm">
-                            Nothing queued. Right-click any song &gt; Add to group queue.
+                        <Text className={styles.empty} isMuted size="sm">
+                            Nothing up next. Right-click any song &gt; Add to group queue.
                         </Text>
                     )}
                 </div>
             </Stack>
 
             {isHost && (
-                <Stack gap="xs">
+                <div className={styles.settings}>
                     <Switch
                         checked={!!state?.guestControl}
                         description="Guests can play, pause, skip, reorder and remove any song. They can always add songs and remove their own."
@@ -347,22 +380,22 @@ export const GroupPlayPanel = () => {
                     />
                     {!!state?.members.length && (
                         <Group gap="xs">
-                            <Text isMuted size="xs">
-                                Remove:
-                            </Text>
                             {state.members.map((m) => (
-                                <Button
-                                    key={m.id}
-                                    onClick={() => kick(m.id)}
-                                    size="compact-xs"
-                                    variant="default"
-                                >
+                                <span className={styles.person} key={m.id}>
+                                    <Avatar name={m.name} small />
                                     {m.name}
-                                </Button>
+                                    <ActionIcon
+                                        icon="x"
+                                        onClick={() => kick(m.id)}
+                                        size="xs"
+                                        tooltip={{ label: `Remove ${m.name} from the group` }}
+                                        variant="subtle"
+                                    />
+                                </span>
                             ))}
                         </Group>
                     )}
-                </Stack>
+                </div>
             )}
             {!isHost && !state?.guestControl && (
                 <Text isMuted size="xs">
@@ -371,7 +404,7 @@ export const GroupPlayPanel = () => {
             )}
 
             <Group justify="flex-end">
-                <Button color="red" disabled={busy} onClick={leave} variant="subtle">
+                <Button color="red" disabled={busy} onClick={leave} variant="light">
                     {isHost ? 'End group' : 'Leave group'}
                 </Button>
             </Group>

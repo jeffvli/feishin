@@ -1,26 +1,20 @@
-import { useTranslation } from 'react-i18next';
-
-import { toTag } from '/@/renderer/hooks';
-import { useLatestVersion } from '/@/renderer/store';
+import {
+    installHermesUpdate,
+    useHermesUpdate,
+} from '/@/renderer/features/hermes-update/components/hermes-update-button';
 import { Button } from '/@/shared/components/button/button';
 
+// Hermes Music edition: shown once an update has downloaded; clicking restarts into it.
 export const UpdateAvailableButton = () => {
-    const { t } = useTranslation();
-    const { currentVersion, isUpdateAvailable, latestVersion } = useLatestVersion();
+    const update = useHermesUpdate();
 
-    if (!isUpdateAvailable || !latestVersion) {
+    if (update?.state !== 'ready') {
         return null;
     }
 
     return (
-        <Button
-            component="a"
-            href={`https://github.com/jeffvli/feishin/releases/tag/${toTag(latestVersion || currentVersion)}`}
-            size="compact-sm"
-            target="_blank"
-            variant="filled"
-        >
-            {t('common.newVersionAvailable')}: v{latestVersion}
+        <Button onClick={installHermesUpdate} size="compact-sm" variant="filled">
+            Update to v{update.version}
         </Button>
     );
 };

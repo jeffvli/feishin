@@ -37,6 +37,7 @@ export interface GroupSong {
     by?: string;
     duration: number;
     id: string;
+    imageId?: null | string;
     title: string;
 }
 
