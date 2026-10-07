@@ -65,7 +65,10 @@ export const groupApi = {
     list: async (base: string) => {
         const res = await fetch(`${base}/api/group/list`);
         if (!res.ok) throw new Error(`Hermes Music returned ${res.status}`);
-        return (await res.json()) as GroupListing[];
+        const list = await res.json().catch(() => null);
+        // a wrong address answers with a web page instead of Hermes Music's list
+        if (!Array.isArray(list)) throw new Error("That address doesn't answer like Hermes Music");
+        return list as GroupListing[];
     },
     // change your picture while in a group
     profile: (

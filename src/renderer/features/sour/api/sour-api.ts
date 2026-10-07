@@ -30,6 +30,9 @@ export interface SourProfile {
     status: string;
 }
 
+const NOT_HERMES =
+    "That address doesn't answer like Hermes Music (Settings > General > Music videos)";
+
 const call = async <T>(url: string, body?: unknown): Promise<T> => {
     const res = await fetch(
         url,
@@ -41,8 +44,10 @@ const call = async <T>(url: string, body?: unknown): Promise<T> => {
                   method: 'POST',
               },
     );
-    const json = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(json.error || `Hermes Music returned ${res.status}`);
+    const json = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(json?.error || `Hermes Music returned ${res.status}`);
+    // a wrong address (Umbrel's own page, Navidrome...) answers with a web page, not Hermes Music
+    if (json === null || typeof json !== 'object') throw new Error(NOT_HERMES);
     return json as T;
 };
 
@@ -61,7 +66,11 @@ export const bannerUrl = (base: string, profile?: null | Pick<SourProfile, 'bann
 
 // Sour Player's side of Hermes Music: profiles, who's online and playlist themes.
 export const sourApi = {
-    list: (base: string) => call<SourProfile[]>(`${base}/api/profiles`),
+    list: async (base: string) => {
+        const list = await call<SourProfile[]>(`${base}/api/profiles`);
+        if (!Array.isArray(list)) throw new Error(NOT_HERMES);
+        return list;
+    },
     playlistTheme: async (base: string, playlistId: string) => {
         const res = await fetch(`${base}/api/playlist-themes/${encodeURIComponent(playlistId)}`);
         if (res.status === 404) return null;

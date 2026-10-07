@@ -122,7 +122,11 @@ const RequestPanel = () => {
         queryFn: async () => {
             const res = await fetch(`${url}/api/requests`);
             if (!res.ok) throw new Error(`Hermes Music returned ${res.status}`);
-            return (await res.json()) as HermesRequest[];
+            const list = await res.json().catch(() => null);
+            if (!Array.isArray(list)) {
+                throw new Error("That address doesn't answer like Hermes Music");
+            }
+            return list as HermesRequest[];
         },
         queryKey: ['hermes-requests', url],
         refetchInterval: 4000,
