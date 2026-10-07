@@ -69,7 +69,7 @@ export const ProfileAvatar = ({
     );
 };
 
-const SongCover = ({ song, size }: { size: number; song: GroupSong }) => {
+const SongCover = ({ size, song }: { size: number; song: GroupSong }) => {
     const serverId = useCurrentServer()?.id;
     return (
         <div className={styles.cover} style={{ height: size, width: size }}>

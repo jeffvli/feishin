@@ -79,10 +79,10 @@ const MusicVideoTools = () => {
 
     const wrong = () =>
         run(async () => {
-            const r = await post<{ removed?: boolean; title?: string }>(
-                `${url}/api/videos/wrong`,
-                { artist: song.artistName, title: song.name },
-            );
+            const r = await post<{ removed?: boolean; title?: string }>(`${url}/api/videos/wrong`, {
+                artist: song.artistName,
+                title: song.name,
+            });
             if (r.removed) return 'No other video matches, so it was removed';
             return 'Trying the next video';
         });

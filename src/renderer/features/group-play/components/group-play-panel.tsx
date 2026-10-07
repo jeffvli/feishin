@@ -581,9 +581,9 @@ export const GroupPlayPanel = () => {
             )}
             {isRadio && (
                 <Text isMuted size="xs">
-                    Sour Radio is always on: random songs from the library, plus anything people
-                    add (right-click a song &gt; Add to group queue). Half the listeners voting
-                    skips a song.
+                    Sour Radio is always on: random songs from the library, plus anything people add
+                    (right-click a song &gt; Add to group queue). Half the listeners voting skips a
+                    song.
                 </Text>
             )}
             {!isRadio && !isHost && !state?.guestControl && (
