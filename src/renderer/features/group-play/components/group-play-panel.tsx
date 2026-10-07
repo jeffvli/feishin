@@ -233,17 +233,18 @@ export const GroupPlayPanel = () => {
             </Group>
 
             <div className={styles.nowPlaying}>
-                {showCover ? (
-                    <ItemImage
-                        className={styles.cover}
-                        id={current.imageId}
-                        itemType={LibraryItem.SONG}
-                        serverId={current._serverId}
-                        type="table"
-                    />
-                ) : (
-                    <div className={styles.cover} />
-                )}
+                <div className={styles.cover}>
+                    {showCover && (
+                        <ItemImage
+                            className={styles.coverImage}
+                            containerClassName={styles.coverImage}
+                            id={current.imageId}
+                            itemType={LibraryItem.SONG}
+                            serverId={current._serverId}
+                            type="table"
+                        />
+                    )}
+                </div>
                 <Stack flex={1} gap={2} miw={0}>
                     <Text isMuted size="xs">
                         {state?.playing ? 'NOW PLAYING' : 'PAUSED'}

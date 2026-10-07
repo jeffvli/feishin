@@ -44,12 +44,19 @@
 }
 
 .cover {
-    flex-shrink: 0;
+    position: relative;
+    flex: 0 0 64px;
     width: 64px;
     height: 64px;
     overflow: hidden;
     background: rgb(255 255 255 / 8%);
     border-radius: 6px;
+}
+
+.cover-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .queue {
