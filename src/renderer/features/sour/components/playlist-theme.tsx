@@ -100,9 +100,7 @@ const PlaylistThemeEditor = ({ playlistId }: { playlistId: string }) => {
                     checked={crossfade !== undefined}
                     description="Only on this computer. Your usual crossfade comes back when you play something else."
                     label="Own crossfade for this playlist"
-                    onChange={(e) =>
-                        setCrossfade(e.currentTarget.checked ? 6 : undefined)
-                    }
+                    onChange={(e) => setCrossfade(e.currentTarget.checked ? 6 : undefined)}
                 />
                 {crossfade !== undefined && (
                     <Slider

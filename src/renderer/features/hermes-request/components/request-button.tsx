@@ -43,12 +43,14 @@ const SECRETS: Record<string, () => void> = {
         window.setTimeout(() => document.body.classList.remove('sour-disco'), 6000);
     },
     '/lemon': () => {
-        for (let i = 0; i < 18; i++) window.setTimeout(() => useReactions.getState().add('🍋', ''), i * 120);
+        for (let i = 0; i < 18; i++)
+            window.setTimeout(() => useReactions.getState().add('🍋', ''), i * 120);
         playSound('lemon');
     },
     '/party': () => {
         const all = ['🎉', '🥳', '🎊', '✨', '🔥'];
-        for (let i = 0; i < 24; i++) window.setTimeout(() => useReactions.getState().add(all[i % all.length], ''), i * 90);
+        for (let i = 0; i < 24; i++)
+            window.setTimeout(() => useReactions.getState().add(all[i % all.length], ''), i * 90);
         playSound('airhorn');
     },
     '/sour': () => {
@@ -182,7 +184,12 @@ const RequestPanel = () => {
         setBusy(true);
         try {
             const res = await fetch(`${url}/api/requests`, {
-                body: JSON.stringify({ by: userName.trim() || undefined, profile: me?.id, query, type }),
+                body: JSON.stringify({
+                    by: userName.trim() || undefined,
+                    profile: me?.id,
+                    query,
+                    type,
+                }),
                 headers: { 'content-type': 'application/json' },
                 method: 'POST',
             });
@@ -303,7 +310,9 @@ const RequestPanel = () => {
                             </span>
                             {r.status === 'pending' && me && (
                                 <button
-                                    className={r.voters?.includes(me.id) ? styles.voted : styles.vote}
+                                    className={
+                                        r.voters?.includes(me.id) ? styles.voted : styles.vote
+                                    }
                                     onClick={() => vote(r)}
                                     title="Upvote: most-wanted downloads first"
                                     type="button"

@@ -53,6 +53,14 @@ export interface GroupRequest {
     song: GroupSong;
 }
 
+export interface GroupShow {
+    end: number;
+    id: string;
+    name: string;
+    profile: string;
+    start: number;
+}
+
 export interface GroupSong {
     album: string;
     artist: string;
@@ -61,14 +69,6 @@ export interface GroupSong {
     id: string;
     imageId?: null | string;
     title: string;
-}
-
-export interface GroupShow {
-    end: number;
-    id: string;
-    name: string;
-    profile: string;
-    start: number;
 }
 
 export interface GroupState {
@@ -127,15 +127,15 @@ interface GroupPlayStore {
         setState: (state: GroupState) => void;
         setUserName: (userName: string) => void;
     };
-    panelOpen: boolean;
-    played: GroupSong[];
-    sleepAt: null | number;
     avatar: null | string;
     clockOffset: number;
     code: null | string;
     hostKey: null | string;
     member: null | string;
+    panelOpen: boolean;
+    played: GroupSong[];
     role: 'host' | 'member' | null;
+    sleepAt: null | number;
     state: GroupState | null;
     userName: string;
 }
@@ -154,13 +154,13 @@ export const useGroupPlayStore = createWithEqualityFn<GroupPlayStore>()(
             },
             avatar: null,
             clockOffset: 0,
-            panelOpen: false,
-            played: [],
-            sleepAt: null,
             code: null,
             hostKey: null,
             member: null,
+            panelOpen: false,
+            played: [],
             role: null,
+            sleepAt: null,
             state: null,
             userName: '',
         }),

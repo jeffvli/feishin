@@ -72,7 +72,8 @@ export const playsSince = (n: number) => {
     const counts = new Map<string, number>();
     for (const [day, songs] of Object.entries(days)) {
         if (day < from) continue;
-        for (const [id, count] of Object.entries(songs)) counts.set(id, (counts.get(id) ?? 0) + count);
+        for (const [id, count] of Object.entries(songs))
+            counts.set(id, (counts.get(id) ?? 0) + count);
     }
     return [...counts.entries()]
         .map(([id, count]) => ({ count, entry: plays[id] }))

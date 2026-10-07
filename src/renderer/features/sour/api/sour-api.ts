@@ -57,8 +57,8 @@ export interface ProfileCustom {
     header?: string;
     hiddenSongs?: string[];
     invisible?: boolean;
-    jokes?: string;
     joinSound?: string;
+    jokes?: string;
     nameEffect?: string;
     nameFont?: string;
     nickname?: string;
@@ -73,7 +73,7 @@ export interface ProfileCustom {
     recentPlays?: GroupSong[];
     sections?: { hidden: string[]; order: string[] };
     signatureSong?: GroupSong | null;
-    spotlight?: { song: GroupSong; week: string } | null;
+    spotlight?: null | { song: GroupSong; week: string };
     spotlightHistory?: { song: GroupSong; week: string }[];
     stickers?: { emoji: string; x: number; y: number }[];
     theme?: { accent?: string; background?: string; card?: string };

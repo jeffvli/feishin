@@ -41,7 +41,9 @@ export const playSound = (name?: string) => {
         } else if (name === 'airhorn') {
             for (const f of [440, 554, 659]) tone(ctx, 'sawtooth', f, f * 0.98, 0, 0.6, 0.06);
         } else if (name === 'lemon') {
-            [523, 659, 784, 1046].forEach((f, i) => tone(ctx, 'square', f, f, i * 0.09, 0.15, 0.05));
+            [523, 659, 784, 1046].forEach((f, i) =>
+                tone(ctx, 'square', f, f, i * 0.09, 0.15, 0.05),
+            );
         }
     } catch {
         // no audio device: stay quiet

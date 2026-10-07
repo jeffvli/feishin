@@ -32,7 +32,10 @@ const who = () => {
 
 // save songs as a playlist on the music server (Group Play sessions, blends)
 export const saveAsPlaylist = async (serverId: string, name: string, songs: GroupSong[]) => {
-    const created = await api.controller.createPlaylist({ apiClientProps: { serverId }, body: { name } });
+    const created = await api.controller.createPlaylist({
+        apiClientProps: { serverId },
+        body: { name },
+    });
     if (!created?.id) throw new Error("The music server didn't make the playlist");
     await api.controller.addToPlaylist({
         apiClientProps: { serverId },
@@ -139,7 +142,9 @@ export const HostTools = ({ state }: { state: GroupState }) => {
     const set = (changes: { djRotation?: boolean; watchVideo?: boolean }) =>
         code &&
         hostKey &&
-        groupApi.settings(url, code, hostKey, changes).catch((error: Error) => toast.error({ message: error.message }));
+        groupApi
+            .settings(url, code, hostKey, changes)
+            .catch((error: Error) => toast.error({ message: error.message }));
     return (
         <Stack gap="xs">
             <Switch
@@ -162,8 +167,16 @@ export const HostTools = ({ state }: { state: GroupState }) => {
                     disabled={!played.length || !serverId}
                     onClick={() =>
                         serverId &&
-                        saveAsPlaylist(serverId, `${state.name} - ${new Date().toLocaleDateString()}`, played)
-                            .then(() => toast.success({ message: `Saved ${played.length} songs as a playlist` }))
+                        saveAsPlaylist(
+                            serverId,
+                            `${state.name} - ${new Date().toLocaleDateString()}`,
+                            played,
+                        )
+                            .then(() =>
+                                toast.success({
+                                    message: `Saved ${played.length} songs as a playlist`,
+                                }),
+                            )
                             .catch((error: Error) => toast.error({ message: error.message }))
                     }
                     size="xs"
@@ -198,7 +211,9 @@ export const StationTools = ({ state }: { state: GroupState }) => {
                     {[30, 60, 90].map((m) => (
                         <Button
                             key={m}
-                            onClick={() => useGroupPlayStore.setState({ sleepAt: Date.now() + m * 60000 })}
+                            onClick={() =>
+                                useGroupPlayStore.setState({ sleepAt: Date.now() + m * 60000 })
+                            }
                             size="compact-xs"
                             variant="default"
                         >
@@ -207,7 +222,11 @@ export const StationTools = ({ state }: { state: GroupState }) => {
                     ))}
                     {sleepAt && (
                         <Text isMuted size="xs">
-                            stops at {new Date(sleepAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            stops at{' '}
+                            {new Date(sleepAt).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            })}
                         </Text>
                     )}
                 </Group>
@@ -219,7 +238,9 @@ export const StationTools = ({ state }: { state: GroupState }) => {
                 onChange={() =>
                     code &&
                     member &&
-                    groupApi.control(url, code, member, 'guess').catch((error: Error) => toast.error({ message: error.message }))
+                    groupApi
+                        .control(url, code, member, 'guess')
+                        .catch((error: Error) => toast.error({ message: error.message }))
                 }
             />
             {state.guess && !!upNext.length && member && (
@@ -232,7 +253,11 @@ export const StationTools = ({ state }: { state: GroupState }) => {
                             <Select
                                 data={names}
                                 onChange={(name) =>
-                                    name && code && groupApi.guess(url, code, member, s.id, name).then(() => toast.info({ message: 'Guess saved' }))
+                                    name &&
+                                    code &&
+                                    groupApi
+                                        .guess(url, code, member, s.id, name)
+                                        .then(() => toast.info({ message: 'Guess saved' }))
                                 }
                                 placeholder="Who added it?"
                                 size="xs"
@@ -256,7 +281,11 @@ export const StationTools = ({ state }: { state: GroupState }) => {
             {state.show && (
                 <Text size="sm">
                     Live now: <b>{state.show.name}</b> (until{' '}
-                    {new Date(state.show.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})
+                    {new Date(state.show.end).toLocaleTimeString([], {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                    })}
+                    )
                 </Text>
             )}
             {(state.schedule ?? [])
@@ -265,12 +294,23 @@ export const StationTools = ({ state }: { state: GroupState }) => {
                 .map((s) => (
                     <Group gap="xs" key={s.id}>
                         <Text size="xs">
-                            {new Date(s.start).toLocaleString([], { hour: '2-digit', minute: '2-digit', weekday: 'short' })}{' '}
+                            {new Date(s.start).toLocaleString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                weekday: 'short',
+                            })}{' '}
                             - {s.name}
                         </Text>
                         {me && s.profile === me.id && (
                             <Button
-                                onClick={() => code && groupApi.schedule(url, code, { cancel: s.id, key: me.key, profile: me.id })}
+                                onClick={() =>
+                                    code &&
+                                    groupApi.schedule(url, code, {
+                                        cancel: s.id,
+                                        key: me.key,
+                                        profile: me.id,
+                                    })
+                                }
                                 size="compact-xs"
                                 variant="subtle"
                             >
@@ -281,7 +321,12 @@ export const StationTools = ({ state }: { state: GroupState }) => {
                 ))}
             {me && (
                 <Group gap="xs" wrap="nowrap">
-                    <TextInput onChange={(e) => setStart(e.currentTarget.value)} size="xs" type="datetime-local" value={start} />
+                    <TextInput
+                        onChange={(e) => setStart(e.currentTarget.value)}
+                        size="xs"
+                        type="datetime-local"
+                        value={start}
+                    />
                     <Select
                         data={['30', '60', '90', '120', '180']}
                         onChange={(v) => setMinutes(v || '60')}
@@ -323,12 +368,20 @@ export const StationTools = ({ state }: { state: GroupState }) => {
                     ))}
                     {!!stats.data.songs.length && (
                         <Text isMuted size="xs">
-                            Most played here: {stats.data.songs.slice(0, 3).map((s) => `${s.title} (${s.plays})`).join(', ')}
+                            Most played here:{' '}
+                            {stats.data.songs
+                                .slice(0, 3)
+                                .map((s) => `${s.title} (${s.plays})`)
+                                .join(', ')}
                         </Text>
                     )}
                     {!!stats.data.adders.length && (
                         <Text isMuted size="xs">
-                            Adds the most: {stats.data.adders.slice(0, 3).map((a) => `${a.name} (${a.songs})`).join(', ')}
+                            Adds the most:{' '}
+                            {stats.data.adders
+                                .slice(0, 3)
+                                .map((a) => `${a.name} (${a.songs})`)
+                                .join(', ')}
                         </Text>
                     )}
                 </>
@@ -366,18 +419,25 @@ export const RoomAndSaved = ({ onStart }: { onStart: (name: string) => void }) =
         <Stack gap="xs">
             <Text fw={700}>Your room</Text>
             <Text isMuted size="sm">
-                Your own always-on station: it keeps playing (random songs plus anything people add) even
-                when you&#39;re not there. You can skip and remove songs in it.
+                Your own always-on station: it keeps playing (random songs plus anything people add)
+                even when you&#39;re not there. You can skip and remove songs in it.
             </Text>
             <Group gap="xs">
-                <TextInput onChange={(e) => setRoomName(e.currentTarget.value)} placeholder="Room name" size="xs" value={roomName} />
+                <TextInput
+                    onChange={(e) => setRoomName(e.currentTarget.value)}
+                    placeholder="Room name"
+                    size="xs"
+                    value={roomName}
+                />
                 <Button
                     disabled={!me}
                     onClick={() =>
                         me &&
                         groupApi
                             .room(url, me.id, me.key, roomName)
-                            .then((r) => toast.success({ message: `${r.name} is open (code ${r.code})` }))
+                            .then((r) =>
+                                toast.success({ message: `${r.name} is open (code ${r.code})` }),
+                            )
                             .catch((error: Error) => toast.error({ message: error.message }))
                     }
                     size="xs"
@@ -387,7 +447,12 @@ export const RoomAndSaved = ({ onStart }: { onStart: (name: string) => void }) =
                 </Button>
                 <Button
                     disabled={!me}
-                    onClick={() => me && groupApi.room(url, me.id, me.key, '', true).then(() => toast.info({ message: 'Room closed' }))}
+                    onClick={() =>
+                        me &&
+                        groupApi
+                            .room(url, me.id, me.key, '', true)
+                            .then(() => toast.info({ message: 'Room closed' }))
+                    }
                     size="xs"
                     variant="subtle"
                 >
@@ -428,7 +493,8 @@ const PartyMode = () => {
             <Text className={styles.partyTitle}>{song?.title ?? 'Waiting for songs'}</Text>
             <Text size="xl">{song?.artist}</Text>
             <Text isMuted size="sm">
-                {song?.by ? `added by ${song.by}` : ''} - {state ? state.members.length + (state.radio ? 0 : 1) : 0} listening
+                {song?.by ? `added by ${song.by}` : ''} -{' '}
+                {state ? state.members.length + (state.radio ? 0 : 1) : 0} listening
             </Text>
             <Stack gap={4} mt="xl">
                 {next.map((s, i) => (
@@ -449,7 +515,12 @@ export const saveGroupSettings = (state: GroupState) => {
     set({
         savedGroups: [
             ...savedGroups.filter((g) => g.name !== state.name),
-            { djRotation: !!state.djRotation, guestControl: state.guestControl, listed: state.listed, name: state.name },
+            {
+                djRotation: !!state.djRotation,
+                guestControl: state.guestControl,
+                listed: state.listed,
+                name: state.name,
+            },
         ].slice(-10),
     });
 };

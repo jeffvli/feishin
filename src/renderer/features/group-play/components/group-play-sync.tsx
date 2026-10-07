@@ -113,14 +113,17 @@ export const GroupPlaySync = () => {
         });
         events.addEventListener('joined', (event) => {
             const j = JSON.parse((event as MessageEvent).data) as { profile: null | string };
-            const profiles = queryClientRef.current.getQueryData<{ custom?: { joinSound?: string }; id: string }[]>([
-                'sour-profiles',
-                url,
-            ]);
+            const profiles = queryClientRef.current.getQueryData<
+                { custom?: { joinSound?: string }; id: string }[]
+            >(['sour-profiles', url]);
             playSound(profiles?.find((p) => p.id === j.profile)?.custom?.joinSound);
         });
         events.addEventListener('reveal', (event) => {
-            const r = JSON.parse((event as MessageEvent).data) as { by: string; right: string[]; title: string };
+            const r = JSON.parse((event as MessageEvent).data) as {
+                by: string;
+                right: string[];
+                title: string;
+            };
             toast.info({
                 message: `${r.title} was ${r.by}'s pick${r.right.length ? ` - ${r.right.join(', ')} guessed right` : ''}`,
             });
@@ -236,7 +239,10 @@ export const GroupPlaySync = () => {
         let stopped = false;
         const random = (extra: { genre?: string; maxYear?: number }) =>
             queryClient.fetchQuery({
-                ...songsQueries.random({ query: { limit: 10, played: Played.All, ...extra }, serverId }),
+                ...songsQueries.random({
+                    query: { limit: 10, played: Played.All, ...extra },
+                    serverId,
+                }),
                 queryKey: ['group-radio-fill', Date.now(), extra],
             });
         const fill = async () => {
@@ -278,7 +284,9 @@ export const GroupPlaySync = () => {
         }
         if (role === 'host') {
             useGroupPlayStore.setState((s) =>
-                s.played[s.played.length - 1]?.id === song.id ? s : { played: [...s.played, song].slice(-200) },
+                s.played[s.played.length - 1]?.id === song.id
+                    ? s
+                    : { played: [...s.played, song].slice(-200) },
             );
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -8,7 +8,11 @@ ipcMain.on('sour-mini', (event, on: boolean) => {
     const win = BrowserWindow.fromWebContents(event.sender);
     if (!win) return;
     if (on && !saved) {
-        saved = { bounds: win.getBounds(), minimum: win.getMinimumSize(), onTop: win.isAlwaysOnTop() };
+        saved = {
+            bounds: win.getBounds(),
+            minimum: win.getMinimumSize(),
+            onTop: win.isAlwaysOnTop(),
+        };
         if (win.isMaximized()) win.unmaximize();
         win.setMinimumSize(360, 100);
         win.setSize(520, 140);

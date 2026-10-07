@@ -32,7 +32,7 @@ export const ProfileAvatar = ({
     size = 40,
 }: {
     online?: boolean;
-    profile: Pick<SourProfile, 'avatar' | 'id' | 'name'> & Partial<Pick<SourProfile, 'custom'>>;
+    profile: Partial<Pick<SourProfile, 'custom'>> & Pick<SourProfile, 'avatar' | 'id' | 'name'>;
     size?: number;
 }) => {
     const url = useHermesUrl();

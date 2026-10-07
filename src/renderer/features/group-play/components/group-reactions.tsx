@@ -16,8 +16,13 @@ export const useReactions = create<{
 }>((set) => ({
     add: (emoji, by) => {
         const id = Date.now() + Math.random();
-        set((state) => ({ list: [...state.list, { by, emoji, id, left: 10 + Math.random() * 70 }].slice(-20) }));
-        window.setTimeout(() => set((state) => ({ list: state.list.filter((r) => r.id !== id) })), 3200);
+        set((state) => ({
+            list: [...state.list, { by, emoji, id, left: 10 + Math.random() * 70 }].slice(-20),
+        }));
+        window.setTimeout(
+            () => set((state) => ({ list: state.list.filter((r) => r.id !== id) })),
+            3200,
+        );
     },
     list: [],
 }));

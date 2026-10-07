@@ -10,7 +10,11 @@ import { playsSince } from '/@/renderer/features/hermes-plays/store/play-count.s
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { getSongById } from '/@/renderer/features/player/utils';
 import { readPicture, sourApi, type SourProfile } from '/@/renderer/features/sour/api/sour-api';
-import { ProfileAvatar, SongCover, usePlaySong } from '/@/renderer/features/sour/components/profile-bits';
+import {
+    ProfileAvatar,
+    SongCover,
+    usePlaySong,
+} from '/@/renderer/features/sour/components/profile-bits';
 import { useSourProfiles, useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { useCurrentServer, usePlayerSong } from '/@/renderer/store';
 import { addToQueueByData, usePlayerStoreBase } from '/@/renderer/store/player.store';
@@ -61,7 +65,11 @@ const FriendGroupPage = () => {
         <Stack gap="md">
             <div className={styles.groupHero}>
                 {g.picture ? (
-                    <img alt="" className={styles.groupPic} src={`${url}/api/friend-group/picture?v=${g.picture}`} />
+                    <img
+                        alt=""
+                        className={styles.groupPic}
+                        src={`${url}/api/friend-group/picture?v=${g.picture}`}
+                    />
                 ) : (
                     <div className={styles.groupPic} />
                 )}
@@ -82,8 +90,18 @@ const FriendGroupPage = () => {
             {g.bio && <Text className={styles.bio}>{g.bio}</Text>}
             {editing ? (
                 <Stack gap="xs">
-                    <TextInput label="Group name" onChange={(e) => setName(e.currentTarget.value)} value={name} />
-                    <Textarea autosize label="About the group" minRows={3} onChange={(e) => setBio(e.currentTarget.value)} value={bio} />
+                    <TextInput
+                        label="Group name"
+                        onChange={(e) => setName(e.currentTarget.value)}
+                        value={name}
+                    />
+                    <Textarea
+                        autosize
+                        label="About the group"
+                        minRows={3}
+                        onChange={(e) => setBio(e.currentTarget.value)}
+                        value={bio}
+                    />
                     <Group gap="xs">
                         <FileButton
                             accept="image/png,image/jpeg,image/webp,image/gif"
@@ -91,7 +109,9 @@ const FriendGroupPage = () => {
                                 file &&
                                 readPicture(file, 800, 6000000)
                                     .then((picture) => save({ picture }))
-                                    .catch((error: Error) => toast.error({ message: error.message }))
+                                    .catch((error: Error) =>
+                                        toast.error({ message: error.message }),
+                                    )
                             }
                         >
                             {(props) => (
@@ -128,7 +148,12 @@ const FriendGroupPage = () => {
             )}
             <Text fw={700}>The group&#39;s top songs this week</Text>
             {g.topSongs.map((s, i) => (
-                <button className={styles.favoriteSong} key={s.id} onClick={() => playSong(s)} type="button">
+                <button
+                    className={styles.favoriteSong}
+                    key={s.id}
+                    onClick={() => playSong(s)}
+                    type="button"
+                >
                     <Text w={18}>{i + 1}</Text>
                     <SongCover size={36} song={s} />
                     <Stack gap={0} miw={0}>
@@ -141,7 +166,11 @@ const FriendGroupPage = () => {
                     </Stack>
                 </button>
             ))}
-            {!g.topSongs.length && <Text isMuted size="sm">Nothing played this week yet.</Text>}
+            {!g.topSongs.length && (
+                <Text isMuted size="sm">
+                    Nothing played this week yet.
+                </Text>
+            )}
         </Stack>
     );
 };
@@ -158,7 +187,12 @@ export const LeaderboardList = ({ limit }: { limit?: number }) => {
         refetchInterval: 60000,
     });
     const list = (rows.data ?? []).slice(0, limit ?? 20);
-    if (!list.length) return <Text isMuted size="sm">Nobody has listened this week yet.</Text>;
+    if (!list.length)
+        return (
+            <Text isMuted size="sm">
+                Nobody has listened this week yet.
+            </Text>
+        );
     return (
         <Stack gap={6}>
             {list.map((r, i) => (
@@ -203,7 +237,10 @@ const Recap = ({ days, title }: { days: number; title: string }) => {
     for (const x of list) artists.set(x.entry.artist, (artists.get(x.entry.artist) ?? 0) + x.count);
     const topArtists = [...artists.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5);
     const [slide, setSlide] = useState(0);
-    if (!list.length) return <Text isMuted>No plays on this computer yet - check back after some listening.</Text>;
+    if (!list.length)
+        return (
+            <Text isMuted>No plays on this computer yet - check back after some listening.</Text>
+        );
     const slides: ReactNode[] = [
         <Stack align="center" gap={4} key="minutes">
             <Text className={styles.recapBig}>{minutes.toLocaleString()}</Text>
@@ -218,7 +255,11 @@ const Recap = ({ days, title }: { days: number; title: string }) => {
             </Text>
             <Text className={styles.recapBig}>{topArtists[0]?.[0]}</Text>
             <Text isMuted size="sm">
-                then {topArtists.slice(1).map((a) => a[0]).join(', ') || 'nobody else'}
+                then{' '}
+                {topArtists
+                    .slice(1)
+                    .map((a) => a[0])
+                    .join(', ') || 'nobody else'}
             </Text>
         </Stack>,
         <Stack gap={6} key="songs">
@@ -257,13 +298,21 @@ const Recap = ({ days, title }: { days: number; title: string }) => {
             <Text className={styles.eyebrow}>{title}</Text>
             <div className={styles.recapSlide}>{slides[slide]}</div>
             <Group justify="space-between">
-                <Button disabled={slide === 0} onClick={() => setSlide(slide - 1)} variant="default">
+                <Button
+                    disabled={slide === 0}
+                    onClick={() => setSlide(slide - 1)}
+                    variant="default"
+                >
                     Back
                 </Button>
                 <Text isMuted size="xs">
                     {slide + 1} / {slides.length}
                 </Text>
-                <Button disabled={slide === slides.length - 1} onClick={() => setSlide(slide + 1)} variant="filled">
+                <Button
+                    disabled={slide === slides.length - 1}
+                    onClick={() => setSlide(slide + 1)}
+                    variant="filled"
+                >
                     Next
                 </Button>
             </Group>
@@ -271,7 +320,11 @@ const Recap = ({ days, title }: { days: number; title: string }) => {
     );
 };
 export const openRecap = () =>
-    openModal({ children: <Recap days={7} title="Your week" />, size: 'md', title: 'Weekly recap' });
+    openModal({
+        children: <Recap days={7} title="Your week" />,
+        size: 'md',
+        title: 'Weekly recap',
+    });
 export const openYearInReview = () =>
     openModal({
         children: <Recap days={365} title="Your year" />,
@@ -289,7 +342,8 @@ export const useBlend = () => {
         const right = b?.stats?.topSongs ?? [];
         const mix: GroupSong[] = [];
         for (let i = 0; i < Math.max(left.length, right.length) && mix.length < 40; i++) {
-            for (const s of [left[i], right[i]]) if (s && !mix.some((m) => m.id === s.id)) mix.push(s);
+            for (const s of [left[i], right[i]])
+                if (s && !mix.some((m) => m.id === s.id)) mix.push(s);
         }
         if (!mix.length) {
             toast.info({ message: 'Not enough listening yet to blend - play some music first' });
@@ -329,7 +383,10 @@ export const ListenAlong = () => {
             const elapsed = p.playing ? (Date.now() - p.positionAt) / 1000 : 0;
             const target = p.position + elapsed;
             const player = usePlayerStoreBase.getState();
-            if (player.getCurrentSong()?.id !== p.listening.id && lastSong.current !== p.listening.id) {
+            if (
+                player.getCurrentSong()?.id !== p.listening.id &&
+                lastSong.current !== p.listening.id
+            ) {
                 lastSong.current = p.listening.id;
                 await playSong(p.listening, target);
                 return;
@@ -394,11 +451,16 @@ export const SocialWatcher = () => {
                     for (const ping of box.pings) notify('Wake up!', `${ping.fromName} pinged you`);
                     for (const n of box.notes) {
                         notify(
-                            n.song ? `${n.fromName} dedicated a song to you` : `${n.fromName} wrote on your wall`,
+                            n.song
+                                ? `${n.fromName} dedicated a song to you`
+                                : `${n.fromName} wrote on your wall`,
                             n.song ? (
                                 <Group gap="xs">
                                     <Text size="sm">{n.song.title}</Text>
-                                    <Button onClick={() => n.song && playSong(n.song)} size="compact-xs">
+                                    <Button
+                                        onClick={() => n.song && playSong(n.song)}
+                                        size="compact-xs"
+                                    >
                                         Play
                                     </Button>
                                 </Group>
@@ -426,7 +488,8 @@ export const SocialWatcher = () => {
                     const fresh = list.filter((m) => !seenMilestones.includes(m.id));
                     if (!fresh.length) return;
                     // the first time, just remember the old ones instead of celebrating them all
-                    if (seenMilestones.length) for (const m of fresh) notify('Group milestone', m.text, 12000);
+                    if (seenMilestones.length)
+                        for (const m of fresh) notify('Group milestone', m.text, 12000);
                     set({ seenMilestones: [...seenMilestones, ...fresh.map((m) => m.id)] });
                 })
                 .catch(() => {});
@@ -448,7 +511,10 @@ export const SocialWatcher = () => {
                         const before = statuses.current.get(r.id);
                         statuses.current.set(r.id, r.status);
                         if (before && before !== 'done' && r.status === 'done' && !isDnd()) {
-                            notify('Request ready', `${r.title || r.query} is in the library (after the next scan)`);
+                            notify(
+                                'Request ready',
+                                `${r.title || r.query} is in the library (after the next scan)`,
+                            );
                         }
                         if (before && before !== 'failed' && r.status === 'failed' && !isDnd()) {
                             notify('Request failed', r.title || r.query);
@@ -473,9 +539,7 @@ export const SocialWatcher = () => {
                 notify(
                     'Pick up where you left off?',
                     <Group gap="xs">
-                        <Text size="sm">
-                            {r.song.title} on your other computer
-                        </Text>
+                        <Text size="sm">{r.song.title} on your other computer</Text>
                         <Button onClick={() => playSong(r.song, r.position)} size="compact-xs">
                             Resume
                         </Button>

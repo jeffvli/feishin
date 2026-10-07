@@ -55,7 +55,8 @@ export const LookEffects = () => {
         const root = document.documentElement;
         if (wantColor && background) root.style.setProperty('--sour-album-color', background);
         else root.style.removeProperty('--sour-album-color');
-        if (look.albumAccent && background) root.style.setProperty('--theme-colors-primary', background);
+        if (look.albumAccent && background)
+            root.style.setProperty('--theme-colors-primary', background);
         else root.style.removeProperty('--theme-colors-primary');
     }, [background, look.albumAccent, wantColor]);
 
@@ -117,7 +118,8 @@ export const Shortcuts = ({ onRequest }: { onRequest: () => void }) => {
     const url = useHermesUrl();
     useEffect(() => {
         const onKey = (e: KeyboardEvent) => {
-            const typing = /input|textarea|select/i.test((e.target as HTMLElement)?.tagName ?? '') ||
+            const typing =
+                /input|textarea|select/i.test((e.target as HTMLElement)?.tagName ?? '') ||
                 (e.target as HTMLElement)?.isContentEditable;
             if (e.key === '?' && !typing) {
                 openModal({
@@ -161,12 +163,22 @@ export const FriendChips = () => {
     const song = usePlayerSong();
     const me = useSourStore((state) => state.me);
     const profiles = useSourProfiles().data ?? [];
-    const same = profiles.filter((p) => p.id !== me?.id && p.online && p.listening?.id === song?.id);
+    const same = profiles.filter(
+        (p) => p.id !== me?.id && p.online && p.listening?.id === song?.id,
+    );
     if (!song || !same.length) return null;
     return (
-        <span className={styles.chips} title={`Also playing for ${same.map((p) => p.name).join(', ')}`}>
+        <span
+            className={styles.chips}
+            title={`Also playing for ${same.map((p) => p.name).join(', ')}`}
+        >
             {same.slice(0, 3).map((p) => (
-                <button className={styles.chip} key={p.id} onClick={() => openProfile(p)} type="button">
+                <button
+                    className={styles.chip}
+                    key={p.id}
+                    onClick={() => openProfile(p)}
+                    type="button"
+                >
                     <ProfileAvatar profile={p} size={20} />
                 </button>
             ))}
@@ -210,8 +222,18 @@ export const SidebarPins = () => {
                         <button
                             className={styles.pinButton}
                             onClick={() => {
-                                if (p.kind === 'album') navigate(generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: p.id }));
-                                else if (p.kind === 'playlist') navigate(generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, { playlistId: p.id }));
+                                if (p.kind === 'album')
+                                    navigate(
+                                        generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, {
+                                            albumId: p.id,
+                                        }),
+                                    );
+                                else if (p.kind === 'playlist')
+                                    navigate(
+                                        generatePath(AppRoute.PLAYLISTS_DETAIL_SONGS, {
+                                            playlistId: p.id,
+                                        }),
+                                    );
                                 else openProfile({ id: p.id, name: p.name });
                             }}
                             type="button"

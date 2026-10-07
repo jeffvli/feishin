@@ -76,7 +76,9 @@ export const SourPresence = () => {
             if (!profile) return;
             const before = (profile.custom?.recentPlays ?? []).map((s) => s.id).join();
             if (before === plays.map((s) => s.id).join()) return;
-            await sourApi.update(url, me, { custom: { ...profile.custom, recentPlays: plays } }).catch(() => {});
+            await sourApi
+                .update(url, me, { custom: { ...profile.custom, recentPlays: plays } })
+                .catch(() => {});
         };
         beat();
         const timer = setInterval(beat, 15000);

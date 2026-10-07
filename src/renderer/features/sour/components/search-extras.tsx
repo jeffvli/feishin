@@ -37,7 +37,12 @@ export const SearchExtras = () => {
         const { userName } = useGroupPlayStore.getState();
         try {
             const res = await fetch(`${url}/api/requests`, {
-                body: JSON.stringify({ by: userName || undefined, profile: me?.id, query, type: 'song' }),
+                body: JSON.stringify({
+                    by: userName || undefined,
+                    profile: me?.id,
+                    query,
+                    type: 'song',
+                }),
                 headers: { 'content-type': 'application/json' },
                 method: 'POST',
             });
@@ -66,7 +71,12 @@ export const SearchExtras = () => {
         <div className={styles.strip}>
             <Group gap="xs">
                 <Text size="sm">Not in the library?</Text>
-                <Button disabled={asked === query} onClick={request} size="compact-xs" variant="filled">
+                <Button
+                    disabled={asked === query}
+                    onClick={request}
+                    size="compact-xs"
+                    variant="filled"
+                >
                     {asked === query ? 'Requested' : `Request "${query}" from Hermes Music`}
                 </Button>
             </Group>
@@ -76,7 +86,12 @@ export const SearchExtras = () => {
                         People:
                     </Text>
                     {people.slice(0, 6).map((p) => (
-                        <button className={styles.person} key={p.id} onClick={() => openProfile(p)} type="button">
+                        <button
+                            className={styles.person}
+                            key={p.id}
+                            onClick={() => openProfile(p)}
+                            type="button"
+                        >
                             <ProfileAvatar online={p.online} profile={p} size={22} />
                             <Text size="sm">{p.name}</Text>
                         </button>
@@ -89,7 +104,12 @@ export const SearchExtras = () => {
                         Groups:
                     </Text>
                     {rooms.slice(0, 6).map((g) => (
-                        <Button key={g.code} onClick={() => join(g.code)} size="compact-xs" variant="default">
+                        <Button
+                            key={g.code}
+                            onClick={() => join(g.code)}
+                            size="compact-xs"
+                            variant="default"
+                        >
                             {g.name}
                         </Button>
                     ))}

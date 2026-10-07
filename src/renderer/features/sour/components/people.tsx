@@ -138,7 +138,8 @@ export const PeopleButton = () => {
     );
 };
 
-export const openPeople = () => openModal({ children: <PeoplePanel />, size: 'xl', title: 'People' });
+export const openPeople = () =>
+    openModal({ children: <PeoplePanel />, size: 'xl', title: 'People' });
 
 // Opens one person's profile (from Group Play, the sidebar, search...).
 export const openProfile = (profile: Pick<SourProfile, 'id' | 'name'>) =>

@@ -6,11 +6,6 @@ import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-vid
 import { type Me, sourApi } from '/@/renderer/features/sour/api/sour-api';
 import { type Song } from '/@/shared/types/domain-types';
 
-interface BlockedArtist {
-    id: null | string;
-    name: string;
-}
-
 export interface Pin {
     id: string;
     imageId: null | string;
@@ -34,6 +29,11 @@ export interface SourLook {
     reducedMotion: boolean;
     seasonal: boolean;
     startupSound: boolean;
+}
+
+interface BlockedArtist {
+    id: null | string;
+    name: string;
 }
 
 // This computer's Sour Player state: the profile key (what lets it change the profile), blocked

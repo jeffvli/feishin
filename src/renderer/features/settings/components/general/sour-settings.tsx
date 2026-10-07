@@ -41,15 +41,32 @@ export const SourSettings = memo(() => {
                     Open People
                 </Button>
             ),
-            description: 'Your profile, who is online, the group page, the leaderboard and your recaps.',
+            description:
+                'Your profile, who is online, the group page, the leaderboard and your recaps.',
             title: 'Profile and friends',
         },
-        toggle('albumAccent', 'Accent colour from the album', 'The app accent follows the cover of the song that is playing.'),
-        toggle('animatedBackground', 'Animated background', 'A slow moving gradient in the album colours behind the pages.'),
-        toggle('seasonal', 'Seasonal themes', 'Switches to a Hermes theme that fits the time of year when Sour Player starts.'),
+        toggle(
+            'albumAccent',
+            'Accent colour from the album',
+            'The app accent follows the cover of the song that is playing.',
+        ),
+        toggle(
+            'animatedBackground',
+            'Animated background',
+            'A slow moving gradient in the album colours behind the pages.',
+        ),
+        toggle(
+            'seasonal',
+            'Seasonal themes',
+            'Switches to a Hermes theme that fits the time of year when Sour Player starts.',
+        ),
         toggle('startupSound', 'Startup sound', 'A short jingle when Sour Player opens.'),
         toggle('reducedMotion', 'Reduce motion', 'Turns off animations and transitions.'),
-        toggle('autoVideo', 'Open music videos by themselves', 'A small video window opens when a song with a music video starts.'),
+        toggle(
+            'autoVideo',
+            'Open music videos by themselves',
+            'A small video window opens when a song with a music video starts.',
+        ),
         ...BUTTONS.map(([id, label]) => ({
             control: (
                 <Switch

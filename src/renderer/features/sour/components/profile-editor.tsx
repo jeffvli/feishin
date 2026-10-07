@@ -45,7 +45,13 @@ type Draft = Pick<SourProfile, 'away' | 'bio' | 'color' | 'custom' | 'name' | 's
 
 // Edit your own profile with a live preview next to it. Nothing is saved until you press Save;
 // Undo puts everything back to how it was when you opened the editor.
-export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile: SourProfile }) => {
+export const ProfileEditor = ({
+    onDone,
+    profile,
+}: {
+    onDone: () => void;
+    profile: SourProfile;
+}) => {
     const url = useHermesUrl();
     const me = useSourStore((state) => state.me);
     const setStore = useSourStore((state) => state.set);
@@ -160,7 +166,9 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
                                 sourApi
                                     .restoreAvatar(url, me, v)
                                     .then(refresh)
-                                    .catch((error: Error) => toast.error({ message: error.message }))
+                                    .catch((error: Error) =>
+                                        toast.error({ message: error.message }),
+                                    )
                             }
                             title="Use this picture again"
                             type="button"
@@ -178,12 +186,20 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
                     </Text>
                     <Slider
                         label={(v) => `left/right ${v}%`}
-                        onChange={(x) => setC({ bannerPos: { ...(c.bannerPos || { x: 50, y: 50, zoom: 100 }), x } })}
+                        onChange={(x) =>
+                            setC({
+                                bannerPos: { ...(c.bannerPos || { x: 50, y: 50, zoom: 100 }), x },
+                            })
+                        }
                         value={c.bannerPos?.x ?? 50}
                     />
                     <Slider
                         label={(v) => `up/down ${v}%`}
-                        onChange={(y) => setC({ bannerPos: { ...(c.bannerPos || { x: 50, y: 50, zoom: 100 }), y } })}
+                        onChange={(y) =>
+                            setC({
+                                bannerPos: { ...(c.bannerPos || { x: 50, y: 50, zoom: 100 }), y },
+                            })
+                        }
                         value={c.bannerPos?.y ?? 50}
                     />
                     <Slider
@@ -191,7 +207,12 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
                         max={300}
                         min={100}
                         onChange={(zoom) =>
-                            setC({ bannerPos: { ...(c.bannerPos || { x: 50, y: 50, zoom: 100 }), zoom } })
+                            setC({
+                                bannerPos: {
+                                    ...(c.bannerPos || { x: 50, y: 50, zoom: 100 }),
+                                    zoom,
+                                },
+                            })
                         }
                         value={c.bannerPos?.zoom ?? 100}
                     />
@@ -306,7 +327,11 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
                         setC({
                             stickers: [
                                 ...(c.stickers || []),
-                                { emoji: sticker, x: 10 + Math.random() * 80, y: 15 + Math.random() * 60 },
+                                {
+                                    emoji: sticker,
+                                    x: 10 + Math.random() * 80,
+                                    y: 15 + Math.random() * 60,
+                                },
                             ],
                         });
                         setSticker('');
@@ -323,20 +348,30 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
                     <Slider
                         flex={1}
                         onChange={(x) =>
-                            setC({ stickers: (c.stickers || []).map((t, j) => (j === i ? { ...t, x } : t)) })
+                            setC({
+                                stickers: (c.stickers || []).map((t, j) =>
+                                    j === i ? { ...t, x } : t,
+                                ),
+                            })
                         }
                         value={s.x}
                     />
                     <Slider
                         flex={1}
                         onChange={(y) =>
-                            setC({ stickers: (c.stickers || []).map((t, j) => (j === i ? { ...t, y } : t)) })
+                            setC({
+                                stickers: (c.stickers || []).map((t, j) =>
+                                    j === i ? { ...t, y } : t,
+                                ),
+                            })
                         }
                         value={s.y}
                     />
                     <ActionIcon
                         icon="x"
-                        onClick={() => setC({ stickers: (c.stickers || []).filter((_, j) => j !== i) })}
+                        onClick={() =>
+                            setC({ stickers: (c.stickers || []).filter((_, j) => j !== i) })
+                        }
                         size="xs"
                         variant="subtle"
                     />
@@ -415,7 +450,12 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
         </Stack>
     );
 
-    const songPicker = (label: string, song: null | undefined | { title: string }, onSet: () => void, onClear: () => void) => (
+    const songPicker = (
+        label: string,
+        song: null | undefined | { title: string },
+        onSet: () => void,
+        onClear: () => void,
+    ) => (
         <Group gap="xs" justify="space-between">
             <Text size="sm">
                 {label}: <b>{song ? song.title : 'none'}</b>
@@ -447,8 +487,14 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
                 () => {
                     if (!current) return;
                     const week = weekNow();
-                    const history = c.spotlight && c.spotlight.week !== week ? [c.spotlight, ...(c.spotlightHistory || [])] : c.spotlightHistory || [];
-                    setC({ spotlight: { song: toGroupSong(current), week }, spotlightHistory: history.slice(0, 12) });
+                    const history =
+                        c.spotlight && c.spotlight.week !== week
+                            ? [c.spotlight, ...(c.spotlightHistory || [])]
+                            : c.spotlightHistory || [];
+                    setC({
+                        spotlight: { song: toGroupSong(current), week },
+                        spotlightHistory: history.slice(0, 12),
+                    });
                 },
                 () => setC({ spotlight: null }),
             )}
@@ -472,7 +518,9 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
                     />
                     <ActionIcon
                         icon="x"
-                        onClick={() => setC({ top5: (c.top5 || []).filter((s) => s.id !== song.id) })}
+                        onClick={() =>
+                            setC({ top5: (c.top5 || []).filter((s) => s.id !== song.id) })
+                        }
                         size="xs"
                         variant="subtle"
                     />
@@ -480,7 +528,15 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
             ))}
             <Button
                 disabled={!current || (c.top5 || []).length >= 5}
-                onClick={() => current && setC({ top5: [...(c.top5 || []).filter((s) => s.id !== current.id), toGroupSong(current)] })}
+                onClick={() =>
+                    current &&
+                    setC({
+                        top5: [
+                            ...(c.top5 || []).filter((s) => s.id !== current.id),
+                            toGroupSong(current),
+                        ],
+                    })
+                }
                 size="xs"
                 variant="default"
                 w="fit-content"
@@ -504,7 +560,12 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
                     onChange={(e) => setGenre(e.currentTarget.value)}
                     onKeyDown={(e) => {
                         if (e.key === 'Enter' && genre.trim()) {
-                            setC({ genres: [...new Set([...(c.genres || []), genre.trim()])].slice(0, 12) });
+                            setC({
+                                genres: [...new Set([genre.trim(), ...(c.genres || [])])].slice(
+                                    0,
+                                    12,
+                                ),
+                            });
                             setGenre('');
                         }
                     }}
@@ -514,10 +575,15 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
                 />
             </Group>
             <Text size="sm">
-                Pinned playlist: <b>{c.pinnedPlaylist?.name || 'none'}</b> (right-click a playlist &gt;
-                Pin to my profile)
+                Pinned playlist: <b>{c.pinnedPlaylist?.name || 'none'}</b> (right-click a playlist
+                &gt; Pin to my profile)
                 {c.pinnedPlaylist && (
-                    <Button ml="xs" onClick={() => setC({ pinnedPlaylist: undefined })} size="compact-xs" variant="subtle">
+                    <Button
+                        ml="xs"
+                        onClick={() => setC({ pinnedPlaylist: undefined })}
+                        size="compact-xs"
+                        variant="subtle"
+                    >
                         Remove
                     </Button>
                 )}
@@ -533,7 +599,9 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
                         onChange={(e) =>
                             setC({
                                 sections: {
-                                    hidden: e.currentTarget.checked ? hidden.filter((h) => h !== id) : [...hidden, id],
+                                    hidden: e.currentTarget.checked
+                                        ? hidden.filter((h) => h !== id)
+                                        : [...hidden, id],
                                     order: fullOrder,
                                 },
                             })
@@ -542,8 +610,18 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
                     <Text flex={1} size="sm">
                         {SECTIONS.find(([key]) => key === id)?.[1] ?? id}
                     </Text>
-                    <ActionIcon icon="arrowUp" onClick={() => moveSection(id, -1)} size="xs" variant="subtle" />
-                    <ActionIcon icon="arrowDownS" onClick={() => moveSection(id, 1)} size="xs" variant="subtle" />
+                    <ActionIcon
+                        icon="arrowUp"
+                        onClick={() => moveSection(id, -1)}
+                        size="xs"
+                        variant="subtle"
+                    />
+                    <ActionIcon
+                        icon="arrowDownS"
+                        onClick={() => moveSection(id, 1)}
+                        size="xs"
+                        variant="subtle"
+                    />
                 </Group>
             ))}
         </Stack>
@@ -602,7 +680,9 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
                 {(c.hiddenSongs || []).map((id) => (
                     <Button
                         key={id}
-                        onClick={() => setC({ hiddenSongs: (c.hiddenSongs || []).filter((x) => x !== id) })}
+                        onClick={() =>
+                            setC({ hiddenSongs: (c.hiddenSongs || []).filter((x) => x !== id) })
+                        }
                         rightSection={<span>&times;</span>}
                         size="compact-xs"
                         variant="default"
@@ -633,7 +713,10 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
                 </Button>
                 {linkCode && (
                     <Text className={styles.linkCode}>
-                        {linkCode} <span className={styles.muted}>(type it on the other computer, works for 10 min)</span>
+                        {linkCode}{' '}
+                        <span className={styles.muted}>
+                            (type it on the other computer, works for 10 min)
+                        </span>
                     </Text>
                 )}
             </Group>
@@ -651,7 +734,9 @@ export const ProfileEditor = ({ onDone, profile }: { onDone: () => void; profile
                             .then((r) => {
                                 setStore({ me: { id: r.id, key: r.key } });
                                 useGroupPlayStore.getState().actions.setUserName(r.profile.name);
-                                toast.success({ message: `This computer now uses ${r.profile.name}'s profile` });
+                                toast.success({
+                                    message: `This computer now uses ${r.profile.name}'s profile`,
+                                });
                                 refresh();
                                 onDone();
                             })

@@ -239,7 +239,9 @@ export const ProfileView = ({
             </Section>
         ),
         recent: !!c.recentPlays?.length && (
-            <Section title="Recently played">{c.recentPlays.slice(0, 6).map((s) => songRow(s))}</Section>
+            <Section title="Recently played">
+                {c.recentPlays.slice(0, 6).map((s) => songRow(s))}
+            </Section>
         ),
         signature: c.signatureSong && (
             <Section title="Signature song">{songRow(c.signatureSong)}</Section>
@@ -338,14 +340,16 @@ export const ProfileView = ({
                         <TextInput
                             flex={1}
                             onChange={(e) => setNote(e.currentTarget.value)}
-                            placeholder={isMe ? 'Write on your wall' : `Write on ${profile.name}'s wall`}
+                            placeholder={
+                                isMe ? 'Write on your wall' : `Write on ${profile.name}'s wall`
+                            }
                             value={note}
                         />
                         <Button
                             disabled={!note.trim()}
                             onClick={() =>
-                                act(() => sourApi.wall(url, me, profile.id, { text: note })).then(() =>
-                                    setNote(''),
+                                act(() => sourApi.wall(url, me, profile.id, { text: note })).then(
+                                    () => setNote(''),
                                 )
                             }
                             variant="filled"
@@ -365,7 +369,9 @@ export const ProfileView = ({
                                 <ActionIcon
                                     icon="x"
                                     onClick={() =>
-                                        act(() => sourApi.wall(url, me, profile.id, { remove: n.id }))
+                                        act(() =>
+                                            sourApi.wall(url, me, profile.id, { remove: n.id }),
+                                        )
                                     }
                                     size="xs"
                                     tooltip={{ label: 'Delete' }}
@@ -442,12 +448,14 @@ export const ProfileView = ({
                         )}
                     </div>
                     {!preview && !isMe && me && (
-                        <Group gap="xs" px="md" pb="md">
+                        <Group gap="xs" pb="md" px="md">
                             {profile.online && profile.listening && (
                                 <Button
                                     onClick={() => {
                                         setStore({ listenAlong: profile.id });
-                                        toast.info({ message: `Listening along with ${profile.name}` });
+                                        toast.info({
+                                            message: `Listening along with ${profile.name}`,
+                                        });
                                     }}
                                     size="xs"
                                     variant="filled"
@@ -457,7 +465,10 @@ export const ProfileView = ({
                             )}
                             <Button
                                 onClick={() =>
-                                    act(() => sourApi.ping(url, me, profile.id), `Pinged ${profile.name}`)
+                                    act(
+                                        () => sourApi.ping(url, me, profile.id),
+                                        `Pinged ${profile.name}`,
+                                    )
                                 }
                                 size="xs"
                                 variant="default"
@@ -486,7 +497,13 @@ export const ProfileView = ({
                                 onClick={() =>
                                     setStore({
                                         pins: pinned
-                                            ? pins.filter((p) => !(p.kind === 'profile' && p.id === profile.id))
+                                            ? pins.filter(
+                                                  (p) =>
+                                                      !(
+                                                          p.kind === 'profile' &&
+                                                          p.id === profile.id
+                                                      ),
+                                              )
                                             : [
                                                   ...pins,
                                                   {

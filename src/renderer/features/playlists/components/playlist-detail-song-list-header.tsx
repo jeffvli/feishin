@@ -138,7 +138,10 @@ export const PlaylistDetailSongListHeader = ({
 
     const handlePlay = (type?: Play) => {
         // Sour Player: this playlist's own crossfade, if it has one
-        applyPlaylistCrossfade(playlistId, (listData as Song[]).map((song) => song.id));
+        applyPlaylistCrossfade(
+            playlistId,
+            (listData as Song[]).map((song) => song.id),
+        );
         player.addToQueueByData(listData as Song[], type || Play.NOW);
     };
 

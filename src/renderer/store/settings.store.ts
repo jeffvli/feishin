@@ -2973,7 +2973,11 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                 if (version < 36) {
                     // Sour Player 0.3: the friend-group sections on Home
                     const have = new Set(state.general.homeItems.map((item) => item.id));
-                    const top = [HomeItem.SOUR_RADIO, HomeItem.FRIENDS_PLAYING, HomeItem.YOUR_REQUESTS];
+                    const top = [
+                        HomeItem.SOUR_RADIO,
+                        HomeItem.FRIENDS_PLAYING,
+                        HomeItem.YOUR_REQUESTS,
+                    ];
                     const rest = [
                         HomeItem.SONG_OF_THE_DAY,
                         HomeItem.JUMP_BACK_IN,
@@ -2986,7 +2990,9 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     state.general.homeItems = [
                         ...top.filter((id) => !have.has(id)).map((id) => ({ disabled: false, id })),
                         ...state.general.homeItems,
-                        ...rest.filter((id) => !have.has(id)).map((id) => ({ disabled: false, id })),
+                        ...rest
+                            .filter((id) => !have.has(id))
+                            .map((id) => ({ disabled: false, id })),
                     ];
                 }
 

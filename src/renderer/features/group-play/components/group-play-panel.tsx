@@ -173,7 +173,12 @@ export const GroupPlayPanel = () => {
         const name = userName.trim() || 'Guest';
         const start = (savedName?: string) =>
             run(async () => {
-                const res = await groupApi.create(url, savedName ?? groupName, name, sourMe?.id ?? null);
+                const res = await groupApi.create(
+                    url,
+                    savedName ?? groupName,
+                    name,
+                    sourMe?.id ?? null,
+                );
                 // a group starts with an empty queue; the first song anyone adds starts it
                 const player = usePlayerStoreBase.getState();
                 player.mediaStop();
@@ -494,7 +499,9 @@ export const GroupPlayPanel = () => {
                 {isRadio && nowPlaying && (
                     <Stack gap={4}>
                         <Button onClick={voteSkip} size="xs" variant="default">
-                            {canSkipNow ? 'Skip' : `Vote to skip${state?.votes ? ` (${state.votes})` : ''}`}
+                            {canSkipNow
+                                ? 'Skip'
+                                : `Vote to skip${state?.votes ? ` (${state.votes})` : ''}`}
                         </Button>
                         <Button onClick={() => likeSong(nowPlaying)} size="xs" variant="subtle">
                             Like
@@ -534,7 +541,9 @@ export const GroupPlayPanel = () => {
             {state?.show && <Text className={styles.banner}>DJ {state.show.name} is live</Text>}
             {state?.djRotation && state.dj && (
                 <Text className={styles.banner}>
-                    {state.dj.name === me ? "It's your turn to pick the next song" : `${state.dj.name} picks the next song`}
+                    {state.dj.name === me
+                        ? "It's your turn to pick the next song"
+                        : `${state.dj.name} picks the next song`}
                 </Text>
             )}
             {isRadio && state && <VoteBar state={state} />}
@@ -622,7 +631,12 @@ export const GroupPlayPanel = () => {
                 <div className={styles.settings}>
                     {state && <HostTools state={state} />}
                     {state && (
-                        <Button onClick={() => saveGroupSettings(state)} size="xs" variant="default" w="fit-content">
+                        <Button
+                            onClick={() => saveGroupSettings(state)}
+                            size="xs"
+                            variant="default"
+                            w="fit-content"
+                        >
                             Save this group for later
                         </Button>
                     )}

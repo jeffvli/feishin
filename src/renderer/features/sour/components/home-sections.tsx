@@ -8,7 +8,10 @@ import {
     type GroupSong,
     useGroupPlayStore,
 } from '/@/renderer/features/group-play/store/group-play.store';
-import { playsSince, usePlayCountStore } from '/@/renderer/features/hermes-plays/store/play-count.store';
+import {
+    playsSince,
+    usePlayCountStore,
+} from '/@/renderer/features/hermes-plays/store/play-count.store';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { getSongById } from '/@/renderer/features/player/utils';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
@@ -106,7 +109,14 @@ const RadioCard = () => {
             {radio.nowPlaying ? (
                 <SongCover
                     size={64}
-                    song={{ album: '', artist: radio.nowPlaying.artist, duration: 0, id: 'radio', imageId: radio.nowPlaying.imageId, title: radio.nowPlaying.title }}
+                    song={{
+                        album: '',
+                        artist: radio.nowPlaying.artist,
+                        duration: 0,
+                        id: 'radio',
+                        imageId: radio.nowPlaying.imageId,
+                        title: radio.nowPlaying.title,
+                    }}
                 />
             ) : (
                 <div className={styles.placeholder} />
@@ -117,12 +127,15 @@ const RadioCard = () => {
                     {radio.nowPlaying?.title ?? 'Waiting for listeners'}
                 </Text>
                 <Text isMuted size="sm" truncate>
-                    {radio.nowPlaying?.artist ?? 'Join and it starts playing'} - {radio.listening} listening
+                    {radio.nowPlaying?.artist ?? 'Join and it starts playing'} - {radio.listening}{' '}
+                    listening
                 </Text>
             </Stack>
             <Button
                 onClick={() =>
-                    inGroup === 'RADIO' ? useGroupPlayStore.setState({ panelOpen: true }) : join('RADIO')
+                    inGroup === 'RADIO'
+                        ? useGroupPlayStore.setState({ panelOpen: true })
+                        : join('RADIO')
                 }
                 variant="filled"
             >
@@ -147,7 +160,11 @@ const FriendsPlaying = () => {
             <div className={styles.friends}>
                 {friends.map((p) => (
                     <div className={styles.friend} key={p.id}>
-                        <button className={styles.friendInfo} onClick={() => openProfile(p)} type="button">
+                        <button
+                            className={styles.friendInfo}
+                            onClick={() => openProfile(p)}
+                            type="button"
+                        >
                             <ProfileAvatar online profile={p} size={34} />
                             <Stack gap={0} miw={0}>
                                 <Text fw={600} size="sm" truncate>
@@ -159,7 +176,11 @@ const FriendsPlaying = () => {
                             </Stack>
                         </button>
                         {p.group ? (
-                            <Button onClick={() => p.group && join(p.group.code)} size="compact-xs" variant="default">
+                            <Button
+                                onClick={() => p.group && join(p.group.code)}
+                                size="compact-xs"
+                                variant="default"
+                            >
                                 Join
                             </Button>
                         ) : (
@@ -216,7 +237,8 @@ const YourRequests = () => {
         <Box title="Your requests">
             {!mine.length && (
                 <Text isMuted size="sm">
-                    Nothing requested yet - the + button in the player bar asks Hermes Music for music.
+                    Nothing requested yet - the + button in the player bar asks Hermes Music for
+                    music.
                 </Text>
             )}
             {mine.map((r) => (
@@ -261,7 +283,14 @@ const JumpBackIn = () => {
                 {recent.map((p) => (
                     <SongRow
                         key={p.id}
-                        song={{ album: p.album, artist: p.artist, duration: p.duration ?? 0, id: p.id, imageId: p.imageId, title: p.name }}
+                        song={{
+                            album: p.album,
+                            artist: p.artist,
+                            duration: p.duration ?? 0,
+                            id: p.id,
+                            imageId: p.imageId,
+                            title: p.name,
+                        }}
                     />
                 ))}
             </div>
@@ -365,10 +394,15 @@ const SmartPlaylists = () => {
         const found = await Promise.all(
             ids.map((id) => getSongById({ id, queryClient, serverId }).catch(() => null)),
         );
-        await addToQueueByData(Play.NOW, found.flatMap((r) => r?.items ?? []));
+        await addToQueueByData(
+            Play.NOW,
+            found.flatMap((r) => r?.items ?? []),
+        );
     };
     const [now] = useState(() => Date.now());
-    const onRepeat = playsSince(7).slice(0, 25).map((x) => x.entry.id);
+    const onRepeat = playsSince(7)
+        .slice(0, 25)
+        .map((x) => x.entry.id);
     const forgotten = Object.values(plays)
         .filter((p) => now - p.last > 30 * 86400000)
         .sort((a, b) => b.count - a.count)
@@ -389,7 +423,11 @@ const SmartPlaylists = () => {
                 <Button onClick={() => play(onRepeat, 'On repeat')} size="xs" variant="default">
                     On repeat (this week)
                 </Button>
-                <Button onClick={() => play(forgotten, 'Forgotten favourites')} size="xs" variant="default">
+                <Button
+                    onClick={() => play(forgotten, 'Forgotten favourites')}
+                    size="xs"
+                    variant="default"
+                >
                     Forgotten favourites
                 </Button>
                 <Button onClick={neverPlayed} size="xs" variant="default">

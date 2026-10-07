@@ -124,8 +124,13 @@ export const HideFromActivityAction = ({ songs }: { songs: Song[] }) => {
         if (!url || !me) return;
         try {
             const profile = await sourApi.me(url, me);
-            const hidden = new Set([...(profile.custom?.hiddenSongs ?? []), ...songs.map((s) => s.id)]);
-            await sourApi.update(url, me, { custom: { ...profile.custom, hiddenSongs: [...hidden] } });
+            const hidden = new Set([
+                ...(profile.custom?.hiddenSongs ?? []),
+                ...songs.map((s) => s.id),
+            ]);
+            await sourApi.update(url, me, {
+                custom: { ...profile.custom, hiddenSongs: [...hidden] },
+            });
             toast.info({ message: 'Hidden from your activity' });
         } catch (error) {
             toast.error({ message: (error as Error).message });
@@ -149,7 +154,12 @@ const SongNote = ({ song }: { song: Song }) => {
             <Text isMuted size="sm">
                 Only you see this note.
             </Text>
-            <Textarea autosize minRows={3} onChange={(e) => setText(e.currentTarget.value)} value={text} />
+            <Textarea
+                autosize
+                minRows={3}
+                onChange={(e) => setText(e.currentTarget.value)}
+                value={text}
+            />
             <Group justify="flex-end">
                 <Button
                     onClick={() => {
@@ -174,7 +184,9 @@ export const SongNoteAction = ({ songs }: { songs: Song[] }) => {
     return (
         <ContextMenu.Item
             leftIcon="edit"
-            onSelect={() => openModal({ children: <SongNote song={song} />, title: `Note: ${song.name}` })}
+            onSelect={() =>
+                openModal({ children: <SongNote song={song} />, title: `Note: ${song.name}` })
+            }
         >
             {has ? 'Edit my note' : 'Add a note'}
         </ContextMenu.Item>
@@ -190,7 +202,8 @@ const WhoElseLikes = ({ song }: { song: Song }) => {
             p.stats?.topSongs.some((s) => s.id === song.id) ||
             p.custom?.top5?.some((s) => s.id === song.id),
     );
-    if (!fans.length) return <Text isMuted>Nobody has this one in their favourites or top songs yet.</Text>;
+    if (!fans.length)
+        return <Text isMuted>Nobody has this one in their favourites or top songs yet.</Text>;
     return (
         <Stack gap="xs">
             {fans.map((p) => (
@@ -216,7 +229,9 @@ export const WhoElseLikesAction = ({ songs }: { songs: Song[] }) => {
     return (
         <ContextMenu.Item
             leftIcon="user"
-            onSelect={() => openModal({ children: <WhoElseLikes song={song} />, title: 'Who else likes this' })}
+            onSelect={() =>
+                openModal({ children: <WhoElseLikes song={song} />, title: 'Who else likes this' })
+            }
         >
             Who else likes this
         </ContextMenu.Item>
@@ -268,7 +283,9 @@ export const ShareSongAction = ({ songs }: { songs: Song[] }) => {
     return (
         <ContextMenu.Item
             leftIcon="share"
-            onSelect={() => openModal({ children: <ShareSong song={song} />, title: `Send ${song.name}` })}
+            onSelect={() =>
+                openModal({ children: <ShareSong song={song} />, title: `Send ${song.name}` })
+            }
         >
             Send to a friend
         </ContextMenu.Item>
@@ -294,7 +311,10 @@ export const PinAction = ({
                 set({
                     pins: pinned
                         ? pins.filter((p) => !(p.kind === kind && p.id === item.id))
-                        : [...pins, { id: item.id, imageId: item.imageId ?? null, kind, name: item.name }],
+                        : [
+                              ...pins,
+                              { id: item.id, imageId: item.imageId ?? null, kind, name: item.name },
+                          ],
                 })
             }
         >
@@ -317,7 +337,11 @@ export const PinPlaylistToProfileAction = ({ playlist }: { playlist?: Playlist }
                     await sourApi.update(url, me, {
                         custom: {
                             ...profile.custom,
-                            pinnedPlaylist: { id: playlist.id, imageId: playlist.imageId, name: playlist.name },
+                            pinnedPlaylist: {
+                                id: playlist.id,
+                                imageId: playlist.imageId,
+                                name: playlist.name,
+                            },
                         },
                     });
                     toast.success({ message: `${playlist.name} is on your profile` });
@@ -343,7 +367,11 @@ export const FollowArtistAction = ({ artists }: { artists: (AlbumArtist | Artist
             onSelect={() =>
                 sourApi
                     .follow(url, me, artist.name)
-                    .then((r) => toast.success({ message: `New releases from ${r.artist} will download by themselves` }))
+                    .then((r) =>
+                        toast.success({
+                            message: `New releases from ${r.artist} will download by themselves`,
+                        }),
+                    )
                     .catch((error: Error) => toast.error({ message: error.message }))
             }
         >
@@ -365,16 +393,29 @@ export const ArtistToRadioAction = ({ artists }: { artists: (AlbumArtist | Artis
             onSelect={async () => {
                 try {
                     const res = await queryClient.fetchQuery(
-                        songsQueries.artistRadio({ query: { artistId: artist.id, count: 30 }, serverId }),
+                        songsQueries.artistRadio({
+                            query: { artistId: artist.id, count: 30 },
+                            serverId,
+                        }),
                     );
                     const theirs = res
-                        .filter((s) => s.artistName.toLowerCase().includes(artist.name.toLowerCase()))
+                        .filter((s) =>
+                            s.artistName.toLowerCase().includes(artist.name.toLowerCase()),
+                        )
                         .sort(() => Math.random() - 0.5)
                         .slice(0, 3);
                     if (!theirs.length) throw new Error(`Couldn't find songs by ${artist.name}`);
                     const { member, userName } = useGroupPlayStore.getState();
-                    await groupApi.add(url, 'RADIO', userName || 'Someone', theirs.map(toGroupSong), member);
-                    toast.success({ message: `Added ${theirs.length} ${artist.name} songs to Sour Radio` });
+                    await groupApi.add(
+                        url,
+                        'RADIO',
+                        userName || 'Someone',
+                        theirs.map(toGroupSong),
+                        member,
+                    );
+                    toast.success({
+                        message: `Added ${theirs.length} ${artist.name} songs to Sour Radio`,
+                    });
                 } catch (error) {
                     toast.error({ message: (error as Error).message });
                 }

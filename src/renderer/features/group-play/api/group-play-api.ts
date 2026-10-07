@@ -91,18 +91,35 @@ export const groupApi = {
         post<{ ok: boolean }>(`${base}/api/group/${code}/report`, body),
     // your own always-on room (one per person)
     room: (base: string, profile: string, key: string, name: string, remove?: boolean) =>
-        post<{ code: string; name: string }>(`${base}/api/group/rooms`, { key, name, profile, remove }),
+        post<{ code: string; name: string }>(`${base}/api/group/rooms`, {
+            key,
+            name,
+            profile,
+            remove,
+        }),
     // book a DJ show on a station (start in ms, length in minutes), or cancel one
     schedule: (
         base: string,
         code: string,
-        body: { cancel?: string; key: string; member?: null | string; minutes?: number; profile: string; start?: number },
+        body: {
+            cancel?: string;
+            key: string;
+            member?: null | string;
+            minutes?: number;
+            profile: string;
+            start?: number;
+        },
     ) => post<{ ok: boolean }>(`${base}/api/group/${code}/schedule`, body),
     settings: (
         base: string,
         code: string,
         hostKey: string,
-        changes: { djRotation?: boolean; guestControl?: boolean; listed?: boolean; watchVideo?: boolean },
+        changes: {
+            djRotation?: boolean;
+            guestControl?: boolean;
+            listed?: boolean;
+            watchVideo?: boolean;
+        },
     ) => post<{ ok: boolean }>(`${base}/api/group/${code}/settings`, { hostKey, ...changes }),
     stats: async (base: string, code: string) => {
         const res = await fetch(`${base}/api/group/${code}/stats`);

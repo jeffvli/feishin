@@ -206,42 +206,46 @@ const SyncedVideo = ({ artist, compact, title, video: saved }: SyncedVideoProps)
                 />
             </div>
             {!compact && (
-            <Group justify="space-between" mt="sm">
-                <Text isMuted size="sm">
-                    {`${artist} - ${title} - timing ${offset >= 0 ? '+' : ''}${offset.toFixed(1)}s`}
-                </Text>
-                <Group gap="xs">
-                    <Button disabled={skipping} onClick={wrongVideo} size="compact-sm">
-                        Wrong video
-                    </Button>
-                    <Button onClick={() => setNudge((n) => n - 0.5)} size="compact-sm">
-                        -0.5s
-                    </Button>
-                    <Button onClick={() => setNudge((n) => n + 0.5)} size="compact-sm">
-                        +0.5s
-                    </Button>
-                    <Button
-                        disabled={!nudge || saving}
-                        onClick={save}
-                        size="compact-sm"
-                        variant="filled"
-                    >
-                        Save timing
-                    </Button>
-                    <Button onClick={toggleLive} size="compact-sm" variant={live ? 'filled' : 'default'}>
-                        {live ? 'Official video' : 'Live version'}
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            closeAllModals();
-                            useVideoWindow.setState({ floating: true, watch: null });
-                        }}
-                        size="compact-sm"
-                    >
-                        Pop out
-                    </Button>
+                <Group justify="space-between" mt="sm">
+                    <Text isMuted size="sm">
+                        {`${artist} - ${title} - timing ${offset >= 0 ? '+' : ''}${offset.toFixed(1)}s`}
+                    </Text>
+                    <Group gap="xs">
+                        <Button disabled={skipping} onClick={wrongVideo} size="compact-sm">
+                            Wrong video
+                        </Button>
+                        <Button onClick={() => setNudge((n) => n - 0.5)} size="compact-sm">
+                            -0.5s
+                        </Button>
+                        <Button onClick={() => setNudge((n) => n + 0.5)} size="compact-sm">
+                            +0.5s
+                        </Button>
+                        <Button
+                            disabled={!nudge || saving}
+                            onClick={save}
+                            size="compact-sm"
+                            variant="filled"
+                        >
+                            Save timing
+                        </Button>
+                        <Button
+                            onClick={toggleLive}
+                            size="compact-sm"
+                            variant={live ? 'filled' : 'default'}
+                        >
+                            {live ? 'Official video' : 'Live version'}
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                closeAllModals();
+                                useVideoWindow.setState({ floating: true, watch: null });
+                            }}
+                            size="compact-sm"
+                        >
+                            Pop out
+                        </Button>
+                    </Group>
                 </Group>
-            </Group>
             )}
         </>
     );
@@ -357,12 +361,14 @@ const VideoWall = () => {
         queryFn: async () => {
             const res = await fetch(`${url}/api/videos`);
             const json = await res.json().catch(() => null);
-            if (!Array.isArray(json)) throw new Error("That address doesn't answer like Hermes Music");
+            if (!Array.isArray(json))
+                throw new Error("That address doesn't answer like Hermes Music");
             return json as { artist: string; song: string; title: string; videoId: string }[];
         },
         queryKey: ['video-wall', url],
     });
-    if (!list.data?.length) return <Text isMuted>No music videos yet - add some with /video on the request page.</Text>;
+    if (!list.data?.length)
+        return <Text isMuted>No music videos yet - add some with /video on the request page.</Text>;
     return (
         <div className={styles.wall}>
             {list.data.map((v) => (
@@ -371,7 +377,10 @@ const VideoWall = () => {
                     key={v.videoId}
                     onClick={() => {
                         closeAllModals();
-                        useVideoWindow.setState({ floating: true, watch: { title: v.title, videoId: v.videoId } });
+                        useVideoWindow.setState({
+                            floating: true,
+                            watch: { title: v.title, videoId: v.videoId },
+                        });
                     }}
                     type="button"
                 >
