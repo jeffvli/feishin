@@ -542,11 +542,7 @@ export const GroupPlayPanel = () => {
                         <Group gap="xs">
                             {state.members.map((m) => (
                                 <span className={styles.person} key={m.id}>
-                                    <Avatar
-                                        name={m.name}
-                                        small
-                                        src={pictureOf(m.id, m.avatar)}
-                                    />
+                                    <Avatar name={m.name} small src={pictureOf(m.id, m.avatar)} />
                                     {m.name}
                                     <ActionIcon
                                         icon="x"

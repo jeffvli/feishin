@@ -117,11 +117,7 @@ const RequestPanel = () => {
                     placeholder={placeholder}
                     value={query}
                 />
-                <Button
-                    disabled={busy || query.trim().length < 2}
-                    onClick={send}
-                    variant="filled"
-                >
+                <Button disabled={busy || query.trim().length < 2} onClick={send} variant="filled">
                     Request
                 </Button>
             </Group>
