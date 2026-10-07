@@ -86,5 +86,12 @@ export const SourSettings = memo(() => {
         })),
     ];
 
+    options.push({
+        control: <></>,
+        description:
+            'The Determination font is by anonymous-1438277 on fontstruct.com, licensed CC BY 3.0 (licence included with the app).',
+        title: 'Font credits',
+    });
+
     return <SettingsSection options={options} title="Sour Player" />;
 });

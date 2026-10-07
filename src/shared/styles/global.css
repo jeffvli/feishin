@@ -406,3 +406,16 @@ body.sour-disco {
         filter: hue-rotate(360deg);
     }
 }
+
+/* Determination by anonymous-1438277 (fontstruct.com), CC BY 3.0 - licence next to the font file.
+   Only some Sour Player profiles may use it (for their name and their playlists); everyone sees it there. */
+@font-face {
+    font-family: Determination;
+    font-display: swap;
+    src: url('../../../assets/fonts/determination/determination.ttf');
+}
+
+.sour-font-determination h1 {
+    font-family: Determination, monospace !important;
+    letter-spacing: 0.02em;
+}

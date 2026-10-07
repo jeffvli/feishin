@@ -6,11 +6,12 @@ import styles from './playlist-theme.module.css';
 
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { readPicture, sourApi } from '/@/renderer/features/sour/api/sour-api';
-import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
+import { useMyProfile, useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { Button } from '/@/shared/components/button/button';
 import { ColorInput } from '/@/shared/components/color-input/color-input';
 import { FileButton } from '/@/shared/components/file-button/file-button';
 import { Group } from '/@/shared/components/group/group';
+import { Select } from '/@/shared/components/select/select';
 import { Slider } from '/@/shared/components/slider/slider';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Switch } from '/@/shared/components/switch/switch';
@@ -42,9 +43,15 @@ const PlaylistThemeEditor = ({ playlistId }: { playlistId: string }) => {
         useSourStore.getState().set({ crossfade: all });
     };
     const [color, setColor] = useState(theme.data?.color || '');
+    const perks = useMyProfile().data?.perks ?? [];
     const [busy, setBusy] = useState(false);
 
-    const save = (changes: { color?: null | string; image?: null | string; remove?: boolean }) => {
+    const save = (changes: {
+        color?: null | string;
+        font?: null | string;
+        image?: null | string;
+        remove?: boolean;
+    }) => {
         if (!me) return Promise.resolve();
         setBusy(true);
         return sourApi
@@ -95,6 +102,17 @@ const PlaylistThemeEditor = ({ playlistId }: { playlistId: string }) => {
                     </Button>
                 )}
             </Group>
+            {perks.includes('determination') && (
+                <Select
+                    data={[
+                        { label: 'Normal', value: '' },
+                        { label: 'Determination (only yours)', value: 'determination' },
+                    ]}
+                    label="Title font"
+                    onChange={(font) => save({ font: font || null })}
+                    value={theme.data?.font || ''}
+                />
+            )}
             <Stack gap={4}>
                 <Switch
                     checked={crossfade !== undefined}
@@ -179,7 +197,11 @@ export const PlaylistThemed = ({
 
     return (
         <div
-            className={styles.themed}
+            className={
+                theme.font === 'determination'
+                    ? `${styles.themed} sour-font-determination`
+                    : styles.themed
+            }
             ref={root}
             style={theme.color ? { background: theme.color } : undefined}
         >

@@ -40,6 +40,7 @@ export interface Nickname {
 
 export interface PlaylistTheme {
     color: null | string;
+    font?: null | string;
     image: number;
     owner: string;
     ownerName: null | string;
@@ -105,6 +106,7 @@ export interface SourProfile {
     name: string;
     nicknames: Nickname[];
     online: boolean;
+    perks?: string[];
     playing: boolean;
     position: number;
     positionAt: number;
@@ -241,7 +243,12 @@ export const sourApi = {
         base: string,
         me: Me,
         playlistId: string,
-        changes: { color?: null | string; image?: null | string; remove?: boolean },
+        changes: {
+            color?: null | string;
+            font?: null | string;
+            image?: null | string;
+            remove?: boolean;
+        },
     ) =>
         call<PlaylistTheme>(`${base}/api/playlist-themes/${encodeURIComponent(playlistId)}`, {
             key: me.key,

@@ -280,6 +280,9 @@ export const ProfileEditor = ({
                         { label: 'Mono', value: 'mono' },
                         { label: 'Rounded', value: 'rounded' },
                         { label: 'Script', value: 'script' },
+                        ...(mine?.perks?.includes('determination')
+                            ? [{ label: 'Determination (only yours)', value: 'determination' }]
+                            : []),
                     ]}
                     label="Name font"
                     onChange={(v) => setC({ nameFont: v || 'default' })}

@@ -18,6 +18,7 @@ export const hue = (name: string) =>
 
 export const NAME_FONTS: Record<string, string> = {
     default: 'inherit',
+    determination: 'Determination, monospace',
     mono: 'ui-monospace, Consolas, monospace',
     rounded: '"Trebuchet MS", "Comic Sans MS", sans-serif',
     script: '"Brush Script MT", "Segoe Script", cursive',
