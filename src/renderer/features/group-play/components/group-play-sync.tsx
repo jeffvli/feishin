@@ -19,13 +19,15 @@ const groupPosition = (state: GroupState, clockOffset: number) =>
     state.position + (state.playing ? (Date.now() + clockOffset - state.updatedAt) / 1000 : 0);
 
 // Keeps this Feishin in step with a Group Play session (hosted by Hermes Music):
-// members follow the host's song and position; the host reports its player and adds members' songs.
+// members follow the host's song and position; the host reports its player, adds members' songs and
+// carries out what they do with the group's controls.
 export const GroupPlaySync = () => {
     const url = useHermesUrl();
     const code = useGroupPlayStore((state) => state.code);
     const role = useGroupPlayStore((state) => state.role);
     const member = useGroupPlayStore((state) => state.member);
     const requests = useGroupPlayStore((state) => state.state?.requests);
+    const commands = useGroupPlayStore((state) => state.state?.commands);
     const queryClient = useQueryClient();
     const serverId = useCurrentServer()?.id;
     const loading = useRef<null | string>(null);
@@ -47,6 +49,10 @@ export const GroupPlaySync = () => {
                 return;
             }
             actions.setState(state);
+        });
+        events.addEventListener('kicked', () => {
+            toast.info({ message: 'The host removed you from the group' });
+            useGroupPlayStore.getState().actions.leave();
         });
         return () => events.close();
     }, [code, member, url]);
@@ -147,6 +153,50 @@ export const GroupPlaySync = () => {
                     .finally(() => applied.current.push(request.rid));
             });
     }, [queryClient, requests, role, serverId]);
+
+    // host: carry out what guests did with the group's controls
+    useEffect(() => {
+        if (role !== 'host' || !commands?.length) return;
+        commands
+            .filter((command) => !applying.current.has(command.cid))
+            .forEach((command) => {
+                applying.current.add(command.cid);
+                const player = usePlayerStoreBase.getState();
+                const item = player.getQueue().items[command.index];
+                const sameSong = !!item && item.id === command.songId;
+                switch (command.cmd) {
+                    case 'next':
+                        player.mediaNext(false);
+                        toast.info({ message: `${command.by} skipped` });
+                        break;
+                    case 'pause':
+                        player.mediaPause();
+                        break;
+                    case 'play':
+                        player.mediaPlay();
+                        break;
+                    case 'playIndex':
+                        if (sameSong) player.mediaPlayByIndex(command.index);
+                        break;
+                    case 'playNext':
+                        if (sameSong) player.moveSelectedToNext([item]);
+                        break;
+                    case 'previous':
+                        player.mediaPrevious(false);
+                        break;
+                    case 'remove':
+                        if (sameSong) {
+                            player.clearSelected([item]);
+                            toast.info({ message: `${command.by} removed ${item.name}` });
+                        }
+                        break;
+                    case 'seek':
+                        player.mediaSeekToTimestamp(command.position);
+                        break;
+                }
+                applied.current.push(command.cid);
+            });
+    }, [commands, role]);
 
     return null;
 };

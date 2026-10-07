@@ -7,16 +7,16 @@ import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { toast } from '/@/shared/components/toast/toast';
 import { type Song } from '/@/shared/types/domain-types';
 
-// Song right-click menu: ask the group's host to add these songs (shown only while in a group).
+// Song right-click menu: add these songs to the group's queue (shown only while in a group).
 export const AddToGroupAction = ({ songs }: { songs: Song[] }) => {
     const url = useHermesUrl();
     const code = useGroupPlayStore((state) => state.code);
 
     const onSelect = useCallback(() => {
         if (!url || !code) return;
-        const { userName } = useGroupPlayStore.getState();
+        const { member, userName } = useGroupPlayStore.getState();
         groupApi
-            .add(url, code, userName.trim() || 'Guest', songs.map(toGroupSong))
+            .add(url, code, userName.trim() || 'Guest', songs.map(toGroupSong), member)
             .then((res) => toast.success({ message: `Added ${res.added} to the group queue` }))
             .catch((error: Error) => toast.error({ message: error.message }));
     }, [code, songs, url]);

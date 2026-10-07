@@ -1,4 +1,5 @@
 import {
+    type GroupControl,
     type GroupSong,
     type GroupState,
 } from '/@/renderer/features/group-play/store/group-play.store';
@@ -35,14 +36,28 @@ export const toGroupSong = (song: Song): GroupSong => ({
 });
 
 export const groupApi = {
-    add: (base: string, code: string, user: string, songs: GroupSong[]) =>
-        post<{ added: number }>(`${base}/api/group/${code}/add`, { songs, user }),
+    add: (base: string, code: string, user: string, songs: GroupSong[], member?: null | string) =>
+        post<{ added: number }>(`${base}/api/group/${code}/add`, { member, songs, user }),
+    // a guest using the group's controls (the host's Feishin carries it out)
+    control: (
+        base: string,
+        code: string,
+        member: string,
+        cmd: GroupControl,
+        target: { index?: number; position?: number; songId?: string } = {},
+    ) => post<{ ok: boolean }>(`${base}/api/group/${code}/control`, { cmd, member, ...target }),
     create: (base: string, name: string, user: string) =>
         post<Created>(`${base}/api/group/create`, { name, user }),
     end: (base: string, code: string, hostKey: string) =>
         post<{ ok: boolean }>(`${base}/api/group/${code}/end`, { hostKey }),
     join: (base: string, code: string, user: string) =>
         post<Joined>(`${base}/api/group/${code}/join`, { user }),
+    kick: (base: string, code: string, hostKey: string, target: string) =>
+        post<{ ok: boolean }>(`${base}/api/group/${code}/kick`, { hostKey, target }),
+    leave: (base: string, code: string, member: string) =>
+        post<{ ok: boolean }>(`${base}/api/group/${code}/leave`, { member }),
     report: (base: string, code: string, body: Record<string, unknown>) =>
         post<{ ok: boolean }>(`${base}/api/group/${code}/report`, body),
+    settings: (base: string, code: string, hostKey: string, guestControl: boolean) =>
+        post<{ ok: boolean }>(`${base}/api/group/${code}/settings`, { guestControl, hostKey }),
 };

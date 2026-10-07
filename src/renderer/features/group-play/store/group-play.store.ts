@@ -1,6 +1,30 @@
 import { persist } from 'zustand/middleware';
 import { createWithEqualityFn } from 'zustand/traditional';
 
+export interface GroupCommand {
+    by: string;
+    cid: string;
+    cmd: GroupControl;
+    index: number;
+    position: number;
+    songId: null | string;
+}
+
+export type GroupControl =
+    | 'next'
+    | 'pause'
+    | 'play'
+    | 'playIndex'
+    | 'playNext'
+    | 'previous'
+    | 'remove'
+    | 'seek';
+
+export interface GroupMember {
+    id: string;
+    name: string;
+}
+
 export interface GroupRequest {
     by: string;
     rid: string;
@@ -10,6 +34,7 @@ export interface GroupRequest {
 export interface GroupSong {
     album: string;
     artist: string;
+    by?: string;
     duration: number;
     id: string;
     title: string;
@@ -17,10 +42,12 @@ export interface GroupSong {
 
 export interface GroupState {
     code: string;
+    commands: GroupCommand[];
     ended: boolean;
+    guestControl: boolean;
     host: string;
     index: number;
-    members: string[];
+    members: GroupMember[];
     name: string;
     playing: boolean;
     position: number;
@@ -30,8 +57,8 @@ export interface GroupState {
     updatedAt: number;
 }
 
-// Group Play session. Hermes Music runs the group; the host's player is the source of truth and
-// members follow it. Only the display name is remembered between restarts.
+// Group Play session (like a Spotify Jam). Hermes Music runs the group; the host's player is the
+// source of truth and members follow it. Only the display name is remembered between restarts.
 interface GroupPlayStore {
     actions: {
         leave: () => void;

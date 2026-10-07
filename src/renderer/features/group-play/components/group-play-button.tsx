@@ -6,6 +6,8 @@ import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 
 export const GroupPlayButton = () => {
     const code = useGroupPlayStore((state) => state.code);
+    const listening = useGroupPlayStore((state) => (state.state?.members.length ?? 0) + 1);
+    const label = code ? `Group Play (${code}) - ${listening} listening` : 'Group Play';
 
     return (
         <ActionIcon
@@ -13,10 +15,10 @@ export const GroupPlayButton = () => {
             iconProps={{ color: code ? 'primary' : undefined, size: 'lg' }}
             onClick={(e) => {
                 e.stopPropagation();
-                openModal({ children: <GroupPlayPanel />, size: 'md', title: 'Group Play' });
+                openModal({ children: <GroupPlayPanel />, size: 'lg', title: 'Group Play' });
             }}
             size="sm"
-            tooltip={{ label: code ? `Group Play (${code})` : 'Group Play', openDelay: 0 }}
+            tooltip={{ label, openDelay: 0 }}
             variant="subtle"
         />
     );
