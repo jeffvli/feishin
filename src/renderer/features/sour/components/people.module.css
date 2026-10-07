@@ -134,3 +134,49 @@
     gap: 4px;
     align-items: center;
 }
+
+.tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 10px;
+}
+
+.tile {
+    position: relative;
+    min-width: 0;
+}
+
+.tile-button {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: stretch;
+    width: 100%;
+    padding: 6px;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+}
+
+.tile-button:hover {
+    background: var(--theme-colors-surface, rgb(255 255 255 / 6%));
+}
+
+.album-cover,
+.artist-cover {
+    width: 100%;
+    aspect-ratio: 1;
+    overflow: hidden;
+    background: rgb(255 255 255 / 8%);
+}
+
+.album-cover {
+    border-radius: 6px;
+}
+
+.artist-cover {
+    border-radius: 50%;
+}

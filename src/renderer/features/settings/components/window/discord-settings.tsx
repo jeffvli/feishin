@@ -135,7 +135,7 @@ export const DiscordSettings = memo(() => {
                     aria-label={t('setting.discordDisplayType')}
                     clearable={false}
                     data={[
-                        { label: 'Feishin', value: DiscordDisplayType.FEISHIN },
+                        { label: 'Sour Player', value: DiscordDisplayType.FEISHIN },
                         {
                             label: t('setting.discordDisplayType', {
                                 context: 'songname',

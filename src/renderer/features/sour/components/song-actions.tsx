@@ -2,15 +2,16 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
 import { toGroupSong } from '/@/renderer/features/group-play/api/group-play-api';
+import { type GroupSong } from '/@/renderer/features/group-play/store/group-play.store';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { sourApi } from '/@/renderer/features/sour/api/sour-api';
 import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { toast } from '/@/shared/components/toast/toast';
-import { type Song } from '/@/shared/types/domain-types';
+import { type Album, type AlbumArtist, type Artist, type Song } from '/@/shared/types/domain-types';
 
-// Song right-click menu: add these songs to the favourites on your profile.
-export const AddToProfileAction = ({ songs }: { songs: Song[] }) => {
+// Adds songs, albums or artists to the favourites on your profile (skipping ones already there).
+const AddFavoritesItem = ({ entries }: { entries: GroupSong[] }) => {
     const url = useHermesUrl();
     const me = useSourStore((state) => state.me);
     const queryClient = useQueryClient();
@@ -20,7 +21,7 @@ export const AddToProfileAction = ({ songs }: { songs: Song[] }) => {
         try {
             const profile = await sourApi.profile(url, me.id);
             const have = new Set(profile.favorites.map((f) => f.id));
-            const added = songs.map(toGroupSong).filter((song) => !have.has(song.id));
+            const added = entries.filter((entry) => !have.has(entry.id));
             await sourApi.update(url, me, { favorites: [...profile.favorites, ...added] });
             queryClient.invalidateQueries({ queryKey: ['sour-profiles', url] });
             toast.success({
@@ -29,9 +30,9 @@ export const AddToProfileAction = ({ songs }: { songs: Song[] }) => {
         } catch (error) {
             toast.error({ message: (error as Error).message });
         }
-    }, [me, queryClient, songs, url]);
+    }, [entries, me, queryClient, url]);
 
-    if (!url || !me) return null;
+    if (!url || !me || !entries.length) return null;
 
     return (
         <ContextMenu.Item leftIcon="favorite" onSelect={onSelect}>
@@ -39,6 +40,39 @@ export const AddToProfileAction = ({ songs }: { songs: Song[] }) => {
         </ContextMenu.Item>
     );
 };
+
+// Song right-click menu
+export const AddToProfileAction = ({ songs }: { songs: Song[] }) => (
+    <AddFavoritesItem entries={songs.map(toGroupSong)} />
+);
+
+// Album right-click menu
+export const AddAlbumToProfileAction = ({ albums }: { albums: Album[] }) => (
+    <AddFavoritesItem
+        entries={albums.map((a) => ({
+            album: a.name,
+            artist: a.albumArtistName,
+            duration: 0,
+            id: `album:${a.id}`,
+            imageId: a.imageId,
+            title: a.name,
+        }))}
+    />
+);
+
+// Artist right-click menu
+export const AddArtistToProfileAction = ({ artists }: { artists: (AlbumArtist | Artist)[] }) => (
+    <AddFavoritesItem
+        entries={artists.map((a) => ({
+            album: '',
+            artist: a.name,
+            duration: 0,
+            id: `artist:${a.id}`,
+            imageId: a.imageId,
+            title: a.name,
+        }))}
+    />
+);
 
 // Song right-click menu: never let Auto DJ add this song's artist for you.
 export const BlockArtistAction = ({ songs }: { songs: Song[] }) => {

@@ -1,0 +1,45 @@
+.row,
+.row-offline {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    padding: 6px 8px;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+}
+
+.row-offline {
+    opacity: 0.6;
+}
+
+.row:hover,
+.row-offline:hover {
+    background: var(--theme-colors-surface, rgb(255 255 255 / 6%));
+}
+
+.text {
+    flex: 1;
+    min-width: 0;
+}
+
+.empty {
+    padding: 4px 8px;
+}
+
+.toggle {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 0.75rem;
+    color: var(--theme-colors-foreground-muted, #aaa);
+    cursor: pointer;
+    background: transparent;
+    border: none;
+}

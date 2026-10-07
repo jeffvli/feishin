@@ -26,9 +26,9 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
-            - name: Set the version (Sour Lemon 0.1.x; each build is newer, so installed copies update themselves)
+            - name: Set the version (Sour Lemon 0.x; each build is newer, so installed copies update themselves)
               shell: bash
-              run: npm pkg set version=0.1.$(( ${{ github.run_number }} - 18 ))
+              run: npm pkg set version=0.2.$(( ${{ github.run_number }} - 20 ))
 
             - name: Build for Windows
               run: pnpm run package:win:pr
@@ -56,9 +56,9 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
-            - name: Set the version (Sour Lemon 0.1.x; each build is newer, so installed copies update themselves)
+            - name: Set the version (Sour Lemon 0.x; each build is newer, so installed copies update themselves)
               shell: bash
-              run: npm pkg set version=0.1.$(( ${{ github.run_number }} - 18 ))
+              run: npm pkg set version=0.2.$(( ${{ github.run_number }} - 20 ))
 
             - name: Build for Linux
               run: pnpm run package:linux:pr
@@ -109,7 +109,7 @@ jobs:
 
             - name: Work out the version
               id: version
-              run: echo "v=0.1.$(( ${{ github.run_number }} - 18 ))" >> "$GITHUB_OUTPUT"
+              run: echo "v=0.2.$(( ${{ github.run_number }} - 20 ))" >> "$GITHUB_OUTPUT"
 
             - name: Publish release
               uses: softprops/action-gh-release@v2

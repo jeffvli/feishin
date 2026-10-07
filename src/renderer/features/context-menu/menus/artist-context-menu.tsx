@@ -9,6 +9,7 @@ import { SetFavoriteAction } from '/@/renderer/features/context-menu/actions/set
 import { SetRatingAction } from '/@/renderer/features/context-menu/actions/set-rating-action';
 import { ShareAction } from '/@/renderer/features/context-menu/actions/share-action';
 import { ContextMenuPreview } from '/@/renderer/features/context-menu/components/context-menu-preview';
+import { AddArtistToProfileAction } from '/@/renderer/features/sour/components/song-actions';
 import { ContextMenu } from '/@/shared/components/context-menu/context-menu';
 import { Artist, LibraryItem } from '/@/shared/types/domain-types';
 
@@ -31,6 +32,7 @@ export const ArtistContextMenu = ({ items, type }: ArtistContextMenuProps) => {
             <PlayArtistRadioAction artist={items[0]} disabled={items.length > 1} />
             <ContextMenu.Divider />
             <AddToPlaylistAction items={ids} itemType={LibraryItem.ARTIST} />
+            <AddArtistToProfileAction artists={items} />
             <ContextMenu.Divider />
             <SetFavoriteAction ids={ids} itemType={LibraryItem.ARTIST} />
             <SetRatingAction ids={ids} itemType={LibraryItem.ARTIST} />

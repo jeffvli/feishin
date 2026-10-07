@@ -1,6 +1,7 @@
-import { openModal } from '@mantine/modals';
+import { closeAllModals, openModal } from '@mantine/modals';
 import { useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { generatePath, useNavigate } from 'react-router';
 
 import styles from './people.module.css';
 
@@ -14,12 +15,15 @@ import { getSongById } from '/@/renderer/features/player/utils';
 import {
     avatarUrl,
     bannerUrl,
+    favoriteId,
+    favoriteKind,
     readPicture,
     sourApi,
     type SourProfile,
     timeAgo,
 } from '/@/renderer/features/sour/api/sour-api';
 import { useSourProfiles, useSourStore } from '/@/renderer/features/sour/store/sour.store';
+import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { addToQueueByData } from '/@/renderer/store/player.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
@@ -69,7 +73,7 @@ export const ProfileAvatar = ({
     );
 };
 
-const SongCover = ({ size, song }: { size: number; song: GroupSong }) => {
+export const SongCover = ({ size, song }: { size: number; song: GroupSong }) => {
     const serverId = useCurrentServer()?.id;
     return (
         <div className={styles.cover} style={{ height: size, width: size }}>
@@ -81,6 +85,25 @@ const SongCover = ({ size, song }: { size: number; song: GroupSong }) => {
                     itemType={LibraryItem.SONG}
                     serverId={serverId}
                     type="table"
+                />
+            )}
+        </div>
+    );
+};
+
+// album or artist picture from the shared music server
+const ItemCover = ({ entry, round }: { entry: GroupSong; round?: boolean }) => {
+    const serverId = useCurrentServer()?.id;
+    return (
+        <div className={round ? styles.artistCover : styles.albumCover}>
+            {entry.imageId && serverId && (
+                <ItemImage
+                    className={styles.coverImage}
+                    containerClassName={styles.coverImage}
+                    id={entry.imageId}
+                    itemType={round ? LibraryItem.ALBUM_ARTIST : LibraryItem.ALBUM}
+                    serverId={serverId}
+                    type="itemCard"
                 />
             )}
         </div>
@@ -258,6 +281,33 @@ const ProfileView = ({ onBack, profile }: { onBack?: () => void; profile: SourPr
 
     if (editing) return <ProfileEditor onDone={() => setEditing(false)} profile={profile} />;
 
+    const navigate = useNavigate();
+    const albums = profile.favorites.filter((f) => favoriteKind(f) === 'album');
+    const artists = profile.favorites.filter((f) => favoriteKind(f) === 'artist');
+    const songs = profile.favorites.filter((f) => favoriteKind(f) === 'song');
+
+    // album and artist favourites open their page
+    const openItem = (entry: GroupSong) => {
+        const id = favoriteId(entry);
+        closeAllModals();
+        if (favoriteKind(entry) === 'album') {
+            navigate(generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: id }));
+        } else {
+            navigate(generatePath(AppRoute.LIBRARY_ALBUM_ARTISTS_DETAIL, { albumArtistId: id }));
+        }
+    };
+
+    const removeButton = (entry: GroupSong) =>
+        isMe && (
+            <ActionIcon
+                icon="x"
+                onClick={() => removeFavorite(entry)}
+                size="xs"
+                tooltip={{ label: 'Remove from my profile' }}
+                variant="subtle"
+            />
+        );
+
     const removeFavorite = (song: GroupSong) => {
         if (!me) return;
         sourApi
@@ -329,42 +379,85 @@ const ProfileView = ({ onBack, profile }: { onBack?: () => void; profile: SourPr
                     </Stack>
                 </button>
             )}
-            <Stack gap={6}>
-                <Text fw={700}>Favourite songs</Text>
-                {!profile.favorites.length && (
-                    <Text isMuted size="sm">
-                        {isMe ? 'Right-click any song > Add to my profile.' : 'No favourites yet.'}
-                    </Text>
-                )}
-                {profile.favorites.map((song) => (
-                    <div className={styles.favorite} key={song.id}>
-                        <button
-                            className={styles.favoriteSong}
-                            onClick={() => playSong(song)}
-                            type="button"
-                        >
-                            <SongCover size={40} song={song} />
-                            <Stack gap={0} miw={0}>
-                                <Text fw={600} size="sm" truncate>
-                                    {song.title}
-                                </Text>
-                                <Text isMuted size="xs" truncate>
-                                    {song.artist}
-                                </Text>
-                            </Stack>
-                        </button>
-                        {isMe && (
-                            <ActionIcon
-                                icon="x"
-                                onClick={() => removeFavorite(song)}
-                                size="sm"
-                                tooltip={{ label: 'Remove from my profile' }}
-                                variant="subtle"
-                            />
-                        )}
+            {!profile.favorites.length && (
+                <Text isMuted size="sm">
+                    {isMe
+                        ? 'Right-click any song, album or artist > Add to my profile.'
+                        : 'No favourites yet.'}
+                </Text>
+            )}
+            {!!albums.length && (
+                <Stack gap={6}>
+                    <Text fw={700}>Favourite albums</Text>
+                    <div className={styles.tiles}>
+                        {albums.map((entry) => (
+                            <div className={styles.tile} key={entry.id}>
+                                <button
+                                    className={styles.tileButton}
+                                    onClick={() => openItem(entry)}
+                                    type="button"
+                                >
+                                    <ItemCover entry={entry} />
+                                    <Text fw={600} size="sm" truncate>
+                                        {entry.title}
+                                    </Text>
+                                    <Text isMuted size="xs" truncate>
+                                        {entry.artist}
+                                    </Text>
+                                </button>
+                                {removeButton(entry)}
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </Stack>
+                </Stack>
+            )}
+            {!!artists.length && (
+                <Stack gap={6}>
+                    <Text fw={700}>Favourite artists</Text>
+                    <div className={styles.tiles}>
+                        {artists.map((entry) => (
+                            <div className={styles.tile} key={entry.id}>
+                                <button
+                                    className={styles.tileButton}
+                                    onClick={() => openItem(entry)}
+                                    type="button"
+                                >
+                                    <ItemCover entry={entry} round />
+                                    <Text fw={600} size="sm" ta="center" truncate>
+                                        {entry.title}
+                                    </Text>
+                                </button>
+                                {removeButton(entry)}
+                            </div>
+                        ))}
+                    </div>
+                </Stack>
+            )}
+            {!!songs.length && (
+                <Stack gap={6}>
+                    <Text fw={700}>Favourite songs</Text>
+                    {songs.map((song) => (
+                        <div className={styles.favorite} key={song.id}>
+                            <button
+                                className={styles.favoriteSong}
+                                onClick={() => playSong(song)}
+                                type="button"
+                            >
+                                <SongCover size={40} song={song} />
+                                <Stack gap={0} miw={0}>
+                                    <Text fw={600} size="sm" truncate>
+                                        {song.title}
+                                    </Text>
+                                    <Text isMuted size="xs" truncate>
+                                        {song.artist}
+                                    </Text>
+                                </Stack>
+                            </button>
+                            {removeButton(song)}
+                        </div>
+                    ))}
+                </Stack>
+            )}
             {isMe && (
                 <Stack gap={6}>
                     <Text fw={700}>Blocked from Auto DJ</Text>

@@ -248,7 +248,7 @@ export const GroupPlayPanel = () => {
                     <div className={styles.choice}>
                         <Text fw={700}>Start a group</Text>
                         <Text isMuted size="sm">
-                            You host it: your Feishin plays the music.
+                            You host it: your Sour Player plays the music.
                         </Text>
                         <TextInput
                             onChange={(e) => setGroupName(e.currentTarget.value)}
@@ -377,7 +377,7 @@ export const GroupPlayPanel = () => {
             closeAllModals();
         });
 
-    const invite = `Join my Group Play in Feishin: people icon in the player bar > Join > code ${code}`;
+    const invite = `Join my Group Play in Sour Player: people icon in the player bar > Join > code ${code}`;
 
     return (
         <Stack gap="md">
@@ -556,7 +556,7 @@ export const GroupPlayPanel = () => {
                     />
                     <Switch
                         checked={!!state?.listed}
-                        description="Anyone with Feishin can see it under Groups playing now and join. Turn off to need the code."
+                        description="Anyone with Sour Player can see it under Groups playing now and join. Turn off to need the code."
                         label="Show in the group list"
                         onChange={(e) => setListed(e.currentTarget.checked)}
                     />

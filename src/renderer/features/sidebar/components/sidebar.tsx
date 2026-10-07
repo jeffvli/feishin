@@ -21,6 +21,7 @@ import {
     SidebarSharedPlaylistList,
     useSidebarPlaylistAddDragMonitor,
 } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
+import { SidebarFriends } from '/@/renderer/features/sour/components/sidebar-friends';
 import {
     useAppStore,
     useAppStoreActions,
@@ -136,7 +137,7 @@ export const Sidebar = () => {
                         item: styles.accordionItem,
                         root: styles.accordionRoot,
                     }}
-                    defaultValue={['library', 'collections', 'playlists']}
+                    defaultValue={['library', 'collections', 'playlists', 'friends']}
                     multiple
                 >
                     <Accordion.Item value="library">
@@ -160,6 +161,7 @@ export const Sidebar = () => {
                     </Accordion.Item>
                     <SidebarCollectionList />
                     {sidebarPlaylistList && <SidebarPlaylistSection />}
+                    <SidebarFriends />
                 </Accordion>
             </ScrollArea>
             <AnimatePresence initial={false} mode="popLayout">

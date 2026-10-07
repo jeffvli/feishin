@@ -1,5 +1,7 @@
 import { type GroupSong } from '/@/renderer/features/group-play/store/group-play.store';
 
+export type FavoriteKind = 'album' | 'artist' | 'song';
+
 export interface Me {
     id: string;
     key: string;
@@ -43,6 +45,13 @@ const call = async <T>(url: string, body?: unknown): Promise<T> => {
     if (!res.ok) throw new Error(json.error || `Hermes Music returned ${res.status}`);
     return json as T;
 };
+
+// Favourite albums and artists are kept in the profile's favourites list next to the songs, with
+// "album:" or "artist:" in front of their id (so Hermes Music needs no changes for them).
+export const favoriteKind = (f: GroupSong): FavoriteKind =>
+    f.id.startsWith('album:') ? 'album' : f.id.startsWith('artist:') ? 'artist' : 'song';
+
+export const favoriteId = (f: GroupSong) => f.id.replace(/^(album|artist):/, '');
 
 export const avatarUrl = (base: string, profile?: null | Pick<SourProfile, 'avatar' | 'id'>) =>
     profile?.avatar ? `${base}/api/profiles/${profile.id}/avatar?v=${profile.avatar}` : null;
