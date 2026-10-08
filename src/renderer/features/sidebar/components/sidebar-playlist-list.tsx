@@ -13,8 +13,10 @@ import { ItemImage, useItemImageUrl } from '/@/renderer/components/item-image/it
 import imageColumnStyles from '/@/renderer/components/item-list/item-table-list/columns/image-column.module.css';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
+import { getAlbumSongsById } from '/@/renderer/features/player/utils';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { openCreatePlaylistModal } from '/@/renderer/features/playlists/components/create-playlist-form';
+import { useAddToPlaylist } from '/@/renderer/features/playlists/mutations/add-to-playlist-mutation';
 import { useIsMutatingSidebarPlaylistFolderMove } from '/@/renderer/features/playlists/mutations/sidebar-playlist-folder-move-mutation';
 import { ItemRowPlayControls } from '/@/renderer/features/shared/components/item-row-play-controls';
 import { PlayButton } from '/@/renderer/features/shared/components/play-button';
@@ -33,6 +35,7 @@ import {
 } from '/@/renderer/features/sidebar/components/playlist-folder-tree';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { useDragMonitor } from '/@/renderer/hooks/use-drag-monitor';
+import { queryClient } from '/@/renderer/lib/react-query';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     useCurrentPlaylistContextId,
@@ -55,6 +58,7 @@ import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
 import { Text } from '/@/shared/components/text/text';
+import { toast } from '/@/shared/components/toast/toast';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import {
@@ -134,6 +138,52 @@ export const PlaylistRowButton = memo(
         const [isHovered, setIsHovered] = useState(false);
         const isSmartPlaylist = Boolean(item.rules);
         const isAddDragActive = useContext(SidebarPlaylistAddDragContext);
+        const addToPlaylistMutation = useAddToPlaylist({});
+        const currentServerId = useCurrentServerId();
+
+        const addSongsDirectly = async (songIds: string[]) => {
+            if (songIds.length === 0) return;
+
+            addToPlaylistMutation.mutate(
+                {
+                    apiClientProps: { serverId: currentServerId },
+                    body: { songId: songIds },
+                    query: { id: item.id },
+                },
+                {
+                    onError: (err) => {
+                        toast.error({
+                            message: `[${item.name}] ${err.message}`,
+                            title: t('error.genericError'),
+                        });
+                    },
+                    onSuccess: () => {
+                        toast.success({
+                            message: t('form.addToPlaylist.success', {
+                                message: songIds.length,
+                                numOfPlaylists: 1,
+                            }),
+                        });
+                    },
+                },
+            );
+        };
+
+        const addAlbumDirectly = async (albumIds: string[]) => {
+            try {
+                const songs = await getAlbumSongsById({
+                    id: albumIds,
+                    queryClient,
+                    serverId: currentServerId,
+                });
+                await addSongsDirectly(songs?.items?.map((song) => song.id) ?? []);
+            } catch (error: any) {
+                toast.error({
+                    message: error?.message || t('error.genericError'),
+                    title: t('error.genericError'),
+                });
+            }
+        };
 
         const { isDraggedOver, isDragging, ref } = useDragDrop<HTMLAnchorElement>({
             drag: {
@@ -209,6 +259,21 @@ export const PlaylistRowButton = memo(
                         return;
                     }
 
+                    if (sourceItemType === LibraryItem.SONG) {
+                        const songs = Array.isArray(args.source.item)
+                            ? (args.source.item as Song[])
+                            : [];
+                        addSongsDirectly(
+                            songs.length > 0 ? songs.map((song) => song.id) : sourceIds,
+                        );
+                        return;
+                    }
+
+                    if (sourceItemType === LibraryItem.ALBUM) {
+                        addAlbumDirectly(sourceIds);
+                        return;
+                    }
+
                     const modalProps: {
                         albumId?: string[];
                         artistId?: string[];
@@ -222,9 +287,6 @@ export const PlaylistRowButton = memo(
                     };
 
                     switch (sourceItemType) {
-                        case LibraryItem.ALBUM:
-                            modalProps.albumId = sourceIds;
-                            break;
                         case LibraryItem.ALBUM_ARTIST:
                         case LibraryItem.ARTIST:
                             modalProps.artistId = sourceIds;
@@ -240,7 +302,6 @@ export const PlaylistRowButton = memo(
                             break;
                         case LibraryItem.PLAYLIST_SONG:
                         case LibraryItem.QUEUE_SONG:
-                        case LibraryItem.SONG:
                             if (args.source.item && Array.isArray(args.source.item)) {
                                 const songs = args.source.item as Song[];
                                 modalProps.songId = songs.map((song) => song.id);

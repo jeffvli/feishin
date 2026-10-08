@@ -18,6 +18,7 @@ import {
     useIsRadioActive,
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
+import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { useHotkeys } from '/@/renderer/hooks/use-hotkeys';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
@@ -37,6 +38,7 @@ import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { PlaybackSelectors } from '/@/shared/constants/playback-selectors';
 import { LibraryItem } from '/@/shared/types/domain-types';
+import { DragOperation, DragTarget } from '/@/shared/types/drag-and-drop';
 
 export const LeftControls = () => {
     const { t } = useTranslation();
@@ -67,6 +69,37 @@ export const LeftControls = () => {
     const isSongDefined = Boolean(currentSong?.id) && !isRadioMode;
     const title = currentSong?.name;
     const artists = currentSong?.artists;
+
+    const { ref: songDragRef } = useDragDrop<HTMLDivElement>({
+        drag: {
+            getId: () => (currentSong?.id ? [currentSong.id] : []),
+            getItem: () => (currentSong ? [currentSong] : []),
+            itemType: LibraryItem.SONG,
+            operation: [DragOperation.ADD],
+            target: DragTarget.SONG,
+        },
+        isEnabled: isSongDefined,
+    });
+
+    const { ref: albumDragRef } = useDragDrop<HTMLDivElement>({
+        drag: {
+            getId: () => (currentSong?.albumId ? [currentSong.albumId] : []),
+            getItem: () =>
+                currentSong?.albumId
+                    ? [
+                          {
+                              id: currentSong.albumId,
+                              imageId: currentSong.imageId,
+                              name: currentSong.album,
+                          },
+                      ]
+                    : [],
+            itemType: LibraryItem.ALBUM,
+            operation: [DragOperation.ADD],
+            target: DragTarget.ALBUM,
+        },
+        isEnabled: isSongDefined && Boolean(currentSong?.albumId),
+    });
 
     const handleToggleFullScreenPlayer = (e?: KeyboardEvent | MouseEvent<HTMLDivElement>) => {
         // don't toggle if right click
@@ -209,11 +242,16 @@ export const LeftControls = () => {
                         />
                     ) : (
                         <>
-                            <div className={styles.lineItem} onClick={stopPropagation}>
+                            <div
+                                className={styles.lineItem}
+                                onClick={stopPropagation}
+                                ref={songDragRef}
+                            >
                                 <Group align="center" gap="xs" wrap="nowrap">
                                     <Text
                                         className={PlaybackSelectors.songTitle}
                                         component={Link}
+                                        draggable={false}
                                         fw={500}
                                         isLink
                                         onContextMenu={handleToggleContextMenu}
@@ -285,9 +323,11 @@ export const LeftControls = () => {
                                     PlaybackSelectors.songAlbum,
                                 )}
                                 onClick={stopPropagation}
+                                ref={albumDragRef}
                             >
                                 <Text
                                     component={Link}
+                                    draggable={false}
                                     fw={500}
                                     isLink
                                     overflow="hidden"
