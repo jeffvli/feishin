@@ -388,6 +388,7 @@
             "success": "Added $t(entity.trackWithCount, {\"count\": {{message}} }) to $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
             "title": "Add to $t(entity.playlist, {\"count\": 1})",
             "alreadyInPlaylist": "This song is already in this playlist",
+            "checkingPlaylist": "Still fetching this playlist's songs, can't tell yet if this song is already in it",
             "disableSkipDuplicatesForAddingExistingInPlaylist": "This song is already in this playlist and \"{{skipDuplicates}}\" is enabled. Please uncheck \"{{skipDuplicates}}\" to add this song to the playlist."
         },
         "createPlaylist": {

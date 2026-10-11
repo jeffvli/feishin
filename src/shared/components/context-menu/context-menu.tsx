@@ -133,7 +133,14 @@ function Item(props: ItemProps) {
         >
             {leftIcon && <Icon className={styles.leftIcon} icon={leftIcon} />}
             {children}
-            {rightIcon && <Icon className={styles.rightIcon} icon={rightIcon} />}
+            {rightIcon &&
+                (rightIcon === 'spinner' ? (
+                    <span className={styles.rightIcon}>
+                        <Icon animate="spin" icon={rightIcon} />
+                    </span>
+                ) : (
+                    <Icon className={styles.rightIcon} icon={rightIcon} />
+                ))}
         </RadixContextMenu.Item>
     );
 

@@ -100,18 +100,17 @@ export const AddToPlaylistContextModal = ({
         songIds: songId,
     });
 
-    const isPlaylistsReady = !!playlistList.data && isReady;
-
     const [playlistSelect, playlistMap] = useMemo(() => {
         const options = playlists.map((playlist, index) => ({
             ...playlist,
             alreadyInPlaylist: inPlaylist[index] ?? false,
+            isChecking: !isReady && inPlaylist[index] === undefined,
             label: playlist.name,
             value: playlist.id,
         }));
 
         return [options, new Map(options.map(({ id, name }) => [id, name]))] as const;
-    }, [playlists, inPlaylist]);
+    }, [playlists, inPlaylist, isReady]);
 
     const filteredItems = useMemo(() => {
         if (search) {
@@ -469,13 +468,8 @@ export const AddToPlaylistContextModal = ({
                         placeholder={t('form.addToPlaylist.searchOrCreate')}
                         value={search}
                     />
-                    {!isPlaylistsReady && <Spinner container />}
-                    <ScrollArea
-                        style={{
-                            display: isPlaylistsReady ? undefined : 'none',
-                            maxHeight: '18rem',
-                        }}
-                    >
+                    {!playlistList.data && <Spinner container />}
+                    <ScrollArea style={{ maxHeight: '18rem' }}>
                         <Table styles={{ td: { padding: 'var(--theme-spacing-sm)' } }}>
                             <Table.Tbody>
                                 {filteredItems.map((item, index) => (
@@ -594,7 +588,6 @@ export const AddToPlaylistContextModal = ({
                         <ModalButton
                             disabled={
                                 isLoading ||
-                                !isPlaylistsReady ||
                                 addToPlaylistMutation.isPending ||
                                 (form.values.selectedPlaylistIds.length === 0 &&
                                     form.values.newPlaylists.length === 0)
@@ -617,7 +610,12 @@ const PlaylistTableItem = memo(
     ({
         item,
     }: {
-        item: Playlist & { alreadyInPlaylist: boolean; label: string; value: string };
+        item: Playlist & {
+            alreadyInPlaylist: boolean;
+            isChecking: boolean;
+            label: string;
+            value: string;
+        };
     }) => {
         const { t } = useTranslation();
 
@@ -660,6 +658,13 @@ const PlaylistTableItem = memo(
                                     </Group>
                                 </Group>
                                 <Stack align="center" className={styles.statusText} gap={0}>
+                                    {item.isChecking && (
+                                        <Tooltip label={t('form.addToPlaylist.checkingPlaylist')}>
+                                            <span>
+                                                <Spinner size="md" />
+                                            </span>
+                                        </Tooltip>
+                                    )}
                                     {item.alreadyInPlaylist && (
                                         <Tooltip label={t('form.addToPlaylist.alreadyInPlaylist')}>
                                             <span>
