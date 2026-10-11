@@ -15,11 +15,16 @@ export const packageVersion = JSON.parse(
 ).version;
 
 const isExpectedMediaCancellation = (message) =>
-    message.startsWith('The play() request was interrupted by a new load request.');
+    message.startsWith('The play() request was interrupted by a new load request.') ||
+    message.startsWith('The play() request was interrupted by a call to pause().');
 
-export const launchKatiesAmp = ({ mockJellyfin, serverLock = 'true', userDataDirectory }) =>
-    electron.launch({
-        args: [`--user-data-dir=${userDataDirectory}`, repositoryRoot],
+export const launchKatiesAmp = ({ mockJellyfin, serverLock = 'true', userDataDirectory }) => {
+    const packagedExecutablePath = process.env.KATIESAMP_EXECUTABLE_PATH;
+    const args = [`--user-data-dir=${userDataDirectory}`];
+    if (!packagedExecutablePath) args.push(repositoryRoot);
+
+    return electron.launch({
+        args,
         env: {
             ...process.env,
             APPDATA: userDataDirectory,
@@ -30,16 +35,21 @@ export const launchKatiesAmp = ({ mockJellyfin, serverLock = 'true', userDataDir
             SERVER_TYPE: 'jellyfin',
             SERVER_URL: mockJellyfin.url,
         },
-        executablePath: electronPath,
+        executablePath: packagedExecutablePath || electronPath,
     });
+};
 
 export const test = base.extend({
     electronApp: async ({ mockJellyfin, serverLock, userDataDirectory }, use) => {
+        const launchStartedAt = performance.now();
         const electronApp = await launchKatiesAmp({
             mockJellyfin,
             serverLock,
             userDataDirectory,
         });
+        const firstWindow = await electronApp.firstWindow();
+        await firstWindow.waitForLoadState('domcontentloaded');
+        electronApp.katiesAmpLaunchDurationMs = performance.now() - launchStartedAt;
 
         await use(electronApp);
 
@@ -50,13 +60,15 @@ export const test = base.extend({
             .catch(() => {});
         await electronApp.close().catch(() => {});
     },
-    // Playwright requires object destructuring even when a fixture has no dependencies.
-    // eslint-disable-next-line no-empty-pattern
-    mockJellyfin: async ({}, use) => {
-        const mockJellyfin = await startMockJellyfin();
+    launchDurationMs: async ({ electronApp }, use) => {
+        await use(electronApp.katiesAmpLaunchDurationMs);
+    },
+    mockJellyfin: async ({ mockSongCount }, use) => {
+        const mockJellyfin = await startMockJellyfin({ songCount: mockSongCount });
         await use(mockJellyfin);
         await mockJellyfin.close();
     },
+    mockSongCount: [6, { option: true }],
     page: async ({ electronApp, mockJellyfin }, use, testInfo) => {
         const page = await electronApp.firstWindow();
         const errors = [];

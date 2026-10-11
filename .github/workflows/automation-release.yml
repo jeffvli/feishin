@@ -119,6 +119,13 @@ jobs:
                   }
                   pnpm exec electron-builder --config $config --win --x64 --publish never
 
+            - name: Measure packaged Windows performance
+              shell: pwsh
+              run: |
+                  $env:KATIESAMP_EXECUTABLE_PATH = (Resolve-Path 'dist/win-unpacked/KatiesAmp.exe').Path
+                  $env:KATIESAMP_TEST_OUTPUT_ROOT = 'test-results/electron/packaged-performance'
+                  pnpm run test:ui:performance
+
             - name: Verify packaged application and update files
               shell: pwsh
               run: scripts/automation/verify-windows-package.ps1 -ManifestName '${{ steps.version.outputs.manifest }}'
@@ -152,6 +159,15 @@ jobs:
                       dist/*.yml
                       dist/SHA256SUMS.txt
                   if-no-files-found: error
+                  retention-days: 30
+
+            - name: Upload performance evidence
+              if: always()
+              uses: actions/upload-artifact@v7
+              with:
+                  name: katiesamp-performance-${{ github.run_id }}
+                  path: test-results/electron
+                  if-no-files-found: ignore
                   retention-days: 30
 
             - name: Publish GitHub release
