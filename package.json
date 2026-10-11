@@ -50,6 +50,7 @@
         "test:ui": "playwright test --config playwright.electron.config.mjs --grep \"@smoke|@full\"",
         "test:ui:all": "playwright test --config playwright.electron.config.mjs",
         "test:ui:nightly": "playwright test --config playwright.electron.config.mjs --grep @nightly",
+        "test:ui:performance": "playwright test --config playwright.electron.config.mjs --grep @performance-release",
         "typecheck": "pnpm run typecheck:node && pnpm run typecheck:web",
         "typecheck:node": "tsc --noEmit -p tsconfig.node.json --composite false",
         "typecheck:web": "tsc --noEmit -p tsconfig.web.json --composite false"

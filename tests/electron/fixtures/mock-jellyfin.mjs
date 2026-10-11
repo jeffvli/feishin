@@ -210,11 +210,13 @@ export const startMockJellyfin = async ({ songCount = 6 } = {}) => {
         unexpectedRequests: [],
     };
     state.playlistSongIds = state.library.songs.map((song) => song.Id);
+    const audioFixtures = [
+        makeWave(12, 1_000, 220),
+        makeWave(12, 20_000, 250),
+        makeWave(12, 4_000, 280),
+    ];
     const audioBySongId = new Map(
-        state.library.songs.map((song, index) => [
-            song.Id,
-            makeWave(12, index === 0 ? 1_000 : index === 1 ? 20_000 : 4_000, 220 + index * 30),
-        ]),
+        state.library.songs.map((song, index) => [song.Id, audioFixtures[Math.min(index, 2)]]),
     );
 
     const server = http.createServer(async (request, response) => {

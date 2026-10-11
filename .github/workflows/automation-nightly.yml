@@ -41,9 +41,10 @@ jobs:
         needs: [changes, full]
         if: needs.changes.outputs.run == 'true'
         runs-on: windows-latest
-        timeout-minutes: 45
+        timeout-minutes: 75
         env:
             DISABLE_AUTO_UPDATES: '1'
+            KATIESAMP_PERF_SOAK_MINUTES: '20'
         steps:
             - name: Check out repository
               uses: actions/checkout@v6
@@ -65,6 +66,13 @@ jobs:
 
             - name: Run extended Electron UI tests
               run: pnpm run test:ui:nightly
+
+            - name: Measure packaged Windows performance
+              shell: pwsh
+              run: |
+                  $env:KATIESAMP_EXECUTABLE_PATH = (Resolve-Path 'dist/win-unpacked/KatiesAmp.exe').Path
+                  $env:KATIESAMP_TEST_OUTPUT_ROOT = 'test-results/electron/packaged-performance'
+                  pnpm run test:ui:performance
 
             - name: Verify packaged application
               shell: pwsh
