@@ -4,8 +4,8 @@ import test from 'node:test';
 import {
     calculateCrossfadeVolumes,
     captureCrossfadeTransitionSettings,
-    resolveManualCrossfadeDuration,
     resolveCrossfadeTransitionSettings,
+    resolveManualCrossfadeDuration,
 } from '../src/renderer/features/player/audio-player/utils/crossfade-transition.ts';
 
 test('an active crossfade keeps the settings it started with', () => {
