@@ -8,6 +8,7 @@ export type EventMap = {
     AUTODJ_QUEUE_ADDED: AutoDJQueueAddedEventPayload;
     ITEM_LIST_REFRESH: ItemListRefreshEventPayload;
     ITEM_LIST_UPDATE_ITEM: ItemListUpdateItemEventPayload;
+    MEDIA_FADE_NEXT: MediaFadeNextEventPayload;
     MEDIA_NEXT: MediaNextEventPayload;
     MEDIA_PREV: MediaPrevEventPayload;
     MPV_RELOAD: MpvReloadEventPayload;
@@ -35,6 +36,8 @@ export type ItemListUpdateItemEventPayload = {
     item: unknown;
     key: string;
 };
+
+export type MediaFadeNextEventPayload = Record<string, never>;
 
 export type MediaNextEventPayload = {
     currentIndex: number;
