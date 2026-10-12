@@ -42,6 +42,7 @@ interface SettingsState {
     // that would otherwise fire has no way to reach the phone.
     confirmQueueChanges: boolean;
     connected: boolean;
+    discardQueueSkipsCurrentTrack: boolean;
     info: Omit<SongUpdateSocket, 'currentTime'>;
     isDark: boolean;
     socket?: StatefulWebSocket;
@@ -56,6 +57,7 @@ const initialState: SettingsState = {
     authFailed: false,
     confirmQueueChanges: true,
     connected: false,
+    discardQueueSkipsCurrentTrack: true,
     info: {},
     isDark: window.matchMedia('(prefers-color-scheme: dark)').matches,
 };
@@ -185,6 +187,12 @@ export const useRemoteStore = createWithEqualityFn<SettingsSlice>()(
                                     case 'confirm-queue-changes-setting': {
                                         set((state) => {
                                             state.confirmQueueChanges = data;
+                                        });
+                                        break;
+                                    }
+                                    case 'discard-queue-skips-current-track': {
+                                        set((state) => {
+                                            state.discardQueueSkipsCurrentTrack = data;
                                         });
                                         break;
                                     }
@@ -529,6 +537,9 @@ export const useAccentColor = () => useRemoteStore((state) => state.accentColor)
 export const useAuthFailed = () => useRemoteStore((state) => state.authFailed);
 
 export const useConfirmQueueChanges = () => useRemoteStore((state) => state.confirmQueueChanges);
+
+export const useDiscardQueueSkipsCurrentTrack = () =>
+    useRemoteStore((state) => state.discardQueueSkipsCurrentTrack);
 
 export const useConnected = () => useRemoteStore((state) => state.connected);
 

@@ -413,6 +413,26 @@ export const ApplicationSettings = memo(() => {
         {
             control: (
                 <Switch
+                    aria-label={t('setting.discardQueueSkipsCurrentTrack')}
+                    checked={settings.discardQueueSkipsCurrentTrack}
+                    onChange={(event) => {
+                        setSettings({
+                            general: {
+                                ...settings,
+                                discardQueueSkipsCurrentTrack: event.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.discardQueueSkipsCurrentTrack', {
+                context: 'description',
+            }),
+            title: t('setting.discardQueueSkipsCurrentTrack'),
+        },
+        {
+            control: (
+                <Switch
                     aria-label={t('setting.homeFeature')}
                     defaultChecked={settings.homeFeature}
                     onChange={(e) =>

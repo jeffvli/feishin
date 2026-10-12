@@ -32,13 +32,15 @@ const remote = isElectron() ? window.api.remote : null;
 export const useRemoteSettingsPush = () => {
     const isRemoteEnabled = useRemoteSettings().enabled;
     const confirmQueueChanges = useGeneralSettings().confirmQueueChanges;
+    const discardQueueSkipsCurrentTrack = useGeneralSettings().discardQueueSkipsCurrentTrack;
     const accent = useAccent();
     const { primaryShade, useThemeAccentColor, useThemePrimaryShade } = useThemeSettings();
 
     useEffect(() => {
         if (!isRemoteEnabled || !remote) return;
         remote.updateConfirmQueueChangesSetting(confirmQueueChanges);
-    }, [isRemoteEnabled, confirmQueueChanges]);
+        remote.updateDiscardQueueSkipsCurrentTrack(discardQueueSkipsCurrentTrack);
+    }, [isRemoteEnabled, confirmQueueChanges, discardQueueSkipsCurrentTrack]);
 
     useEffect(() => {
         if (!isRemoteEnabled || !remote) return;

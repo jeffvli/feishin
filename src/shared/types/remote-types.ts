@@ -218,6 +218,11 @@ export interface ServerConfirmQueueChangesSetting {
     event: 'confirm-queue-changes-setting';
 }
 
+export interface ServerDiscardQueueSkipsCurrentTrack {
+    data: boolean;
+    event: 'discard-queue-skips-current-track';
+}
+
 export interface ServerError {
     data: string;
     event: 'error';
@@ -227,6 +232,7 @@ export type ServerEvent =
     | ServerAccentColor
     | ServerAlbumsResponse
     | ServerConfirmQueueChangesSetting
+    | ServerDiscardQueueSkipsCurrentTrack
     | ServerError
     | ServerFavorite
     | ServerOperationAck

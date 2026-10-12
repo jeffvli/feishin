@@ -118,6 +118,10 @@ const updateConfirmQueueChangesSetting = (enabled: boolean) => {
     ipcRenderer.send('update-confirm-queue-changes-setting', enabled);
 };
 
+const updateDiscardQueueSkipsCurrentTrack = (enabled: boolean) => {
+    ipcRenderer.send('update-discard-queue-skips-current-track', enabled);
+};
+
 const updateAccentColor = (color: { dark: string; light: string }) => {
     ipcRenderer.send('update-accent-color', color);
 };
@@ -232,6 +236,7 @@ export const remote = {
     setRemotePort,
     updateAccentColor,
     updateConfirmQueueChangesSetting,
+    updateDiscardQueueSkipsCurrentTrack,
     updateFavorite,
     updatePassword,
     updatePlayback,
