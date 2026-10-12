@@ -39,3 +39,36 @@ test('@full adds a song next without interrupting the current track', async ({ p
         page.locator('#sidebar-queue').getByText('Automation Track 2', { exact: true }).first(),
     ).toBeVisible();
 });
+
+test('@full fades into the next queued track without advancing twice', async ({ page }) => {
+    await login(page);
+    await navigateTo(page, '/library/songs');
+
+    const firstSong = getSongCell(page, 'Automation Track 1');
+    await expect(firstSong).toBeVisible({ timeout: 15_000 });
+    await firstSong.dblclick();
+
+    const playerBar = page.locator('.media-player');
+    const fadeToNext = playerBar.getByRole('button', { name: 'Fade to next' });
+    await expect(fadeToNext).toBeEnabled();
+    await fadeToNext.click();
+    await expect(fadeToNext).toBeDisabled();
+
+    await expect
+        .poll(() =>
+            page.evaluate(
+                () =>
+                    [...document.querySelectorAll('audio')].filter((audio) => !audio.paused).length,
+            ),
+        )
+        .toBeGreaterThan(1);
+
+    await expect(playerBar.getByText('Automation Track 2', { exact: true })).toBeVisible({
+        timeout: 8_000,
+    });
+    await expect(fadeToNext).toBeEnabled();
+    await page.getByRole('button', { name: 'View queue' }).click();
+    const queue = page.locator('#sidebar-queue');
+    await expect(queue.getByText('Automation Track 2', { exact: true }).first()).toBeVisible();
+    await expect(queue.getByText('Automation Track 3', { exact: true }).first()).toBeVisible();
+});

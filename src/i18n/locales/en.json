@@ -783,6 +783,8 @@
         "addNextShuffled": "Next (shuffled)",
         "albumRadio": "Album radio",
         "artistRadio": "Artist radio",
+        "fadeToNext": "Fade to next",
+        "fadeToNextDescription": "Crossfade into the next queued track now.",
         "holdToShuffle": "Hold to shuffle",
         "favorite": "Favorite",
         "lyrics": "Lyrics",

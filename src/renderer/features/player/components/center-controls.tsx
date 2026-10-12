@@ -13,6 +13,10 @@ import {
 } from '/@/renderer/features/radio/hooks/use-radio-player';
 import {
     useButtonSize,
+    useFadeToNextActive,
+    usePlaybackType,
+    usePlayerActions,
+    usePlayerData,
     usePlayerRepeat,
     usePlayerShuffle,
     usePlayerSongProperties,
@@ -22,7 +26,7 @@ import {
 import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
-import { PlayerRepeat, PlayerShuffle, PlayerStatus } from '/@/shared/types/types';
+import { PlayerRepeat, PlayerShuffle, PlayerStatus, PlayerType } from '/@/shared/types/types';
 
 export const CenterControls = () => {
     const skip = useSkipButtons();
@@ -59,6 +63,7 @@ export const CenterControls = () => {
                     <CenterPlayButton />
                     {skip?.enabled && <SkipForwardButton />}
                     <NextButton />
+                    <FadeToNextButton />
                     <RepeatButton />
                 </div>
             </div>
@@ -266,6 +271,39 @@ const NextButton = ({ disabled }: { disabled?: boolean }) => {
                         </Text>
                     </Stack>
                 ),
+                openDelay: 0,
+            }}
+            variant="secondary"
+        />
+    );
+};
+
+const FadeToNextButton = ({ disabled }: { disabled?: boolean }) => {
+    const { t } = useTranslation();
+    const buttonSize = useButtonSize();
+    const fadeToNextActive = useFadeToNextActive();
+    const playbackType = usePlaybackType();
+    const { nextSong, status } = usePlayerData();
+    const { mediaFadeToNext } = usePlayerActions();
+    const label = t('player.fadeToNext', { defaultValue: 'Fade to next' });
+    const isSupportedPlayer = playbackType === PlayerType.WEB || playbackType === PlayerType.LOCAL;
+
+    return (
+        <PlayerButton
+            aria-label={label}
+            disabled={
+                disabled ||
+                fadeToNextActive ||
+                !isSupportedPlayer ||
+                status !== PlayerStatus.PLAYING ||
+                !nextSong
+            }
+            icon={<Icon fill="default" icon="audioLines" size={buttonSize} />}
+            onClick={mediaFadeToNext}
+            tooltip={{
+                label: t('player.fadeToNextDescription', {
+                    defaultValue: 'Crossfade into the next queued track now.',
+                }),
                 openDelay: 0,
             }}
             variant="secondary"

@@ -34,6 +34,7 @@ import {
     PlayerShuffle,
     PlayerStatus,
     PlayerStyle,
+    PlayerType,
 } from '/@/shared/types/types';
 
 export interface PlayerState extends Actions, State {}
@@ -51,6 +52,7 @@ interface Actions {
     clearQueue: () => void;
     clearSelected: (items: QueueSong[]) => void;
     decreaseVolume: (value: number) => void;
+    finishFadeToNext: () => void;
     getCurrentSong: () => QueueSong | undefined;
     getPlaybackQueue: () => GroupedQueue;
     getPlayerData: () => PlayerData;
@@ -59,7 +61,8 @@ interface Actions {
     increaseVolume: (value: number) => void;
     isFirstTrackInQueue: () => boolean;
     isLastTrackInQueue: () => boolean;
-    mediaAutoNext: () => PlayerData;
+    mediaAutoNext: (options?: { ignoreRepeatOne?: boolean }) => PlayerData;
+    mediaFadeToNext: () => void;
     mediaNext: (toNextAlbum: boolean) => void;
     mediaPause: () => void;
     mediaPlay: (id?: string, options?: { consumePrevious?: boolean }) => void;
@@ -121,6 +124,8 @@ interface QueueConsumptionResult {
 }
 
 interface State {
+    // Runtime-only: manual transitions are never restored after relaunch.
+    fadeToNextActive: boolean;
     hydrated: boolean;
     // Runtime-only: true once the mpv engine has finished initializing.
     // Top-level keys are not persisted (see partialize), same as `hydrated`.
@@ -353,6 +358,7 @@ function generateShuffledIndexes(length: number): number[] {
 }
 
 const initialState: State = {
+    fadeToNextActive: false,
     hydrated: false,
     mpvInitialized: false,
     player: {
@@ -777,6 +783,11 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         state.player.volume = Math.max(0, state.player.volume - value);
                     });
                 },
+                finishFadeToNext: () => {
+                    set((state) => {
+                        state.fadeToNextActive = false;
+                    });
+                },
                 getCurrentSong: () => {
                     const state = get();
                     const queue = state.getQueue();
@@ -945,11 +956,14 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     const currentIndex = state.player.index;
                     return currentIndex === queue.items.length - 1;
                 },
-                mediaAutoNext: () => {
+                mediaAutoNext: (options) => {
                     const stateSnapshot = get();
                     const currentIndex = stateSnapshot.player.index;
                     const player = stateSnapshot.player;
-                    const repeat = player.repeat;
+                    const repeat =
+                        options?.ignoreRepeatOne && player.repeat === PlayerRepeat.ONE
+                            ? PlayerRepeat.NONE
+                            : player.repeat;
                     const queue = stateSnapshot.getQueueOrder();
                     const isShuffle = isShuffleEnabled(stateSnapshot);
 
@@ -1110,6 +1124,26 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         queueLength: queue.items.length,
                         status: newStatus,
                     };
+                },
+                mediaFadeToNext: () => {
+                    const state = get();
+                    const playbackType = useSettingsStore.getState().playback.type;
+                    const isSupportedPlayer =
+                        playbackType === PlayerType.WEB || playbackType === PlayerType.LOCAL;
+
+                    if (
+                        !isSupportedPlayer ||
+                        state.fadeToNextActive ||
+                        state.player.status !== PlayerStatus.PLAYING ||
+                        !state.getPlayerData().nextSong
+                    ) {
+                        return;
+                    }
+
+                    set((draft) => {
+                        draft.fadeToNextActive = true;
+                    });
+                    eventEmitter.emit('MEDIA_FADE_NEXT', {});
                 },
                 mediaNext: (toNextAlbum) => {
                     const state = get();
@@ -2066,12 +2100,14 @@ export const usePlayerActions = () => {
             clearQueue: state.clearQueue,
             clearSelected: state.clearSelected,
             decreaseVolume: state.decreaseVolume,
+            finishFadeToNext: state.finishFadeToNext,
             getPlaybackQueue: state.getPlaybackQueue,
             getQueue: state.getQueue,
             increaseVolume: state.increaseVolume,
             isFirstTrackInQueue: state.isFirstTrackInQueue,
             isLastTrackInQueue: state.isLastTrackInQueue,
             mediaAutoNext: state.mediaAutoNext,
+            mediaFadeToNext: state.mediaFadeToNext,
             mediaNext: state.mediaNext,
             mediaPause: state.mediaPause,
             mediaPlay: state.mediaPlay,
@@ -2503,6 +2539,10 @@ export const usePlayerShuffle = () => {
 
 export const usePlayerStatus = () => {
     return usePlayerStoreBase((state) => state.player.status);
+};
+
+export const useFadeToNextActive = () => {
+    return usePlayerStoreBase((state) => state.fadeToNextActive);
 };
 
 export const usePlayerHydrated = () => {

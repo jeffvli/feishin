@@ -3,7 +3,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { MpvPlayerEngine, MpvPlayerEngineHandle } from './engine/mpv-player-engine';
 
+import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
+import {
+    captureCrossfadeTransitionSettings,
+    getCrossfadeEasing,
+} from '/@/renderer/features/player/audio-player/utils/crossfade-transition';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     usePlaybackSettings,
@@ -24,8 +29,8 @@ const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 export function MpvPlayer() {
     const playerRef = useRef<MpvPlayerEngineHandle>(null);
     const { currentSong, status } = usePlayerData();
-    const { mediaAutoNext, setTimestamp } = usePlayerActions();
-    const { speed } = usePlayerProperties();
+    const { finishFadeToNext, mediaAutoNext, mediaNext, setTimestamp } = usePlayerActions();
+    const { crossfadeDuration, crossfadeStyle, speed } = usePlayerProperties();
     const isMuted = usePlayerMuted();
     const volume = usePlayerVolume();
     const { audioFadeOnStatusChange, preservePitch } = usePlaybackSettings();
@@ -33,6 +38,8 @@ export function MpvPlayer() {
     const [localPlayerStatus, setLocalPlayerStatus] = useState<PlayerStatus>(status);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const fadeIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const manualCrossfadeActiveRef = useRef(false);
+    const manualCrossfadeAdvancingRef = useRef(false);
 
     const fadeAndSetStatus = useCallback(
         async (startVolume: number, endVolume: number, duration: number, status: PlayerStatus) => {
@@ -99,16 +106,124 @@ export function MpvPlayer() {
         return playerData;
     }, [mediaAutoNext, volume, setIsTransitioning]);
 
+    const cancelManualCrossfade = useCallback(() => {
+        if (!manualCrossfadeActiveRef.current) {
+            return;
+        }
+
+        manualCrossfadeActiveRef.current = false;
+        manualCrossfadeAdvancingRef.current = false;
+        playerRef.current?.setVolume(volume);
+        setIsTransitioning(false);
+        finishFadeToNext();
+    }, [finishFadeToNext, volume]);
+
+    const animateManualVolume = useCallback(
+        async (getVolume: (progress: number) => number, durationMs: number) => {
+            const startedAt = performance.now();
+
+            while (manualCrossfadeActiveRef.current) {
+                const now = await new Promise<number>((resolve) => requestAnimationFrame(resolve));
+                if (!manualCrossfadeActiveRef.current) {
+                    return false;
+                }
+
+                const progress = Math.min(1, (now - startedAt) / durationMs);
+                playerRef.current?.setVolume(getVolume(progress));
+                if (progress >= 1) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
+        [],
+    );
+
+    const startManualCrossfade = useCallback(async () => {
+        if (manualCrossfadeActiveRef.current) {
+            return;
+        }
+
+        const playerData = usePlayerStore.getState().getPlayerData();
+        if (playerData.status !== PlayerStatus.PLAYING || !playerData.nextSong) {
+            finishFadeToNext();
+            return;
+        }
+
+        manualCrossfadeActiveRef.current = true;
+        setIsTransitioning(true);
+        const transitionSettings = captureCrossfadeTransitionSettings(
+            crossfadeDuration,
+            crossfadeStyle,
+        );
+        const { easeIn, easeOut } = getCrossfadeEasing(transitionSettings.style);
+        const phaseDurationMs = Math.max(50, (transitionSettings.duration * 1000) / 2);
+
+        const fadedOut = await animateManualVolume(
+            (progress) => (1 - easeOut(progress)) * volume,
+            phaseDurationMs,
+        );
+        if (!fadedOut || !manualCrossfadeActiveRef.current) {
+            return;
+        }
+
+        manualCrossfadeAdvancingRef.current = true;
+        mediaNext(false);
+        manualCrossfadeAdvancingRef.current = false;
+        playerRef.current?.setVolume(0);
+
+        const fadedIn = await animateManualVolume(
+            (progress) => easeIn(progress) * volume,
+            phaseDurationMs,
+        );
+        if (!fadedIn || !manualCrossfadeActiveRef.current) {
+            return;
+        }
+
+        manualCrossfadeActiveRef.current = false;
+        playerRef.current?.setVolume(volume);
+        setIsTransitioning(false);
+        finishFadeToNext();
+    }, [
+        animateManualVolume,
+        crossfadeDuration,
+        crossfadeStyle,
+        finishFadeToNext,
+        mediaNext,
+        volume,
+    ]);
+
+    useEffect(() => {
+        const handleFadeToNext = () => {
+            void startManualCrossfade();
+        };
+
+        eventEmitter.on('MEDIA_FADE_NEXT', handleFadeToNext);
+        return () => {
+            eventEmitter.off('MEDIA_FADE_NEXT', handleFadeToNext);
+        };
+    }, [startManualCrossfade]);
+
     const player = usePlayer();
 
     usePlayerEvents(
         {
+            onCurrentSongChange: () => {
+                if (!manualCrossfadeAdvancingRef.current) {
+                    cancelManualCrossfade();
+                }
+            },
             onPlayerSeekToTimestamp: (properties) => {
+                cancelManualCrossfade();
                 const timestamp = properties.timestamp;
                 playerRef.current?.seekTo(timestamp);
             },
             onPlayerStatus: async (properties) => {
                 const status = properties.status;
+                if (status !== PlayerStatus.PLAYING) {
+                    cancelManualCrossfade();
+                }
                 const volume = usePlayerStore.getState().player.volume;
                 if (audioFadeOnStatusChange) {
                     if (status === PlayerStatus.PLAYING) {
@@ -134,7 +249,7 @@ export function MpvPlayer() {
                 player.mediaStop();
             },
         },
-        [volume, fadeAndSetStatus, audioFadeOnStatusChange],
+        [volume, fadeAndSetStatus, audioFadeOnStatusChange, cancelManualCrossfade],
     );
 
     // Cleanup fade interval on unmount
@@ -144,8 +259,10 @@ export function MpvPlayer() {
                 clearInterval(fadeIntervalRef.current);
                 fadeIntervalRef.current = null;
             }
+            manualCrossfadeActiveRef.current = false;
+            finishFadeToNext();
         };
-    }, []);
+    }, [finishFadeToNext]);
 
     const hasCurrentSong = !!currentSong?.id;
 
