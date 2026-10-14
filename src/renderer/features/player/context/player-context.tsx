@@ -84,7 +84,12 @@ export interface PlayerContext {
     mediaStop: (options?: { reset?: boolean }) => void;
     mediaToggleMute: () => void;
     mediaTogglePlayPause: () => void;
-    moveSelectedTo: (items: QueueSong[], edge: 'bottom' | 'top', uniqueId: string) => void;
+    moveSelectedTo: (
+        items: QueueSong[],
+        edge: 'bottom' | 'top',
+        uniqueId: string,
+        pinAboveUpNext?: boolean,
+    ) => void;
     moveSelectedToBottom: (items: QueueSong[]) => void;
     moveSelectedToNext: (items: QueueSong[]) => void;
     moveSelectedToTop: (items: QueueSong[]) => void;
@@ -775,10 +780,15 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
     }, [storeActions]);
 
     const moveSelectedTo = useCallback(
-        (items: QueueSong[], edge: 'bottom' | 'top', uniqueId: string) => {
+        (
+            items: QueueSong[],
+            edge: 'bottom' | 'top',
+            uniqueId: string,
+            pinAboveUpNext?: boolean,
+        ) => {
             logger.debug('Moved selected to', { edge, items, uniqueId });
 
-            storeActions.moveSelectedTo(items, uniqueId, edge);
+            storeActions.moveSelectedTo(items, uniqueId, edge, pinAboveUpNext);
         },
         [storeActions],
     );

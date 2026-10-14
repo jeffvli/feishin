@@ -363,7 +363,7 @@ const VirtualizedTableGrid = ({
             const groupHeadersBefore = lo;
 
             const dataIndex = rowIndex - headerOffset - groupHeadersBefore;
-            return getItem ? getItem(dataIndex) : undefined;
+            return getItem ? getItem(dataIndex) : dataWithGroups[rowIndex];
         },
         [
             dataWithGroups,
@@ -1154,7 +1154,7 @@ const ItemTableListStickyUI = memo(
 
             return (
                 <div
-                    className={styles.stickyGroupRow}
+                    className={clsx(styles.stickyGroupRow, styles.stickyGroupRowBand)}
                     ref={stickyGroupRowRef}
                     style={{
                         top: `${actualStickyTop}px`,
@@ -1687,11 +1687,34 @@ const BaseItemTableList = ({
         startRowIndex,
     });
 
+    // Maps a data index to a row index, accounting for inserted group header rows
+    // (e.g. the Up Next sections). Without this, scrollToIndex lands on a group
+    // header row (or the wrong data row) whenever groups are present.
+    const mapDataIndexToRowIndex = useCallback(
+        (dataIndex: number) => {
+            let rowIndex = enableHeader ? 1 : 0;
+
+            if (groups) {
+                let cumulative = 0;
+                for (const group of groups) {
+                    const start = cumulative;
+                    cumulative += group.itemCount;
+                    if (dataIndex < start) break;
+                    // A group header row is inserted before each group's items
+                    rowIndex += 1;
+                }
+            }
+
+            return rowIndex + dataIndex;
+        },
+        [enableHeader, groups],
+    );
+
     useTableImperativeHandle({
         autoScrollToActiveRow,
-        enableHeader,
         handleRef,
         internalState,
+        mapDataIndexToRowIndex,
         ref,
         scrollToTableIndex,
         scrollToTableOffset,

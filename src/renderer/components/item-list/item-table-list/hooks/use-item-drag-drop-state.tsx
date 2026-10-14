@@ -4,6 +4,7 @@ import { ItemListStateActions } from '/@/renderer/components/item-list/helpers/i
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { PlayerContext } from '/@/renderer/features/player/context/player-context';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
+import { isUpNextQueueBoundaryDrop } from '/@/renderer/store/player.store';
 import { Folder, LibraryItem, QueueSong, Song } from '/@/shared/types/domain-types';
 import { DragOperation, DragTarget, DragTargetMap } from '/@/shared/types/drag-and-drop';
 
@@ -242,6 +243,7 @@ export const useItemDragDropState = <TElement extends HTMLElement = HTMLDivEleme
                                           sourceItems,
                                           args.edge,
                                           droppedOnUniqueId,
+                                          isUpNextQueueBoundaryDrop(droppedOnUniqueId, args.edge),
                                       );
                                   }
                                   break;
