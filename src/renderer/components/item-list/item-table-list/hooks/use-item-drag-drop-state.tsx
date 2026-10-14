@@ -140,13 +140,22 @@ export const useItemDragDropState = <TElement extends HTMLElement = HTMLDivEleme
                               args.self.item?.[0] as unknown as { _uniqueId: string }
                           )._uniqueId;
 
+                          // Drop lands in the first Queue section, above Up Next: added songs stay in Queue.
+                          const pinAboveUpNext =
+                              args.edge === 'bottom' &&
+                              isUpNextQueueBoundaryDrop(droppedOnUniqueId, args.edge);
+
                           switch (args.source.type) {
                               case DragTarget.ALBUM: {
                                   playerContext.addToQueueByFetch(
                                       sourceServerId,
                                       args.source.id,
                                       sourceItemType,
-                                      { edge: args.edge, uniqueId: droppedOnUniqueId },
+                                      {
+                                          edge: args.edge,
+                                          pinAboveUpNext,
+                                          uniqueId: droppedOnUniqueId,
+                                      },
                                   );
                                   break;
                               }
@@ -155,7 +164,11 @@ export const useItemDragDropState = <TElement extends HTMLElement = HTMLDivEleme
                                       sourceServerId,
                                       args.source.id,
                                       sourceItemType,
-                                      { edge: args.edge, uniqueId: droppedOnUniqueId },
+                                      {
+                                          edge: args.edge,
+                                          pinAboveUpNext,
+                                          uniqueId: droppedOnUniqueId,
+                                      },
                                   );
                                   break;
                               }
@@ -164,7 +177,11 @@ export const useItemDragDropState = <TElement extends HTMLElement = HTMLDivEleme
                                       sourceServerId,
                                       args.source.id,
                                       sourceItemType,
-                                      { edge: args.edge, uniqueId: droppedOnUniqueId },
+                                      {
+                                          edge: args.edge,
+                                          pinAboveUpNext,
+                                          uniqueId: droppedOnUniqueId,
+                                      },
                                   );
                                   break;
                               }
@@ -200,7 +217,11 @@ export const useItemDragDropState = <TElement extends HTMLElement = HTMLDivEleme
                                           sourceServerId,
                                           folderIds,
                                           LibraryItem.FOLDER,
-                                          { edge: args.edge, uniqueId: droppedOnUniqueId },
+                                          {
+                                              edge: args.edge,
+                                              pinAboveUpNext,
+                                              uniqueId: droppedOnUniqueId,
+                                          },
                                       );
                                   }
 
@@ -208,6 +229,7 @@ export const useItemDragDropState = <TElement extends HTMLElement = HTMLDivEleme
                                   if (songs.length > 0) {
                                       playerContext.addToQueueByData(songs, {
                                           edge: args.edge,
+                                          pinAboveUpNext,
                                           uniqueId: droppedOnUniqueId,
                                       });
                                   }
@@ -219,7 +241,11 @@ export const useItemDragDropState = <TElement extends HTMLElement = HTMLDivEleme
                                       sourceServerId,
                                       args.source.id,
                                       sourceItemType,
-                                      { edge: args.edge, uniqueId: droppedOnUniqueId },
+                                      {
+                                          edge: args.edge,
+                                          pinAboveUpNext,
+                                          uniqueId: droppedOnUniqueId,
+                                      },
                                   );
                                   break;
                               }
@@ -228,7 +254,11 @@ export const useItemDragDropState = <TElement extends HTMLElement = HTMLDivEleme
                                       sourceServerId,
                                       args.source.id,
                                       sourceItemType,
-                                      { edge: args.edge, uniqueId: droppedOnUniqueId },
+                                      {
+                                          edge: args.edge,
+                                          pinAboveUpNext,
+                                          uniqueId: droppedOnUniqueId,
+                                      },
                                   );
                                   break;
                               }
@@ -243,7 +273,7 @@ export const useItemDragDropState = <TElement extends HTMLElement = HTMLDivEleme
                                           sourceItems,
                                           args.edge,
                                           droppedOnUniqueId,
-                                          isUpNextQueueBoundaryDrop(droppedOnUniqueId, args.edge),
+                                          pinAboveUpNext,
                                       );
                                   }
                                   break;
@@ -256,7 +286,11 @@ export const useItemDragDropState = <TElement extends HTMLElement = HTMLDivEleme
                                           | undefined;
                                       playerContext.addToQueueByData(
                                           sourceItems,
-                                          { edge: args.edge, uniqueId: droppedOnUniqueId },
+                                          {
+                                              edge: args.edge,
+                                              pinAboveUpNext,
+                                              uniqueId: droppedOnUniqueId,
+                                          },
                                           undefined,
                                           sourcePlaylistId ?? null,
                                       );

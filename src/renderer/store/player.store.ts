@@ -37,6 +37,7 @@ interface Actions {
         uniqueId: string,
         edge: 'bottom' | 'top',
         playSongId?: string,
+        pinAboveUpNext?: boolean,
     ) => void;
     clearQueue: () => void;
     clearSelected: (items: QueueSong[]) => void;
@@ -443,13 +444,19 @@ function syncUpNext(state: Pick<State, 'player' | 'queue'>): void {
         return [...rest.slice(0, at), ...upNext, ...rest.slice(at)];
     };
 
-    // Only settle the order when the block is broken apart. Items pinned between the current
-    // song and a contiguous block (dropped on the bottom of the first Queue section) stay put.
-    const blockIsContiguous = (ids: string[]) => {
-        const start = upNext.length === 0 ? -1 : ids.indexOf(upNext[0]);
-        return start !== -1 && upNext.every((id, offset) => ids[start + offset] === id);
+    // The block stays put only while it sits in front of the current song (queue items pinned
+    // between them are allowed). Playing a song at or below the block settles it: the played song
+    // and every queue song above it move in front of Up Next, so Up Next keeps playing next.
+    const blockIsInFrontOfCurrent = (ids: string[]) => {
+        if (upNext.length === 0) return false;
+
+        const start = ids.indexOf(upNext[0]);
+        if (start === -1 || !upNext.every((id, offset) => ids[start + offset] === id)) return false;
+
+        const currentIndex = currentId === undefined ? -1 : ids.indexOf(currentId);
+        return start > currentIndex;
     };
-    const settle = (ids: string[]) => (blockIsContiguous(ids) ? ids : placeAfterCurrent(ids));
+    const settle = (ids: string[]) => (blockIsInFrontOfCurrent(ids) ? ids : placeAfterCurrent(ids));
 
     if (!sameIds(upNext, queue.priority)) queue.priority = upNext;
 
@@ -520,16 +527,34 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                     ? shuffleInPlace([...newUniqueIds])
                                     : newUniqueIds;
 
-                            // Append to the queue and to Up Next; syncUpNext then moves the new
-                            // songs after the current song and any songs already in Up Next.
-                            const oldQueueLength = state.queue.default.length;
-                            state.queue.default = [...state.queue.default, ...ids];
-                            if (isShuffleEnabled(state)) {
+                            const shuffle = isShuffleEnabled(state);
+                            const playOrder = shuffle
+                                ? state.queue.shuffled.map((i) => state.queue.default[i])
+                                : state.queue.default;
+                            const lastUpNext =
+                                state.queue.priority[state.queue.priority.length - 1];
+                            const lastUpNextPos =
+                                lastUpNext === undefined ? -1 : playOrder.indexOf(lastUpNext);
+                            const insertPos =
+                                lastUpNextPos === -1 ? state.player.index + 1 : lastUpNextPos + 1;
+
+                            if (shuffle) {
+                                const oldQueueLength = state.queue.default.length;
+                                const newIndexes = ids.map((_, i) => oldQueueLength + i);
+                                state.queue.default = [...state.queue.default, ...ids];
                                 state.queue.shuffled = [
-                                    ...state.queue.shuffled,
-                                    ...ids.map((_, i) => oldQueueLength + i),
+                                    ...state.queue.shuffled.slice(0, insertPos),
+                                    ...newIndexes,
+                                    ...state.queue.shuffled.slice(insertPos),
+                                ];
+                            } else {
+                                state.queue.default = [
+                                    ...state.queue.default.slice(0, insertPos),
+                                    ...ids,
+                                    ...state.queue.default.slice(insertPos),
                                 ];
                             }
+
                             state.queue.priority = [...state.queue.priority, ...ids];
                             syncUpNext(state);
                         });
@@ -766,7 +791,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         }
                     }
                 },
-                addToQueueByUniqueId: (items, uniqueId, edge, playSongId) => {
+                addToQueueByUniqueId: (items, uniqueId, edge, playSongId, pinAboveUpNext) => {
                     const newItems = items.map(toQueueSong);
                     const newUniqueIds = newItems.map((item) => item._uniqueId);
 
@@ -846,6 +871,14 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         }
 
                         regroupUpNext(state, currentSongUniqueId, newUniqueIds);
+
+                        // Dropping on the bottom edge of the last row of the first Queue section keeps
+                        // the new songs in Queue, so they must not be pulled into the Up Next block.
+                        if (pinAboveUpNext) {
+                            state.queue.priority = state.queue.priority.filter(
+                                (id) => !newUniqueIds.includes(id),
+                            );
+                        }
                     });
 
                     // If playSongId is provided, find the song and start playback on it
@@ -2050,6 +2083,7 @@ export type AddToQueueByPlayType = Play;
 
 export type AddToQueueByUniqueId = {
     edge: 'bottom' | 'left' | 'right' | 'top' | null;
+    pinAboveUpNext?: boolean;
     uniqueId: string;
 };
 
@@ -2067,7 +2101,15 @@ export async function addToQueueByData(type: AddToQueueType, data: Song[]) {
         usePlayerStoreBase.getState().addToQueueByType(items, type);
     } else {
         const normalizedEdge = type.edge === 'top' ? 'top' : 'bottom';
-        usePlayerStoreBase.getState().addToQueueByUniqueId(items, type.uniqueId, normalizedEdge);
+        usePlayerStoreBase
+            .getState()
+            .addToQueueByUniqueId(
+                items,
+                type.uniqueId,
+                normalizedEdge,
+                undefined,
+                type.pinAboveUpNext,
+            );
     }
 }
 

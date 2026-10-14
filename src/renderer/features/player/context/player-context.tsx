@@ -303,6 +303,7 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                         type.uniqueId,
                         edge,
                         playSongId,
+                        type.pinAboveUpNext,
                     );
                 } else {
                     logger.debug('Added to queue by type', {
@@ -411,7 +412,13 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
                 const addToQueue = () => {
                     if (typeof type === 'object' && 'edge' in type && type.edge !== null) {
                         const edge = type.edge === 'top' ? 'top' : 'bottom';
-                        storeActions.addToQueueByUniqueId(filteredSongs, type.uniqueId, edge);
+                        storeActions.addToQueueByUniqueId(
+                            filteredSongs,
+                            type.uniqueId,
+                            edge,
+                            undefined,
+                            type.pinAboveUpNext,
+                        );
                     } else {
                         storeActions.addToQueueByType(filteredSongs, type as Play);
                     }
