@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { forwardRef, useEffect, useMemo, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import styles from './play-queue.module.css';
@@ -29,6 +29,7 @@ import {
     usePlayerStore,
     useSettingsStore,
 } from '/@/renderer/store';
+import { logger } from '/@/renderer/utils/logger';
 import { Flex } from '/@/shared/components/flex/flex';
 import { LoadingOverlay } from '/@/shared/components/loading-overlay/loading-overlay';
 import { Text } from '/@/shared/components/text/text';
@@ -199,29 +200,37 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(
 
         const currentSongUniqueId = currentSong?._uniqueId;
 
-        const { focused, ref: containerFocusRef } = useFocusWithin();
+        const { focused, ref: focusWithinRef } = useFocusWithin();
+        const containerRef = useRef<HTMLDivElement>(null);
+        const mergedContainerRef = useMergedRef(containerRef, focusWithinRef);
         const player = usePlayer();
 
+        const handleRemoveSelected = useCallback(() => {
+            const selectedItems = tableRef.current?.internalState.getSelected() as QueueSong[];
+
+            if (!selectedItems || selectedItems.length === 0) {
+                return;
+            }
+
+            const container = containerRef.current;
+            const isFocused = container?.contains(document.activeElement) ?? focused;
+
+            if (!isFocused) {
+                logger.debug('Queue remove hotkey skipped', { selected: selectedItems.length });
+                return;
+            }
+
+            player.clearSelected(selectedItems);
+        }, [focused, player]);
+
+        // Mac keyboards send Backspace for the key labelled delete, so accept both
         useHotkeys([
-            [
-                'delete',
-                () => {
-                    if (focused) {
-                        const selectedItems =
-                            tableRef.current?.internalState.getSelected() as QueueSong[];
-
-                        if (!selectedItems || selectedItems.length === 0) {
-                            return;
-                        }
-
-                        player.clearSelected(selectedItems);
-                    }
-                },
-            ],
+            ['backspace', handleRemoveSelected],
+            ['delete', handleRemoveSelected],
         ]);
 
         return (
-            <div className={styles.container} ref={containerFocusRef}>
+            <div className={styles.container} ref={mergedContainerRef}>
                 <LoadingOverlay pos="absolute" visible={isFetching} />
                 <ItemTableList
                     activeRowId={currentSongUniqueId}
