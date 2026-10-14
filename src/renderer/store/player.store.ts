@@ -60,7 +60,12 @@ interface Actions {
     mediaStop: (options?: { reset?: boolean }) => void;
     mediaToggleMute: () => void;
     mediaTogglePlayPause: () => void;
-    moveSelectedTo: (items: QueueSong[], uniqueId: string, edge: 'bottom' | 'top') => void;
+    moveSelectedTo: (
+        items: QueueSong[],
+        uniqueId: string,
+        edge: 'bottom' | 'top',
+        pinAboveUpNext?: boolean,
+    ) => void;
     moveSelectedToBottom: (items: QueueSong[]) => void;
     moveSelectedToNext: (items: QueueSong[]) => void;
     moveSelectedToTop: (items: QueueSong[]) => void;
@@ -345,8 +350,8 @@ const isUpNextQueueEnabled = () => useSettingsStore.getState().general.upNextQue
 const sameIds = <T>(a: T[], b: T[]) => a.length === b.length && a.every((v, i) => v === b[i]);
 
 // After songs are dragged or moved in the queue: Up Next songs moved out of the section become
-// normal queue items, and moved songs dropped inside it (directly after the current song or
-// another Up Next song) join it.
+// normal queue items, and moved songs dropped inside it (directly after the current song, after
+// a Queue item pinned above the section, or after another Up Next song) join it.
 function regroupUpNext(
     state: Pick<State, 'player' | 'queue'>,
     currentId: string | undefined,
@@ -356,26 +361,72 @@ function regroupUpNext(
 
     const moved = new Set(movedIds);
     const kept = new Set(state.queue.priority.filter((id) => !moved.has(id)));
+
+    // Queue items can be pinned between the current song and the Up Next block (dropped on the
+    // bottom of the first Queue section). While sitting there they keep the Up Next run going,
+    // so a song dropped just above the section still joins it.
+    const lastKeptIndex = [...kept].reduce((last, id) => {
+        const index = state.queue.default.indexOf(id);
+        return index > last ? index : last;
+    }, -1);
+
     const upNext: string[] = [];
     let previousIsUpNext = false;
 
-    for (const id of state.queue.default) {
+    state.queue.default.forEach((id, index) => {
         if (id === currentId) {
             previousIsUpNext = true;
-            continue;
+            return;
         }
 
-        previousIsUpNext = kept.has(id) || (moved.has(id) && previousIsUpNext);
-        if (previousIsUpNext) upNext.push(id);
-    }
+        if (kept.has(id)) {
+            previousIsUpNext = true;
+            upNext.push(id);
+            return;
+        }
+
+        if (moved.has(id)) {
+            if (previousIsUpNext) upNext.push(id);
+            return;
+        }
+
+        previousIsUpNext = previousIsUpNext && index < lastKeptIndex;
+    });
 
     state.queue.priority = upNext;
     syncUpNext(state);
 }
 
-// Keeps the Up Next songs (queue.priority) directly after the current song, in both the
-// displayed order and the shuffled play order. Songs that are playing or were removed from
-// the queue leave Up Next.
+// True when a drop on the bottom edge of the row with `targetUniqueId` lands in the first
+// Queue section, above the Up Next block (rows at or below the current song). Dropping there
+// should keep the items in the Queue section instead of joining Up Next.
+export const isUpNextQueueBoundaryDrop = (
+    targetUniqueId: string,
+    edge: 'bottom' | 'top',
+): boolean => {
+    if (edge !== 'bottom') return false;
+
+    const state = usePlayerStoreBase.getState();
+    const upNext = state.queue.priority;
+    if (upNext.length === 0) return false;
+
+    const upNextStart = state.queue.default.indexOf(upNext[0]);
+    const rowIndex = state.queue.default.indexOf(targetUniqueId);
+
+    if (!state.getCurrentSong()?._uniqueId) return false;
+
+    const currentIndex =
+        state.getCurrentSong() !== undefined
+            ? state.queue.default.indexOf(state.getCurrentSong()!._uniqueId)
+            : -1;
+
+    return rowIndex >= currentIndex && rowIndex < upNextStart;
+};
+
+// Keeps the Up Next songs (queue.priority) as a contiguous block after the current song, in
+// both the displayed order and the shuffled play order. Queue items pinned between the current
+// song and the block are left in place. Songs that are playing or were removed from the queue
+// leave Up Next.
 function syncUpNext(state: Pick<State, 'player' | 'queue'>): void {
     const { player, queue } = state;
     if (queue.priority.length === 0) return;
@@ -398,14 +449,22 @@ function syncUpNext(state: Pick<State, 'player' | 'queue'>): void {
         return [...rest.slice(0, at), ...upNext, ...rest.slice(at)];
     };
 
+    // Only settle the order when the block is broken apart. Items pinned between the current
+    // song and a contiguous block (dropped on the bottom of the first Queue section) stay put.
+    const blockIsContiguous = (ids: string[]) => {
+        const start = upNext.length === 0 ? -1 : ids.indexOf(upNext[0]);
+        return start !== -1 && upNext.every((id, offset) => ids[start + offset] === id);
+    };
+    const settle = (ids: string[]) => (blockIsContiguous(ids) ? ids : placeAfterCurrent(ids));
+
     if (!sameIds(upNext, queue.priority)) queue.priority = upNext;
 
-    const newDefault = placeAfterCurrent(queue.default);
+    const newDefault = settle(queue.default);
     if (!sameIds(newDefault, queue.default)) queue.default = newDefault;
 
     if (shuffle) {
-        const newPlayOrder = placeAfterCurrent(playOrder);
-        const position = new Map(newDefault.map((id, i) => [id, i]));
+        const newPlayOrder = settle(playOrder);
+        const position = new Map(queue.default.map((id, i) => [id, i]));
         const newShuffled = newPlayOrder.map((id) => position.get(id)!);
         if (!sameIds(newShuffled, queue.shuffled)) queue.shuffled = newShuffled;
         if (currentId !== undefined) player.index = newPlayOrder.indexOf(currentId);
@@ -1497,10 +1556,23 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         emitPlayerPlayEvent(undefined, set, get);
                     }
                 },
-                moveSelectedTo: (items: QueueSong[], uniqueId: string, edge: 'bottom' | 'top') => {
+                moveSelectedTo: (
+                    items: QueueSong[],
+                    uniqueId: string,
+                    edge: 'bottom' | 'top',
+                    pinAboveUpNext = false,
+                ) => {
                     const itemUniqueIds = items.map((item) => item._uniqueId);
 
                     set((state) => {
+                        const currentId = get().getCurrentSong()?._uniqueId;
+
+                        // Find the index of the drop target
+                        const index = state.queue.default.findIndex((id) => id === uniqueId);
+
+                        // Get the new index based on the edge
+                        const insertIndex = Math.max(0, edge === 'top' ? index : index + 1);
+
                         const existingIds = new Set(Object.keys(state.queue.songs));
 
                         // Add new songs to songs object (avoiding duplicates)
@@ -1509,12 +1581,6 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 state.queue.songs[item._uniqueId] = item;
                             }
                         });
-
-                        // Find the index of the drop target
-                        const index = state.queue.default.findIndex((id) => id === uniqueId);
-
-                        // Get the new index based on the edge
-                        const insertIndex = Math.max(0, edge === 'top' ? index : index + 1);
 
                         const idsBefore = state.queue.default
                             .slice(0, insertIndex)
@@ -1528,7 +1594,13 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
 
                         recalculatePlayerIndex(state, newQueue);
                         state.queue.default = newQueue;
-                        regroupUpNext(state, get().getCurrentSong()?._uniqueId, itemUniqueIds);
+                        regroupUpNext(state, currentId, itemUniqueIds);
+
+                        if (pinAboveUpNext) {
+                            state.queue.priority = state.queue.priority.filter(
+                                (id) => !itemUniqueIds.includes(id),
+                            );
+                        }
                     });
                 },
                 moveSelectedToBottom: (items: QueueSong[]) => {
@@ -1573,8 +1645,14 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         });
 
                         // For every item that is before the current item, subtract one as
-                        // these items will shift the queue up
-                        const insertIndex = currentIndex + 1 - beforeCurrent;
+                        // these items will shift the queue up. When Queue items are pinned
+                        // above the Up Next block, insert at the top of the block instead so
+                        // the new songs stay inside the section's displayed span.
+                        const upNextFirst = state.queue.priority[0];
+                        const upNextTop =
+                            upNextFirst !== undefined ? filtered.indexOf(upNextFirst) : -1;
+                        const insertIndex =
+                            upNextTop !== -1 ? upNextTop : currentIndex + 1 - beforeCurrent;
 
                         const newQueue = [
                             ...filtered.slice(0, insertIndex),
