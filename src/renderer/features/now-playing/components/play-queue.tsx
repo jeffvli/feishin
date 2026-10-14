@@ -159,7 +159,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(
                 { count: upNextIds.length, label: t('player.queueSection_upNext') },
                 {
                     count: data.length - start - upNextIds.length,
-                    label: t('player.queueSection_later'),
+                    label: t('player.queueSection_queue'),
                 },
             ].filter((section) => section.count > 0);
 
@@ -168,12 +168,11 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(
                 render: () => (
                     <div className={styles.groupRow}>
                         <Text
+                            className={styles.groupRowLabel}
                             fw={600}
-                            isMuted
                             isNoSelect
                             overflow="visible"
                             size="sm"
-                            style={{ whiteSpace: 'nowrap' }}
                         >
                             {label}
                         </Text>

@@ -1154,7 +1154,7 @@ const ItemTableListStickyUI = memo(
 
             return (
                 <div
-                    className={styles.stickyGroupRow}
+                    className={clsx(styles.stickyGroupRow, styles.stickyGroupRowBand)}
                     ref={stickyGroupRowRef}
                     style={{
                         top: `${actualStickyTop}px`,
