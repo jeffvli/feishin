@@ -1366,7 +1366,7 @@ export const SubsonicController: InternalControllerEndpoint = {
             query: {
                 fromYear: query.minYear,
                 genre: query.genre,
-                musicFolderId: query.musicFolderId,
+                musicFolderId: getLibraryId(query.musicFolderId),
                 size: query.limit,
                 toYear: query.maxYear,
             },
