@@ -77,10 +77,16 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(
 
             const unsubCurrentTrack = subscribeCurrentTrack((e) => {
                 if (followCurrentSong && e.index !== -1) {
-                    tableRef.current?.scrollToIndex(e.index, {
-                        align: 'center',
-                        behavior: 'auto',
-                    });
+                    // Defer a tick so the scroll applies to the updated queue/groups
+                    // row model, not the pre-change layout. Scrolling immediately
+                    // computes the offset against the stale rows, and the follow
+                    // re-apply after re-render then jumps the viewport a second time.
+                    setTimeout(() => {
+                        tableRef.current?.scrollToIndex(e.index, {
+                            align: 'center',
+                            behavior: 'auto',
+                        });
+                    }, 0);
                 }
             });
 

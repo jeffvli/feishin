@@ -5,9 +5,9 @@ import { ItemListHandle } from '/@/renderer/components/item-list/types';
 
 interface UseTableImperativeHandleProps {
     autoScrollToActiveRow: boolean;
-    enableHeader: boolean;
     handleRef: React.RefObject<ItemListHandle | null>;
     internalState: ItemListStateActions;
+    mapDataIndexToRowIndex: (dataIndex: number) => number;
     ref?: React.Ref<ItemListHandle>;
     scrollToTableIndex: (
         index: number,
@@ -21,9 +21,9 @@ interface UseTableImperativeHandleProps {
  */
 export const useTableImperativeHandle = ({
     autoScrollToActiveRow,
-    enableHeader,
     handleRef,
     internalState,
+    mapDataIndexToRowIndex,
     ref,
     scrollToTableIndex,
     scrollToTableOffset,
@@ -32,7 +32,7 @@ export const useTableImperativeHandle = ({
         () => ({
             internalState,
             scrollToIndex: (index: number, options?: { align?: 'bottom' | 'center' | 'top' }) => {
-                scrollToTableIndex(enableHeader ? index + 1 : index, {
+                scrollToTableIndex(mapDataIndexToRowIndex(index), {
                     ...options,
                     followActiveRow: autoScrollToActiveRow,
                 });
@@ -43,8 +43,8 @@ export const useTableImperativeHandle = ({
         }),
         [
             autoScrollToActiveRow,
-            enableHeader,
             internalState,
+            mapDataIndexToRowIndex,
             scrollToTableIndex,
             scrollToTableOffset,
         ],
