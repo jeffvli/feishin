@@ -1,0 +1,272 @@
+@font-face {
+    font-family: Inter;
+    font-weight: 100 1000;
+    src: url('../../../../assets/fonts/Inter-VariableFont_opsz,wght.woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: Poppins;
+    font-weight: 400;
+    src: url('../../../../assets/fonts/Poppins-Regular.woff2');
+    font-display: swap;
+}
+
+.window {
+    --theme-colors-foreground: white;
+    --theme-colors-surface: #202020;
+    --theme-colors-border: #555;
+    --theme-colors-primary-filled: #228be6;
+    --theme-colors-primary-contrast: white;
+    --lyric-opacity: 1;
+    --lyric-scale: 1;
+    --lyric-scale-origin: center;
+
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 8px 16px;
+    overflow: hidden;
+    color: var(--theme-colors-foreground, white);
+    user-select: none;
+    -webkit-app-region: drag;
+}
+
+.window[data-transparent='false'] {
+    background-color: rgb(255 255 255 / var(--desktop-background-opacity));
+    border-radius: 12px;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / var(--desktop-background-opacity));
+}
+
+.header {
+    display: flex;
+    flex-shrink: 0;
+    gap: 8px;
+    align-items: center;
+    justify-content: flex-end;
+    height: var(--desktop-controls-height, 34px);
+    font-size: 12px;
+}
+
+.controls {
+    display: flex;
+    visibility: hidden;
+    gap: 2px;
+    -webkit-app-region: no-drag;
+}
+
+.controls svg {
+    filter: drop-shadow(0 1px 2px rgb(0 0 0 / 80%));
+}
+
+.window[data-hovered='true'] .controls,
+.window[data-wayland='true']:hover .controls,
+.controls:has(:focus-visible) {
+    visibility: visible;
+}
+
+.controls:has([aria-expanded='true']) {
+    visibility: visible;
+}
+
+.offset-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    color: white;
+    background: rgb(20 20 20 / 95%);
+    border: 1px solid #555;
+    border-radius: 8px;
+    -webkit-app-region: no-drag;
+}
+
+.lyrics {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+    justify-content: center;
+    min-height: 0;
+}
+
+.current,
+.next {
+    flex-shrink: 0;
+}
+
+.current {
+    font-weight: 700;
+}
+
+.line {
+    padding: 0;
+    line-height: 1.2;
+    color: inherit;
+    white-space: nowrap;
+    -webkit-text-stroke: 0;
+}
+
+.line span {
+    display: block;
+    width: max-content;
+    min-height: 1.2em;
+    overflow: visible;
+}
+
+/* Native drag regions swallow the popover's outside-click events. */
+.window[data-offset-open='true'] {
+    -webkit-app-region: no-drag;
+}
+
+.window[data-wayland='true'] {
+    -webkit-app-region: no-drag;
+}
+
+.window[data-wayland='true'] .header {
+    -webkit-app-region: drag;
+}
+
+.line[data-font='primary'] {
+    --desktop-gradient-top: var(--desktop-primary-top-color, white);
+    --desktop-gradient-bottom: var(--desktop-primary-bottom-color, white);
+
+    font-family: var(--desktop-primary-font), sans-serif;
+    color: var(--desktop-primary-color, white);
+    opacity: var(--desktop-primary-opacity, 1);
+}
+
+.line[data-font='translation'] {
+    --desktop-gradient-top: var(--desktop-translation-top-color, white);
+    --desktop-gradient-bottom: var(--desktop-translation-bottom-color, white);
+    --desktop-outline-color: var(--desktop-translation-outline-color, black);
+    --desktop-outline-width: var(--desktop-translation-outline-width, 1px);
+
+    font-family: var(--desktop-translation-font), sans-serif;
+    color: var(--desktop-translation-color, white);
+    opacity: var(--desktop-translation-opacity, 1);
+}
+
+.window[data-shadow='true'] .line {
+    text-shadow:
+        0 1px 3px black,
+        1px 0 3px black,
+        -1px 0 3px black;
+}
+
+.window[data-shadow='true'] .line[data-gradient='true'] {
+    text-shadow: none;
+    filter: drop-shadow(0 1px 3px black);
+}
+
+.current .line {
+    font-weight: 700;
+}
+
+.window[data-layout='diagonal'] .lyrics {
+    justify-content: space-between;
+}
+
+.window[data-layout='diagonal'][data-single-line='true'] .current {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 4px;
+    justify-content: space-between;
+    min-height: 0;
+}
+
+.window[data-layout='diagonal'][data-single-line='true']
+    .current
+    .viewport:has(.line[data-font='primary']) {
+    margin-top: auto;
+}
+
+.error {
+    position: absolute;
+    bottom: 0;
+    font-size: 10px;
+}
+
+.viewport {
+    overflow: clip;
+    overflow-clip-margin: 20px;
+}
+
+.viewport[data-scrolling='false'] .line span {
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.viewport[data-alignment='center'] .line span {
+    margin-inline: auto;
+}
+
+.viewport[data-alignment='right'] .line span {
+    margin-left: auto;
+}
+
+.viewport .line span[data-overflow='true'] {
+    margin-inline: 0;
+}
+
+.line[data-gradient='true'] span {
+    color: transparent;
+    background-image: linear-gradient(
+        to bottom,
+        var(--desktop-gradient-top),
+        var(--desktop-gradient-bottom)
+    );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Composite opacity after the fill has covered the inner half of the stroke. */
+.line-layers {
+    display: grid;
+}
+
+.line-layers .line {
+    grid-area: 1 / 1;
+    min-width: 0;
+    opacity: 1;
+}
+
+.viewport:has(.line[data-font='primary']) {
+    opacity: var(--desktop-primary-opacity, 1);
+}
+
+.viewport:has(.line[data-font='translation']) {
+    opacity: var(--desktop-translation-opacity, 1);
+}
+
+.line[data-outline='true'] {
+    -webkit-text-stroke: calc(2 * var(--desktop-outline-width, 1px))
+        var(--desktop-outline-color, black);
+}
+
+.line[data-outline='true'] span {
+    color: var(--desktop-outline-color, black);
+    background-image: none;
+    -webkit-text-fill-color: var(--desktop-outline-color, black);
+}
+
+.window[data-shadow='true'] .line[data-outline='false'] {
+    text-shadow: none;
+    filter: none;
+}
+
+.window[data-current-on-bottom='true'] .next {
+    order: -1;
+}
+
+.window[data-current-on-bottom='true'] .lyrics:not(:has(.next)) .current {
+    margin-top: auto;
+}
+
+/* Keep ruby inside the span's clipping box, including next-line ellipsis. */
+.line span:has(ruby) {
+    padding-top: 0.5em;
+}

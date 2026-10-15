@@ -25,8 +25,10 @@ import { AppImageUpdater, autoUpdater, MacUpdater, NsisUpdater } from 'electron-
 import { access, constants } from 'fs';
 import path, { join } from 'path';
 import semver from 'semver';
+import { pathToFileURL } from 'url';
 
 import packageJson from '../../package.json';
+import { initDesktopLyrics } from './features/core/desktop-lyrics';
 import { disableMediaKeys, enableMediaKeys } from './features/core/player/media-keys';
 import { shutdownServer } from './features/core/remote';
 import { store } from './features/core/settings';
@@ -361,6 +363,10 @@ if (isLinux() && !process.argv.some((a) => a.startsWith('--password-store='))) {
 
 let mainWindow: BrowserWindow | null = null;
 let tray: null | Tray = null;
+const desktopLyrics = initDesktopLyrics(
+    () => mainWindow,
+    () => updateTrayMenu(),
+);
 let exitFromTray = false;
 let forceQuit = false;
 let powerSaveBlockerId: null | number = null;
@@ -543,6 +549,22 @@ const createTray = () => {
 
     tray = new Tray(trayIcon);
 
+    if (!isMacOS()) {
+        tray.on('click', () => {
+            if (store.get('window_minimize_to_tray') && mainWindow?.isVisible()) {
+                hideMainWindowToTray();
+            } else {
+                showMainWindow();
+            }
+        });
+    }
+
+    tray.setToolTip('Feishin');
+    updateTrayMenu();
+};
+
+function updateTrayMenu() {
+    if (!tray || tray.isDestroyed()) return;
     const contextMenu = Menu.buildFromTemplate([
         {
             click: () => {
@@ -581,6 +603,16 @@ const createTray = () => {
             label: 'Open main window',
         },
         {
+            click: () => desktopLyrics.setLocked(false),
+            enabled: desktopLyrics.getState().locked,
+            label: desktopLyrics.getLabels().unlock,
+        },
+        {
+            click: () => desktopLyrics.close(),
+            enabled: desktopLyrics.getState().open,
+            label: desktopLyrics.getLabels().close,
+        },
+        {
             click: () => {
                 exitFromTray = true;
                 app.quit();
@@ -589,19 +621,8 @@ const createTray = () => {
         },
     ]);
 
-    if (!isMacOS()) {
-        tray.on('click', () => {
-            if (store.get('window_minimize_to_tray') && mainWindow?.isVisible()) {
-                hideMainWindowToTray();
-            } else {
-                showMainWindow();
-            }
-        });
-    }
-
-    tray.setToolTip('Feishin');
     tray.setContextMenu(contextMenu);
-};
+}
 
 const validateUrl = (url: string): boolean => {
     // Minor security, really. Enforce only loading websites (http/https). file://
@@ -782,6 +803,7 @@ async function createWindow(first = true): Promise<void> {
     });
 
     mainWindow.webContents.on('render-process-gone', (_event, details) => {
+        desktopLyrics.dispose();
         log.error('Renderer process gone', {
             exitCode: details.exitCode,
             reason: details.reason,
@@ -805,6 +827,7 @@ async function createWindow(first = true): Promise<void> {
         ipcMain.removeHandler('window-clear-cache');
         ipcMain.removeHandler('app-check-for-updates');
         mainWindow = null;
+        desktopLyrics.dispose();
     });
 
     mainWindow.on('close', (event) => {
@@ -915,6 +938,14 @@ const shouldDisableMediaFeatures =
     isLinux() || !enableMediaSession || playbackType !== PlayerType.WEB;
 
 const chromiumDisabledFeatures: string[] = [];
+if (isMacOS()) {
+    // Keep transparent lyrics rendering when Chromium reports native occlusion;
+    // backgroundThrottling alone does not disable this path.
+    // This startup flag applies app-wide, even when desktop lyrics are closed,
+    // and may increase background rendering. It does not guarantee visibility
+    // during macOS window-management animations.
+    chromiumDisabledFeatures.push('MacWebContentsOcclusion');
+}
 // Fractional scaling on Wayland: https://github.com/jeffvli/feishin/issues/1271#issuecomment-4063326712
 if (isLinux()) {
     chromiumDisabledFeatures.push('WaylandFractionalScaleV1');
@@ -1137,10 +1168,16 @@ if (!singleInstance) {
                 version: packageJson.version,
             });
 
-            protocol.handle('feishin', async () => {
-                const filePath = store.get('local_font_path');
+            protocol.handle('feishin', async (request) => {
+                const url = new URL(request.url);
+                const isDesktopFont = url.hostname === 'desktop-lyrics';
+                // Resolve only saved desktop font paths. Never read a request-supplied path.
+                const filePath = isDesktopFont
+                    ? desktopLyrics.getFontPath(url.pathname)
+                    : store.get('local_font_path');
                 if (typeof filePath !== 'string') {
-                    getMainWindow()?.webContents.send('custom-font-error', filePath);
+                    if (!isDesktopFont)
+                        getMainWindow()?.webContents.send('custom-font-error', filePath);
 
                     return new Response(null, {
                         status: 403,
@@ -1148,7 +1185,9 @@ if (!singleInstance) {
                     });
                 }
 
-                const response = await net.fetch('file:' + filePath);
+                const response = await net.fetch(
+                    isDesktopFont ? pathToFileURL(filePath).toString() : 'file:' + filePath,
+                );
                 const contentType = response.headers.get('content-type');
 
                 // On Linux, the mime type is included in the response header
@@ -1174,7 +1213,8 @@ if (!singleInstance) {
                     });
                 }
 
-                getMainWindow()?.webContents.send('custom-font-error', filePath);
+                if (!isDesktopFont)
+                    getMainWindow()?.webContents.send('custom-font-error', filePath);
 
                 return new Response(null, {
                     status: 403,
@@ -1201,7 +1241,11 @@ if (!singleInstance) {
                 // On macOS it's common to re-create a window in the app when the
                 // dock icon is clicked and there are no other windows open.
                 if (mainWindow === null) createWindow(false);
-                else if (!mainWindow.isVisible() || mainWindow.isMinimized()) {
+                else if (
+                    (isMacOS() && desktopLyrics.getState().open) ||
+                    !mainWindow.isVisible() ||
+                    mainWindow.isMinimized()
+                ) {
                     showMainWindow();
                 }
             });

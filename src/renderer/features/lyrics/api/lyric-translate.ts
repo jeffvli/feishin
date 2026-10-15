@@ -1,3 +1,4 @@
+import { queryOptions } from '@tanstack/react-query';
 import axios from 'axios';
 
 export const translateLyrics = async (
@@ -48,3 +49,28 @@ export const translateLyrics = async (
     }
     return TranslatedText;
 };
+
+// Both lyric surfaces consume one completed translation, including manual translations.
+export const lyricsTranslationQuery = (
+    originalLyrics: string,
+    translationApiKey: string,
+    translationApiProvider: null | string,
+    translationTargetLanguage: null | string,
+) =>
+    queryOptions({
+        queryFn: () =>
+            translateLyrics(
+                originalLyrics,
+                translationApiKey,
+                translationApiProvider,
+                translationTargetLanguage,
+            ),
+        queryKey: [
+            'lyrics-translation',
+            originalLyrics,
+            translationApiProvider,
+            translationTargetLanguage,
+        ],
+        // Failed/empty translations remain retryable; successful results can be shared.
+        staleTime: (query) => (query.state.data ? Infinity : 0),
+    });
