@@ -485,7 +485,9 @@
         "scrobbleForceSubmit": "強制紀錄",
         "sleepTimer_endOfAlbum": "專輯播完時",
         "nextAlbum": "Alt + 點擊：下一張專輯",
-        "previousAlbum": "Alt + 點擊：上一張專輯"
+        "previousAlbum": "Alt + 點擊：上一張專輯",
+        "queueSection_queue": "佇列",
+        "queueSection_upNext": "即將播放"
     },
     "setting": {
         "audioPlayer_description": "選擇用於播放的音訊播放器",
@@ -976,7 +978,9 @@
         "imagePlaceholderPriority_optionBlurhash": "BlurHash",
         "imagePlaceholderPriority_optionDominantColor": "主要顏色",
         "imagePlaceholderPriority_optionOff": "關閉",
-        "imagePlaceholderPriority_optionThumbhash": "ThumbHash"
+        "imagePlaceholderPriority_optionThumbhash": "ThumbHash",
+        "upNextQueue_description": "「接續播放」會將歌曲依新增順序加入至目前播放歌曲之後的「即將播放」區域。當佇列隨機播放或替換時，「即將播放」仍會保持在最前列。停用此功能則會將每次選擇的「接續播放」直接插在目前播放歌曲的正後方",
+        "upNextQueue": "「即將播放」佇列"
     },
     "table": {
         "config": {
