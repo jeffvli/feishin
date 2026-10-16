@@ -474,7 +474,7 @@ const AlbumMetadataExternalLinks = ({
                         component="a"
                         href={
                             nativeSpotify
-                                ? `spotify:search:${encodeURIComponent(albumArtist || '')}%20${encodeURIComponent(albumName || '')}`
+                                ? `spotify:search:${encodeURIComponent(albumArtist || '').replaceAll('%20', '+')}+${encodeURIComponent(albumName || '').replaceAll('%20', '+')}`
                                 : `https://open.spotify.com/search/${encodeURIComponent(albumArtist || '')}%20${encodeURIComponent(albumName || '')}`
                         }
                         icon="brandSpotify"
