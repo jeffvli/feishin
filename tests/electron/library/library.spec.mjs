@@ -31,13 +31,14 @@ test('@full loads songs from Jellyfin', async ({ page }) => {
 
 test('@full uses the clean-install navigation and content columns', async ({ page }) => {
     const sidebar = page.locator('#left-sidebar');
-    for (const label of ['Home', 'Albums', 'Tracks', 'Artists', 'Settings']) {
+    for (const label of ['Home', 'Tracks', 'Artists', 'Settings']) {
         await expect(sidebar.getByText(label, { exact: true }).first()).toBeVisible();
     }
     for (const label of [
         'Now Playing',
         'Search',
         'Favorites',
+        'Albums',
         'Album Artists',
         'Genres',
         'Folders',

@@ -76,5 +76,43 @@ export const KATIESAMP_DEFAULT_UI_SETTINGS = {
             enabledColumns: ['rowIndex', 'titleCombined', 'duration', 'album'],
         },
     },
-    sidebarEnabledItems: ['Home', 'Albums', 'Tracks', 'Artists-all', 'Settings'],
+    sidebarEnabledItems: ['Home', 'Tracks', 'Artists-all', 'Settings'],
 } as const;
+
+export const KATIESAMP_SIDEBAR_MIGRATION_VERSION = 38;
+
+const V1_2_0_SIDEBAR_ENABLED_ITEMS = [
+    'Home',
+    'Albums',
+    'Tracks',
+    'Artists-all',
+    'Settings',
+] as const;
+
+type SidebarSettingsState = {
+    general?: {
+        sidebarItems?: Array<{
+            disabled: boolean;
+            id: string;
+        }>;
+    };
+};
+
+export const migrateKatiesAmpSidebarSettings = (
+    state: SidebarSettingsState,
+    version: number,
+): void => {
+    if (version >= KATIESAMP_SIDEBAR_MIGRATION_VERSION) return;
+
+    const items = state.general?.sidebarItems;
+    if (!items) return;
+
+    const enabledIds = new Set(items.filter((item) => !item.disabled).map((item) => item.id));
+    const hasV1_2_0Defaults =
+        enabledIds.size === V1_2_0_SIDEBAR_ENABLED_ITEMS.length &&
+        V1_2_0_SIDEBAR_ENABLED_ITEMS.every((id) => enabledIds.has(id));
+    if (!hasV1_2_0Defaults) return;
+
+    const albumsItem = items.find((item) => item.id === 'Albums');
+    if (albumsItem) albumsItem.disabled = true;
+};
