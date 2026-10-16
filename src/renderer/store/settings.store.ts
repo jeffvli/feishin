@@ -29,7 +29,11 @@ import {
 } from '/@/renderer/features/player/audio-player/utils/volume-leveling';
 import { audiomotionanalyzerPresets } from '/@/renderer/features/visualizer/components/audiomotionanalyzer/presets';
 import { AppRoute } from '/@/renderer/router/routes';
-import { KATIESAMP_DEFAULT_UI_SETTINGS } from '/@/renderer/store/default-ui-settings';
+import {
+    KATIESAMP_DEFAULT_UI_SETTINGS,
+    KATIESAMP_SIDEBAR_MIGRATION_VERSION,
+    migrateKatiesAmpSidebarSettings,
+} from '/@/renderer/store/default-ui-settings';
 import { getEnvSettingsOverrides } from '/@/renderer/store/env-settings-overrides';
 import { mergeOverridingColumns } from '/@/renderer/store/utils';
 import { FontValueSchema } from '/@/renderer/types/fonts';
@@ -2934,11 +2938,15 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                 }
 
                 migrateVolumeLevelingSettings(state, version);
+                migrateKatiesAmpSidebarSettings(state, version);
 
                 return persistedState;
             },
             name: 'store_settings',
-            version: VOLUME_LEVELING_MIGRATION_VERSION,
+            version: Math.max(
+                VOLUME_LEVELING_MIGRATION_VERSION,
+                KATIESAMP_SIDEBAR_MIGRATION_VERSION,
+            ),
         },
     ),
 );

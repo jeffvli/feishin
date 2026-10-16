@@ -1,16 +1,64 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { KATIESAMP_DEFAULT_UI_SETTINGS } from '../src/renderer/store/default-ui-settings.ts';
+import {
+    KATIESAMP_DEFAULT_UI_SETTINGS,
+    KATIESAMP_SIDEBAR_MIGRATION_VERSION,
+    migrateKatiesAmpSidebarSettings,
+} from '../src/renderer/store/default-ui-settings.ts';
 
 test('clean installs use the captured KatiesAmp navigation content', () => {
     assert.deepEqual(KATIESAMP_DEFAULT_UI_SETTINGS.sidebarEnabledItems, [
+        'Home',
+        'Tracks',
+        'Artists-all',
+        'Settings',
+    ]);
+});
+
+const sidebarState = (enabledIds) => ({
+    general: {
+        sidebarItems: ['Home', 'Albums', 'Tracks', 'Artists-all', 'Settings', 'Playlists'].map(
+            (id) => ({
+                disabled: !enabledIds.includes(id),
+                id,
+            }),
+        ),
+    },
+});
+
+test('v1.2.0 sidebar defaults migrate without Albums', () => {
+    const state = sidebarState(['Home', 'Albums', 'Tracks', 'Artists-all', 'Settings']);
+
+    migrateKatiesAmpSidebarSettings(state, KATIESAMP_SIDEBAR_MIGRATION_VERSION - 1);
+
+    assert.deepEqual(
+        state.general.sidebarItems.filter((item) => !item.disabled).map((item) => item.id),
+        ['Home', 'Tracks', 'Artists-all', 'Settings'],
+    );
+});
+
+test('sidebar migration preserves an administrator-customised layout', () => {
+    const state = sidebarState([
         'Home',
         'Albums',
         'Tracks',
         'Artists-all',
         'Settings',
+        'Playlists',
     ]);
+
+    migrateKatiesAmpSidebarSettings(state, KATIESAMP_SIDEBAR_MIGRATION_VERSION - 1);
+
+    assert.equal(state.general.sidebarItems.find((item) => item.id === 'Albums').disabled, false);
+});
+
+test('current sidebar settings are not remigrated', () => {
+    const state = sidebarState(['Home', 'Albums', 'Tracks', 'Artists-all', 'Settings']);
+
+    migrateKatiesAmpSidebarSettings(state, KATIESAMP_SIDEBAR_MIGRATION_VERSION);
+
+    assert.equal(state.general.sidebarItems.find((item) => item.id === 'Albums').disabled, false);
 });
 
 test('clean installs use the captured KatiesAmp presentation settings', () => {
