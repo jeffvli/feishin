@@ -102,6 +102,8 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
     // Group headers need to be rendered consistently across all grids (pinned left, main, pinned right)
     // to maintain proper styling and row heights
     let groupHeader: 'GROUP_HEADER' | null | ReactElement = null;
+    let groupCellClassName: string | undefined;
+    let groupHideRowBorder = false;
     if (props.groups && isDataRow && props.groups.length > 0) {
         const groupInfo = props.groupHeaderInfoByRowIndex?.get(props.rowIndex);
         const group = groupInfo ? props.groups[groupInfo.groupIndex] : undefined;
@@ -116,6 +118,9 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
                 !hasPinnedLeftColumns &&
                 (props.columnIndex === (props.pinnedLeftColumnCount || 0) ||
                     (props.columnIndex === 0 && (props.pinnedLeftColumnCount || 0) === 0));
+
+            groupCellClassName = group.cellClassName;
+            groupHideRowBorder = !!group.hideRowBorder;
 
             // Render group header content in the first pinned left column (if exists) or first main grid column
             if (isFirstPinnedLeftColumn || isMainGridFirstColumn) {
@@ -157,8 +162,8 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
 
     // Render group header if this row should have one
     if (groupHeader) {
-        const groupHeaderCellClass = clsx(styles.groupHeaderCell, {
-            [styles.withHorizontalBorder]: !!props.enableHorizontalBorders,
+        const groupHeaderCellClass = clsx(styles.groupHeaderCell, groupCellClassName, {
+            [styles.withHorizontalBorder]: !!props.enableHorizontalBorders && !groupHideRowBorder,
         });
 
         if (groupHeader === 'GROUP_HEADER') {
@@ -167,9 +172,7 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
             // This ensures consistent row heights and styling across all grids
             return <div className={groupHeaderCellClass} style={{ ...props.style }} />;
         }
-        // Render the group header spanning full table width
-        // If rendering in pinned left column, extend right to cover all columns
-        // If rendering in main grid, extend left to cover pinned columns
+
         const pinnedLeftWidth =
             props.pinnedLeftColumnWidths?.reduce((sum, width) => sum + width, 0) || 0;
 
@@ -179,35 +182,21 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
 
         const totalTableWidth = totalTableWidthOf(props);
 
-        if (isFirstPinnedLeftColumn) {
-            return (
+        // Only the content stretches across the full table width; the cell keeps its
+        // own column width so its border lines up with the sibling cells instead of
+        // painting over them (the border color is translucent, so an overlap reads
+        // as a darker line). Content is offset left to cover any pinned columns.
+        return (
+            <div className={groupHeaderCellClass} style={{ ...props.style, zIndex: 1 }}>
                 <div
-                    className={groupHeaderCellClass}
+                    className={styles.groupHeaderContent}
                     style={{
-                        ...props.style,
-                        marginLeft: 0,
-                        marginRight: 0,
+                        left: isFirstPinnedLeftColumn ? 0 : -pinnedLeftWidth,
                         width: totalTableWidth,
-                        zIndex: 1,
                     }}
                 >
-                    <div className={styles.groupHeaderContent}>{groupHeader}</div>
+                    {groupHeader}
                 </div>
-            );
-        }
-
-        // For main grid, use negative margin to extend left
-        return (
-            <div
-                className={groupHeaderCellClass}
-                style={{
-                    ...props.style,
-                    marginLeft: pinnedLeftWidth > 0 ? `-${pinnedLeftWidth}px` : 0,
-                    width: totalTableWidth,
-                    zIndex: 1,
-                }}
-            >
-                <div className={styles.groupHeaderContent}>{groupHeader}</div>
             </div>
         );
     }
@@ -658,7 +647,15 @@ function getAlbumGroupClampHeight(props: ItemTableListInnerColumn): null | numbe
 }
 
 function showHorizontalBorderFor(props: ItemTableListInnerColumn, isLastRow: boolean): boolean {
-    if (!props.enableHorizontalBorders || !props.enableHeader || props.rowIndex <= 0) {
+    if (!props.enableHorizontalBorders || props.rowIndex <= 0) {
+        return false;
+    }
+    const nextGroupInfo = props.groupHeaderInfoByRowIndex?.get(props.rowIndex + 1);
+    if (
+        !isAlbumGroupingActive(props.columns) &&
+        nextGroupInfo &&
+        props.groups?.[nextGroupInfo.groupIndex]?.hideRowBorder
+    ) {
         return false;
     }
     // Album group uses group top/bottom edges only (no mid-group lines that would

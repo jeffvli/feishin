@@ -796,6 +796,7 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
         }
 
         return discGroups.map((discGroup) => ({
+            cellClassName: styles.discGroupRowCell,
             itemCount: discGroup.itemCount,
             render: ({
                 data,

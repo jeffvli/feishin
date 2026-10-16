@@ -23,13 +23,6 @@
     white-space: nowrap;
 }
 
-.group-row-separator,
-.group-row-count {
-    flex-shrink: 0;
-    font-size: var(--theme-font-size-xs);
-    color: var(--theme-colors-foreground-muted);
-}
-
 .drop-zone {
     position: absolute;
     top: 40px;
