@@ -56,19 +56,21 @@ function DefaultTitleColumn(props: ItemTableListInnerColumn) {
 
         return (
             <TableColumnContainer {...props}>
-                <Text
-                    className={clsx({
-                        [styles.compact]: props.size === 'compact',
-                        [styles.large]: props.size === 'large',
-                        [styles.nameContainer]: true,
-                    })}
-                    isNoSelect
-                    {...titleLinkProps}
-                >
-                    <ExplicitIndicator explicitStatus={item?.explicitStatus} />
-                    {row}
+                <div className={styles.nameRow}>
+                    <Text
+                        className={clsx({
+                            [styles.compact]: props.size === 'compact',
+                            [styles.large]: props.size === 'large',
+                            [styles.nameContainer]: true,
+                        })}
+                        isNoSelect
+                        {...titleLinkProps}
+                    >
+                        <ExplicitIndicator explicitStatus={item?.explicitStatus} />
+                        {row}
+                    </Text>
                     <OfflineStatusIcon item={item} itemType={props.itemType} />
-                </Text>
+                </div>
             </TableColumnContainer>
         );
     }
@@ -106,34 +108,36 @@ function QueueSongTitleColumn(props: ItemTableListInnerColumn) {
 
         return (
             <TableColumnContainer {...props}>
-                <Text
-                    className={clsx({
-                        [styles.active]: isActive,
-                        [styles.compact]: props.size === 'compact',
-                        [styles.large]: props.size === 'large',
-                        [styles.nameContainer]: true,
-                    })}
-                    isNoSelect
-                    {...titleLinkProps}
-                >
-                    <ExplicitIndicator explicitStatus={song?.explicitStatus} />
-                    {row}
+                <div className={styles.nameRow}>
+                    <Text
+                        className={clsx({
+                            [styles.active]: isActive,
+                            [styles.compact]: props.size === 'compact',
+                            [styles.large]: props.size === 'large',
+                            [styles.nameContainer]: true,
+                        })}
+                        isNoSelect
+                        {...titleLinkProps}
+                    >
+                        <ExplicitIndicator explicitStatus={song?.explicitStatus} />
+                        {row}
+                        {song?.trackSubtitle && props.itemType !== LibraryItem.QUEUE_SONG && (
+                            <Text
+                                className={clsx({
+                                    [styles.active]: isActive,
+                                })}
+                                component="span"
+                                isMuted
+                                size="sm"
+                            >
+                                {' ('}
+                                {song.trackSubtitle}
+                                {')'}
+                            </Text>
+                        )}
+                    </Text>
                     <OfflineStatusIcon item={item} itemType={props.itemType} />
-                    {song?.trackSubtitle && props.itemType !== LibraryItem.QUEUE_SONG && (
-                        <Text
-                            className={clsx({
-                                [styles.active]: isActive,
-                            })}
-                            component="span"
-                            isMuted
-                            size="sm"
-                        >
-                            {' ('}
-                            {song.trackSubtitle}
-                            {')'}
-                        </Text>
-                    )}
-                </Text>
+                </div>
             </TableColumnContainer>
         );
     }

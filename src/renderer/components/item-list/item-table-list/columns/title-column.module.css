@@ -1,3 +1,11 @@
+.name-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    width: 100%;
+    min-width: 0;
+}
+
 .name-container {
     display: -webkit-inline-box;
     align-self: flex-start;
