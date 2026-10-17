@@ -7,13 +7,17 @@ import styles from './mobile-layout.module.css';
 
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { FullScreenVisualizer } from '/@/renderer/features/player/components/full-screen-visualizer';
-import { MobileFullscreenPlayer } from '/@/renderer/features/player/components/mobile-fullscreen-player';
 import { MobileSidebar } from '/@/renderer/features/sidebar/components/mobile-sidebar';
 import { SourRoot } from '/@/renderer/features/sour/components/sour-root';
 import { MobileNav } from '/@/renderer/features/sour/mobile/mobile-nav';
+import { toggleStage } from '/@/renderer/features/sour/stage/sour-stage';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
 import { WindowBar } from '/@/renderer/layouts/window-bar';
-import { useFullScreenPlayerOverlayState, useWindowBarStyle } from '/@/renderer/store';
+import {
+    useFullScreenPlayerOverlayState,
+    useFullScreenPlayerStore,
+    useWindowBarStyle,
+} from '/@/renderer/store';
 import { Drawer } from '/@/shared/components/drawer/drawer';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { useDisclosure } from '/@/shared/hooks/use-disclosure';
@@ -31,6 +35,12 @@ export const MobileLayout = ({ shell }: MobileLayoutProps) => {
     } = useFullScreenPlayerOverlayState();
     const windowBarStyle = useWindowBarStyle();
     const { pathname } = useLocation();
+    // the full screen player on phones is the Sour Stage
+    useEffect(() => {
+        if (!isFullScreenPlayerExpanded) return;
+        useFullScreenPlayerStore.getState().actions.setStore({ expanded: false });
+        toggleStage(true);
+    }, [isFullScreenPlayerExpanded]);
     // the menu closes once something in it was picked
     const lastPath = useRef(pathname);
     useEffect(() => {
@@ -94,13 +104,6 @@ export const MobileLayout = ({ shell }: MobileLayoutProps) => {
                     </div>
                 </Drawer>
             )}
-            <AnimatePresence initial={false}>
-                {isFullScreenPlayerExpanded && (
-                    <div className={styles.fullScreenPlayerOverlay}>
-                        <MobileFullscreenPlayer />
-                    </div>
-                )}
-            </AnimatePresence>
             <AnimatePresence initial={false}>
                 {isFullScreenVisualizerExpanded && (
                     <div className={styles.fullScreenPlayerOverlay}>

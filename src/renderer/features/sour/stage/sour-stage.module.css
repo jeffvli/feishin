@@ -494,3 +494,99 @@
 .toolbar * {
     -webkit-app-region: no-drag;
 }
+
+/* Phones: the Stage is the full screen player - one column (cover, song, controls, lyrics) over the
+   whole screen, with the player's buttons at the bottom */
+.phone {
+    inset: 0;
+    z-index: 250;
+    padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+}
+
+.phone .toolbar {
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    min-height: 0;
+    padding: 10px 12px 4px;
+}
+
+.phone .toolbar > button:first-child {
+    margin-right: auto;
+}
+
+.phone .main {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    padding: 10px 18px 0;
+    overflow: hidden;
+}
+
+.phone .left {
+    flex: none;
+    gap: 8px;
+}
+
+.phone .cover-wrap {
+    width: min(56vw, 28vh);
+}
+
+.phone-no-lyrics .cover-wrap {
+    width: min(82vw, 46vh);
+}
+
+.phone .title {
+    font-size: 1.35rem;
+}
+
+.phone .artist {
+    font-size: 1rem;
+}
+
+.phone .loop-row {
+    display: none;
+}
+
+.phone-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
+}
+
+.phone .lyrics-column {
+    flex: 1;
+    width: 100%;
+}
+
+.phone-no-lyrics .lyrics-column {
+    display: none;
+}
+
+.phone .lyrics {
+    padding: 10vh 0;
+}
+
+.phone .line {
+    padding: 6px 0;
+    font-size: 1.1rem;
+}
+
+.phone .huge-line {
+    font-size: 1.9rem;
+}
+
+.phone .bottom {
+    gap: 2px;
+    padding: 0 8px 6px;
+}
+
+.phone .viz {
+    height: 52px;
+}
+
+.phone .viz-tall {
+    height: min(130px, 16vh);
+}

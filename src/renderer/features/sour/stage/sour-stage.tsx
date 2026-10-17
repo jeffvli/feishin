@@ -6,9 +6,13 @@ import { create } from 'zustand';
 import styles from './sour-stage.module.css';
 
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { useGroupPlayStore } from '/@/renderer/features/group-play/store/group-play.store';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { lyricsQueries } from '/@/renderer/features/lyrics/api/lyrics-api';
+import { MobileFullscreenPlayerBottomControls } from '/@/renderer/features/player/components/mobile-fullscreen-player-bottom-controls';
+import { MobileFullscreenPlayerControls } from '/@/renderer/features/player/components/mobile-fullscreen-player-controls';
+import { MobileFullscreenPlayerProgress } from '/@/renderer/features/player/components/mobile-fullscreen-player-progress';
 import { socialApi } from '/@/renderer/features/sour/api/social-api';
 import { avatarUrl } from '/@/renderer/features/sour/api/sour-api';
 import { openProfile } from '/@/renderer/features/sour/components/people';
@@ -46,6 +50,8 @@ import {
     VISUALIZER_STYLES,
 } from '/@/renderer/features/sour/visualizer/sour-visualizer';
 import { useFastAverageColor } from '/@/renderer/hooks';
+import { useIsMobile } from '/@/renderer/hooks/use-is-mobile';
+import { AppRoute } from '/@/renderer/router/routes';
 import {
     usePlayerSong,
     usePlayerSpeed,
@@ -151,6 +157,9 @@ const StageView = () => {
     const group = useGroupPlayStore((s) => s.state);
     const loop = useLoop();
     const [flipped, setFlipped] = useState(false);
+    // phones: the Stage is the full screen player too (its controls, and lyrics that can be hidden)
+    const phone = useIsMobile();
+    const [phoneLyrics, setPhoneLyrics] = useState(true);
     const [soulPlay, setSoulPlay] = useState(false);
     // playing from a playlist with its own background picture (playlist Theme): that picture is
     // the Stage's backdrop instead of the blurred cover
@@ -301,7 +310,13 @@ const StageView = () => {
     const speedId = SPEEDS.find((s) => Math.abs(s.speed - speed) < 0.01)?.id ?? 'normal';
 
     return (
-        <div className={styles.stage} style={{ '--stage-color': color } as CSSProperties}>
+        <div
+            className={clsx(styles.stage, {
+                [styles.phone]: phone,
+                [styles.phoneNoLyrics]: phone && !phoneLyrics,
+            })}
+            style={{ '--stage-color': color } as CSSProperties}
+        >
             {backdrop ? (
                 <div
                     className={styles.backdrop}
@@ -314,13 +329,23 @@ const StageView = () => {
             )}
             <Scene className={styles.scene} scene={look.stageScene} />
             <div className={styles.toolbar}>
+                {phone && (
+                    <button
+                        aria-label="Close the Sour Stage"
+                        className={styles.tool}
+                        onClick={() => toggleStage(false)}
+                        type="button"
+                    >
+                        <Icon icon="arrowDownS" />
+                    </button>
+                )}
                 <Select
                     aria-label="Scene"
                     data={SCENES.map((s) => ({ label: s.label, value: s.id }))}
                     onChange={(v) => v && setLook({ stageScene: v as SourLook['stageScene'] })}
-                    size="sm"
+                    size={phone ? 'xs' : 'sm'}
                     value={look.stageScene}
-                    w={160}
+                    w={phone ? 130 : 160}
                 />
                 <Select
                     aria-label="Visualizer"
@@ -328,9 +353,9 @@ const StageView = () => {
                         (v) => ({ label: v.label, value: v.id }),
                     )}
                     onChange={(v) => v && setLook({ visualizer: v as SourLook['visualizer'] })}
-                    size="sm"
+                    size={phone ? 'xs' : 'sm'}
                     value={visualizer}
-                    w={150}
+                    w={phone ? 130 : 150}
                 />
                 <SegmentedControl
                     data={[
@@ -364,15 +389,17 @@ const StageView = () => {
                 >
                     <Icon icon="disc" />
                 </button>
-                <button
-                    aria-label="Close the Sour Stage"
-                    className={styles.tool}
-                    onClick={() => toggleStage(false)}
-                    title="Close (Esc)"
-                    type="button"
-                >
-                    <Icon icon="x" />
-                </button>
+                {!phone && (
+                    <button
+                        aria-label="Close the Sour Stage"
+                        className={styles.tool}
+                        onClick={() => toggleStage(false)}
+                        title="Close (Esc)"
+                        type="button"
+                    >
+                        <Icon icon="x" />
+                    </button>
+                )}
             </div>
 
             <div className={styles.main}>
@@ -500,6 +527,12 @@ const StageView = () => {
                         <div className={styles.artist}>{song?.artistName}</div>
                         {why && <div className={styles.why}>{why}</div>}
                     </div>
+                    {phone && (
+                        <div className={styles.phoneControls}>
+                            <MobileFullscreenPlayerProgress currentSong={song} />
+                            <MobileFullscreenPlayerControls currentSong={song} />
+                        </div>
+                    )}
                     <div className={styles.loopRow}>
                         <SegmentedControl
                             data={SPEEDS.map((s) => ({ label: s.label, value: s.id }))}
@@ -599,6 +632,26 @@ const StageView = () => {
                         style={visualizer}
                     />
                 </div>
+                {phone && (
+                    <MobileFullscreenPlayerBottomControls
+                        isLyricsActive={phoneLyrics}
+                        isQueueActive={false}
+                        onToggleContextMenu={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            if (!song) return;
+                            ContextMenuController.call({
+                                cmd: { items: [song], type: LibraryItem.SONG },
+                                event: e,
+                            });
+                        }}
+                        onToggleLyrics={() => setPhoneLyrics((on) => !on)}
+                        onToggleQueue={() => {
+                            toggleStage(false);
+                            window.location.hash = AppRoute.NOW_PLAYING;
+                        }}
+                    />
+                )}
                 <div className={styles.info}>
                     {sameSong.length > 0 && (
                         <span className={styles.friends}>
