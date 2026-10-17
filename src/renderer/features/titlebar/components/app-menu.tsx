@@ -8,6 +8,8 @@ import styles from './app-menu.module.css';
 import { UpdateAvailableButton } from '/@/renderer/features/settings/components/update-available-button';
 import { openSettingsModal } from '/@/renderer/features/settings/utils/open-settings-modal';
 import { ServerSelector } from '/@/renderer/features/sidebar/components/server-selector';
+import { openFeedback, openReports } from '/@/renderer/features/sour/components/feedback';
+import { useMyProfile } from '/@/renderer/features/sour/store/sour.store';
 import { openReleaseNotesModal } from '/@/renderer/release-notes-modal';
 import {
     useAppStore,
@@ -83,6 +85,7 @@ export const AppMenu = () => {
     const navigate = useNavigate();
     const collapsed = useAppStore((state) => state.sidebar.collapsed);
     const privateMode = useAppStore((state) => state.privateMode);
+    const isAdmin = !!useMyProfile().data?.perks?.includes('admin');
     const { setPrivateMode, setSideBar } = useAppStoreActions();
     const { setSettings } = useSettingsStoreActions();
     const settings = useGeneralSettings();
@@ -218,6 +221,24 @@ export const AppMenu = () => {
             label: t('page.appMenu.settings'),
             onClick: () => openSettingsModal(),
             type: 'item',
+        },
+        {
+            icon: 'messageCircle',
+            id: 'sour-feedback',
+            label: 'Report a bug or suggest something',
+            onClick: () => openFeedback(),
+            type: 'item',
+        },
+        {
+            condition: isAdmin,
+            id: 'sour-reports',
+            item: {
+                icon: 'lightbulb',
+                label: 'Bug reports and suggestions',
+                onClick: () => openReports(),
+                type: 'item',
+            },
+            type: 'conditional-item',
         },
         {
             condition: privateMode,

@@ -7,7 +7,8 @@ import styles from './feedback.module.css';
 
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { timeAgo } from '/@/renderer/features/sour/api/sour-api';
-import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
+import { useMyProfile, useSourStore } from '/@/renderer/features/sour/store/sour.store';
+import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
@@ -199,3 +200,35 @@ const Reports = () => {
 
 export const openReports = () =>
     openModal({ children: <Reports />, size: 'lg', title: 'Bug reports and suggestions' });
+
+// Player bar: report a bug or idea in one click; admins right-click it to read everyone's reports
+export const FeedbackButton = () => {
+    const admin = !!useMyProfile().data?.perks?.includes('admin');
+    return (
+        <ActionIcon
+            icon="messageCircle"
+            iconProps={{ size: 'lg' }}
+            onClick={(e) => {
+                e.stopPropagation();
+                openFeedback();
+            }}
+            onContextMenu={
+                admin
+                    ? (e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          openReports();
+                      }
+                    : undefined
+            }
+            size="sm"
+            tooltip={{
+                label: admin
+                    ? 'Report a bug or suggest something (right-click: see all reports)'
+                    : 'Report a bug or suggest something',
+                openDelay: 0,
+            }}
+            variant="subtle"
+        />
+    );
+};

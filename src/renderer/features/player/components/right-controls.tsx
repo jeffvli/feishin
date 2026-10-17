@@ -34,6 +34,7 @@ import {
 import { useSetRating } from '/@/renderer/features/shared/hooks/use-set-rating';
 import { useCreateFavorite } from '/@/renderer/features/shared/mutations/create-favorite-mutation';
 import { useDeleteFavorite } from '/@/renderer/features/shared/mutations/delete-favorite-mutation';
+import { FeedbackButton } from '/@/renderer/features/sour/components/feedback';
 import {
     CrossfadeWatcher,
     FriendChips,
@@ -146,6 +147,7 @@ export const RightControls = () => {
             <Group gap={2} justify="flex-end" wrap="nowrap">
                 {!simple && <PlayCounter />}
                 <HermesUpdateButton />
+                <FeedbackButton />
                 <DlnaCastButton />
                 {!simple && <SleepTimerButton />}
                 {!simple && <PlayerConfig />}
