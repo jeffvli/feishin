@@ -55,3 +55,12 @@
         transform: translate(-50%, 0);
     }
 }
+
+/* phones: full width above the player and the bottom bar, instead of a squashed pill */
+@media (width <= 768px) {
+    .greeting {
+        bottom: 160px;
+        width: calc(100vw - 32px);
+        border-radius: 16px;
+    }
+}

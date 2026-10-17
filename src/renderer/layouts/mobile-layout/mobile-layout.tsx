@@ -79,7 +79,19 @@ export const MobileLayout = ({ shell }: MobileLayoutProps) => {
                     trapFocus={false}
                     withCloseButton={false}
                 >
-                    <MobileSidebar />
+                    {/* picking something (a page, the Stage, the Studio...) closes the menu; opening a
+                        section or the search/app menu at the top doesn't */}
+                    <div
+                        onClickCapture={(e) => {
+                            const el = e.target as HTMLElement;
+                            if (el.closest('#global-search-container, .mantine-Accordion-control'))
+                                return;
+                            if (el.closest('a, button')) setTimeout(closeSidebar, 0);
+                        }}
+                        style={{ height: '100%' }}
+                    >
+                        <MobileSidebar />
+                    </div>
                 </Drawer>
             )}
             <AnimatePresence initial={false}>
