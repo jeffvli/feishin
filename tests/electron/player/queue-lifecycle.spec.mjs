@@ -29,6 +29,15 @@ const seekActiveTrackNearEnd = (page, secondsFromEnd = 0.15) =>
         active.currentTime = Math.max(0, active.duration - offset);
     }, secondsFromEnd);
 
+const seekActiveTrackToStart = (page) =>
+    page.evaluate(() => {
+        const active = [...document.querySelectorAll('audio')].find((audio) => !audio.paused);
+        if (!active) {
+            throw new Error('No active audio element is available');
+        }
+        active.currentTime = 0;
+    });
+
 const enableRepeatAll = async (page) => {
     await page.getByRole('button', { name: 'Repeat disabled' }).click();
     await page.getByRole('button', { name: 'Repeat one' }).click();
@@ -39,7 +48,7 @@ test('@nightly removes played and manually skipped tracks from the visible queue
     page,
 }) => {
     await startQueue(page);
-    await page.getByRole('button', { name: 'Next' }).click();
+    await page.getByRole('button', { exact: true, name: 'Next' }).click();
 
     await expect
         .poll(() => queueNames(page))
@@ -52,6 +61,40 @@ test('@nightly removes played and manually skipped tracks from the visible queue
         ]);
     await expect(
         page.locator('.media-player').getByText('Automation Track 2', { exact: true }),
+    ).toBeVisible();
+});
+
+test('@nightly previous restores the consumed track instead of wrapping to queue end', async ({
+    page,
+}) => {
+    await startQueue(page);
+    await enableRepeatAll(page);
+    await page.getByRole('button', { exact: true, name: 'Next' }).click();
+    await expect
+        .poll(() => queueNames(page))
+        .toEqual([
+            'Automation Track 2',
+            'Automation Track 3',
+            'Automation Track 4',
+            'Automation Track 5',
+            'Automation Track 6',
+        ]);
+
+    await seekActiveTrackToStart(page);
+    await page.getByRole('button', { exact: true, name: 'Previous' }).click();
+
+    await expect
+        .poll(() => queueNames(page))
+        .toEqual([
+            'Automation Track 1',
+            'Automation Track 2',
+            'Automation Track 3',
+            'Automation Track 4',
+            'Automation Track 5',
+            'Automation Track 6',
+        ]);
+    await expect(
+        page.locator('.media-player').getByText('Automation Track 1', { exact: true }),
     ).toBeVisible();
 });
 
