@@ -2,6 +2,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router';
 
+import styles from './sidebar-album-list.module.css';
+
 import { albumQueries } from '/@/renderer/features/albums/api/album-api';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { OfflineStatusIcon } from '/@/renderer/features/offline/components/offline-status-icon';
@@ -73,11 +75,17 @@ export const SidebarAlbumList = () => {
                             }}
                             to={generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: album.id })}
                         >
-                            <Group gap="md" wrap="nowrap">
-                                <Icon icon="album" size="1rem" />
-                                <Text overflow="hidden">{album.name}</Text>
+                            <Group className={styles.row} gap="md" wrap="nowrap">
+                                <Icon className={styles.albumIcon} icon="album" size="1rem" />
+                                <Text className={styles.albumName} overflow="hidden">
+                                    {album.name}
+                                </Text>
                                 {isCurrentAlbum && (
-                                    <span aria-label={t('page.sidebar.nowPlaying')} role="img">
+                                    <span
+                                        aria-label={t('page.sidebar.nowPlaying')}
+                                        className={styles.trailingIcon}
+                                        role="img"
+                                    >
                                         <Icon color="primary" icon="mediaPlay" size="sm" />
                                     </span>
                                 )}
