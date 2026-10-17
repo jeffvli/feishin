@@ -1,0 +1,13 @@
+{
+    "name": "sour-player-mobile",
+    "private": true,
+    "description": "Sour Player for Android: the web build of Sour Player in an app, with media controls and Android Auto",
+    "scripts": {
+        "setup": "node setup-android.mjs"
+    },
+    "dependencies": {
+        "@capacitor/android": "7.4.3",
+        "@capacitor/cli": "7.4.3",
+        "@capacitor/core": "7.4.3"
+    }
+}

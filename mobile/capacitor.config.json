@@ -1,0 +1,13 @@
+{
+    "appId": "com.anjalo.sourplayer",
+    "appName": "Sour Player",
+    "webDir": "../out/web",
+    "server": {
+        "androidScheme": "http",
+        "cleartext": true
+    },
+    "android": {
+        "allowMixedContent": true,
+        "backgroundColor": "#101010"
+    }
+}

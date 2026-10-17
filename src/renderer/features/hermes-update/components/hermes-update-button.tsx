@@ -2,6 +2,7 @@ import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
 import { create } from 'zustand';
 
+import { isAndroidApp, onSourMedia, sourMedia } from '/@/renderer/features/sour/mobile/android';
 import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { usePlayerStoreBase } from '/@/renderer/store/player.store';
 
@@ -27,7 +28,65 @@ const utils = isElectron() ? window.api?.utils : undefined;
 
 export const useHermesUpdate = () => useHermesUpdateStore((state) => state.update);
 
-export const installHermesUpdate = () => utils?.hermesUpdateInstall();
+export const installHermesUpdate = () =>
+    isAndroidApp() ? sourMedia('installUpdate').catch(() => undefined) : utils?.hermesUpdateInstall();
+
+// Android: the app's releases are the mobile-v... ones on GitHub (each with the APK attached)
+const RELEASES = 'https://api.github.com/repos/Urmomnumber1/feishin/releases?per_page=30';
+
+const versionParts = (v: string) => (v.match(/\d+/g) || []).map(Number);
+
+const isNewer = (a: string, b: string) => {
+    const x = versionParts(a);
+    const y = versionParts(b);
+    for (let i = 0; i < Math.max(x.length, y.length); i++) {
+        if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0);
+    }
+    return false;
+};
+
+const useAndroidUpdateListener = () => {
+    useEffect(() => {
+        if (!isAndroidApp()) return undefined;
+        let busy = false;
+        const off = onSourMedia('update', (e: { percent: number }) => {
+            const update = useHermesUpdateStore.getState().update;
+            if (update?.state === 'downloading') {
+                useHermesUpdateStore.setState({ update: { ...update, percent: e.percent } });
+            }
+        });
+        const check = async () => {
+            if (busy || useHermesUpdateStore.getState().update) return;
+            busy = true;
+            try {
+                const { version } = await sourMedia('info');
+                const releases: { assets: { browser_download_url: string; name: string }[]; tag_name: string }[] =
+                    await fetch(RELEASES).then((r) => r.json());
+                const newest = releases
+                    .filter((r) => r.tag_name.startsWith('mobile-v') && r.assets.some((a) => a.name.endsWith('.apk')))
+                    .sort((a, b) => (isNewer(a.tag_name, b.tag_name) ? -1 : 1))[0];
+                const latest = newest?.tag_name.replace('mobile-v', '');
+                if (!newest || !latest || !isNewer(latest, version)) return;
+                const apk = newest.assets.find((a) => a.name.endsWith('.apk'))!;
+                useHermesUpdateStore.setState({ update: { percent: 0, state: 'downloading', version: latest } });
+                await sourMedia('downloadUpdate', { url: apk.browser_download_url });
+                useHermesUpdateStore.setState({ update: { state: 'ready', version: latest } });
+            } catch {
+                if (useHermesUpdateStore.getState().update?.state === 'downloading') {
+                    useHermesUpdateStore.setState({ update: null });
+                }
+            } finally {
+                busy = false;
+            }
+        };
+        check();
+        const timer = window.setInterval(check, 30 * 60 * 1000);
+        return () => {
+            off();
+            window.clearInterval(timer);
+        };
+    }, []);
+};
 
 // Listens for updates once (mounted in the player bar).
 const useHermesUpdateListener = () => {
@@ -40,19 +99,11 @@ const useHermesUpdateListener = () => {
     }, []);
 };
 
-// Player bar: shows while an update downloads, then turns into an Update button that restarts
-// Feishin into the new version. A popup also offers it once per version.
-export const HermesUpdateButton = () => {
-    useHermesUpdateListener();
-    const update = useHermesUpdate();
-    const [dismissed, setDismissed] = useState<null | string>(null);
-    const auto = useSourStore((state) => state.look.autoUpdate !== false);
-
-    // Auto updates: once the new version has downloaded, Sour Player restarts into it by itself the
-    // next time nothing has been playing for a minute (never in the middle of a song)
-    const ready = update?.state === 'ready';
+// Auto updates: once the new version has downloaded, Sour Player installs it by itself the
+// next time nothing has been playing for a minute (never in the middle of a song)
+const useAutoInstall = (enabled: boolean) => {
     useEffect(() => {
-        if (!ready || !auto) return undefined;
+        if (!enabled) return undefined;
         let quietSince = 0;
         const timer = window.setInterval(() => {
             const playing =
@@ -68,9 +119,21 @@ export const HermesUpdateButton = () => {
             }
         }, 5000);
         return () => window.clearInterval(timer);
-    }, [auto, ready]);
+    }, [enabled]);
+};
 
-    if (!update) return null;
+// Player bar: shows while an update downloads, then turns into an Update button that restarts
+// Feishin into the new version. A popup also offers it once per version.
+export const HermesUpdateButton = () => {
+    useHermesUpdateListener();
+    const update = useHermesUpdate();
+    const [dismissed, setDismissed] = useState<null | string>(null);
+    const auto = useSourStore((state) => state.look.autoUpdate !== false);
+
+    useAutoInstall(update?.state === 'ready' && auto && !isAndroidApp());
+
+    // Android has its own prompt (AndroidUpdatePrompt)
+    if (!update || isAndroidApp()) return null;
 
     if (update.state === 'downloading') {
         return (
@@ -127,5 +190,43 @@ export const HermesUpdateButton = () => {
                 </Stack>
             </Dialog>
         </>
+    );
+};
+
+// Android: the phone layout has no player bar button, so this finds updates, offers them and (with
+// auto updates on) opens the installer once nothing has played for a minute. Always mounted there.
+export const AndroidUpdatePrompt = () => {
+    useAndroidUpdateListener();
+    const update = useHermesUpdate();
+    const [dismissed, setDismissed] = useState<null | string>(null);
+    const auto = useSourStore((state) => state.look.autoUpdate !== false);
+    useAutoInstall(update?.state === 'ready' && auto);
+
+    if (update?.state !== 'ready') return null;
+    return (
+        <Dialog
+            onClose={() => setDismissed(update.version)}
+            opened={dismissed !== update.version}
+            position={{ bottom: 100, right: 12 }}
+            radius="md"
+            size="lg"
+            withCloseButton
+        >
+            <Stack gap="sm">
+                <Text fw={700}>Update ready: Sour Player {update.version}</Text>
+                <Text isMuted size="sm">
+                    Android asks you to confirm the install. The first time, allow Sour Player to install
+                    apps when it asks.
+                </Text>
+                <Group justify="flex-end">
+                    <Button onClick={() => setDismissed(update.version)} size="xs" variant="default">
+                        Later
+                    </Button>
+                    <Button onClick={installHermesUpdate} size="xs" variant="filled">
+                        Update now
+                    </Button>
+                </Group>
+            </Stack>
+        </Dialog>
     );
 };

@@ -13,6 +13,7 @@ import { SleepTimerHook } from '/@/renderer/features/player/components/sleep-tim
 import { AutoDJHook } from '/@/renderer/features/player/hooks/use-auto-dj';
 import { AutosaveHook } from '/@/renderer/features/player/hooks/use-autosave';
 import { MediaSessionHook } from '/@/renderer/features/player/hooks/use-media-session';
+import { AndroidMediaHook } from '/@/renderer/features/sour/mobile/android-media';
 import { MPRISHook } from '/@/renderer/features/player/hooks/use-mpris';
 import { PlaybackHotkeysHook } from '/@/renderer/features/player/hooks/use-playback-hotkeys';
 import { PowerSaveBlockerHook } from '/@/renderer/features/player/hooks/use-power-save-blocker';
@@ -139,6 +140,7 @@ export const AudioPlayers = () => {
             <MPRISHook />
             <MainPlayerListenerHook />
             <MediaSessionHook />
+            <AndroidMediaHook />
             <PlaybackHotkeysHook />
             <RemoteHook />
             <RemoteLibraryHook />
