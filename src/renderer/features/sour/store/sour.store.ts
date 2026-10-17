@@ -33,6 +33,11 @@ export interface SavedGroup {
 export interface SourLook {
     albumAccent: boolean;
     animatedBackground: boolean;
+    // restart into a downloaded update by itself when nothing is playing
+    autoUpdate: boolean;
+    // a picture (or GIF) behind the Home page (stored on this computer), and how much it's dimmed
+    homeBackground: boolean;
+    homeBackgroundDim: number;
     autoVideo: boolean;
     barLayout: 'classic' | 'floating';
     // the look of the small visualizer in the player bar and the mini player
@@ -69,6 +74,7 @@ export type VisualizerStyle = 'bars' | 'glow' | 'halo' | 'orbit' | 'pulp' | 'riv
 export const DEFAULT_LOOK: SourLook = {
     albumAccent: false,
     animatedBackground: false,
+    autoUpdate: true,
     autoVideo: false,
     barLayout: 'classic',
     barStyle: 'bars',
@@ -81,6 +87,8 @@ export const DEFAULT_LOOK: SourLook = {
     glass: false,
     hiddenButtons: [],
     holidays: true,
+    homeBackground: false,
+    homeBackgroundDim: 45,
     hoverPreview: false,
     iconPack: 'classic',
     lemonLoader: true,

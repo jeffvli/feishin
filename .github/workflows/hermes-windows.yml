@@ -28,7 +28,7 @@ jobs:
 
             - name: Set the version (Sour Lemon 0.x; each build is newer, so installed copies update themselves)
               shell: bash
-              run: npm pkg set version=0.5.$(( ${{ github.run_number }} - 29 ))
+              run: npm pkg set version=0.6.$(( ${{ github.run_number }} - 33 ))
 
             - name: Build for Windows
               run: pnpm run package:win:pr
@@ -58,7 +58,7 @@ jobs:
 
             - name: Set the version (Sour Lemon 0.x; each build is newer, so installed copies update themselves)
               shell: bash
-              run: npm pkg set version=0.5.$(( ${{ github.run_number }} - 29 ))
+              run: npm pkg set version=0.6.$(( ${{ github.run_number }} - 33 ))
 
             - name: Build for Linux
               run: pnpm run package:linux:pr
@@ -91,7 +91,7 @@ jobs:
 
             - name: Set the version
               shell: bash
-              run: npm pkg set version=0.5.$(( ${{ github.run_number }} - 29 ))
+              run: npm pkg set version=0.6.$(( ${{ github.run_number }} - 33 ))
 
             - name: Build for macOS
               run: pnpm run package:mac:pr
@@ -141,7 +141,7 @@ jobs:
 
             - name: Work out the version
               id: version
-              run: echo "v=0.5.$(( ${{ github.run_number }} - 29 ))" >> "$GITHUB_OUTPUT"
+              run: echo "v=0.6.$(( ${{ github.run_number }} - 33 ))" >> "$GITHUB_OUTPUT"
 
             - name: Publish release
               uses: softprops/action-gh-release@v2
@@ -151,6 +151,15 @@ jobs:
                   make_latest: true
                   body: |
                       Sour Player: the music player for Hermes Music (built on Feishin).
+
+                      **New in 0.6:** Sour Player updates itself (when nothing has played for a minute; turn it
+                      off in Settings > Sour Player); report a bug or suggest something from Settings (admins see
+                      them all); your own picture or GIF behind Home; a see-through option for playlist colours;
+                      30 more fonts; every Hermes Music command (/help, /follow, /fix-all, /issues...) works in
+                      Request music, plus YouTube playlist and profile links; a themed playlist's picture shows
+                      in the Sour Stage even when you press play without opening it; the Stage's Scene and
+                      Visualizer menus are easier to click; the mini player stays on top on Linux and shows the
+                      cover on macOS. Needs Hermes Music 3.5 for reports, playlist opacity and the new commands.
 
                       **New in 0.5.3:** the Discord status says Sour Player, with its own icon.
 

@@ -2,6 +2,9 @@ import isElectron from 'is-electron';
 import { useEffect, useState } from 'react';
 import { create } from 'zustand';
 
+import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
+import { usePlayerStoreBase } from '/@/renderer/store/player.store';
+
 import { Button } from '/@/shared/components/button/button';
 import { Dialog } from '/@/shared/components/dialog/dialog';
 import { Group } from '/@/shared/components/group/group';
@@ -9,6 +12,7 @@ import { Icon } from '/@/shared/components/icon/icon';
 import { Stack } from '/@/shared/components/stack/stack';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
+import { PlayerStatus } from '/@/shared/types/types';
 
 interface HermesUpdate {
     percent?: number;
@@ -42,6 +46,29 @@ export const HermesUpdateButton = () => {
     useHermesUpdateListener();
     const update = useHermesUpdate();
     const [dismissed, setDismissed] = useState<null | string>(null);
+    const auto = useSourStore((state) => state.look.autoUpdate !== false);
+
+    // Auto updates: once the new version has downloaded, Sour Player restarts into it by itself the
+    // next time nothing has been playing for a minute (never in the middle of a song)
+    const ready = update?.state === 'ready';
+    useEffect(() => {
+        if (!ready || !auto) return undefined;
+        let quietSince = 0;
+        const timer = window.setInterval(() => {
+            const playing =
+                usePlayerStoreBase.getState().player.status === PlayerStatus.PLAYING;
+            if (playing) {
+                quietSince = 0;
+                return;
+            }
+            if (!quietSince) quietSince = Date.now();
+            if (Date.now() - quietSince > 60000) {
+                window.clearInterval(timer);
+                installHermesUpdate();
+            }
+        }, 5000);
+        return () => window.clearInterval(timer);
+    }, [auto, ready]);
 
     if (!update) return null;
 
@@ -81,8 +108,9 @@ export const HermesUpdateButton = () => {
                 <Stack gap="sm">
                     <Text fw={700}>Update ready: Sour Player {update.version}</Text>
                     <Text isMuted size="sm">
-                        Restart now to get the newest Hermes Music features. Or keep listening - it
-                        installs the next time you close Sour Player.
+                        {auto
+                            ? 'It installs by itself the next time nothing is playing for a minute (or when you close Sour Player). Or restart now.'
+                            : 'Restart now to get the newest features. Or keep listening - it installs the next time you close Sour Player.'}
                     </Text>
                     <Group justify="flex-end">
                         <Button

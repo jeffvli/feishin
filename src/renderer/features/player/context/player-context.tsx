@@ -17,6 +17,7 @@ import {
 } from '/@/renderer/features/player/utils';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
+import { markPlayContext } from '/@/renderer/features/sour/stage/play-context';
 import {
     AddToQueueOptions,
     AddToQueueType,
@@ -327,6 +328,10 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
             type: AddToQueueType,
             options?: AddToQueueOptions,
         ) => {
+            // Sour Stage backdrop: remember when a whole playlist starts playing (not just added)
+            if (type === Play.NOW || type === Play.SHUFFLE) {
+                markPlayContext(itemType === LibraryItem.PLAYLIST && id.length === 1 ? id[0] : null);
+            }
             let toastId: null | string = null;
             const fetchId = nanoid();
 

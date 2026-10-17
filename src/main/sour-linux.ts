@@ -46,3 +46,10 @@ const integrateAppImage = () => {
 };
 
 app.whenReady().then(integrateAppImage);
+
+// Linux: on Wayland desktops apps aren't allowed to keep a window above the others, so the mini player
+// fell behind other windows. Running through XWayland lets it stay on top (and taskbars match the
+// window to its launcher more reliably). SOUR_WAYLAND=1 keeps native Wayland for anyone who prefers it.
+if (process.platform === 'linux' && !process.env.SOUR_WAYLAND && !app.commandLine.hasSwitch('ozone-platform')) {
+    app.commandLine.appendSwitch('ozone-platform', 'x11');
+}

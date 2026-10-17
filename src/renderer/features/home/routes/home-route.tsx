@@ -19,6 +19,7 @@ import {
     SourHomeSection,
 } from '/@/renderer/features/sour/components/home-sections';
 import { useSimpleMode } from '/@/renderer/features/sour/store/sour.store';
+import { HomeBackground } from '/@/renderer/features/sour/components/home-background';
 import {
     HomeFeatureStyle,
     HomeItem,
@@ -112,6 +113,7 @@ const HomeRoute = () => {
     const simple = useSimpleMode();
     return (
         <AnimatedPage>
+            <HomeBackground />
             <NativeScrollArea
                 pageHeaderProps={{
                     backgroundColor: 'var(--theme-colors-background)',

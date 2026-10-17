@@ -6,4 +6,5 @@
     height: 100%;
     container-type: inline-size;
     overflow: hidden;
+    isolation: isolate; /* lets a page put a background behind itself (Sour Player Home background) */
 }

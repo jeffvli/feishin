@@ -15,6 +15,186 @@
 }
 
 @font-face {
+    font-family: 'Sour Nunito';
+    src: url('../../../assets/fonts/sour/nunito.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Quicksand';
+    src: url('../../../assets/fonts/sour/quicksand.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Baloo 2';
+    src: url('../../../assets/fonts/sour/baloo-2.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Lilita One';
+    src: url('../../../assets/fonts/sour/lilita-one.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Luckiest Guy';
+    src: url('../../../assets/fonts/sour/luckiest-guy.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Dancing Script';
+    src: url('../../../assets/fonts/sour/dancing-script.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Great Vibes';
+    src: url('../../../assets/fonts/sour/great-vibes.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Indie Flower';
+    src: url('../../../assets/fonts/sour/indie-flower.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Shadows Into Light';
+    src: url('../../../assets/fonts/sour/shadows-into-light.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Amatic SC';
+    src: url('../../../assets/fonts/sour/amatic-sc.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Kalam';
+    src: url('../../../assets/fonts/sour/kalam.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Patrick Hand';
+    src: url('../../../assets/fonts/sour/patrick-hand.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Anton';
+    src: url('../../../assets/fonts/sour/anton.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Oswald';
+    src: url('../../../assets/fonts/sour/oswald.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Teko';
+    src: url('../../../assets/fonts/sour/teko.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Rubik Mono One';
+    src: url('../../../assets/fonts/sour/rubik-mono-one.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Exo 2';
+    src: url('../../../assets/fonts/sour/exo-2.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour IBM Plex Mono';
+    src: url('../../../assets/fonts/sour/ibm-plex-mono.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Courier Prime';
+    src: url('../../../assets/fonts/sour/courier-prime.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Sacramento';
+    src: url('../../../assets/fonts/sour/sacramento.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Gloria Hallelujah';
+    src: url('../../../assets/fonts/sour/gloria-hallelujah.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Chewy';
+    src: url('../../../assets/fonts/sour/chewy.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Bubblegum Sans';
+    src: url('../../../assets/fonts/sour/bubblegum-sans.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Cherry Bomb One';
+    src: url('../../../assets/fonts/sour/cherry-bomb-one.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Dela Gothic One';
+    src: url('../../../assets/fonts/sour/dela-gothic-one.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Uncial Antiqua';
+    src: url('../../../assets/fonts/sour/uncial-antiqua.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Metal Mania';
+    src: url('../../../assets/fonts/sour/metal-mania.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Pirata One';
+    src: url('../../../assets/fonts/sour/pirata-one.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Rock Salt';
+    src: url('../../../assets/fonts/sour/rock-salt.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Sour Sedgwick Ave';
+    src: url('../../../assets/fonts/sour/sedgwick-ave.woff2') format('woff2');
+    font-display: swap;
+}
+
+@font-face {
     font-family: 'Sour Pacifico';
     src: url('../../../assets/fonts/sour/pacifico.woff2') format('woff2');
     font-display: swap;

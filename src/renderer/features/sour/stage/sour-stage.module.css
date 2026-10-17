@@ -2,6 +2,9 @@
     position: fixed;
     inset: 0 0 90px;
     z-index: 190;
+    /* the window's title bar is draggable underneath: without this its drag area swallowed clicks on
+       the top of the Stage's menus */
+    -webkit-app-region: no-drag;
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
     overflow: hidden;
@@ -45,6 +48,8 @@
 .toolbar {
     position: relative;
     z-index: 2;
+    min-height: 54px;
+    -webkit-app-region: no-drag;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
@@ -483,4 +488,8 @@
     to {
         transform: rotate(360deg);
     }
+}
+
+.toolbar * {
+    -webkit-app-region: no-drag;
 }

@@ -87,3 +87,32 @@
 .ask {
     flex-basis: 100%;
 }
+
+/* what Hermes Music's commands answer */
+.log {
+    max-height: 220px;
+    padding: 8px 10px;
+    overflow-y: auto;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 0.78rem;
+    white-space: pre-wrap;
+    background: alpha(var(--theme-colors-foreground), 0.05);
+    border-radius: 8px;
+}
+
+.log-line,
+.log-info {
+    color: var(--theme-colors-foreground-muted);
+}
+
+.log-echo {
+    color: var(--theme-colors-foreground);
+}
+
+.log-ok {
+    color: #4ade80;
+}
+
+.log-error {
+    color: #f87171;
+}

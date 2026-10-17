@@ -21,6 +21,7 @@ import {
     useLoop,
 } from '/@/renderer/features/sour/stage/loop';
 import { PeelOff } from '/@/renderer/features/sour/stage/peel-off';
+import { usePlayContext } from '/@/renderer/features/sour/stage/play-context';
 import { Scene, SCENES } from '/@/renderer/features/sour/stage/scenes';
 import {
     KaraokeLine,
@@ -63,9 +64,6 @@ const useStage = create<{ open: boolean }>(() => ({ open: false }));
 
 export const useStageOpen = () => useStage((s) => s.open);
 
-// Which playlist the queue was started from (worked out when a new queue starts while a playlist
-// page is open), for the Stage's backdrop
-const usePlayContext = create<{ playlistId: null | string }>(() => ({ playlistId: null }));
 const PlayContextWatcher = () => {
     const song = usePlayerSong();
     const last = useRef<string | undefined>(undefined);
@@ -75,8 +73,10 @@ const PlayContextWatcher = () => {
         if (!song) return;
         const queue = usePlayerStoreBase.getState().getQueue().items;
         if (before && queue.some((q) => q._uniqueId === before)) return; // same queue as before
+        // a playlist was just started from somewhere (its card, the sidebar, a right-click...)
+        if (Date.now() - usePlayContext.getState().at < 15000) return;
         const match = window.location.hash.match(/\/playlists\/([^/?#]+)/);
-        usePlayContext.setState({ playlistId: match ? decodeURIComponent(match[1]) : null });
+        usePlayContext.setState({ at: 0, playlistId: match ? decodeURIComponent(match[1]) : null });
     }, [song]);
     return null;
 };
@@ -318,7 +318,7 @@ const StageView = () => {
                     aria-label="Scene"
                     data={SCENES.map((s) => ({ label: s.label, value: s.id }))}
                     onChange={(v) => v && setLook({ stageScene: v as SourLook['stageScene'] })}
-                    size="xs"
+                    size="sm"
                     value={look.stageScene}
                     w={160}
                 />
@@ -328,7 +328,7 @@ const StageView = () => {
                         (v) => ({ label: v.label, value: v.id }),
                     )}
                     onChange={(v) => v && setLook({ visualizer: v as SourLook['visualizer'] })}
-                    size="xs"
+                    size="sm"
                     value={visualizer}
                     w={150}
                 />

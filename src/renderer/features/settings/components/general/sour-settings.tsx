@@ -7,6 +7,8 @@ import {
 } from '/@/renderer/features/settings/components/settings-section';
 import { openPeople, openProfileHelper } from '/@/renderer/features/sour/components/people';
 import { openSourStudio } from '/@/renderer/features/sour/components/sour-studio';
+import { openFeedback, openReports } from '/@/renderer/features/sour/components/feedback';
+import { HomeBackgroundSetting } from '/@/renderer/features/sour/components/home-background';
 import {
     type SourLook,
     useMyProfile,
@@ -92,6 +94,36 @@ export const SourSettings = memo(() => {
                 'Your profile, who is online, the group page, the leaderboard and your recaps.',
             title: 'Profile and friends',
         },
+        {
+            control: (
+                <Button onClick={openFeedback} size="compact-sm" variant="default">
+                    Report or suggest
+                </Button>
+            ),
+            description:
+                'Something broken, or an idea? It goes straight to the admins of your Hermes Music.',
+            title: 'Report a bug or suggest something',
+        },
+        {
+            control: (
+                <Button onClick={openReports} size="compact-sm" variant="default">
+                    Open reports
+                </Button>
+            ),
+            description: 'Every bug report and suggestion your friends sent. Only admins have this.',
+            isHidden: !admin,
+            title: 'Bug reports and suggestions',
+        },
+        {
+            control: <HomeBackgroundSetting />,
+            description: 'Your own picture or GIF behind the Home page (kept on this computer).',
+            title: 'Home background',
+        },
+        toggle(
+            'autoUpdate',
+            'Auto updates',
+            'New versions download by themselves and install the next time nothing is playing for a minute.',
+        ),
         {
             control: (
                 <Button onClick={openProfileHelper} size="compact-sm" variant="default">

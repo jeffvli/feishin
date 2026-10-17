@@ -51,6 +51,8 @@ export interface Nickname {
 
 export interface PlaylistTheme {
     color: null | string;
+    // how strong the colour is, 10-100 (%)
+    opacity?: number;
     font?: null | string;
     image: number;
     owner: string;
@@ -302,6 +304,7 @@ export const sourApi = {
             color?: null | string;
             font?: null | string;
             image?: null | string;
+            opacity?: number;
             remove?: boolean;
         },
     ) =>

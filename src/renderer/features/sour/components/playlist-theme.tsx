@@ -44,6 +44,7 @@ const PlaylistThemeEditor = ({ playlistId }: { playlistId: string }) => {
         useSourStore.getState().set({ crossfade: all });
     };
     const [color, setColor] = useState(theme.data?.color || '');
+    const [opacity, setOpacity] = useState(theme.data?.opacity ?? 100);
     const perks = useMyProfile().data?.perks ?? [];
     const [busy, setBusy] = useState(false);
 
@@ -51,6 +52,7 @@ const PlaylistThemeEditor = ({ playlistId }: { playlistId: string }) => {
         color?: null | string;
         font?: null | string;
         image?: null | string;
+        opacity?: number;
         remove?: boolean;
     }) => {
         if (!me) return Promise.resolve();
@@ -89,6 +91,18 @@ const PlaylistThemeEditor = ({ playlistId }: { playlistId: string }) => {
                 swatches={['#1e3a8a', '#4c1d95', '#134e4a', '#14532d', '#7c2d12', '#881337']}
                 value={color}
             />
+            {!!color && (
+                <Stack gap={2}>
+                    <Text size="sm">How strong the colour is</Text>
+                    <Slider
+                        label={(v) => `${v}%`}
+                        max={100}
+                        min={10}
+                        onChange={setOpacity}
+                        value={opacity}
+                    />
+                </Stack>
+            )}
             <Group gap="xs">
                 <FileButton accept="image/png,image/jpeg,image/webp,image/gif" onChange={picture}>
                     {(props) => (
@@ -144,7 +158,7 @@ const PlaylistThemeEditor = ({ playlistId }: { playlistId: string }) => {
                 )}
                 <Button
                     disabled={busy}
-                    onClick={() => save({ color: color || null })}
+                    onClick={() => save({ color: color || null, opacity })}
                     size="xs"
                     variant="filled"
                 >
@@ -201,7 +215,11 @@ export const PlaylistThemed = ({
             style={
                 {
                     '--sour-title-font': theme.font ? fontFamily(theme.font) : undefined,
-                    background: theme.color || undefined,
+                    background: theme.color
+                        ? (theme.opacity ?? 100) < 100
+                            ? `color-mix(in srgb, ${theme.color} ${theme.opacity}%, transparent)`
+                            : theme.color
+                        : undefined,
                 } as CSSProperties
             }
         >

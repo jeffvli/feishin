@@ -16,3 +16,6 @@ Each font's copyright stays with its designers (see fonts.google.com for each fa
 ../twemoji.woff2 - Twemoji (twemoji-colr-font 15.0.3, Mozilla build of Twitter's Twemoji).
 Graphics copyright Twitter, Inc and other contributors, CC BY 4.0
 (https://creativecommons.org/licenses/by/4.0/). Used so emoji look the same on every computer.
+
+Added in Sour Player 0.6 (Google Fonts, from the @fontsource packages): Nunito, Quicksand, Baloo 2, Lilita One, Luckiest Guy, Dancing Script, Great Vibes, Indie Flower, Shadows Into Light, Amatic SC, Kalam, Patrick Hand, Anton, Oswald, Teko, Rubik Mono One, Exo 2, IBM Plex Mono, Courier Prime, Sacramento, Gloria Hallelujah, Chewy, Bubblegum Sans, Cherry Bomb One, Dela Gothic One, Uncial Antiqua, Metal Mania, Pirata One, Rock Salt, Sedgwick Ave.
+All are under the SIL Open Font License 1.1, except Rock Salt (Apache License 2.0).

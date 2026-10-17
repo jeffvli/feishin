@@ -1,0 +1,18 @@
+.report {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 10px;
+    background: alpha(var(--theme-colors-foreground), 0.05);
+    border: 1px solid alpha(var(--theme-colors-foreground), 0.1);
+    border-radius: 8px;
+}
+
+.done-report {
+    composes: report;
+    opacity: 0.55;
+}
+
+.text {
+    white-space: pre-wrap;
+}

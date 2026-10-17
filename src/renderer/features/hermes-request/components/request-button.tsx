@@ -8,6 +8,11 @@ import { useReactions } from '/@/renderer/features/group-play/components/group-r
 import { useGroupPlayStore } from '/@/renderer/features/group-play/store/group-play.store';
 import { openVideoWall } from '/@/renderer/features/hermes-video/components/music-video-button';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
+import {
+    isCommand,
+    requestCommand,
+    runHermesCommand,
+} from '/@/renderer/features/hermes-request/utils/hermes-commands';
 import { requestApi, type RequestGuess } from '/@/renderer/features/sour/api/sour-api';
 import { RequestQuestion } from '/@/renderer/features/sour/components/request-question';
 import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
@@ -149,6 +154,7 @@ const RequestPanel = () => {
     const queryClient = useQueryClient();
     const me = useSourStore((state) => state.me);
     const [type, setType] = useState<RequestType>('song');
+    const [log, setLog] = useState<{ kind: string; text: string }[]>([]);
     const [query, setQuery] = useState('');
     const [busy, setBusy] = useState(false);
 
@@ -184,21 +190,44 @@ const RequestPanel = () => {
             return;
         }
         if (query.trim().length < 2) return;
+        // Hermes Music's commands (/help lists them); /album, /artist and /karaoke are requests
+        let sendQuery = query.trim();
+        let sendType: RequestType = type;
+        const typed = requestCommand(sendQuery);
+        if (typed) {
+            sendQuery = typed.query;
+            sendType = typed.type;
+        } else if (isCommand(sendQuery)) {
+            setBusy(true);
+            setLog([{ kind: 'echo', text: sendQuery }]);
+            setQuery('');
+            await runHermesCommand(url, sendQuery, (text, kind = 'info') =>
+                setLog((lines) => [...lines, { kind, text }].slice(-80)),
+            );
+            setBusy(false);
+            queryClient.invalidateQueries({ queryKey: ['hermes-requests', url] });
+            return;
+        }
+        if (sendQuery.length < 2) return;
         setBusy(true);
         try {
             const res = await fetch(`${url}/api/requests`, {
                 body: JSON.stringify({
                     by: userName.trim() || undefined,
                     profile: me?.id,
-                    query,
-                    type,
+                    query: sendQuery,
+                    type: sendType,
                 }),
                 headers: { 'content-type': 'application/json' },
                 method: 'POST',
             });
             const json = await res.json().catch(() => ({}));
             if (!res.ok) throw new Error(json.error || `Hermes Music returned ${res.status}`);
-            toast.success({ message: `Requested ${query.trim()}` });
+            toast.success({
+                message: json.imported
+                    ? `Requested ${json.imported} playlists from that profile`
+                    : `Requested ${sendQuery}`,
+            });
             setQuery('');
             queryClient.invalidateQueries({ queryKey: ['hermes-requests', url] });
         } catch (error) {
@@ -286,9 +315,26 @@ const RequestPanel = () => {
                 </Button>
             </Group>
             <Text isMuted size="xs">
-                You can also paste a Spotify link, or paste a screenshot of a playlist (Ctrl+V) to
-                request every song in it. Downloaded songs show up after Navidrome&#39;s next scan.
+                You can also paste a Spotify, YouTube or YouTube Music link (song, album or playlist),
+                a Spotify profile or YouTube channel link (all its public playlists), or a screenshot
+                of a playlist (Ctrl+V). Hermes Music&#39;s commands work here too: type /help.
+                Downloaded songs show up after Navidrome&#39;s next scan.
             </Text>
+            {log.length > 0 && (
+                <div className={styles.log}>
+                    {log.map((line, i) => (
+                        <div
+                            className={
+                                styles[`log${line.kind[0].toUpperCase()}${line.kind.slice(1)}`] ||
+                                styles.logLine
+                            }
+                            key={i}
+                        >
+                            {line.kind === 'echo' ? `> ${line.text}` : line.text}
+                        </div>
+                    ))}
+                </div>
+            )}
             <Button onClick={openVideoWall} size="xs" variant="default" w="fit-content">
                 Video wall
             </Button>
