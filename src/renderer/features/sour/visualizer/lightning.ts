@@ -87,8 +87,9 @@ export const drawLightning = (
     const shoulder = top + neckH;
     const mouthY = top;
 
-    // escaping bolts on the beat (more and brighter with a harder kick)
-    if (levels.beat && playing) {
+    // escaping bolts on the beat (more and brighter with a harder kick), and now and then on loud
+    // passages even between beats
+    if (playing && (levels.beat || (energy > 0.35 && Math.random() < 0.04 * dt))) {
         const n = small ? 1 : 1 + Math.round(kick * 3);
         for (let i = 0; i < n; i++) {
             const side = Math.random() < 0.5 ? -1 : 1;
@@ -220,7 +221,7 @@ export const drawLightning = (
         stroke(ctx, b.points);
         ctx.lineWidth = b.width * 0.6;
         for (const br of b.branches) stroke(ctx, br);
-        b.life -= 0.07 * dt;
+        b.life -= 0.035 * dt;
     }
     s.bolts = s.bolts.filter((b) => b.life > 0);
 

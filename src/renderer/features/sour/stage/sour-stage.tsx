@@ -656,7 +656,7 @@ const StageView = () => {
             <div className={styles.bottom}>
                 <div
                     className={clsx(styles.viz, {
-                        [styles.vizTall]: visualizer === 'soul',
+                        [styles.vizTall]: visualizer === 'soul' || visualizer === 'lightning',
                     })}
                 >
                     <SourVisualizer
