@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import packageJson from '../../package.json';
 
-import { isAndroidApp } from '/@/renderer/features/sour/mobile/android';
+import { isNativeApp } from '/@/renderer/features/sour/mobile/android';
 import {
     GITHUB_RELEASES_URL,
     type GitHubRelease,
@@ -426,7 +426,7 @@ export const ReleaseNotesModal = () => {
 
             // Only show modal if the stored version is different from current version (not in the
             // Android app: its releases are mobile-v... ones this popup can't find)
-            if (valueFromLocalStorage !== versionString && !isAndroidApp()) {
+            if (valueFromLocalStorage !== versionString && !isNativeApp()) {
                 openModal({
                     children: (
                         <ReleaseNotesModalContentWrapper

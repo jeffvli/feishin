@@ -7,7 +7,7 @@ import { usePlayCountStore } from '/@/renderer/features/hermes-plays/store/play-
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { sourApi } from '/@/renderer/features/sour/api/sour-api';
 import { deviceId } from '/@/renderer/features/sour/components/social';
-import { isAndroidApp } from '/@/renderer/features/sour/mobile/android';
+import { isNativeApp } from '/@/renderer/features/sour/mobile/android';
 import { useMyProfile, useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { useCurrentServer } from '/@/renderer/store';
 import { useAuthStore } from '/@/renderer/store/auth.store';
@@ -153,7 +153,7 @@ export const SourPresence = () => {
                     group: group && !group.ended ? { code: group.code, name: group.name } : null,
                     listening: shown ? toGroupSong(shown) : null,
                     // shown to friends: "on their phone"
-                    on: isAndroidApp() ? 'phone' : 'computer',
+                    on: isNativeApp() ? 'phone' : 'computer',
                     playing: player.player.status === PlayerStatus.PLAYING,
                     position: useTimestampStoreBase.getState().timestamp,
                 })

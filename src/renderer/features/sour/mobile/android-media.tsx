@@ -5,7 +5,12 @@ import { getItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { AndroidUpdatePrompt } from '/@/renderer/features/hermes-update/components/hermes-update-button';
 import { lyricsQueries } from '/@/renderer/features/lyrics/api/lyrics-api';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
-import { isAndroidApp, onSourMedia, sourMedia } from '/@/renderer/features/sour/mobile/android';
+import {
+    isIosApp,
+    isNativeApp,
+    onSourMedia,
+    sourMedia,
+} from '/@/renderer/features/sour/mobile/android';
 import { PhoneFeatures } from '/@/renderer/features/sour/mobile/phone-features';
 import { DrivingMode } from '/@/renderer/features/sour/mobile/phone-panels';
 import { usePhoneStore } from '/@/renderer/features/sour/mobile/phone-store';
@@ -35,6 +40,10 @@ const coverOf = (song?: QueueSong) =>
 
 const AndroidMediaInner = () => {
     const player = usePlayer();
+    // iPhone: the cleaner iOS look (system font, see-through bars) - see sour.css
+    useEffect(() => {
+        if (isIosApp()) document.documentElement.classList.add('sour-ios');
+    }, []);
     // the line being sung (lock screen lyrics) and what friends play (the widget)
     const song = usePlayerSong();
     const { data: lyricData } = useQuery(
@@ -160,7 +169,7 @@ const AndroidMediaInner = () => {
 };
 
 export const AndroidMediaHook = () =>
-    isAndroidApp() ? (
+    isNativeApp() ? (
         <>
             <AndroidMediaInner />
             <AndroidUpdatePrompt />

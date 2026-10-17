@@ -1,7 +1,7 @@
 import type { QueueSong, Song } from '/@/shared/types/domain-types';
 
 import { api } from '/@/renderer/api';
-import { isAndroidApp, sourMedia } from '/@/renderer/features/sour/mobile/android';
+import { isNativeApp, sourMedia } from '/@/renderer/features/sour/mobile/android';
 import { usePhoneStore } from '/@/renderer/features/sour/mobile/phone-store';
 
 // Offline listening on Android: songs of chosen playlists are saved in the app's own storage, and
@@ -14,7 +14,7 @@ const fileUrl = (path: string) => {
 
 // the saved copy of a song, if there is one (used by the player for every song it plays)
 export const offlineUrl = (song?: null | QueueSong | { id: string }): string | undefined => {
-    if (!song || !isAndroidApp()) return undefined;
+    if (!song || !isNativeApp()) return undefined;
     const saved = usePhoneStore.getState().offline[song.id];
     return saved ? fileUrl(saved.path) : undefined;
 };
@@ -36,7 +36,7 @@ const onWifi = async () => {
 // downloads whatever the offline playlists still miss (one at a time, respecting Wi-Fi only and the
 // size limit)
 export const syncOffline = async () => {
-    if (running || !isAndroidApp()) return;
+    if (running || !isNativeApp()) return;
     running = true;
     try {
         const state = usePhoneStore.getState();

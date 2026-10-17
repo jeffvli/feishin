@@ -19,7 +19,7 @@ import { socialApi } from '/@/renderer/features/sour/api/social-api';
 import { avatarUrl } from '/@/renderer/features/sour/api/sour-api';
 import { openProfile } from '/@/renderer/features/sour/components/people';
 import { hue, ProfileAvatar } from '/@/renderer/features/sour/components/profile-bits';
-import { isAndroidApp } from '/@/renderer/features/sour/mobile/android';
+import { isNativeApp } from '/@/renderer/features/sour/mobile/android';
 import { usePhoneStore } from '/@/renderer/features/sour/mobile/phone-store';
 import {
     clearLoop,
@@ -99,7 +99,7 @@ export const toggleStage = (open = !useStage.getState().open) => {
 const LRC = /\[(\d{1,3}):(\d{2})(?:[.:](\d{1,3}))?]/g;
 
 // lyrics from the shared lyrics query, as timed lines (or plain lines without times)
-const hapticsOn = () => usePhoneStore.getState().settings.haptics && isAndroidApp();
+const hapticsOn = () => usePhoneStore.getState().settings.haptics && isNativeApp();
 
 export const toLines = (lyrics: unknown): { lines: Line[]; synced: boolean } => {
     if (Array.isArray(lyrics)) {

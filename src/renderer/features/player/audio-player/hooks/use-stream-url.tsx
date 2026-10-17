@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 
 import { api } from '/@/renderer/api';
-import { isAndroidApp } from '/@/renderer/features/sour/mobile/android';
+import { isNativeApp } from '/@/renderer/features/sour/mobile/android';
 import { offlineUrl } from '/@/renderer/features/sour/mobile/offline';
 import { phoneTranscode } from '/@/renderer/features/sour/mobile/phone-store';
 import { TranscodingConfig } from '/@/renderer/store';
@@ -14,7 +14,7 @@ export function useSongUrl(
     transcodeSetting: Partial<TranscodingConfig>,
 ): string | undefined {
     // Android: data saver on mobile data, and saved offline copies (see features/sour/mobile)
-    const transcode = isAndroidApp() ? phoneTranscode(transcodeSetting) : transcodeSetting;
+    const transcode = isNativeApp() ? phoneTranscode(transcodeSetting) : transcodeSetting;
     const offline = offlineUrl(song);
     const prior = useRef(['', '']);
     const shouldReusePrior = Boolean(
@@ -78,7 +78,7 @@ export const getSongUrl = async (
 ) => {
     const offline = offlineUrl(song);
     if (offline) return offline;
-    if (isAndroidApp()) transcode = phoneTranscode(transcode);
+    if (isNativeApp()) transcode = phoneTranscode(transcode);
     const url = await api.controller.getStreamUrl({
         apiClientProps: { serverId: song._serverId },
         query: {

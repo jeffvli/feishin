@@ -152,3 +152,24 @@
         opacity: 1;
     }
 }
+
+/* Sour Player for iPhone: cleaner, more like iOS - the system font, frosted see-through bars at the
+   bottom, and no holiday critters wandering over the screen */
+.sour-ios body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+.sour-ios nav[class*='mobile-nav'],
+.sour-ios #player-bar {
+    background: rgb(20 10 24 / 72%);
+    backdrop-filter: blur(24px) saturate(180%);
+}
+
+.sour-ios nav[class*='mobile-nav'] {
+    border-top-color: rgb(255 255 255 / 8%);
+}
+
+.sour-ios [class*='holiday-layer-module-canvas'] {
+    display: none;
+}
