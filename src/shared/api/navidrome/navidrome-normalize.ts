@@ -223,6 +223,22 @@ const getArtists = (
     return { albumArtists, artists, participants };
 };
 
+/**
+ * Navidrome's scalar `lyrics` field is only the first value. The tag map holds
+ * every line, including blanks, so join those and fall back when it is absent.
+ */
+const normalizeNavidromeSongLyrics = (item: {
+    lyrics?: string;
+    tags?: null | Record<string, string[]>;
+}): null | string => {
+    if (item.tags?.lyrics) {
+        const text = item.tags.lyrics.join('\n');
+        if (text.length > 0) return text;
+    }
+
+    return item.lyrics ? item.lyrics : null;
+};
+
 const normalizeSong = (
     item: z.infer<typeof ndType._response.playlistSong> | z.infer<typeof ndType._response.song>,
     server?: null | ServerListItem,
@@ -307,7 +323,7 @@ const normalizeSong = (
         lastPlayedAt: normalizePlayDate(item),
         libraryId: item.libraryId ?? null,
         libraryName: item.libraryName || null,
-        lyrics: item.lyrics ? item.lyrics : null,
+        lyrics: normalizeNavidromeSongLyrics(item),
         mbzAlbumId: item.mbzAlbumId || null,
         mbzAlbumType: item.mbzAlbumType || null,
         mbzRecordingId: item.mbzRecordingID || null,
