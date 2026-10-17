@@ -1,0 +1,85 @@
+/* driving mode: big targets, readable at a glance */
+.driving {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    padding: env(safe-area-inset-top, 0) 24px env(safe-area-inset-bottom, 0);
+    color: #fff;
+    background: #0d0710;
+}
+
+.driving-top {
+    position: absolute;
+    top: calc(env(safe-area-inset-top, 0px) + 12px);
+    right: 16px;
+    left: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.driving-close,
+.driving-remember,
+.driving-buttons button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.driving-remember {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    background: rgb(255 255 255 / 12%);
+    border-radius: 999px;
+}
+
+.driving-cover {
+    width: min(60vw, 34vh);
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 16px;
+}
+
+.driving-title {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 2rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.driving-artist {
+    font-size: 1.3rem;
+    color: rgb(255 255 255 / 70%);
+}
+
+.driving-buttons {
+    display: flex;
+    gap: 6vw;
+    align-items: center;
+    margin-top: 4vh;
+}
+
+.driving-play {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 9rem;
+    height: 9rem;
+    background: rgb(255 255 255 / 14%) !important;
+    border-radius: 50%;
+}
+
+.qr {
+    width: min(70vw, 300px);
+    border-radius: 12px;
+}

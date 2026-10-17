@@ -60,20 +60,33 @@ const useAndroidUpdateListener = () => {
             if (busy || useHermesUpdateStore.getState().update) return;
             busy = true;
             try {
-                const { version } = await sourMedia('info');
+                const { code, version } = await sourMedia('info');
                 const releases: {
                     assets: { browser_download_url: string; name: string }[];
                     tag_name: string;
                 }[] = await fetch(RELEASES).then((r) => r.json());
+                // the APK's name ends with its build number (Sour-Player-0.1.0-110.apk): that decides
+                // what's newer, so 0.1.0 can follow the 0.1.xb betas
+                const build = (r: (typeof releases)[number]) =>
+                    Number(
+                        r.assets
+                            .find((a) => a.name.endsWith('.apk'))
+                            ?.name.match(/-(\d+)\.apk$/)?.[1] || 0,
+                    );
                 const newest = releases
                     .filter(
                         (r) =>
                             r.tag_name.startsWith('mobile-v') &&
                             r.assets.some((a) => a.name.endsWith('.apk')),
                     )
-                    .sort((a, b) => (isNewer(a.tag_name, b.tag_name) ? -1 : 1))[0];
+                    .sort(
+                        (a, b) => build(b) - build(a) || (isNewer(a.tag_name, b.tag_name) ? -1 : 1),
+                    )[0];
                 const latest = newest?.tag_name.replace('mobile-v', '');
-                if (!newest || !latest || !isNewer(latest, version)) return;
+                if (!newest || !latest) return;
+                const newer =
+                    build(newest) && code ? build(newest) > Number(code) : isNewer(latest, version);
+                if (!newer) return;
                 const apk = newest.assets.find((a) => a.name.endsWith('.apk'))!;
                 useHermesUpdateStore.setState({
                     update: { percent: 0, state: 'downloading', version: latest },

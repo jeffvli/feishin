@@ -43,7 +43,7 @@ import java.util.concurrent.Executors;
 public class SourMediaService extends MediaBrowserServiceCompat {
 
     static class NowPlaying {
-        String title = "", artist = "", album = "", art = "";
+        String title = "", artist = "", album = "", art = "", lyric = "", friends = "";
         long duration, position;
         boolean playing;
     }
@@ -59,7 +59,8 @@ public class SourMediaService extends MediaBrowserServiceCompat {
     private static final String UP_NEXT = "up-next";
 
     private static SourMediaService running;
-    private static NowPlaying now = new NowPlaying();
+    static NowPlaying now = new NowPlaying();
+    static Bitmap lastArt;
     private static List<QueueItem> queue = new ArrayList<>();
 
     private final Handler main = new Handler(Looper.getMainLooper());
@@ -122,6 +123,13 @@ public class SourMediaService extends MediaBrowserServiceCompat {
                 JSObject data = new JSObject();
                 data.put("index", Integer.parseInt(mediaId.substring(2)));
                 SourMediaPlugin.send("playIndex", data);
+            }
+
+            @Override
+            public void onPlayFromSearch(String query, Bundle extras) {
+                JSObject data = new JSObject();
+                data.put("query", query == null ? "" : query);
+                SourMediaPlugin.send("search", data);
             }
 
             @Override
@@ -193,10 +201,13 @@ public class SourMediaService extends MediaBrowserServiceCompat {
             .setActions(PlaybackStateCompat.ACTION_PLAY | PlaybackStateCompat.ACTION_PAUSE | PlaybackStateCompat.ACTION_PLAY_PAUSE
                 | PlaybackStateCompat.ACTION_SKIP_TO_NEXT | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
                 | PlaybackStateCompat.ACTION_SEEK_TO | PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
-                | PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM | PlaybackStateCompat.ACTION_STOP)
+                | PlaybackStateCompat.ACTION_SKIP_TO_QUEUE_ITEM | PlaybackStateCompat.ACTION_STOP
+                | PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH)
             .setState(n.playing ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED, n.position, n.playing ? 1f : 0f)
             .build());
 
+        lastArt = artBitmap;
+        SourWidget.updateAll(this);
         Notification notification = buildNotification(n);
         if (n.playing) {
             try {
@@ -222,7 +233,7 @@ public class SourMediaService extends MediaBrowserServiceCompat {
     private Notification buildNotification(NowPlaying n) {
         NotificationCompat.Builder b = new NotificationCompat.Builder(this, CHANNEL)
             .setContentTitle(n.title.isEmpty() ? "Sour Player" : n.title)
-            .setContentText(n.artist)
+            .setContentText(n.lyric.isEmpty() ? n.artist : n.lyric)
             .setSubText(n.album)
             .setLargeIcon(artBitmap)
             .setSmallIcon(android.R.drawable.ic_media_play)

@@ -27,7 +27,10 @@ export const sourMedia = (method: string, options: Record<string, unknown> = {})
     return Promise.reject(new Error('Not running in the Sour Player app'));
 };
 
-export const onSourMedia = (eventName: 'action' | 'update', listener: Listener): (() => void) => {
+export const onSourMedia = (
+    eventName: 'action' | 'device' | 'intent' | 'update',
+    listener: Listener,
+): (() => void) => {
     const c = cap();
     const plugin = c?.Plugins?.SourMedia;
     if (plugin?.addListener) {

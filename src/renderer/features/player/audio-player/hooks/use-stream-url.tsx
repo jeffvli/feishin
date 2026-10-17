@@ -2,14 +2,20 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 
 import { api } from '/@/renderer/api';
+import { isAndroidApp } from '/@/renderer/features/sour/mobile/android';
+import { offlineUrl } from '/@/renderer/features/sour/mobile/offline';
+import { phoneTranscode } from '/@/renderer/features/sour/mobile/phone-store';
 import { TranscodingConfig } from '/@/renderer/store';
 import { QueueSong } from '/@/shared/types/domain-types';
 
 export function useSongUrl(
     song: QueueSong | undefined,
     current: boolean,
-    transcode: Partial<TranscodingConfig>,
+    transcodeSetting: Partial<TranscodingConfig>,
 ): string | undefined {
+    // Android: data saver on mobile data, and saved offline copies (see features/sour/mobile)
+    const transcode = isAndroidApp() ? phoneTranscode(transcodeSetting) : transcodeSetting;
+    const offline = offlineUrl(song);
     const prior = useRef(['', '']);
     const shouldReusePrior = Boolean(
         song?._serverId && current && prior.current[0] === song._uniqueId && prior.current[1],
@@ -60,7 +66,7 @@ export function useSongUrl(
         }
     }, [song?._serverId]);
 
-    return shouldReusePrior ? prior.current[1] : queryStreamUrl;
+    return offline ?? (shouldReusePrior ? prior.current[1] : queryStreamUrl);
 }
 
 export const getSongUrl = async (
@@ -70,6 +76,9 @@ export const getSongUrl = async (
     forRenderer?: boolean,
     startTime?: number,
 ) => {
+    const offline = offlineUrl(song);
+    if (offline) return offline;
+    if (isAndroidApp()) transcode = phoneTranscode(transcode);
     const url = await api.controller.getStreamUrl({
         apiClientProps: { serverId: song._serverId },
         query: {

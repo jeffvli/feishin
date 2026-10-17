@@ -13,10 +13,14 @@ import { lyricsQueries } from '/@/renderer/features/lyrics/api/lyrics-api';
 import { MobileFullscreenPlayerBottomControls } from '/@/renderer/features/player/components/mobile-fullscreen-player-bottom-controls';
 import { MobileFullscreenPlayerControls } from '/@/renderer/features/player/components/mobile-fullscreen-player-controls';
 import { MobileFullscreenPlayerProgress } from '/@/renderer/features/player/components/mobile-fullscreen-player-progress';
+import { SleepTimerButton } from '/@/renderer/features/player/components/sleep-timer-button';
+import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { socialApi } from '/@/renderer/features/sour/api/social-api';
 import { avatarUrl } from '/@/renderer/features/sour/api/sour-api';
 import { openProfile } from '/@/renderer/features/sour/components/people';
 import { hue, ProfileAvatar } from '/@/renderer/features/sour/components/profile-bits';
+import { isAndroidApp } from '/@/renderer/features/sour/mobile/android';
+import { usePhoneStore } from '/@/renderer/features/sour/mobile/phone-store';
 import {
     clearLoop,
     setLoopPoint,
@@ -95,7 +99,9 @@ export const toggleStage = (open = !useStage.getState().open) => {
 const LRC = /\[(\d{1,3}):(\d{2})(?:[.:](\d{1,3}))?]/g;
 
 // lyrics from the shared lyrics query, as timed lines (or plain lines without times)
-const toLines = (lyrics: unknown): { lines: Line[]; synced: boolean } => {
+const hapticsOn = () => usePhoneStore.getState().settings.haptics && isAndroidApp();
+
+export const toLines = (lyrics: unknown): { lines: Line[]; synced: boolean } => {
     if (Array.isArray(lyrics)) {
         const lines = (lyrics as SynchronizedLyrics)
             .filter((l) => typeof l?.startMs === 'number')
@@ -160,6 +166,8 @@ const StageView = () => {
     // phones: the Stage is the full screen player too (its controls, and lyrics that can be hidden)
     const phone = useIsMobile();
     const [phoneLyrics, setPhoneLyrics] = useState(true);
+    const touch = useRef<null | { x: number; y: number }>(null);
+    const controls = usePlayer();
     const [soulPlay, setSoulPlay] = useState(false);
     // playing from a playlist with its own background picture (playlist Theme): that picture is
     // the Stage's backdrop instead of the blurred cover
@@ -260,10 +268,16 @@ const StageView = () => {
         const levels = makeLevels();
         let frame = 0;
         let pulse = 0;
+        let lastBuzz = 0;
         const tick = (now: number) => {
             frame = requestAnimationFrame(tick);
             readLevels(levels, now);
             pulse = levels.beat ? 1 : pulse * 0.88;
+            // phones: feel the beat (Settings > Phone)
+            if (levels.beat && hapticsOn() && now - lastBuzz > 220) {
+                lastBuzz = now;
+                navigator.vibrate?.(18);
+            }
             if (coverWrap.current) coverWrap.current.style.setProperty('--beat', String(pulse));
         };
         frame = requestAnimationFrame(tick);
@@ -389,6 +403,7 @@ const StageView = () => {
                 >
                     <Icon icon="disc" />
                 </button>
+                {phone && <SleepTimerButton />}
                 {!phone && (
                     <button
                         aria-label="Close the Sour Stage"
@@ -413,6 +428,26 @@ const StageView = () => {
                                 x: ((e.clientX - r.left) / r.width - 0.5) * 12,
                                 y: ((e.clientY - r.top) / r.height - 0.5) * -12,
                             });
+                        }}
+                        // phones: swipe the cover left/right to skip, down to close, up for the queue
+                        onTouchEnd={(e) => {
+                            if (!phone || !touch.current) return;
+                            const t = e.changedTouches[0];
+                            const dx = t.clientX - touch.current.x;
+                            const dy = t.clientY - touch.current.y;
+                            touch.current = null;
+                            if (Math.max(Math.abs(dx), Math.abs(dy)) < 50) return;
+                            if (Math.abs(dx) > Math.abs(dy)) {
+                                if (dx < 0) controls.mediaNext(false);
+                                else controls.mediaPrevious(false);
+                            } else if (dy > 0) toggleStage(false);
+                            else {
+                                toggleStage(false);
+                                window.location.hash = AppRoute.NOW_PLAYING;
+                            }
+                        }}
+                        onTouchStart={(e) => {
+                            touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
                         }}
                         ref={coverWrap}
                     >

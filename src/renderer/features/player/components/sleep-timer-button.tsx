@@ -61,6 +61,7 @@ const useSleepTimer = () => {
     const { mediaPause } = usePlayer();
 
     const mediaPauseRef = useRef(mediaPause);
+    const fadeFrom = useRef<null | number>(null);
     mediaPauseRef.current = mediaPause;
 
     // End of album mode. Set the pauseOnNextSongEnd flag whenever the current track
@@ -129,8 +130,20 @@ const useSleepTimer = () => {
             if (remaining <= elapsedSeconds) {
                 cancelTimer();
                 mediaPauseRef.current();
+                if (fadeFrom.current !== null) {
+                    const volume = fadeFrom.current;
+                    fadeFrom.current = null;
+                    window.setTimeout(() => usePlayerStoreBase.getState().setVolume(volume), 800);
+                }
             } else {
-                setRemaining(remaining - elapsedSeconds);
+                const left = remaining - elapsedSeconds;
+                setRemaining(left);
+                // fade out over the last 20 seconds instead of stopping mid-song
+                if (left <= 20) {
+                    const store = usePlayerStoreBase.getState();
+                    if (fadeFrom.current === null) fadeFrom.current = store.player.volume;
+                    store.setVolume(Math.round((fadeFrom.current * left) / 20));
+                }
             }
         }, 1000);
 

@@ -73,9 +73,22 @@ edit(path.join(main, 'AndroidManifest.xml'), (s) =>
                 '    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />',
                 '    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />',
                 '    <uses-permission android:name="android.permission.WAKE_LOCK" />',
+                '    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />',
             ].join('\n'),
         )
         .replace('<application', '<application\n        android:usesCleartextTraffic="true"')
+        // links shared from other apps (Spotify, YouTube...) come to Sour Player
+        .replace(
+            '</activity>',
+            [
+                '    <intent-filter>',
+                '                <action android:name="android.intent.action.SEND" />',
+                '                <category android:name="android.intent.category.DEFAULT" />',
+                '                <data android:mimeType="text/plain" />',
+                '            </intent-filter>',
+                '        </activity>',
+            ].join('\n        '),
+        )
         // the launcher entries are the icon pack aliases below
         .replace(
             /\s*<intent-filter>\s*<action android:name="android\.intent\.action\.MAIN" \/>\s*<category android:name="android\.intent\.category\.LAUNCHER" \/>\s*<\/intent-filter>/,
@@ -85,6 +98,35 @@ edit(path.join(main, 'AndroidManifest.xml'), (s) =>
             '</application>',
             [
                 ...aliases,
+                '        <receiver',
+                '            android:name=".SourWidget"',
+                '            android:exported="true"',
+                '            android:label="Sour Player">',
+                '            <intent-filter>',
+                '                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />',
+                '            </intent-filter>',
+                '            <meta-data android:name="android.appwidget.provider" android:resource="@xml/sour_widget_info" />',
+                '        </receiver>',
+                '        <service',
+                '            android:name=".SourPlayTile"',
+                '            android:exported="true"',
+                '            android:icon="@android:drawable/ic_media_play"',
+                '            android:label="Sour Player"',
+                '            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">',
+                '            <intent-filter>',
+                '                <action android:name="android.service.quicksettings.action.QS_TILE" />',
+                '            </intent-filter>',
+                '        </service>',
+                '        <service',
+                '            android:name=".SourRequestTile"',
+                '            android:exported="true"',
+                '            android:icon="@android:drawable/stat_sys_download"',
+                '            android:label="Request a song"',
+                '            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">',
+                '            <intent-filter>',
+                '                <action android:name="android.service.quicksettings.action.QS_TILE" />',
+                '            </intent-filter>',
+                '        </service>',
                 '    <service',
                 '            android:name=".SourMediaService"',
                 '            android:exported="true"',
@@ -135,7 +177,12 @@ edit(path.join(app, 'build.gradle'), (s) =>
         )
         .replace(
             /dependencies \{/,
-            'dependencies {\n    implementation "androidx.media:media:1.7.0"',
+            [
+                'dependencies {',
+                '    implementation "androidx.media:media:1.7.0"',
+                '    implementation "com.google.android.gms:play-services-code-scanner:16.1.0"',
+                '    implementation "com.google.zxing:core:3.5.3"',
+            ].join('\n'),
         ),
 );
 
