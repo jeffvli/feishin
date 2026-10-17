@@ -18,6 +18,7 @@ const TooltipComponent = memo(
         openDelay = 500,
         transitionProps = DEFAULT_TRANSITION_PROPS,
         withinPortal = true,
+        zIndex = 9999,
         ...props
     }: TooltipProps) => {
         const memoizedClassNames = useMemo(
@@ -42,6 +43,7 @@ const TooltipComponent = memo(
                 transitionProps={memoizedTransitionProps}
                 withArrow
                 withinPortal={withinPortal}
+                zIndex={zIndex}
                 {...props}
             >
                 {children}

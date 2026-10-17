@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useAppTracker } from '/@/renderer/features/analytics/hooks/use-app-tracker';
+import { usePlaylistMembershipWarmup } from '/@/renderer/features/playlists/hooks/use-playlists-containing-songs';
 import { CommandPalette } from '/@/renderer/features/search/components/command-palette';
 import { useGarbageCollection } from '/@/renderer/hooks/use-garbage-collection';
 import { HotkeyItem, useHotkeys } from '/@/renderer/hooks/use-hotkeys';
@@ -33,6 +34,7 @@ const ResponsiveLayoutBase = ({ shell }: ResponsiveLayoutProps) => {
 
 export const ResponsiveLayout = ({ shell }: ResponsiveLayoutProps) => {
     useAppTracker();
+    usePlaylistMembershipWarmup();
 
     return (
         <>
