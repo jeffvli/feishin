@@ -5,12 +5,12 @@ The UI suite deliberately separates quick pull request confidence from slower be
 | Area | Smoke | Full | Nightly | Next high-value cases |
 | --- | --- | --- | --- | --- |
 | Launch and sign-in | App identity, configured server form, successful login | Invalid credentials | - | Server loss and recovery, Quick Connect |
-| Home | Brand, support details, user, version, connected server | Narrow-window layout, music-folder selector, live permission refresh | - | Repeated resize stress, offline status transition |
+| Home | Brand, support details, user, version, connected server | Narrow-window layout, music-folder selector, live permission refresh, ready-update installation action | - | Repeated resize stress, offline status transition |
 | Library | - | Albums, songs, and playlists load from Jellyfin; clean-install navigation and Album, Artist, and Track content columns | A generated 10,000-track library loads within its time and memory budgets | Search, sorting, filtering, metadata refresh |
 | Playback | - | Volume levelling defaults, profiles, persistence, Web/MPV availability, live crossfade duration changes, and manual Fade to next overlap/queue advancement | Synthetic playback plus measured Web Audio levelling, limiting, and crossfade output | Real MPV output measurement and perceptual loudness comparison |
 | Queue | - | Clean-install side-queue columns and fullscreen queue default and toggle | Skip removal, later-track selection, visible shuffle order, repeat-off stop, repeat-all or shuffled refill before track end, and server-deleted track pruning | Exact drag position in the rendered virtual queue and crossfade plus refill in one scenario |
 | Downloads | - | - | Actions and icons, live progress, cancellation, retry, application restart restoration, playlist synchronization, server-deletion reconciliation, and playback after server loss | Interrupted-download resume |
-| Product policy | - | Radio and playlist-creation entry points stay hidden | - | Native application-menu restrictions |
+| Product policy | - | Radio, playlist-creation, and legacy Auto DJ entry points stay hidden | - | Native application-menu restrictions |
 | Packaging and updates | - | Production build | Portable launch, NSIS install, installed launch, uninstall | Signed `electron-updater` transport and install against a temporary release feed |
 | Performance | - | Development startup, idle CPU, memory, and process-count budgets | Twenty-minute playback/navigation soak, memory-growth guard, large-library load, and packaged Windows startup/idle budgets | Real MPV child-process metrics and hardware-specific baselines |
 

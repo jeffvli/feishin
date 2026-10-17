@@ -16,7 +16,6 @@ import {
     shouldEnableOutputLimiter,
 } from '/@/renderer/features/player/audio-player/utils/volume-leveling';
 import { WebPlayer } from '/@/renderer/features/player/audio-player/web-player';
-import { AutoDJHook } from '/@/renderer/features/player/hooks/use-auto-dj';
 import { AutosaveHook } from '/@/renderer/features/player/hooks/use-autosave';
 import { MediaSessionHook } from '/@/renderer/features/player/hooks/use-media-session';
 import { MPRISHook } from '/@/renderer/features/player/hooks/use-mpris';
@@ -177,7 +176,6 @@ export const AudioPlayers = () => {
             <RemoteQueuePushHook />
             <RemoteRadioPushHook />
             <RemoteSettingsPushHook />
-            <AutoDJHook />
             <QueueSourceRefreshHook />
             <QueueRestoreTimestampHook />
             <InitialTimestampRestoreHook />

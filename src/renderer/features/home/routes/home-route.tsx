@@ -9,7 +9,9 @@ import companyLogo from '/@/renderer/features/home/assets/katie-obriens-logo.web
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { useServerLibraryControls } from '/@/renderer/features/shared/hooks/use-server-library-controls';
+import { useAppUpdateState } from '/@/renderer/hooks/use-app-update-state';
 import { useCurrentServer } from '/@/renderer/store';
+import { Button } from '/@/shared/components/button/button';
 import { Select } from '/@/shared/components/select/select';
 
 const SUPPORT_EMAIL = 'k.laws@katieobriensirishtaverns.com';
@@ -106,6 +108,8 @@ const useServerConnectionStatus = (serverId?: string) => {
 
 const HomeRoute = () => {
     const server = useCurrentServer();
+    const updateState = useAppUpdateState();
+    const [installingUpdate, setInstallingUpdate] = useState(false);
     const connectionStatus = useServerConnectionStatus(server?.id);
     const { musicFolders, musicFoldersQuery, selectedMusicFolders, selectMusicFolder } =
         useServerLibraryControls();
@@ -119,6 +123,22 @@ const HomeRoute = () => {
         offline: 'Offline — downloaded music available',
         unavailable: 'Server unavailable',
     }[connectionStatus];
+    const updateReady = updateState.status === 'downloaded' && updateState.version;
+
+    const handleInstallUpdate = async () => {
+        if (installingUpdate) return;
+
+        setInstallingUpdate(true);
+
+        try {
+            const installationStarted = await window.api.utils.installUpdate();
+            if (!installationStarted) {
+                setInstallingUpdate(false);
+            }
+        } catch {
+            setInstallingUpdate(false);
+        }
+    };
 
     return (
         <AnimatedPage>
@@ -156,7 +176,20 @@ const HomeRoute = () => {
                                     </div>
                                     <div className={styles.detailRow}>
                                         <dt>Version</dt>
-                                        <dd>
+                                        <dd className={styles.versionActions}>
+                                            {updateReady && (
+                                                <Button
+                                                    aria-label={`Install update ${updateState.version}`}
+                                                    className={styles.installUpdateButton}
+                                                    loading={installingUpdate}
+                                                    onClick={handleInstallUpdate}
+                                                    size="compact-sm"
+                                                    type="button"
+                                                    variant="outline"
+                                                >
+                                                    Install update
+                                                </Button>
+                                            )}
                                             <span className={styles.versionBadge}>
                                                 v{packageJson.version}
                                             </span>

@@ -1,4 +1,50 @@
-import { expect, getSongCell, login, navigateTo, test } from '../fixtures/katiesamp-test.mjs';
+import {
+    expect,
+    getSongCell,
+    login,
+    navigateTo,
+    packageVersion,
+    test,
+} from '../fixtures/katiesamp-test.mjs';
+
+test('@full shows the ready update action beside the current version', async ({
+    electronApp,
+    page,
+}) => {
+    await login(page);
+
+    const currentVersion = page.getByText(`v${packageVersion}`, { exact: true });
+    const installUpdate = page.getByRole('button', { name: 'Install update 9.9.9' });
+    await expect(currentVersion).toBeVisible();
+    await expect(installUpdate).toHaveCount(0);
+
+    await electronApp.evaluate(({ BrowserWindow }) => {
+        BrowserWindow.getAllWindows()[0]?.webContents.send('update-downloaded', '9.9.9');
+    });
+
+    await expect(installUpdate).toBeVisible();
+    await expect(page.getByText('Update ready - 9.9.9', { exact: true })).toBeVisible();
+
+    const currentVersionBox = await currentVersion.boundingBox();
+    const installUpdateBox = await installUpdate.boundingBox();
+    expect(currentVersionBox).not.toBeNull();
+    expect(installUpdateBox).not.toBeNull();
+    const overlapsHorizontally =
+        installUpdateBox.x < currentVersionBox.x + currentVersionBox.width &&
+        installUpdateBox.x + installUpdateBox.width > currentVersionBox.x;
+    const overlapsVertically =
+        installUpdateBox.y < currentVersionBox.y + currentVersionBox.height &&
+        installUpdateBox.y + installUpdateBox.height > currentVersionBox.y;
+    expect(overlapsHorizontally && overlapsVertically).toBe(false);
+    if (overlapsVertically) {
+        expect(installUpdateBox.x + installUpdateBox.width).toBeLessThanOrEqual(
+            currentVersionBox.x + 1,
+        );
+    }
+
+    await installUpdate.click();
+    await expect(installUpdate).toBeEnabled();
+});
 
 test('@full home layout remains readable when the application window is narrow', async ({
     electronApp,
