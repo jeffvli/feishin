@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { AnimatePresence } from 'motion/react';
-import { Suspense } from 'react';
-import { Outlet } from 'react-router';
+import { Suspense, useEffect, useRef } from 'react';
+import { Outlet, useLocation } from 'react-router';
 
 import styles from './mobile-layout.module.css';
 
@@ -9,10 +9,10 @@ import { ContextMenuController } from '/@/renderer/features/context-menu/context
 import { FullScreenVisualizer } from '/@/renderer/features/player/components/full-screen-visualizer';
 import { MobileFullscreenPlayer } from '/@/renderer/features/player/components/mobile-fullscreen-player';
 import { MobileSidebar } from '/@/renderer/features/sidebar/components/mobile-sidebar';
+import { MobileNav } from '/@/renderer/features/sour/mobile/mobile-nav';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
 import { WindowBar } from '/@/renderer/layouts/window-bar';
 import { useFullScreenPlayerOverlayState, useWindowBarStyle } from '/@/renderer/store';
-import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Drawer } from '/@/shared/components/drawer/drawer';
 import { Spinner } from '/@/shared/components/spinner/spinner';
 import { useDisclosure } from '/@/shared/hooks/use-disclosure';
@@ -29,6 +29,14 @@ export const MobileLayout = ({ shell }: MobileLayoutProps) => {
         visualizerExpanded: isFullScreenVisualizerExpanded,
     } = useFullScreenPlayerOverlayState();
     const windowBarStyle = useWindowBarStyle();
+    const { pathname } = useLocation();
+    // the menu closes once something in it was picked
+    const lastPath = useRef(pathname);
+    useEffect(() => {
+        if (lastPath.current === pathname) return;
+        lastPath.current = pathname;
+        closeSidebar();
+    }, [pathname, closeSidebar]);
 
     return (
         <>
@@ -40,22 +48,13 @@ export const MobileLayout = ({ shell }: MobileLayoutProps) => {
                 id="mobile-layout"
             >
                 {!shell && <WindowBar />}
-                {!shell && (
-                    <ActionIcon
-                        className={styles.drawerButton}
-                        icon="menu"
-                        onClick={openSidebar}
-                        size="lg"
-                        tooltip={{ label: 'Menu' }}
-                        variant="subtle"
-                    />
-                )}
                 <main className={styles.mainContent}>
                     <Suspense fallback={<Spinner container />}>
                         <Outlet />
                     </Suspense>
                 </main>
                 <PlayerBar />
+                {!shell && <MobileNav onMenu={openSidebar} />}
             </div>
             {!shell && (
                 <Drawer

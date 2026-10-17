@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './mobile-sidebar.module.css';
 
 import { ActionBar } from '/@/renderer/features/sidebar/components/action-bar';
+import { SidebarCollectionList } from '/@/renderer/features/sidebar/components/sidebar-collection-list';
 import { SidebarIcon } from '/@/renderer/features/sidebar/components/sidebar-icon';
 import { SidebarItem } from '/@/renderer/features/sidebar/components/sidebar-item';
 import {
@@ -12,6 +13,9 @@ import {
     SidebarSharedPlaylistList,
     useSidebarPlaylistAddDragMonitor,
 } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
+import { SidebarPins } from '/@/renderer/features/sour/components/look';
+import { SidebarFriends, SidebarSour } from '/@/renderer/features/sour/components/sidebar-friends';
+import { useSimpleMode } from '/@/renderer/features/sour/store/sour.store';
 import {
     SidebarItemType,
     useSidebarItems,
@@ -71,6 +75,8 @@ export const MobileSidebar = () => {
         return items;
     }, [sidebarItems, translatedSidebarItemMap]);
 
+    const simple = useSimpleMode();
+
     return (
         <div className={styles.container} id="mobile-sidebar">
             <Group grow id="global-search-container" style={{ flexShrink: 0 }}>
@@ -84,9 +90,18 @@ export const MobileSidebar = () => {
                         item: styles.accordionItem,
                         root: styles.accordionRoot,
                     }}
-                    defaultValue={['library', 'playlists']}
+                    defaultValue={[
+                        'pins',
+                        'sour',
+                        'library',
+                        'collections',
+                        'playlists',
+                        'friends',
+                    ]}
                     multiple
                 >
+                    {!simple && <SidebarPins />}
+                    {!simple && <SidebarSour />}
                     <Accordion.Item value="library">
                         <Accordion.Control>
                             <Text fw={600} variant="secondary">
@@ -106,7 +121,9 @@ export const MobileSidebar = () => {
                             })}
                         </Accordion.Panel>
                     </Accordion.Item>
+                    <SidebarCollectionList />
                     {sidebarPlaylistList && <MobileSidebarPlaylistSection />}
+                    {!simple && <SidebarFriends />}
                 </Accordion>
             </ScrollArea>
         </div>

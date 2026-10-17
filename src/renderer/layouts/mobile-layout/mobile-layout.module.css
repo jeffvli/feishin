@@ -4,38 +4,23 @@
     grid-template-areas:
         'window-bar'
         'main-content'
-        'player';
-    grid-template-rows: 0 calc(100vh - 90px) 90px;
-    grid-template-rows: 0 calc(100dvh - 90px) 90px;
+        'player'
+        'nav';
+    grid-template-rows: 0 minmax(0, 1fr) 90px auto;
     grid-template-columns: 1fr;
     gap: 0;
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh;
+    width: 100%;
+
+    /* the screen minus the phone's notch and gesture bar (body is padded by those) */
+    height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
     overflow: hidden;
     background: var(--theme-colors-background);
 }
 
 .windows,
 .macos {
-    grid-template-rows: 30px calc(100vh - 120px) 90px;
-    grid-template-rows: 30px calc(100dvh - 120px) 90px;
-}
-
-.drawer-button {
-    position: absolute;
-    bottom: calc(90px + 0.75rem);
-    left: 0.75rem;
-    z-index: 100;
-    background: color-mix(in srgb, var(--theme-colors-background) 90%, transparent);
-    border: 1px solid var(--theme-colors-border);
-    backdrop-filter: blur(10px);
-}
-
-@media (height < 192px) {
-    .drawer-button {
-        display: none;
-    }
+    grid-template-rows: 30px minmax(0, 1fr) 90px auto;
 }
 
 .main-content {

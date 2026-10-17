@@ -1,0 +1,29 @@
+.nav {
+    display: grid;
+    grid-area: nav;
+    grid-template-columns: repeat(6, 1fr);
+    height: 56px;
+    background: var(--theme-colors-background);
+    border-top: 1px solid var(--theme-colors-border);
+}
+
+.item,
+.active {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    padding: 0;
+    font: inherit;
+    font-size: 0.68rem;
+    color: var(--theme-colors-foreground-muted);
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.active {
+    color: var(--theme-colors-primary);
+}
