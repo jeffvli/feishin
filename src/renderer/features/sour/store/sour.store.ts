@@ -69,7 +69,15 @@ export interface SourLook {
     visualizer: VisualizerStyle;
 }
 
-export type VisualizerStyle = 'bars' | 'glow' | 'halo' | 'orbit' | 'pulp' | 'river' | 'soul';
+export type VisualizerStyle =
+    | 'bars'
+    | 'glow'
+    | 'halo'
+    | 'lightning'
+    | 'orbit'
+    | 'pulp'
+    | 'river'
+    | 'soul';
 
 export const DEFAULT_LOOK: SourLook = {
     albumAccent: false,

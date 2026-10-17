@@ -17,6 +17,11 @@ import {
     readLevels,
     useLevelSource,
 } from '/@/renderer/features/sour/visualizer/levels';
+import {
+    drawLightning,
+    lightningBusy,
+    makeLightning,
+} from '/@/renderer/features/sour/visualizer/lightning';
 import { drawSoul, makeSoul, steerSoul } from '/@/renderer/features/sour/visualizer/soul';
 import { useFastAverageColor } from '/@/renderer/hooks';
 import { usePlayerSong } from '/@/renderer/store';
@@ -36,6 +41,7 @@ export const VISUALIZER_STYLES: { id: VisualizerStyle; label: string; perk?: str
     { id: 'glow', label: 'Album glow' },
     { id: 'orbit', label: 'Group orbit' },
     { id: 'soul', label: 'Soul (admins)', perk: 'determination' },
+    { id: 'lightning', label: 'Lightning in a bottle (Gavin)', perk: 'gavin' },
 ];
 
 interface Props {
@@ -97,6 +103,7 @@ export const SourVisualizer = ({ className, colors, coverUrl, people, soulPlay, 
         let spin = 0;
         let visible = true;
         const soul = makeSoul();
+        const lightning = makeLightning();
 
         const fit = () => {
             const r = canvas.getBoundingClientRect();
@@ -128,7 +135,8 @@ export const SourVisualizer = ({ className, colors, coverUrl, people, soulPlay, 
             const playing = isPlaying();
             const settled = !playing && levels.energy < 0.004 && !sparks.length && flash < 0.02;
             const still =
-                look !== 'soul' || (soul.broken > 0.97 && !soul.stars.length && soul.hurt <= 0);
+                (look !== 'soul' || (soul.broken > 0.97 && !soul.stars.length && soul.hurt <= 0)) &&
+                (look !== 'lightning' || !lightningBusy(lightning));
             if (settled && still && now - drawn < 400) return;
             drawn = now;
             if (playing) spin += dt / 540;
@@ -320,6 +328,8 @@ export const SourVisualizer = ({ className, colors, coverUrl, people, soulPlay, 
                 });
             } else if (look === 'soul') {
                 drawSoul(ctx, W, H, levels, soul, playing, dt, now, !!steer);
+            } else if (look === 'lightning') {
+                drawLightning(ctx, W, H, levels, dpr, lightning, dt, playing);
             }
         };
         frame = requestAnimationFrame(draw);

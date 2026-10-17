@@ -119,6 +119,8 @@ export interface SourProfile {
     created: string;
     custom: ProfileCustom;
     favorites: GroupSong[];
+    // Gavin (orange name, the Skyrim font and the lightning visualizer)
+    gavin?: boolean;
     group: null | { code: string; name: string };
     id: string;
     lastSeen: null | number;

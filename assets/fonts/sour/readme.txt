@@ -19,3 +19,5 @@ Graphics copyright Twitter, Inc and other contributors, CC BY 4.0
 
 Added in Sour Player 0.6 (Google Fonts, from the @fontsource packages): Nunito, Quicksand, Baloo 2, Lilita One, Luckiest Guy, Dancing Script, Great Vibes, Indie Flower, Shadows Into Light, Amatic SC, Kalam, Patrick Hand, Anton, Oswald, Teko, Rubik Mono One, Exo 2, IBM Plex Mono, Courier Prime, Sacramento, Gloria Hallelujah, Chewy, Bubblegum Sans, Cherry Bomb One, Dela Gothic One, Uncial Antiqua, Metal Mania, Pirata One, Rock Salt, Sedgwick Ave.
 All are under the SIL Open Font License 1.1, except Rock Salt (Apache License 2.0).
+
+skyrim.ttf: "Skyrim Font" by DarkXShadowX21 (2014), supplied by the user for Gavin's profile.

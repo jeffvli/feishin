@@ -373,3 +373,10 @@
     src: url('../../../assets/fonts/sour/mountains-of-christmas.woff2') format('woff2');
     font-display: swap;
 }
+
+/* Gavin's font (DarkXShadowX21's Skyrim Font) */
+@font-face {
+    font-family: 'Sour Skyrim';
+    src: url('../../../assets/fonts/sour/skyrim.ttf') format('truetype');
+    font-display: swap;
+}

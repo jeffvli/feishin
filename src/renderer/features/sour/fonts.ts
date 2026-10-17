@@ -81,6 +81,8 @@ export const SOUR_FONTS: SourFont[] = [
     bundled('rock-salt', 'Rock Salt', 'cursive'),
     bundled('sedgwick-ave', 'Sedgwick Ave', 'cursive'),
     { family: 'Determination, monospace', id: 'determination', label: 'Determination', perk: true },
+    // Gavin's own font
+    { family: "'Sour Skyrim', serif", id: 'skyrim', label: 'Skyrim', perk: true },
 ];
 
 export const fontFamily = (id?: null | string) =>
@@ -89,6 +91,6 @@ export const fontFamily = (id?: null | string) =>
 // choices for a font picker; perk fonts only for the profiles that have them
 export const fontChoices = (perks: string[] = []) =>
     SOUR_FONTS.filter((f) => !f.perk || perks.includes(f.id)).map((f) => ({
-        label: f.perk ? `${f.label} (admins)` : f.label,
+        label: f.perk ? `${f.label} (${f.id === 'skyrim' ? 'Gavin' : 'admins'})` : f.label,
         value: f.id,
     }));

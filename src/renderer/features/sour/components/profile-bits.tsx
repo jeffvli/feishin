@@ -128,10 +128,11 @@ export const activity = (p: SourProfile) => {
 export const isBirthday = (p: Pick<SourProfile, 'custom'>) =>
     !!p.custom?.birthday && p.custom.birthday.slice(-5) === new Date().toISOString().slice(5, 10);
 
-// Navidrome admins have a light royal blue name everywhere
+// Navidrome admins have a light royal blue name everywhere; Gavin's is orange (his alone)
 export const ADMIN_BLUE = '#7397ff';
-export const nameColor = (profile?: null | Pick<SourProfile, 'admin'>) =>
-    profile?.admin ? ADMIN_BLUE : undefined;
+export const GAVIN_ORANGE = '#ff8a1f';
+export const nameColor = (profile?: null | Pick<SourProfile, 'admin' | 'gavin'>) =>
+    profile?.gavin ? GAVIN_ORANGE : profile?.admin ? ADMIN_BLUE : undefined;
 
 // the name line: chosen font and effect, emoji, and the nickname friends gave them
 export const ProfileName = ({ profile, size = 22 }: { profile: SourProfile; size?: number }) => {
