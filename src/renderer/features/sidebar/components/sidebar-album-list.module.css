@@ -1,0 +1,18 @@
+.row {
+    width: 100%;
+    min-width: 0;
+}
+
+.album-icon {
+    flex: 0 0 1rem;
+}
+
+.album-name {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.trailing-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+}

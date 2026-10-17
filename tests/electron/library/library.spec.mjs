@@ -184,6 +184,12 @@ test('@full labels the sidebar album list with the selected music folder', async
         sidebar.getByRole('button', { exact: true, name: "Katie O'Brien's Music" }),
     ).toBeVisible();
     await expect(sidebar.getByText('Automation Album', { exact: true })).toBeVisible();
+    const albumRow = sidebar
+        .getByText('Automation Album', { exact: true })
+        .locator('xpath=ancestor::a[1]');
+    const albumIcon = albumRow.locator('svg').first();
+    await expect(albumIcon).toBeVisible();
+    expect(await albumIcon.evaluate((element) => getComputedStyle(element).flexShrink)).toBe('0');
     await sidebar.getByText('Automation Album', { exact: true }).click({ button: 'right' });
     for (const label of ['Play', 'Shuffle', 'Play next', 'Add to end of queue']) {
         await expect(page.getByRole('menuitem', { exact: true, name: label })).toBeVisible();
