@@ -303,5 +303,8 @@ const MediaSessionHookInner = () => {
 export const MediaSessionHook = () => {
     // Always render the hook — let the internal guard logic decide whether to act.
     // Conditional rendering here causes unmount/remount cycles that destroy handlers mid-session.
+    // Android's WebView has no media session at all (the Android app has its own, see
+    // features/sour/mobile), so there is nothing to drive there.
+    if (!mediaSession) return null;
     return React.createElement(MediaSessionHookInner);
 };

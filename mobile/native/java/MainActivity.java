@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.webkit.WebView;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.getcapacitor.BridgeActivity;
 
@@ -13,6 +15,11 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         registerPlugin(SourMediaPlugin.class);
         super.onCreate(savedInstanceState);
+        // dark behind the status and navigation bars (the app is dark), with light icons on them
+        getWindow().getDecorView().setBackgroundColor(0xFF140A18);
+        WindowInsetsControllerCompat bars = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        bars.setAppearanceLightStatusBars(false);
+        bars.setAppearanceLightNavigationBars(false);
         // Back goes back a page; on the first page it hides the app instead of closing it, so the
         // music keeps playing
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {

@@ -8,6 +8,7 @@
     },
     "android": {
         "adjustMarginsForEdgeToEdge": "force",
+        "loggingBehavior": "production",
         "allowMixedContent": true,
         "backgroundColor": "#101010"
     }
