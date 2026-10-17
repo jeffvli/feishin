@@ -9,9 +9,11 @@ import {
     isLegacyAuth,
     isServerLock,
 } from '/@/renderer/features/action-required/utils/window-properties';
+import KatieObriensLogo from '/@/renderer/features/home/assets/katie-obriens-logo.webp';
 import JellyfinIcon from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeIcon from '/@/renderer/features/servers/assets/navidrome.png';
 import SubsonicIcon from '/@/renderer/features/servers/assets/opensubsonic.png';
+import styles from '/@/renderer/features/servers/components/add-server-form.module.css';
 import { IgnoreCorsSslSwitches } from '/@/renderer/features/servers/components/ignore-cors-ssl-switches';
 import { JellyfinQuickConnectButton } from '/@/renderer/features/servers/components/jellyfin-quick-connect-button';
 import {
@@ -39,6 +41,10 @@ import { DiscoveredServerItem, ServerType, toServerType } from '/@/shared/types/
 
 const autodiscover = isElectron() ? window.api.autodiscover : null;
 const localSettings = isElectron() ? window.api.localSettings : null;
+const DEFAULT_SERVER_NAME = 'KATIESMUSICSERVER';
+const DEFAULT_SERVER_URL = 'http://82.31.161.12:8096';
+const SUPPORT_EMAIL = 'k.laws@katieobriensirishtaverns.com';
+const SUPPORT_PHONE = '07969 765 597';
 
 interface AddServerFormProps {
     onCancel: (() => void) | null;
@@ -47,6 +53,19 @@ interface AddServerFormProps {
 interface ServerDetails {
     icon: string;
     name: string;
+}
+
+function InitialServerBrand() {
+    return (
+        <Stack align="center" className={styles.initialServerBrand} justify="center">
+            <img
+                alt="Katie O'Brien's"
+                className={styles.initialServerLogo}
+                src={KatieObriensLogo}
+            />
+            <Text fw={700}>{"Katie O'Brien's"}</Text>
+        </Stack>
+    );
 }
 
 function ServerIconWithLabel({ icon, label }: { icon: string; label: string }) {
@@ -100,38 +119,56 @@ const ALL_SERVERS = Object.keys(SERVER_TYPES).map((serverType) => {
     };
 });
 
+const INITIAL_SERVER = [
+    {
+        label: <InitialServerBrand />,
+        value: ServerType.JELLYFIN,
+    },
+];
+
 export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const { t } = useTranslation();
     const focusTrapRef = useFocusTrap(true);
     const [isLoading, setIsLoading] = useState(false);
     const { addServer, setCurrentServer } = useAuthStoreActions();
     const serverList = useServerList();
+    const isInitialSetup = Object.keys(serverList).length === 0;
     const { servers: discovered } = useAutodiscovery();
 
     const serverLock = isServerLock();
+    const configuredServerUrl = localSettings ? localSettings.env.SERVER_URL : window.SERVER_URL;
+    const hasConfiguredServerUrl =
+        configuredServerUrl && !['http://', 'https://'].includes(configuredServerUrl);
 
     const form = useForm({
         initialValues: {
             legacyAuth: isLegacyAuth(),
             name:
-                (localSettings ? localSettings.env.SERVER_NAME : window.SERVER_NAME) || 'My Server',
+                (localSettings ? localSettings.env.SERVER_NAME : window.SERVER_NAME) ||
+                (isInitialSetup ? DEFAULT_SERVER_NAME : 'My Server'),
             password: '',
             preferInstantMix: undefined,
             preferRemoteUrl: false,
             remoteUrl: '',
             savePassword: undefined,
-            type:
-                (localSettings
-                    ? localSettings.env.SERVER_TYPE
-                    : toServerType(window.SERVER_TYPE)) ?? ServerType.NAVIDROME,
-            url: (localSettings ? localSettings.env.SERVER_URL : window.SERVER_URL) ?? 'https://',
+            type: isInitialSetup
+                ? ServerType.JELLYFIN
+                : ((localSettings
+                      ? localSettings.env.SERVER_TYPE
+                      : toServerType(window.SERVER_TYPE)) ?? ServerType.NAVIDROME),
+            url:
+                isInitialSetup && !hasConfiguredServerUrl
+                    ? DEFAULT_SERVER_URL
+                    : (configuredServerUrl ?? 'https://'),
             username: '',
         },
     });
 
     const [signInMethod, setSignInMethod] = useState<JellyfinSignInMethod>('password');
     const showQuickConnect =
-        form.values.type === ServerType.JELLYFIN && signInMethod === 'quickConnect';
+        !isInitialSetup &&
+        form.values.type === ServerType.JELLYFIN &&
+        signInMethod === 'quickConnect';
 
     const isSubmitDisabled =
         !form.values.name || !form.values.url || (!showQuickConnect && !form.values.username);
@@ -275,29 +312,31 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
     return (
         <>
-            <Stack>
-                {discovered.map((server) => (
-                    <Paper key={server.url} p="10px">
-                        <Group>
-                            <img height="32" src={SERVER_TYPES[server.type].icon} width="32" />
-                            <div
-                                onClick={() => fillServerDetails(server)}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <Text fw={700}>{server.name}</Text>
-                                <Text>
-                                    {SERVER_TYPES[server.type].name} server at {server.url}
-                                </Text>
-                            </div>
-                        </Group>
-                    </Paper>
-                ))}
-            </Stack>
+            {!isInitialSetup && (
+                <Stack>
+                    {discovered.map((server) => (
+                        <Paper key={server.url} p="10px">
+                            <Group>
+                                <img height="32" src={SERVER_TYPES[server.type].icon} width="32" />
+                                <div
+                                    onClick={() => fillServerDetails(server)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <Text fw={700}>{server.name}</Text>
+                                    <Text>
+                                        {SERVER_TYPES[server.type].name} server at {server.url}
+                                    </Text>
+                                </div>
+                            </Group>
+                        </Paper>
+                    ))}
+                </Stack>
+            )}
             <form onSubmit={handleSubmit}>
                 <Stack m={5} ref={focusTrapRef}>
                     <SegmentedControl
-                        data={ALL_SERVERS}
-                        disabled={serverLock}
+                        data={isInitialSetup ? INITIAL_SERVER : ALL_SERVERS}
+                        disabled={serverLock || isInitialSetup}
                         onChange={(value) => {
                             form.setFieldValue('type', value);
                             if (value !== ServerType.JELLYFIN) stopQuickConnect();
@@ -308,8 +347,8 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                     />
                     <Group grow>
                         <TextInput
-                            data-autofocus
-                            disabled={serverLock}
+                            data-autofocus={!isInitialSetup ? true : undefined}
+                            disabled={serverLock || isInitialSetup}
                             label={t('form.addServer.input', {
                                 context: 'name',
                             })}
@@ -317,7 +356,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             {...form.getInputProps('name')}
                         />
                         <TextInput
-                            disabled={serverLock}
+                            disabled={serverLock || isInitialSetup}
                             label={t('form.addServer.input', {
                                 context: 'url',
                             })}
@@ -325,37 +364,41 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             {...form.getInputProps('url')}
                         />
                     </Group>
-                    <TextInput
-                        description={t('form.addServer.input', {
-                            context: 'remoteUrlDescription',
-                        })}
-                        disabled={serverLock}
-                        label={t('form.addServer.input', {
-                            context: 'remoteUrl',
-                        })}
-                        placeholder={t('form.addServer.input', {
-                            context: 'remoteUrlPlaceholder',
-                        })}
-                        {...form.getInputProps('remoteUrl')}
-                    />
-                    {form.values.remoteUrl && (
-                        <Checkbox
-                            label={t('form.addServer.input', {
-                                context: 'preferRemoteUrl',
-                            })}
-                            {...form.getInputProps('preferRemoteUrl', {
-                                type: 'checkbox',
-                            })}
-                        />
+                    {!isInitialSetup && (
+                        <>
+                            <TextInput
+                                description={t('form.addServer.input', {
+                                    context: 'remoteUrlDescription',
+                                })}
+                                disabled={serverLock}
+                                label={t('form.addServer.input', {
+                                    context: 'remoteUrl',
+                                })}
+                                placeholder={t('form.addServer.input', {
+                                    context: 'remoteUrlPlaceholder',
+                                })}
+                                {...form.getInputProps('remoteUrl')}
+                            />
+                            {form.values.remoteUrl && (
+                                <Checkbox
+                                    label={t('form.addServer.input', {
+                                        context: 'preferRemoteUrl',
+                                    })}
+                                    {...form.getInputProps('preferRemoteUrl', {
+                                        type: 'checkbox',
+                                    })}
+                                />
+                            )}
+                        </>
                     )}
-                    {isElectron() && (
+                    {!isInitialSetup && isElectron() && (
                         <>
                             <Divider />
                             <IgnoreCorsSslSwitches />
                             <Divider />
                         </>
                     )}
-                    {form.values.type === ServerType.JELLYFIN && (
+                    {!isInitialSetup && form.values.type === ServerType.JELLYFIN && (
                         <JellyfinSignInMethodPicker
                             onChange={(method) => {
                                 setSignInMethod(method);
@@ -367,6 +410,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                     {!showQuickConnect && (
                         <>
                             <TextInput
+                                data-autofocus={isInitialSetup ? true : undefined}
                                 label={t('form.addServer.input', {
                                     context: 'username',
                                 })}
@@ -384,6 +428,22 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                                 {...form.getInputProps('password')}
                             />
                         </>
+                    )}
+                    {isInitialSetup && (
+                        <Paper className={styles.supportCard} p="md">
+                            <Stack gap="xs">
+                                <Text fw={700}>Need your username or password?</Text>
+                                <Text size="sm">Contact Kev Laws for technical support.</Text>
+                                <Group className={styles.supportContacts} gap="lg">
+                                    <Text size="sm">
+                                        <strong>Phone:</strong> {SUPPORT_PHONE}
+                                    </Text>
+                                    <Text className={styles.supportValue} size="sm">
+                                        <strong>Email:</strong> {SUPPORT_EMAIL}
+                                    </Text>
+                                </Group>
+                            </Stack>
+                        </Paper>
                     )}
                     {localSettings && form.values.type === ServerType.NAVIDROME && (
                         <Checkbox
@@ -404,7 +464,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             {...form.getInputProps('legacyAuth', { type: 'checkbox' })}
                         />
                     )}
-                    {form.values.type === ServerType.JELLYFIN && (
+                    {!isInitialSetup && form.values.type === ServerType.JELLYFIN && (
                         <Checkbox
                             description={t('form.addServer.input', {
                                 context: 'preferInstantMixDescription',
@@ -438,7 +498,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                                 type="submit"
                                 variant="filled"
                             >
-                                {t('common.add')}
+                                {isInitialSetup ? 'Login' : t('common.add')}
                             </ModalButton>
                         )}
                     </Group>
