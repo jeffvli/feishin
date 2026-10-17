@@ -9,6 +9,7 @@ import { createWithEqualityFn } from 'zustand/traditional';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { useRadioStore as useRadioPlayerStore } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { createSelectors } from '/@/renderer/lib/zustand';
+import { restorePreviousConsumedId } from '/@/renderer/store/player-queue-history';
 import { insertQueueIdsAtTarget } from '/@/renderer/store/player-queue-insertion';
 import { pruneUnavailableQueue } from '/@/renderer/store/player-queue-pruning';
 import { removeQueueIds, shouldRefillQueue } from '/@/renderer/store/player-queue-repeat';
@@ -1378,6 +1379,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     const queue = get().getQueueOrder();
                     const currentTimestamp = useTimestampStoreBase.getState().timestamp;
                     const isFirstTrack = currentIndex === 0;
+                    const resumeFromStopped = player.status === PlayerStatus.STOPPED;
 
                     // If timestamp is greater than 10 seconds, restart current song
                     if (currentTimestamp > 10) {
@@ -1385,6 +1387,49 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             state.player.seekToTimestamp = uniqueSeekToTimestamp(0);
                         });
                         return;
+                    }
+
+                    if (
+                        useSettingsStore.getState().playback.consumeQueue &&
+                        player.index === 0 &&
+                        get().queue.consumed.length > 0
+                    ) {
+                        let restoredId: string | undefined;
+
+                        set((state) => {
+                            const restored = restorePreviousConsumedId(
+                                state.queue.default,
+                                state.queue.shuffled,
+                                state.queue.consumed,
+                                new Set(Object.keys(state.queue.songs)),
+                                state.player.shuffle === PlayerShuffle.TRACK,
+                            );
+
+                            restoredId = restored.restoredId;
+                            if (!restoredId) {
+                                state.queue.consumed = restored.consumedIds;
+                                cleanupOrphanedSongs(state);
+                                return;
+                            }
+
+                            state.queue.consumed = restored.consumedIds;
+                            state.queue.default = restored.defaultIds;
+                            state.queue.shuffled = restored.shuffledIndexes;
+                            state.player.index = 0;
+                            state.player.playerNum = 1;
+                            if (resumeFromStopped) {
+                                state.player.status = PlayerStatus.PLAYING;
+                            }
+                            setTimestampStore(0);
+                        });
+
+                        if (restoredId) {
+                            eventEmitter.emit('MEDIA_PREV', {
+                                currentIndex,
+                                prevIndex: 0,
+                            });
+                            return;
+                        }
                     }
 
                     let previousIndex: number;
@@ -1407,8 +1452,6 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
 
                     // Same Chromium Media Session pitfall as mediaNext: a STOPPED→new-src
                     // transition without PLAYING drops OS media-key routing.
-                    const resumeFromStopped = get().player.status === PlayerStatus.STOPPED;
-
                     set((state) => {
                         state.player.index = previousIndex;
                         state.player.playerNum = 1;
