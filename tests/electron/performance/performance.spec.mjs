@@ -230,18 +230,35 @@ test('@nightly keeps resource growth bounded during a playback and navigation so
     await expect(getSongCell(page, 'Automation Track 1')).toBeVisible({ timeout: 30_000 });
     await getSongCell(page, 'Automation Track 1').dblclick();
 
+    const playTrack = async (trackNumber) => {
+        const song = getSongCell(page, `Automation Track ${trackNumber}`);
+        await expect(song).toBeVisible({ timeout: 30_000 });
+        await song.dblclick();
+
+        const confirmation = page.getByRole('dialog', {
+            name: 'Discard the current queue?',
+        });
+        const confirmationOpened = await confirmation
+            .waitFor({ state: 'visible', timeout: 5_000 })
+            .then(() => true)
+            .catch(() => false);
+        if (!confirmationOpened) return;
+
+        await confirmation.getByRole('checkbox', { name: 'Do not show this again' }).check();
+        await confirmation.getByRole('button', { exact: true, name: 'Confirm' }).click();
+        await expect(confirmation).toBeHidden({ timeout: 10_000 });
+    };
+
     const startedAt = performance.now();
     const samples = [];
-    let nextInteractionAt = 0;
+    let nextInteractionAt = 30_000;
     let interactionIndex = 0;
     while (performance.now() - startedAt < soakDurationMs) {
         const elapsedMs = performance.now() - startedAt;
         if (elapsedMs >= nextInteractionAt) {
-            const trackNumber = (interactionIndex % 6) + 1;
+            const trackNumber = (interactionIndex % 5) + 2;
             await navigateTo(page, '/library/songs');
-            const song = getSongCell(page, `Automation Track ${trackNumber}`);
-            await expect(song).toBeVisible({ timeout: 30_000 });
-            await song.dblclick();
+            await playTrack(trackNumber);
             interactionIndex += 1;
             nextInteractionAt += 30_000;
         }
