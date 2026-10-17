@@ -1,0 +1,16 @@
+.recovery {
+    position: fixed;
+    top: 48px;
+    left: 50%;
+    z-index: 60000;
+    width: max-content;
+    max-width: calc(100vw - 24px);
+    padding: 6px 8px;
+    color: var(--theme-colors-surface-foreground);
+    white-space: nowrap;
+    background: var(--theme-colors-surface);
+    border: 1px solid var(--theme-colors-border);
+    border-radius: var(--theme-radius-md);
+    transform: translateX(-50%);
+    -webkit-app-region: no-drag;
+}

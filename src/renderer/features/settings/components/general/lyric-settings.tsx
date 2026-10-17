@@ -3,11 +3,13 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { languages } from '/@/i18n/i18n';
+import { DesktopLyricsSettingsSection } from '/@/renderer/features/lyrics/desktop-lyrics-settings';
 import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
 import { useLyricsSettings, useSettingsStoreActions } from '/@/renderer/store';
+import { Divider } from '/@/shared/components/divider/divider';
 import { MultiSelect } from '/@/shared/components/multi-select/multi-select';
 import { NumberInput } from '/@/shared/components/number-input/number-input';
 import { Select } from '/@/shared/components/select/select';
@@ -221,5 +223,15 @@ export const LyricSettings = memo(() => {
         },
     ];
 
-    return <SettingsSection options={lyricOptions} title={t('page.setting.lyrics')} />;
+    return (
+        <>
+            <SettingsSection options={lyricOptions} title={t('page.setting.lyrics')} />
+            {isElectron() && (
+                <>
+                    <Divider />
+                    <DesktopLyricsSettingsSection />
+                </>
+            )}
+        </>
+    );
 });

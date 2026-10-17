@@ -2,6 +2,7 @@ import isElectron from 'is-electron';
 import { useTranslation } from 'react-i18next';
 
 import { languages } from '/@/i18n/i18n';
+import { DesktopLyricsSettingsSection } from '/@/renderer/features/lyrics/desktop-lyrics-settings';
 import {
     ListConfigBooleanControl,
     ListConfigTable,
@@ -581,6 +582,7 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
             <Fieldset legend={t('page.setting.lyricsTranslation')}>
                 <ListConfigTable options={translationSettings} />
             </Fieldset>
+            {isElectron() && <DesktopLyricsSettingsSection compact />}
         </Stack>
     );
 };

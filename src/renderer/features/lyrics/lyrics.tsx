@@ -8,7 +8,7 @@ import styles from './lyrics.module.css';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { eventEmitter } from '/@/renderer/events/event-emitter';
 import { PlayerLyricsFetchedEventPayload } from '/@/renderer/events/events';
-import { translateLyrics } from '/@/renderer/features/lyrics/api/lyric-translate';
+import { lyricsTranslationQuery } from '/@/renderer/features/lyrics/api/lyric-translate';
 import {
     computeSelectedFromResult,
     getDisplayOffset,
@@ -39,6 +39,7 @@ import {
     UnsynchronizedLyricsProps,
 } from '/@/renderer/features/lyrics/unsynchronized-lyrics';
 import { openLyricsSettingsModal } from '/@/renderer/features/lyrics/utils/open-lyrics-settings-modal';
+import { updateLyricsOffset } from '/@/renderer/features/lyrics/utils/update-lyrics-offset';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { useIsRadioActive } from '/@/renderer/features/radio/hooks/use-radio-player';
 import { ComponentErrorBoundary } from '/@/renderer/features/shared/components/component-error-boundary';
@@ -330,19 +331,9 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
         (offsetMs: number) => {
             if (!currentSong || !lyricsKey) return;
 
-            queryClient.setQueryData<LyricsQueryResult>(lyricsKey, (prev) => {
-                if (!prev) return prev;
-                const updated = { ...prev, selectedOffsetMs: offsetMs };
-                if (Array.isArray(prev.local) && prev.local.length > 0) {
-                    const idx = Math.min(indexToUse, prev.local.length - 1);
-                    updated.local = [...prev.local];
-                    updated.local[idx] = {
-                        ...updated.local[idx],
-                        offsetMs,
-                    };
-                }
-                return updated;
-            });
+            queryClient.setQueryData<LyricsQueryResult>(lyricsKey, (prev) =>
+                updateLyricsOffset(prev, indexToUse, offsetMs),
+            );
         },
         [currentSong, indexToUse, lyricsKey],
     );
@@ -397,11 +388,13 @@ export const Lyrics = ({ fadeOutNoLyricsMessage = true, settingsKey = 'default' 
         const originalLyrics = Array.isArray(lyrics.lyrics)
             ? lyrics.lyrics.map((line) => getLyricLineText(line)).join('\n')
             : lyrics.lyrics;
-        const TranslatedText: null | string = await translateLyrics(
-            originalLyrics,
-            translationApiKey,
-            translationApiProvider,
-            translationTargetLanguage,
+        const TranslatedText: null | string = await queryClient.fetchQuery(
+            lyricsTranslationQuery(
+                originalLyrics,
+                translationApiKey,
+                translationApiProvider,
+                translationTargetLanguage,
+            ),
         );
         setTranslatedLyrics(TranslatedText);
         setShowTranslation(true);
