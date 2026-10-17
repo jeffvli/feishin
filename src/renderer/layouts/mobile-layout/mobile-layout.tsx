@@ -9,6 +9,7 @@ import { ContextMenuController } from '/@/renderer/features/context-menu/context
 import { FullScreenVisualizer } from '/@/renderer/features/player/components/full-screen-visualizer';
 import { MobileFullscreenPlayer } from '/@/renderer/features/player/components/mobile-fullscreen-player';
 import { MobileSidebar } from '/@/renderer/features/sidebar/components/mobile-sidebar';
+import { SourRoot } from '/@/renderer/features/sour/components/sour-root';
 import { MobileNav } from '/@/renderer/features/sour/mobile/mobile-nav';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
 import { WindowBar } from '/@/renderer/layouts/window-bar';
@@ -56,6 +57,8 @@ export const MobileLayout = ({ shell }: MobileLayoutProps) => {
                 <PlayerBar />
                 {!shell && <MobileNav onMenu={openSidebar} />}
             </div>
+            {/* the Sour Stage, holiday skins, social pop-ups... (same as on computers) */}
+            <SourRoot />
             {!shell && (
                 <Drawer
                     onClose={closeSidebar}
@@ -72,6 +75,8 @@ export const MobileLayout = ({ shell }: MobileLayoutProps) => {
                             width: '100%',
                         },
                     }}
+                    // don't jump into the search box (and pop up the keyboard) on open
+                    trapFocus={false}
                     withCloseButton={false}
                 >
                     <MobileSidebar />

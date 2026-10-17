@@ -1,5 +1,7 @@
 import { app, BrowserWindow, ipcMain, nativeImage } from 'electron';
 
+import { keepIcon } from './sour-icon';
+
 // Sour Player's mini player: shrinks the window to a small card that stays on top (where you last left
 // it), then puts the window back the way it was (size, maximised, full screen).
 interface Saved {
@@ -124,4 +126,5 @@ ipcMain.on('sour-icon', (event, data: string) => {
     if (image.isEmpty()) return;
     win.setIcon(image);
     if (process.platform === 'darwin') app.dock?.setIcon(image);
+    keepIcon(image);
 });

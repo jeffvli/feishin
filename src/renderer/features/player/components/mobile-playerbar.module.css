@@ -1,4 +1,5 @@
 .container {
+    position: relative;
     display: grid;
     grid-template-columns: 1fr auto;
     gap: var(--theme-spacing-sm);
@@ -72,4 +73,16 @@
     gap: 0.5rem;
     align-items: center;
     justify-content: center;
+}
+
+/* "Listening along with ..." sits just above the player on phones */
+.listen-along {
+    position: absolute;
+    top: -34px;
+    left: 0.75rem;
+    z-index: 5;
+}
+
+.listen-along:empty {
+    display: none;
 }

@@ -125,6 +125,8 @@ export interface SourProfile {
     listening: GroupSong | null;
     name: string;
     nicknames: Nickname[];
+    // where they're listening (Hermes Music 3.5.1+)
+    on?: 'computer' | 'phone';
     online: boolean;
     perks?: string[];
     playing: boolean;

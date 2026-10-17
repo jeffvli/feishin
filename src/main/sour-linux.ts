@@ -21,8 +21,10 @@ const integrateAppImage = () => {
         fs.mkdirSync(apps, { recursive: true });
         fs.mkdirSync(icons, { recursive: true });
         const iconSource = path.join(process.resourcesPath, 'assets', 'icons', '512x512.png');
-        if (fs.existsSync(iconSource)) {
-            fs.copyFileSync(iconSource, path.join(icons, 'sour-player.png'));
+        // only the first time: after that it may be an icon pack the user picked (sour-icon.ts)
+        const iconFile = path.join(icons, 'sour-player.png');
+        if (fs.existsSync(iconSource) && !fs.existsSync(iconFile)) {
+            fs.copyFileSync(iconSource, iconFile);
         }
         const entry = [
             '[Desktop Entry]',

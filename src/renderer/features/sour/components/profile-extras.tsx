@@ -18,6 +18,7 @@ import {
     usePlaySong,
 } from '/@/renderer/features/sour/components/profile-bits';
 import { useSourProfiles, useSourStore } from '/@/renderer/features/sour/store/sour.store';
+import { useIsMobile } from '/@/renderer/hooks/use-is-mobile';
 import { useCurrentServer } from '/@/renderer/store';
 import { HoverCard } from '/@/shared/components/hover-card/hover-card';
 import { Text } from '/@/shared/components/text/text';
@@ -87,6 +88,7 @@ export const ProfileHover = ({
     profile: SourProfile;
 }) => {
     const me = useSourStore((s) => s.me);
+    const phone = useIsMobile();
     const profiles = useSourProfiles().data ?? [];
     const mine = profiles.find((p) => p.id === me?.id);
     const match = profile.id !== me?.id ? tasteMatch(mine?.stats, profile.stats) : null;
@@ -94,6 +96,8 @@ export const ProfileHover = ({
     return (
         <HoverCard
             closeDelay={80}
+            // phones have no hover: a tap opens the profile instead
+            disabled={phone}
             openDelay={350}
             position="right"
             shadow="md"

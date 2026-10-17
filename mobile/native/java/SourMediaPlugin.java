@@ -91,6 +91,30 @@ public class SourMediaPlugin extends Plugin {
         call.resolve();
     }
 
+    // Sour Studio icon packs: switches the home screen icon to the chosen pack
+    @PluginMethod
+    public void setIcon(PluginCall call) {
+        String pack = call.getString("pack", "classic");
+        String[] packs = { "classic", "lime", "grapefruit", "blueberry", "grape", "gold", "mono", "negative", "pixel" };
+        boolean known = false;
+        for (String p : packs) known |= p.equals(pack);
+        if (!known) pack = "classic";
+        android.content.pm.PackageManager pm = getContext().getPackageManager();
+        for (String p : packs) {
+            android.content.ComponentName alias = new android.content.ComponentName(
+                getContext().getPackageName(),
+                "com.anjalo.sourplayer.Icon" + Character.toUpperCase(p.charAt(0)) + p.substring(1)
+            );
+            int state = p.equals(pack)
+                ? android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                : android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
+            if (pm.getComponentEnabledSetting(alias) != state) {
+                pm.setComponentEnabledSetting(alias, state, android.content.pm.PackageManager.DONT_KILL_APP);
+            }
+        }
+        call.resolve();
+    }
+
     @PluginMethod
     public void info(PluginCall call) {
         JSObject result = new JSObject();

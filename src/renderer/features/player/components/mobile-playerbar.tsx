@@ -10,11 +10,13 @@ import { ItemImage } from '/@/renderer/components/item-image/item-image';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { MainPlayButton, PlayerButton } from '/@/renderer/features/player/components/player-button';
 import { RadioMetadataDisplay } from '/@/renderer/features/player/components/radio-metadata-display';
+import { SourWatchers } from '/@/renderer/features/player/components/right-controls';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import {
     useIsRadioActive,
     useRadioPlayer,
 } from '/@/renderer/features/radio/hooks/use-radio-player';
+import { ListenAlong } from '/@/renderer/features/sour/components/social';
 import { AppRoute } from '/@/renderer/router/routes';
 import {
     useFullScreenPlayerStore,
@@ -73,6 +75,11 @@ export const MobilePlayerbar = () => {
 
     return (
         <div className={clsx(styles.container, PlaybackSelectors.mediaPlayer)}>
+            {/* the Sour things that run in the background (presence, Group Play, listen along...) */}
+            <SourWatchers />
+            <div className={styles.listenAlong}>
+                <ListenAlong />
+            </div>
             <div className={styles.contentWrapper}>
                 <LayoutGroup>
                     <AnimatePresence initial={false} mode="popLayout">

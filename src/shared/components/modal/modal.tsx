@@ -1,4 +1,5 @@
 import { Modal as MantineModal, ModalProps as MantineModalProps } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import {
     closeAllModals as closeAllModalsMantine,
     ContextModalProps,
@@ -132,6 +133,8 @@ export const ConfirmModal = ({
 export interface ModalsProviderProps extends MantineModalsProviderProps {}
 
 export const ModalsProvider = ({ children, ...rest }: ModalsProviderProps) => {
+    // phones: dialogs (profiles, settings, people...) take the whole screen
+    const phone = useMediaQuery('(max-width: 768px)');
     return (
         <MantineModalsProvider
             modalProps={{
@@ -149,6 +152,7 @@ export const ModalsProvider = ({ children, ...rest }: ModalsProviderProps) => {
                 closeButtonProps: {
                     icon: <Icon icon="x" size="xl" />,
                 },
+                fullScreen: phone,
                 overlayProps: {
                     backgroundOpacity: 0.5,
                     blur: 1,

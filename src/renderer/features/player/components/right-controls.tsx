@@ -175,7 +175,7 @@ export const RightControls = () => {
     );
 };
 
-const SourWatchers = () => (
+export const SourWatchers = () => (
     <>
         <GroupPlaySync />
         <SourPresence />

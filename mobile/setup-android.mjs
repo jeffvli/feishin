@@ -21,10 +21,33 @@ fs.mkdirSync(javaDir, { recursive: true });
 for (const f of fs.readdirSync(path.join(here, 'native', 'java'))) {
     fs.copyFileSync(path.join(here, 'native', 'java', f), path.join(javaDir, f));
 }
-fs.mkdirSync(path.join(main, 'res', 'xml'), { recursive: true });
-for (const f of fs.readdirSync(path.join(here, 'native', 'res', 'xml'))) {
-    fs.copyFileSync(path.join(here, 'native', 'res', 'xml', f), path.join(main, 'res', 'xml', f));
+for (const dir of fs.readdirSync(path.join(here, 'native', 'res'))) {
+    fs.mkdirSync(path.join(main, 'res', dir), { recursive: true });
+    for (const f of fs.readdirSync(path.join(here, 'native', 'res', dir))) {
+        fs.copyFileSync(path.join(here, 'native', 'res', dir, f), path.join(main, 'res', dir, f));
+    }
 }
+
+// icon packs (Sour Studio): one launcher entry per pack, only the chosen one switched on
+const PACKS = ['classic', 'lime', 'grapefruit', 'blueberry', 'grape', 'gold', 'mono', 'negative', 'pixel'];
+const aliasName = (pack) => `.Icon${pack[0].toUpperCase()}${pack.slice(1)}`;
+const aliases = PACKS.map((pack) =>
+    [
+        '    <activity-alias',
+        `            android:name="${aliasName(pack)}"`,
+        '            android:targetActivity=".MainActivity"',
+        `            android:enabled="${pack === 'classic'}"`,
+        '            android:exported="true"',
+        `            android:icon="@mipmap/ic_pack_${pack}"`,
+        `            android:roundIcon="@mipmap/ic_pack_${pack}"`,
+        '            android:label="@string/app_name">',
+        '            <intent-filter>',
+        '                <action android:name="android.intent.action.MAIN" />',
+        '                <category android:name="android.intent.category.LAUNCHER" />',
+        '            </intent-filter>',
+        '        </activity-alias>',
+    ].join('\n        '),
+);
 
 // the app icon (the same one as the desktop app)
 const icon = path.join(here, '..', 'assets', 'icons', '512x512.png');
@@ -53,9 +76,15 @@ edit(path.join(main, 'AndroidManifest.xml'), (s) =>
             ].join('\n'),
         )
         .replace('<application', '<application\n        android:usesCleartextTraffic="true"')
+        // the launcher entries are the icon pack aliases below
+        .replace(
+            /\s*<intent-filter>\s*<action android:name="android\.intent\.action\.MAIN" \/>\s*<category android:name="android\.intent\.category\.LAUNCHER" \/>\s*<\/intent-filter>/,
+            '',
+        )
         .replace(
             '</application>',
             [
+                ...aliases,
                 '    <service',
                 '            android:name=".SourMediaService"',
                 '            android:exported="true"',

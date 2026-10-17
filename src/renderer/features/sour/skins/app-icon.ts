@@ -2,6 +2,8 @@ import isElectron from 'is-electron';
 
 import appIcon from '../../../../../assets/icons/256x256.png';
 
+import { isAndroidApp, sourMedia } from '/@/renderer/features/sour/mobile/android';
+
 // Icon packs: the Sour Player icon recoloured (and a holiday emoji in the corner during holidays),
 // drawn here and handed to the window as its taskbar/dock icon.
 export const ICON_PACKS: { filter: string; id: string; label: string }[] = [
@@ -65,9 +67,18 @@ export const drawAppIcon = async (pack: string, emoji: null | string, pixel = fa
 
 let lastSent = '';
 export const applyAppIcon = async (pack: string, emoji: null | string) => {
+    // Android: the app ships every pack as a home screen icon and switches to the chosen one
+    // (holiday emoji only show on computers)
+    if (isAndroidApp()) {
+        if (pack === lastSent) return;
+        lastSent = pack;
+        await sourMedia('setIcon', { pack }).catch(() => undefined);
+        return;
+    }
     if (!isElectron()) return;
     const id = `${pack}:${emoji ?? ''}`;
-    if (id === lastSent || (id === 'classic:' && !lastSent)) return;
+    // sent once on every start too, so going back to Classic also puts the shortcuts back
+    if (id === lastSent) return;
     const data = await drawAppIcon(pack, emoji, pack === 'pixel').catch(() => null);
     if (!data) return;
     lastSent = id;

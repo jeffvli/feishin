@@ -116,10 +116,11 @@ export const usePlaySong = () => {
 
 export const activity = (p: SourProfile) => {
     if (!p.online) return p.lastSeen ? `Last online ${timeAgo(p.lastSeen)}` : 'Offline';
-    if (p.group && p.listening) return `${p.listening.title} - in ${p.group.name}`;
+    const where = p.on === 'phone' ? ' on their phone' : '';
+    if (p.group && p.listening) return `${p.listening.title} - in ${p.group.name}${where}`;
     if (p.listening) {
         const verb = p.playing ? 'Listening to' : 'Paused';
-        return `${verb} ${p.listening.title} by ${p.listening.artist}`;
+        return `${verb} ${p.listening.title} by ${p.listening.artist}${where}`;
     }
     return p.status || 'Online';
 };
