@@ -49,7 +49,13 @@ test('@full provides one global track-only results page', async ({ mockJellyfin,
     const resultTrack = getSongCell(page, 'Automation Track 1');
     await expect(resultTrack).toHaveAttribute('draggable', 'true');
     await resultTrack.click({ button: 'right' });
-    for (const label of ['Play', 'Download for offline use', 'Get info']) {
+    for (const label of [
+        'Play',
+        'Add to queue next',
+        'Add to end of queue',
+        'Download for offline use',
+        'Get info',
+    ]) {
         await expect(
             page.getByRole('menuitem', { exact: true, name: label }).first(),
         ).toBeVisible();
@@ -112,9 +118,7 @@ test('@full executes queue actions from a search suggestion context menu', async
     await expect(suggestion).toBeVisible();
     await suggestion.click({ button: 'right' });
 
-    const playMenu = page.getByRole('menuitem', { exact: true, name: 'Play' }).first();
-    await playMenu.hover();
-    await page.getByRole('menuitem', { exact: true, name: 'Next' }).click();
+    await page.getByRole('menuitem', { exact: true, name: 'Add to queue next' }).click();
 
     await page.getByRole('button', { name: 'View queue' }).click();
     const queue = page.locator('#sidebar-queue');

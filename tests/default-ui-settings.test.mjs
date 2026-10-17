@@ -71,6 +71,7 @@ test('clean installs use the captured KatiesAmp presentation settings', () => {
     });
     assert.deepEqual(KATIESAMP_DEFAULT_UI_SETTINGS.fullScreenPlayer, {
         activeTab: 'queue',
+        dynamicBackground: false,
     });
 });
 

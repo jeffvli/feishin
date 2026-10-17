@@ -107,6 +107,31 @@ test('@nightly selecting a later track removes only the rows above it', async ({
         .toEqual(['Automation Track 4', 'Automation Track 5', 'Automation Track 6']);
 });
 
+test('@full exposes Play, Next, and Last directly on queue items', async ({ page }) => {
+    await startQueue(page);
+    await page
+        .locator('#sidebar-queue')
+        .getByText('Automation Track 2', { exact: true })
+        .first()
+        .click({ button: 'right' });
+
+    const playAction = page.getByRole('menuitem', { exact: true, name: 'Play' }).first();
+    const nextAction = page.getByRole('menuitem', { exact: true, name: 'Next' });
+    const lastAction = page.getByRole('menuitem', { exact: true, name: 'Last' });
+    await expect(playAction).toBeVisible();
+    await expect(nextAction).toBeVisible();
+    await expect(lastAction).toBeVisible();
+
+    const playBox = await playAction.boundingBox();
+    const nextBox = await nextAction.boundingBox();
+    const lastBox = await lastAction.boundingBox();
+    expect(playBox).not.toBeNull();
+    expect(nextBox).not.toBeNull();
+    expect(lastBox).not.toBeNull();
+    expect(nextBox.y).toBeGreaterThan(playBox.y);
+    expect(lastBox.y).toBeGreaterThan(nextBox.y);
+});
+
 test('@nightly shuffle anchors the current track at the top of the visible queue', async ({
     page,
 }) => {

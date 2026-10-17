@@ -1,6 +1,7 @@
 export const KATIESAMP_DEFAULT_UI_SETTINGS = {
     fullScreenPlayer: {
         activeTab: 'queue',
+        dynamicBackground: false,
     },
     general: {
         combinedLyricsAndVisualizer: true,
