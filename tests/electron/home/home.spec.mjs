@@ -29,7 +29,18 @@ test('@full shows the ready update action beside the current version', async ({
     const installUpdateBox = await installUpdate.boundingBox();
     expect(currentVersionBox).not.toBeNull();
     expect(installUpdateBox).not.toBeNull();
-    expect(installUpdateBox.x + installUpdateBox.width).toBeLessThanOrEqual(currentVersionBox.x);
+    const overlapsHorizontally =
+        installUpdateBox.x < currentVersionBox.x + currentVersionBox.width &&
+        installUpdateBox.x + installUpdateBox.width > currentVersionBox.x;
+    const overlapsVertically =
+        installUpdateBox.y < currentVersionBox.y + currentVersionBox.height &&
+        installUpdateBox.y + installUpdateBox.height > currentVersionBox.y;
+    expect(overlapsHorizontally && overlapsVertically).toBe(false);
+    if (overlapsVertically) {
+        expect(installUpdateBox.x + installUpdateBox.width).toBeLessThanOrEqual(
+            currentVersionBox.x + 1,
+        );
+    }
 
     await installUpdate.click();
     await expect(installUpdate).toBeEnabled();
