@@ -159,12 +159,44 @@
 }
 
 .version-badge {
+    flex: 0 0 auto;
     padding: 0.3rem 0.65rem;
     font-size: 0.82rem;
     color: var(--brand-mint-bright);
     background: alpha(var(--brand-teal), 0.34);
     border: 1px solid alpha(var(--brand-mint), 0.38);
     border-radius: 999px;
+}
+
+.version-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.install-update-button {
+    flex: 0 0 auto;
+    padding-inline: 0.65rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border-radius: 999px;
+
+    &[data-variant='outline'] {
+        color: #183535;
+        background: linear-gradient(180deg, #ffe39a, #e0ad3f);
+        border-color: #ffeab3;
+        box-shadow: 0 0 0.75rem alpha(#e0ad3f, 0.28);
+
+        &:hover,
+        &:focus-visible {
+            color: #102929;
+            background: linear-gradient(180deg, #ffedbd, #efbd4f);
+            border-color: #fff1c9;
+            box-shadow: 0 0 1rem alpha(#f3c65d, 0.48);
+        }
+    }
 }
 
 .connection-status {
@@ -311,6 +343,10 @@
 
     .detail-row dd {
         text-align: left;
+    }
+
+    .version-actions {
+        justify-content: flex-start;
     }
 
     .music-folder-control {
