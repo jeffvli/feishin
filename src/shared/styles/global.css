@@ -15,6 +15,12 @@
 }
 
 body {
+    box-sizing: border-box;
+
+    /* phones (Android now, iPhone later): keep the app clear of notches, camera holes, rounded
+       corners and the gesture bar, in portrait and landscape. All zero on computers. */
+    padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0)
+        env(safe-area-inset-left, 0);
     margin: 0;
 }
 
