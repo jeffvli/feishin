@@ -33,6 +33,14 @@
     gap: 0;
 }
 
+.title-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    width: 100%;
+    min-width: 0;
+}
+
 .title {
     display: -webkit-inline-box;
     width: 100%;

@@ -153,20 +153,22 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
                         [styles.compact]: props.size === 'compact',
                     })}
                 >
-                    <Text
-                        className={clsx(styles.title, {
-                            [styles.compact]: props.size === 'compact',
-                            [styles.large]: props.size === 'large',
-                        })}
-                        isNoSelect
-                        size="md"
-                        truncate
-                        {...titleLinkProps}
-                    >
-                        <ExplicitIndicator explicitStatus={item?.explicitStatus} />
-                        {item.name as string}
+                    <div className={styles.titleRow}>
+                        <Text
+                            className={clsx(styles.title, {
+                                [styles.compact]: props.size === 'compact',
+                                [styles.large]: props.size === 'large',
+                            })}
+                            isNoSelect
+                            size="md"
+                            truncate
+                            {...titleLinkProps}
+                        >
+                            <ExplicitIndicator explicitStatus={item?.explicitStatus} />
+                            {item.name as string}
+                        </Text>
                         <OfflineStatusIcon item={item} itemType={props.itemType} />
-                    </Text>
+                    </div>
                     <div className={styles.artists}>
                         <JoinedArtists
                             artistName={item.albumArtist}
@@ -322,33 +324,35 @@ export const QueueSongTitleCombinedColumn = (props: ItemTableListInnerColumn) =>
                         [styles.compact]: props.size === 'compact',
                     })}
                 >
-                    <Text
-                        className={clsx({
-                            [styles.active]: isActive,
-                            [styles.compact]: props.size === 'compact',
-                            [styles.large]: props.size === 'large',
-                            [styles.title]: true,
-                        })}
-                        isNoSelect
-                        size="md"
-                        truncate
-                        {...titleLinkProps}
-                    >
-                        <ExplicitIndicator explicitStatus={song?.explicitStatus} />
-                        {row.name as string}
+                    <div className={styles.titleRow}>
+                        <Text
+                            className={clsx({
+                                [styles.active]: isActive,
+                                [styles.compact]: props.size === 'compact',
+                                [styles.large]: props.size === 'large',
+                                [styles.title]: true,
+                            })}
+                            isNoSelect
+                            size="md"
+                            truncate
+                            {...titleLinkProps}
+                        >
+                            <ExplicitIndicator explicitStatus={song?.explicitStatus} />
+                            {row.name as string}
+                            {song?.trackSubtitle && props.itemType !== LibraryItem.QUEUE_SONG && (
+                                <span
+                                    className={clsx(styles.trackSubtitle, {
+                                        [styles.active]: isActive,
+                                    })}
+                                >
+                                    {' ('}
+                                    {song.trackSubtitle}
+                                    {')'}
+                                </span>
+                            )}
+                        </Text>
                         <OfflineStatusIcon item={item} itemType={props.itemType} />
-                        {song?.trackSubtitle && props.itemType !== LibraryItem.QUEUE_SONG && (
-                            <span
-                                className={clsx(styles.trackSubtitle, {
-                                    [styles.active]: isActive,
-                                })}
-                            >
-                                {' ('}
-                                {song.trackSubtitle}
-                                {')'}
-                            </span>
-                        )}
-                    </Text>
+                    </div>
                     <div className={styles.artists}>
                         <JoinedArtists
                             artistName={item.artistName}
