@@ -18,33 +18,51 @@ const isExpectedMediaCancellation = (message) =>
     message.startsWith('The play() request was interrupted by a new load request.') ||
     message.startsWith('The play() request was interrupted by a call to pause().');
 
-export const launchKatiesAmp = ({ mockJellyfin, serverLock = 'true', userDataDirectory }) => {
+export const launchKatiesAmp = ({
+    mockJellyfin,
+    serverLock = 'true',
+    useBrandedServerDefaults = false,
+    userDataDirectory,
+}) => {
     const packagedExecutablePath = process.env.KATIESAMP_EXECUTABLE_PATH;
     const args = [`--user-data-dir=${userDataDirectory}`];
     if (!packagedExecutablePath) args.push(repositoryRoot);
 
+    const environment = {
+        ...process.env,
+        APPDATA: userDataDirectory,
+        DISABLE_AUTO_UPDATES: '1',
+        KATIESAMP_AUTOMATION: '1',
+        SERVER_LOCK: serverLock,
+    };
+
+    if (useBrandedServerDefaults) {
+        delete environment.SERVER_NAME;
+        delete environment.SERVER_TYPE;
+        delete environment.SERVER_URL;
+    } else {
+        environment.SERVER_NAME = 'KATIESMUSICSERVER';
+        environment.SERVER_TYPE = 'jellyfin';
+        environment.SERVER_URL = mockJellyfin.url;
+    }
+
     return electron.launch({
         args,
-        env: {
-            ...process.env,
-            APPDATA: userDataDirectory,
-            DISABLE_AUTO_UPDATES: '1',
-            KATIESAMP_AUTOMATION: '1',
-            SERVER_LOCK: serverLock,
-            SERVER_NAME: 'KATIESMUSICSERVER',
-            SERVER_TYPE: 'jellyfin',
-            SERVER_URL: mockJellyfin.url,
-        },
+        env: environment,
         executablePath: packagedExecutablePath || electronPath,
     });
 };
 
 export const test = base.extend({
-    electronApp: async ({ mockJellyfin, serverLock, userDataDirectory }, use) => {
+    electronApp: async (
+        { mockJellyfin, serverLock, useBrandedServerDefaults, userDataDirectory },
+        use,
+    ) => {
         const launchStartedAt = performance.now();
         const electronApp = await launchKatiesAmp({
             mockJellyfin,
             serverLock,
+            useBrandedServerDefaults,
             userDataDirectory,
         });
         const firstWindow = await electronApp.firstWindow();
@@ -131,6 +149,7 @@ export const test = base.extend({
         ).toEqual([]);
     },
     serverLock: ['true', { option: true }],
+    useBrandedServerDefaults: [false, { option: true }],
     // Playwright requires object destructuring even when a fixture has no dependencies.
     // eslint-disable-next-line no-empty-pattern
     userDataDirectory: async ({}, use) => {

@@ -1,0 +1,30 @@
+.initial-server-brand {
+    gap: 0.4rem;
+    width: 100%;
+}
+
+.initial-server-logo {
+    display: block;
+    width: clamp(7rem, 22cqi, 11rem);
+    max-width: 100%;
+    height: clamp(5rem, 15cqi, 7.5rem);
+    object-fit: contain;
+    filter: drop-shadow(0 0.6rem 0.8rem alpha(#000, 0.22));
+}
+
+.support-card {
+    color: var(--theme-colors-foreground);
+    background:
+        linear-gradient(135deg, alpha(#0a5757, 0.3), transparent 72%),
+        alpha(var(--theme-colors-background), 0.72);
+    border: 1px solid alpha(#83c3a6, 0.35);
+}
+
+.support-contacts {
+    align-items: flex-start;
+}
+
+.support-value {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}

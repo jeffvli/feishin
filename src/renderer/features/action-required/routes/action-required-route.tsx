@@ -12,7 +12,7 @@ import { openManageServersModal } from '/@/renderer/features/servers/utils/open-
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { AppRoute } from '/@/renderer/router/routes';
-import { useCurrentServerWithCredential } from '/@/renderer/store';
+import { useCurrentServerWithCredential, useServerList } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
@@ -22,8 +22,10 @@ import { Stack } from '/@/shared/components/stack/stack';
 const ActionRequiredRoute = () => {
     const { t } = useTranslation();
     const currentServer = useCurrentServerWithCredential();
+    const serverList = useServerList();
     const isServerRequired = !currentServer;
     const isCredentialRequired = currentServer && !currentServer.credential;
+    const isInitialSetup = Object.keys(serverList).length === 0;
 
     const isLoginRequired = isServerLock() && !currentServer;
 
@@ -35,7 +37,7 @@ const ActionRequiredRoute = () => {
         },
         {
             component: <ServerRequired />,
-            title: t('error.serverRequired'),
+            title: isInitialSetup ? 'Server login' : t('error.serverRequired'),
             valid: !isServerRequired,
         },
     ];
