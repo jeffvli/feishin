@@ -44,7 +44,7 @@ export const useFullScreenPlayerStore = createWithEqualityFn<FullScreenPlayerSli
                 },
                 activeTab: KATIESAMP_DEFAULT_UI_SETTINGS.fullScreenPlayer.activeTab,
                 coverArtSize: 75,
-                dynamicBackground: true,
+                dynamicBackground: KATIESAMP_DEFAULT_UI_SETTINGS.fullScreenPlayer.dynamicBackground,
                 dynamicImageBlur: 6,
                 dynamicIsImage: false,
                 expanded: false,

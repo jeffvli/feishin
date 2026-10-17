@@ -29,7 +29,12 @@ export const QueueContextMenu = ({ items }: QueueContextMenuProps) => {
         >
             <RemoveFromQueueAction items={items} />
             <ContextMenu.Divider />
-            <PlayAction ids={ids} itemType={LibraryItem.SONG} songs={items} />
+            <PlayAction
+                ids={ids}
+                inlineQueueActions="short"
+                itemType={LibraryItem.SONG}
+                songs={items}
+            />
             <MoveQueueItemsAction items={items} />
             <ShuffleItemsAction items={items} />
             <ContextMenu.Divider />

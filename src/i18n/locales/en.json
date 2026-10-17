@@ -581,6 +581,7 @@
             "addLast": "$t(player.addLast)",
             "addNext": "$t(player.addNext)",
             "addToQueueEnd": "Add to end of queue",
+            "addToQueueNext": "Add to queue next",
             "addToFavorites": "$t(action.addToFavorites)",
             "addToPlaylist": "$t(action.addToPlaylist)",
             "createPlaylist": "$t(action.createPlaylist)",

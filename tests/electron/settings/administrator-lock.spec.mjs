@@ -27,6 +27,8 @@ test('@full protects administrator controls and allows the password to be change
     await page.getByRole('textbox', { exact: true, name: 'Administrator password' }).fill(password);
     await page.getByRole('button', { name: 'Unlock' }).click();
     await expect(page.getByText('Dynamic background')).toBeVisible();
+    const dynamicBackgroundRow = page.getByRole('row').filter({ hasText: 'Dynamic background' });
+    await expect(dynamicBackgroundRow.locator('input[type="checkbox"]')).not.toBeChecked();
 
     const searchInput = page.getByRole('textbox', { name: 'Search tracks or artists' });
     const searchBox = await searchInput.boundingBox();

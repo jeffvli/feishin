@@ -27,7 +27,7 @@ export const PlaylistSongContextMenu = ({ items, type }: PlaylistSongContextMenu
         <ContextMenu.Content
             bottomStickyContent={<ContextMenuPreview items={items} itemType={type} />}
         >
-            <PlayAction ids={ids} itemType={type} songs={items} />
+            <PlayAction ids={ids} inlineQueueActions="descriptive" itemType={type} songs={items} />
             <ContextMenu.Divider />
             <SetFavoriteAction ids={ids} itemType={type} />
             <SetRatingAction ids={ids} itemType={type} />

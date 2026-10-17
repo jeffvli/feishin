@@ -30,8 +30,7 @@ test('@full adds a song next without interrupting the current track', async ({ p
     await expect(playerBar.getByText('Automation Track 6', { exact: true })).toBeVisible();
 
     await getSongCell(page, 'Automation Track 2').click({ button: 'right' });
-    await page.getByRole('menuitem', { exact: true, name: 'Play' }).first().hover();
-    await page.getByRole('menuitem', { exact: true, name: 'Next' }).click();
+    await page.getByRole('menuitem', { exact: true, name: 'Add to queue next' }).click();
 
     await expect(playerBar.getByText('Automation Track 6', { exact: true })).toBeVisible();
     await page.getByRole('button', { name: 'View queue' }).click();

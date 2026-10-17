@@ -130,6 +130,7 @@
     display: grid;
     gap: 0;
     margin: 0.65rem 0 0;
+    container-type: inline-size;
 }
 
 .detail-row {
@@ -295,7 +296,6 @@
     .details-panel {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
 }
 
 @container (min-width: 900px) {

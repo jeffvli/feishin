@@ -10,11 +10,18 @@ import { Play } from '/@/shared/types/types';
 interface PlayActionProps {
     compact?: boolean;
     ids: string[];
+    inlineQueueActions?: 'descriptive' | 'short';
     itemType: LibraryItem;
     songs?: Song[];
 }
 
-export const PlayAction = ({ compact, ids, itemType, songs }: PlayActionProps) => {
+export const PlayAction = ({
+    compact,
+    ids,
+    inlineQueueActions,
+    itemType,
+    songs,
+}: PlayActionProps) => {
     const { t } = useTranslation();
     const player = usePlayer();
     const serverId = useCurrentServerId();
@@ -67,6 +74,26 @@ export const PlayAction = ({ compact, ids, itemType, songs }: PlayActionProps) =
     }, [handlePlay, playButtonBehavior]);
 
     if (ids.length === 0) return null;
+
+    if (inlineQueueActions) {
+        return (
+            <>
+                <ContextMenu.Item leftIcon="mediaPlay" onSelect={handlePlayNow}>
+                    {t('player.play')}
+                </ContextMenu.Item>
+                <ContextMenu.Item leftIcon="mediaPlayNext" onSelect={handlePlayNext}>
+                    {inlineQueueActions === 'descriptive'
+                        ? t('page.contextMenu.addToQueueNext')
+                        : t('player.addNext')}
+                </ContextMenu.Item>
+                <ContextMenu.Item leftIcon="mediaPlayLast" onSelect={handlePlayLast}>
+                    {inlineQueueActions === 'descriptive'
+                        ? t('page.contextMenu.addToQueueEnd')
+                        : t('player.addLast')}
+                </ContextMenu.Item>
+            </>
+        );
+    }
 
     if (compact) {
         return (

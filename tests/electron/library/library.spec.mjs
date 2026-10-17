@@ -24,9 +24,33 @@ test('@full loads albums from Jellyfin', async ({ page }) => {
 
 test('@full loads songs from Jellyfin', async ({ page }) => {
     await navigateTo(page, '/library/songs');
-    await expect(getSongCell(page, 'Automation Track 1')).toBeVisible({
+    const song = getSongCell(page, 'Automation Track 1');
+    await expect(song).toBeVisible({
         timeout: 15_000,
     });
+    await song.click({ button: 'right' });
+
+    const playAction = page.getByRole('menuitem', { exact: true, name: 'Play' }).first();
+    const playNextAction = page.getByRole('menuitem', {
+        exact: true,
+        name: 'Add to queue next',
+    });
+    const playLastAction = page.getByRole('menuitem', {
+        exact: true,
+        name: 'Add to end of queue',
+    });
+    await expect(playAction).toBeVisible();
+    await expect(playNextAction).toBeVisible();
+    await expect(playLastAction).toBeVisible();
+
+    const playBox = await playAction.boundingBox();
+    const playNextBox = await playNextAction.boundingBox();
+    const playLastBox = await playLastAction.boundingBox();
+    expect(playBox).not.toBeNull();
+    expect(playNextBox).not.toBeNull();
+    expect(playLastBox).not.toBeNull();
+    expect(playNextBox.y).toBeGreaterThan(playBox.y);
+    expect(playLastBox.y).toBeGreaterThan(playNextBox.y);
 });
 
 test('@full uses the clean-install navigation and content columns', async ({ page }) => {
@@ -112,6 +136,13 @@ test('@full keeps the album detail screen focused on playback', async ({ page })
     const main = page.getByRole('main');
     await expect(main.getByText(/^Genres?$/)).toHaveCount(0);
     await expect(main.getByText('External links', { exact: true })).toHaveCount(0);
+
+    await getSongCell(main, 'Automation Track 1').click({ button: 'right' });
+    for (const label of ['Play', 'Add to queue next', 'Add to end of queue']) {
+        await expect(
+            page.getByRole('menuitem', { exact: true, name: label }).first(),
+        ).toBeVisible();
+    }
 });
 
 test('@full plays an album without combining its id with the selected folder', async ({
