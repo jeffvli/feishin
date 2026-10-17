@@ -14,12 +14,12 @@ import { LibraryContainer } from '/@/renderer/features/shared/components/library
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
 import { SongInfiniteCarousel } from '/@/renderer/features/songs/components/song-infinite-carousel';
+import { HomeBackground } from '/@/renderer/features/sour/components/home-background';
 import {
     SOUR_HOME_ITEMS,
     SourHomeSection,
 } from '/@/renderer/features/sour/components/home-sections';
 import { useSimpleMode } from '/@/renderer/features/sour/store/sour.store';
-import { HomeBackground } from '/@/renderer/features/sour/components/home-background';
 import {
     HomeFeatureStyle,
     HomeItem,

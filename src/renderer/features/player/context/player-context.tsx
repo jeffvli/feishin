@@ -330,7 +330,9 @@ export const PlayerProvider = ({ children }: { children: React.ReactNode }) => {
         ) => {
             // Sour Stage backdrop: remember when a whole playlist starts playing (not just added)
             if (type === Play.NOW || type === Play.SHUFFLE) {
-                markPlayContext(itemType === LibraryItem.PLAYLIST && id.length === 1 ? id[0] : null);
+                markPlayContext(
+                    itemType === LibraryItem.PLAYLIST && id.length === 1 ? id[0] : null,
+                );
             }
             let toastId: null | string = null;
             const fetchId = nanoid();

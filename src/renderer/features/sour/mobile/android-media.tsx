@@ -86,7 +86,11 @@ const AndroidMediaInner = () => {
             if (queueKey !== lastQueue) {
                 lastQueue = queueKey;
                 sourMedia('setQueue', {
-                    items: items.map((s) => ({ artist: s.artistName || '', art: coverOf(s), title: s.name || '' })),
+                    items: items.map((s) => ({
+                        art: coverOf(s),
+                        artist: s.artistName || '',
+                        title: s.name || '',
+                    })),
                 }).catch(() => undefined);
             }
         };

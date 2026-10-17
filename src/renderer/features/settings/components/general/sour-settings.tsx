@@ -5,10 +5,10 @@ import {
     SettingOption,
     SettingsSection,
 } from '/@/renderer/features/settings/components/settings-section';
-import { openPeople, openProfileHelper } from '/@/renderer/features/sour/components/people';
-import { openSourStudio } from '/@/renderer/features/sour/components/sour-studio';
 import { openFeedback, openReports } from '/@/renderer/features/sour/components/feedback';
 import { HomeBackgroundSetting } from '/@/renderer/features/sour/components/home-background';
+import { openPeople, openProfileHelper } from '/@/renderer/features/sour/components/people';
+import { openSourStudio } from '/@/renderer/features/sour/components/sour-studio';
 import {
     type SourLook,
     useMyProfile,
@@ -110,7 +110,8 @@ export const SourSettings = memo(() => {
                     Open reports
                 </Button>
             ),
-            description: 'Every bug report and suggestion your friends sent. Only admins have this.',
+            description:
+                'Every bug report and suggestion your friends sent. Only admins have this.',
             isHidden: !admin,
             title: 'Bug reports and suggestions',
         },

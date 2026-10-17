@@ -12,8 +12,8 @@ import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { SegmentedControl } from '/@/shared/components/segmented-control/segmented-control';
 import { Stack } from '/@/shared/components/stack/stack';
-import { Textarea } from '/@/shared/components/textarea/textarea';
 import { Text } from '/@/shared/components/text/text';
+import { Textarea } from '/@/shared/components/textarea/textarea';
 import { toast } from '/@/shared/components/toast/toast';
 
 interface Report {
@@ -61,7 +61,9 @@ const FeedbackForm = ({ onDone }: { onDone: () => void }) => {
             });
             const json = await res.json().catch(() => ({}));
             if (!res.ok) throw new Error(json.error || `Hermes Music returned ${res.status}`);
-            toast.success({ message: kind === 'bug' ? 'Bug reported - thanks!' : 'Suggestion sent - thanks!' });
+            toast.success({
+                message: kind === 'bug' ? 'Bug reported - thanks!' : 'Suggestion sent - thanks!',
+            });
             onDone();
         } catch (error) {
             toast.error({ message: (error as Error).message });
@@ -95,11 +97,7 @@ const FeedbackForm = ({ onDone }: { onDone: () => void }) => {
                 value={text}
             />
             <Group justify="flex-end">
-                <Button
-                    disabled={busy || text.trim().length < 3}
-                    onClick={send}
-                    variant="filled"
-                >
+                <Button disabled={busy || text.trim().length < 3} onClick={send} variant="filled">
                     Send
                 </Button>
             </Group>
@@ -111,9 +109,7 @@ export const openFeedback = () => {
     const id = 'sour-feedback';
     openModal({
         children: (
-            <FeedbackForm
-                onDone={() => import('@mantine/modals').then((m) => m.closeModal(id))}
-            />
+            <FeedbackForm onDone={() => import('@mantine/modals').then((m) => m.closeModal(id))} />
         ),
         modalId: id,
         title: 'Report a bug or suggest something',

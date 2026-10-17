@@ -13,7 +13,6 @@ import { SleepTimerHook } from '/@/renderer/features/player/components/sleep-tim
 import { AutoDJHook } from '/@/renderer/features/player/hooks/use-auto-dj';
 import { AutosaveHook } from '/@/renderer/features/player/hooks/use-autosave';
 import { MediaSessionHook } from '/@/renderer/features/player/hooks/use-media-session';
-import { AndroidMediaHook } from '/@/renderer/features/sour/mobile/android-media';
 import { MPRISHook } from '/@/renderer/features/player/hooks/use-mpris';
 import { PlaybackHotkeysHook } from '/@/renderer/features/player/hooks/use-playback-hotkeys';
 import { PowerSaveBlockerHook } from '/@/renderer/features/player/hooks/use-power-save-blocker';
@@ -38,6 +37,7 @@ import { RemoteQueuePushHook } from '/@/renderer/features/remote/hooks/use-remot
 import { RemoteRadioPushHook } from '/@/renderer/features/remote/hooks/use-remote-radio-push';
 import { RemoteSettingsPushHook } from '/@/renderer/features/remote/hooks/use-remote-settings-push';
 import { ComponentErrorBoundary } from '/@/renderer/features/shared/components/component-error-boundary';
+import { AndroidMediaHook } from '/@/renderer/features/sour/mobile/android-media';
 import { VisualizerSystemAudioBridgeHook } from '/@/renderer/features/visualizer/components/visualizer-system-audio-bridge';
 import { useSettingsStore } from '/@/renderer/store';
 import {

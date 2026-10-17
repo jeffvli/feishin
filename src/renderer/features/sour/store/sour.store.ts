@@ -35,9 +35,6 @@ export interface SourLook {
     animatedBackground: boolean;
     // restart into a downloaded update by itself when nothing is playing
     autoUpdate: boolean;
-    // a picture (or GIF) behind the Home page (stored on this computer), and how much it's dimmed
-    homeBackground: boolean;
-    homeBackgroundDim: number;
     autoVideo: boolean;
     barLayout: 'classic' | 'floating';
     // the look of the small visualizer in the player bar and the mini player
@@ -51,6 +48,9 @@ export interface SourLook {
     glass: boolean;
     hiddenButtons: string[];
     holidays: boolean;
+    // a picture (or GIF) behind the Home page (stored on this computer), and how much it's dimmed
+    homeBackground: boolean;
+    homeBackgroundDim: number;
     hoverPreview: boolean;
     iconPack: string;
     lemonLoader: boolean;

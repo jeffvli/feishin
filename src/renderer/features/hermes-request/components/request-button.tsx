@@ -6,13 +6,13 @@ import styles from './request-button.module.css';
 
 import { useReactions } from '/@/renderer/features/group-play/components/group-reactions';
 import { useGroupPlayStore } from '/@/renderer/features/group-play/store/group-play.store';
-import { openVideoWall } from '/@/renderer/features/hermes-video/components/music-video-button';
-import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import {
     isCommand,
     requestCommand,
     runHermesCommand,
 } from '/@/renderer/features/hermes-request/utils/hermes-commands';
+import { openVideoWall } from '/@/renderer/features/hermes-video/components/music-video-button';
+import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { requestApi, type RequestGuess } from '/@/renderer/features/sour/api/sour-api';
 import { RequestQuestion } from '/@/renderer/features/sour/components/request-question';
 import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
@@ -315,10 +315,10 @@ const RequestPanel = () => {
                 </Button>
             </Group>
             <Text isMuted size="xs">
-                You can also paste a Spotify, YouTube or YouTube Music link (song, album or playlist),
-                a Spotify profile or YouTube channel link (all its public playlists), or a screenshot
-                of a playlist (Ctrl+V). Hermes Music&#39;s commands work here too: type /help.
-                Downloaded songs show up after Navidrome&#39;s next scan.
+                You can also paste a Spotify, YouTube or YouTube Music link (song, album or
+                playlist), a Spotify profile or YouTube channel link (all its public playlists), or
+                a screenshot of a playlist (Ctrl+V). Hermes Music&#39;s commands work here too: type
+                /help. Downloaded songs show up after Navidrome&#39;s next scan.
             </Text>
             {log.length > 0 && (
                 <div className={styles.log}>

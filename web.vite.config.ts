@@ -72,13 +72,13 @@ export default defineConfig({
             web: true,
         }),
         VitePWA({
-            // the Android app (mobile/) ships its files inside the APK; a service worker there would
-            // keep serving the old version's files after an update
-            disable: process.env.SOUR_MOBILE === '1',
             devOptions: {
                 // The PWA will not be shown during development
                 enabled: false,
             },
+            // the Android app (mobile/) ships its files inside the APK; a service worker there would
+            // keep serving the old version's files after an update
+            disable: process.env.SOUR_MOBILE === '1',
             filename: 'assets/sw.js',
             injectRegister: 'inline',
             manifest: {

@@ -5,7 +5,6 @@ import { create } from 'zustand';
 import { isAndroidApp, onSourMedia, sourMedia } from '/@/renderer/features/sour/mobile/android';
 import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { usePlayerStoreBase } from '/@/renderer/store/player.store';
-
 import { Button } from '/@/shared/components/button/button';
 import { Dialog } from '/@/shared/components/dialog/dialog';
 import { Group } from '/@/shared/components/group/group';
@@ -29,7 +28,9 @@ const utils = isElectron() ? window.api?.utils : undefined;
 export const useHermesUpdate = () => useHermesUpdateStore((state) => state.update);
 
 export const installHermesUpdate = () =>
-    isAndroidApp() ? sourMedia('installUpdate').catch(() => undefined) : utils?.hermesUpdateInstall();
+    isAndroidApp()
+        ? sourMedia('installUpdate').catch(() => undefined)
+        : utils?.hermesUpdateInstall();
 
 // Android: the app's releases are the mobile-v... ones on GitHub (each with the APK attached)
 const RELEASES = 'https://api.github.com/repos/Urmomnumber1/feishin/releases?per_page=30';
@@ -60,15 +61,23 @@ const useAndroidUpdateListener = () => {
             busy = true;
             try {
                 const { version } = await sourMedia('info');
-                const releases: { assets: { browser_download_url: string; name: string }[]; tag_name: string }[] =
-                    await fetch(RELEASES).then((r) => r.json());
+                const releases: {
+                    assets: { browser_download_url: string; name: string }[];
+                    tag_name: string;
+                }[] = await fetch(RELEASES).then((r) => r.json());
                 const newest = releases
-                    .filter((r) => r.tag_name.startsWith('mobile-v') && r.assets.some((a) => a.name.endsWith('.apk')))
+                    .filter(
+                        (r) =>
+                            r.tag_name.startsWith('mobile-v') &&
+                            r.assets.some((a) => a.name.endsWith('.apk')),
+                    )
                     .sort((a, b) => (isNewer(a.tag_name, b.tag_name) ? -1 : 1))[0];
                 const latest = newest?.tag_name.replace('mobile-v', '');
                 if (!newest || !latest || !isNewer(latest, version)) return;
                 const apk = newest.assets.find((a) => a.name.endsWith('.apk'))!;
-                useHermesUpdateStore.setState({ update: { percent: 0, state: 'downloading', version: latest } });
+                useHermesUpdateStore.setState({
+                    update: { percent: 0, state: 'downloading', version: latest },
+                });
                 await sourMedia('downloadUpdate', { url: apk.browser_download_url });
                 useHermesUpdateStore.setState({ update: { state: 'ready', version: latest } });
             } catch {
@@ -106,8 +115,7 @@ const useAutoInstall = (enabled: boolean) => {
         if (!enabled) return undefined;
         let quietSince = 0;
         const timer = window.setInterval(() => {
-            const playing =
-                usePlayerStoreBase.getState().player.status === PlayerStatus.PLAYING;
+            const playing = usePlayerStoreBase.getState().player.status === PlayerStatus.PLAYING;
             if (playing) {
                 quietSince = 0;
                 return;
@@ -215,11 +223,15 @@ export const AndroidUpdatePrompt = () => {
             <Stack gap="sm">
                 <Text fw={700}>Update ready: Sour Player {update.version}</Text>
                 <Text isMuted size="sm">
-                    Android asks you to confirm the install. The first time, allow Sour Player to install
-                    apps when it asks.
+                    Android asks you to confirm the install. The first time, allow Sour Player to
+                    install apps when it asks.
                 </Text>
                 <Group justify="flex-end">
-                    <Button onClick={() => setDismissed(update.version)} size="xs" variant="default">
+                    <Button
+                        onClick={() => setDismissed(update.version)}
+                        size="xs"
+                        variant="default"
+                    >
                         Later
                     </Button>
                     <Button onClick={installHermesUpdate} size="xs" variant="filled">

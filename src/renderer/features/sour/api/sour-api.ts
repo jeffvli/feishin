@@ -51,10 +51,10 @@ export interface Nickname {
 
 export interface PlaylistTheme {
     color: null | string;
-    // how strong the colour is, 10-100 (%)
-    opacity?: number;
     font?: null | string;
     image: number;
+    // how strong the colour is, 10-100 (%)
+    opacity?: number;
     owner: string;
     ownerName: null | string;
 }

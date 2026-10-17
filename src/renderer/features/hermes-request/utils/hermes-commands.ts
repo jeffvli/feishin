@@ -38,7 +38,9 @@ export const isCommand = (text: string) => /^\/\w/.test(text.trim());
 // commands that are really requests with a type
 export const requestCommand = (text: string) => {
     const m = text.trim().match(/^\/(album|artist|karaoke)\b\s*(.*)$/i);
-    return m ? { query: m[2].trim(), type: m[1].toLowerCase() as 'album' | 'artist' | 'karaoke' } : null;
+    return m
+        ? { query: m[2].trim(), type: m[1].toLowerCase() as 'album' | 'artist' | 'karaoke' }
+        : null;
 };
 
 export const runHermesCommand = async (url: string, text: string, say: Say) => {
@@ -63,17 +65,26 @@ export const runHermesCommand = async (url: string, text: string, say: Say) => {
         switch (name) {
             case '/bump': {
                 const r = await api<{ count: number; name: string }>('api/bump', { text: rest });
-                say(`${r.name} moved to the front${r.count > 1 ? ` (${r.count} songs)` : ''}`, 'ok');
+                say(
+                    `${r.name} moved to the front${r.count > 1 ? ` (${r.count} songs)` : ''}`,
+                    'ok',
+                );
                 return;
             }
             case '/dup':
             case '/duplicate':
             case '/duplicates': {
                 if (args[0]?.toLowerCase() === 'confirm') {
-                    const r = await api<{ failed?: string[]; moved: number }>('api/duplicates/remove', {
-                        currentPin: args[1] || '',
-                    });
-                    say(`${r.moved} file${r.moved === 1 ? '' : 's'} moved to music/.duplicates`, 'ok');
+                    const r = await api<{ failed?: string[]; moved: number }>(
+                        'api/duplicates/remove',
+                        {
+                            currentPin: args[1] || '',
+                        },
+                    );
+                    say(
+                        `${r.moved} file${r.moved === 1 ? '' : 's'} moved to music/.duplicates`,
+                        'ok',
+                    );
                     return;
                 }
                 say('checking the whole library for copies... this can take a minute');
@@ -90,7 +101,10 @@ export const runHermesCommand = async (url: string, text: string, say: Say) => {
                     say(`keep ${g.keep.path}`);
                     for (const x of g.remove) say(`  remove ${x.path}`);
                 }
-                say(`${r.groups} songs have copies, ${r.files} files would be removed. To remove them: /duplicate confirm PIN`, 'ok');
+                say(
+                    `${r.groups} songs have copies, ${r.files} files would be removed. To remove them: /duplicate confirm PIN`,
+                    'ok',
+                );
                 return;
             }
             case '/fix':
@@ -101,7 +115,9 @@ export const runHermesCommand = async (url: string, text: string, say: Say) => {
                     say('run /issues first, then /fix NUMBER', 'error');
                     return;
                 }
-                say(`${name === '/fix' ? 're-tagging' : 'downloading a better copy of'} ${it.title || it.file}...`);
+                say(
+                    `${name === '/fix' ? 're-tagging' : 'downloading a better copy of'} ${it.title || it.file}...`,
+                );
                 const r = await api<{ artist: string; title: string }>('api/library/fix', {
                     action: name === '/fix' ? 'retag' : 'upgrade',
                     file: it.file,
@@ -114,9 +130,13 @@ export const runHermesCommand = async (url: string, text: string, say: Say) => {
                 say('checking every song, then fixing tags, artists, albums and covers...');
                 for (;;) {
                     await sleep(3000);
-                    const r = await api<{ done: number; failed: number; fixed: number; running: boolean; total: number }>(
-                        'api/library/fix-all',
-                    );
+                    const r = await api<{
+                        done: number;
+                        failed: number;
+                        fixed: number;
+                        running: boolean;
+                        total: number;
+                    }>('api/library/fix-all');
                     if (!r.running) {
                         say(
                             r.total
@@ -157,10 +177,17 @@ export const runHermesCommand = async (url: string, text: string, say: Say) => {
                     say(`no problems found in ${r.total} songs`, 'ok');
                     return;
                 }
-                r.list.slice(0, 40).forEach((x, i) =>
-                    say(`${i + 1}. ${x.artist ? `${x.artist} - ` : ''}${x.title || x.file} (${x.problems.join(', ')})`),
+                r.list
+                    .slice(0, 40)
+                    .forEach((x, i) =>
+                        say(
+                            `${i + 1}. ${x.artist ? `${x.artist} - ` : ''}${x.title || x.file} (${x.problems.join(', ')})`,
+                        ),
+                    );
+                say(
+                    `${r.list.length} songs need attention: /fix N re-tags one, /upgrade N gets a better copy, /fix-all fixes them all`,
+                    'ok',
                 );
-                say(`${r.list.length} songs need attention: /fix N re-tags one, /upgrade N gets a better copy, /fix-all fixes them all`, 'ok');
                 return;
             }
             case '/no':
@@ -176,7 +203,8 @@ export const runHermesCommand = async (url: string, text: string, say: Say) => {
                     { yes: name === '/yes' },
                 );
                 if (r.queued) say('downloading it', 'ok');
-                else if (r.next) say(`Is this the song? ${r.next.title} - ${r.next.artist} (/yes or /no)`);
+                else if (r.next)
+                    say(`Is this the song? ${r.next.title} - ${r.next.artist} (/yes or /no)`);
                 else say('no more guesses - try again with the artist name');
                 return;
             }
@@ -188,13 +216,21 @@ export const runHermesCommand = async (url: string, text: string, say: Say) => {
                 return;
             }
             case '/queue': {
-                const s = await api<{ done: number; pending: number; working: number }>('api/status');
+                const s = await api<{ done: number; pending: number; working: number }>(
+                    'api/status',
+                );
                 say(`${s.pending} waiting, ${s.working} downloading, ${s.done} added`);
                 return;
             }
             case '/rescan': {
-                const r = await api<{ message?: string; started?: boolean }>('api/library/rescan', {});
-                say(r.started ? 'rescanning the music folder' : r.message || 'already scanning', 'ok');
+                const r = await api<{ message?: string; started?: boolean }>(
+                    'api/library/rescan',
+                    {},
+                );
+                say(
+                    r.started ? 'rescanning the music folder' : r.message || 'already scanning',
+                    'ok',
+                );
                 return;
             }
             case '/unfollow': {
@@ -206,16 +242,27 @@ export const runHermesCommand = async (url: string, text: string, say: Say) => {
             case '/video':
             case '/videos': {
                 if (!rest || rest.toLowerCase() === 'list') {
-                    const list = await api<{ artist: string; song: string; videoId: string }[]>('api/videos');
+                    const list =
+                        await api<{ artist: string; song: string; videoId: string }[]>(
+                            'api/videos',
+                        );
                     if (!list.length) say('no music videos yet - add one with /video SONG');
                     list.forEach((x) => say(`${x.artist} - ${x.song} (youtu.be/${x.videoId})`));
                     return;
                 }
                 if (/^wrong\s+/i.test(rest)) {
-                    const r = await api<{ artist: string; removed?: boolean; song: string }>('api/videos/wrong', {
-                        query: rest.replace(/^wrong\s+/i, ''),
-                    });
-                    say(r.removed ? `no other video matches ${r.song}, so it was removed` : `trying the next video for ${r.song}`, 'ok');
+                    const r = await api<{ artist: string; removed?: boolean; song: string }>(
+                        'api/videos/wrong',
+                        {
+                            query: rest.replace(/^wrong\s+/i, ''),
+                        },
+                    );
+                    say(
+                        r.removed
+                            ? `no other video matches ${r.song}, so it was removed`
+                            : `trying the next video for ${r.song}`,
+                        'ok',
+                    );
                     return;
                 }
                 if (/^remove\s+/i.test(rest)) {
@@ -226,7 +273,9 @@ export const runHermesCommand = async (url: string, text: string, say: Say) => {
                     return;
                 }
                 say('looking for the official music video...');
-                const r = await api<{ artist: string; song: string; title: string }>('api/videos', { query: rest });
+                const r = await api<{ artist: string; song: string; title: string }>('api/videos', {
+                    query: rest,
+                });
                 say(`${r.artist} - ${r.song} now has a music video: ${r.title}`, 'ok');
                 return;
             }
