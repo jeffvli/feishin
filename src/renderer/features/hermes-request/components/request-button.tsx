@@ -1,4 +1,4 @@
-import { openModal } from '@mantine/modals';
+import { closeModal, openModal } from '@mantine/modals';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { type ClipboardEvent, useState } from 'react';
 
@@ -142,8 +142,90 @@ const MusicVideoTools = () => {
             <Button disabled={busy} onClick={wrong} size="xs" variant="subtle">
                 Wrong video
             </Button>
+            <Button
+                disabled={busy}
+                onClick={() => openVideoLink(url, `${song.artistName} - ${song.name}`)}
+                size="xs"
+                variant="subtle"
+            >
+                Add link
+            </Button>
         </div>
     );
+};
+
+// "Add link": the song (artist - title) and the YouTube link of its music video, when the search
+// can't find it or picks the wrong one
+const VideoLinkForm = ({
+    initialSong,
+    onDone,
+    url,
+}: {
+    initialSong: string;
+    onDone: () => void;
+    url: string;
+}) => {
+    const [song, setSong] = useState(initialSong);
+    const [link, setLink] = useState('');
+    const [busy, setBusy] = useState(false);
+    const queryClient = useQueryClient();
+    const save = async () => {
+        if (!song.trim() || !link.trim()) return;
+        setBusy(true);
+        try {
+            const r = await post<{ artist?: string; song?: string; title: string }>(
+                `${url}/api/videos`,
+                {
+                    query: `${song.trim()} | ${link.trim()}`,
+                },
+            );
+            toast.success({
+                message: `Music video added for ${r.artist ? `${r.artist} - ${r.song}` : song.trim()}`,
+            });
+            queryClient.invalidateQueries({ queryKey: ['hermes-video'] });
+            onDone();
+        } catch (error) {
+            toast.error({ message: (error as Error).message });
+        } finally {
+            setBusy(false);
+        }
+    };
+    return (
+        <Stack gap="sm">
+            <TextInput
+                description="As it is in your library, e.g. Sanco the Fox - The Lion's Mouth"
+                label="Song (artist - title)"
+                onChange={(e) => setSong(e.currentTarget.value)}
+                value={song}
+            />
+            <TextInput
+                label="YouTube link"
+                onChange={(e) => setLink(e.currentTarget.value)}
+                onKeyDown={(e) => e.key === 'Enter' && save()}
+                placeholder="https://www.youtube.com/watch?v=..."
+                value={link}
+            />
+            <Group justify="flex-end">
+                <Button
+                    disabled={busy || !song.trim() || !link.trim()}
+                    loading={busy}
+                    onClick={save}
+                    variant="filled"
+                >
+                    Add video
+                </Button>
+            </Group>
+        </Stack>
+    );
+};
+
+export const openVideoLink = (url: string, song = '') => {
+    const id = `video-link-${Date.now()}`;
+    openModal({
+        children: <VideoLinkForm initialSong={song} onDone={() => closeModal(id)} url={url} />,
+        modalId: id,
+        title: 'Add a music video',
+    });
 };
 
 // Ask Hermes Music for a song, album or artist without leaving Sour Player; it downloads it into
