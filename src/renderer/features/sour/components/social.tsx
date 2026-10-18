@@ -447,6 +447,9 @@ interface RequestRow {
     title?: string;
 }
 
+// "Pick up where you left off?" is offered once per app start
+let resumeOffered = false;
+
 export const SocialWatcher = () => {
     const url = useHermesUrl();
     const me = useSourStore((state) => state.me);
@@ -455,7 +458,6 @@ export const SocialWatcher = () => {
     const playSong = usePlaySong();
     const current = usePlayerSong();
     const statuses = useRef(new Map<string, string>());
-    const offeredResume = useRef(false);
     const dnd = !!mine?.custom?.dnd;
     useEffect(() => {
         (window as { __sourDnd?: boolean }).__sourDnd = dnd;
@@ -556,8 +558,8 @@ export const SocialWatcher = () => {
 
     // pick up where you left off on another computer
     useEffect(() => {
-        if (!url || !me || offeredResume.current || current) return;
-        offeredResume.current = true;
+        if (!url || !me || resumeOffered || current) return;
+        resumeOffered = true; // once per app start, however many times this is mounted
         sourApi
             .me(url, me)
             .then((p) => {
@@ -566,7 +568,7 @@ export const SocialWatcher = () => {
                 notify(
                     'Pick up where you left off?',
                     <Group gap="xs">
-                        <Text size="sm">{r.song.title} on your other computer</Text>
+                        <Text size="sm">{r.song.title} on another device</Text>
                         <Button onClick={() => playSong(r.song, r.position)} size="compact-xs">
                             Resume
                         </Button>

@@ -6,6 +6,10 @@ import { UserFavoriteEventPayload, UserRatingEventPayload } from '/@/renderer/ev
 import { DiscordRpcHook } from '/@/renderer/features/discord-rpc/use-discord-rpc';
 import { DlnaPlayer } from '/@/renderer/features/player/audio-player/dlna-player';
 import { MainPlayerListenerHook } from '/@/renderer/features/player/audio-player/hooks/use-main-player-listener';
+import {
+    IosWebPlayer,
+    isIphoneBrowser,
+} from '/@/renderer/features/player/audio-player/ios-web-player';
 import { JukeboxPlayer } from '/@/renderer/features/player/audio-player/jukebox-player';
 import { MpvPlayer } from '/@/renderer/features/player/audio-player/mpv-player';
 import { WebPlayer } from '/@/renderer/features/player/audio-player/web-player';
@@ -382,6 +386,10 @@ const AudioPlayersContent = ({
         if (isRadioActive) {
             return <RadioWebPlayer />;
         }
+
+        // iPhone / iPad browsers: one audio element, so it keeps playing (and answers the lock
+        // screen) in the background
+        if (isIphoneBrowser()) return <IosWebPlayer />;
 
         return <WebPlayer />;
     }
