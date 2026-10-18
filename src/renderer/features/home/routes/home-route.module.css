@@ -335,18 +335,14 @@
         gap: 0.7rem;
     }
 
-    .detail-row,
+    .music-folder-row,
     .contact-item {
         grid-template-columns: 1fr;
         gap: 0.3rem;
     }
 
-    .detail-row dd {
+    .music-folder-row dd {
         text-align: left;
-    }
-
-    .version-actions {
-        justify-content: flex-start;
     }
 
     .music-folder-control {

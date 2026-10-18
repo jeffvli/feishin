@@ -87,6 +87,16 @@ test('@full home layout remains readable when the application window is narrow',
 
 test('@full home exposes the configured music folder selector', async ({ page }) => {
     await login(page);
+    const applicationCard = page.getByText('Application', { exact: true }).locator('..');
+    const softwareLabel = applicationCard.getByText('Software', { exact: true });
+    const softwareValue = applicationCard.getByText('KatiesAmp', { exact: true });
+    const softwareLabelBox = await softwareLabel.boundingBox();
+    const softwareValueBox = await softwareValue.boundingBox();
+    expect(softwareLabelBox).not.toBeNull();
+    expect(softwareValueBox).not.toBeNull();
+    expect(softwareValueBox.x).toBeGreaterThan(softwareLabelBox.x + softwareLabelBox.width);
+    expect(softwareValueBox.y).toBeLessThan(softwareLabelBox.y + softwareLabelBox.height);
+
     const selector = page.getByRole('combobox', { name: 'Select music folder' });
     await expect(selector).toBeVisible();
     await expect(selector).toHaveValue("Katie O'Brien's Music");

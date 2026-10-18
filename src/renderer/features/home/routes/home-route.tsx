@@ -212,7 +212,7 @@ const HomeRoute = () => {
                                             </span>
                                         </dd>
                                     </div>
-                                    <div className={styles.detailRow}>
+                                    <div className={`${styles.detailRow} ${styles.musicFolderRow}`}>
                                         <dt>Music folder</dt>
                                         <dd className={styles.musicFolderControl}>
                                             <Select
