@@ -20,14 +20,36 @@ const queueNames = async (page) => {
 const selectQueueTrack = (page, name) =>
     page.locator('#sidebar-queue').getByText(name, { exact: true }).first().dblclick();
 
-const seekActiveTrackNearEnd = (page, secondsFromEnd = 0.15) =>
-    page.evaluate((offset) => {
+const waitForActiveAudio = (page) =>
+    expect
+        .poll(
+            () =>
+                page.evaluate(() => {
+                    const active = [...document.querySelectorAll('audio')].find(
+                        (audio) => !audio.paused,
+                    );
+
+                    return Boolean(
+                        active &&
+                        Number.isFinite(active.duration) &&
+                        active.duration > 0 &&
+                        active.readyState >= HTMLMediaElement.HAVE_METADATA,
+                    );
+                }),
+            { timeout: 15_000 },
+        )
+        .toBe(true);
+
+const seekActiveTrackNearEnd = async (page, secondsFromEnd = 0.15) => {
+    await waitForActiveAudio(page);
+    await page.evaluate((offset) => {
         const active = [...document.querySelectorAll('audio')].find((audio) => !audio.paused);
         if (!active || !Number.isFinite(active.duration)) {
             throw new Error('No active audio element is available');
         }
         active.currentTime = Math.max(0, active.duration - offset);
     }, secondsFromEnd);
+};
 
 const seekActiveTrackToStart = (page) =>
     page.evaluate(() => {
