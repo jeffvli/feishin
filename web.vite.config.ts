@@ -133,7 +133,8 @@ export default defineConfig({
                 start_url: './',
                 theme_color: '#1E003D',
             },
-            manifestFilename: 'assets/manifest.webmanifest',
+            // next to index.html, so the manifest's "./" start address is the app itself
+            manifestFilename: 'manifest.webmanifest',
             outDir: path.resolve(__dirname, './out/web/'),
             registerType: 'autoUpdate',
             scope: './',
