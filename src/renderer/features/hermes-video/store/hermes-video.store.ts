@@ -16,7 +16,11 @@ export const useHermesVideoStore = createWithEqualityFn<HermesVideoState>()(
             actions: {
                 setUrl: (url) => set({ url: url.trim().replace(/\/+$/, '') }),
             },
-            url: '',
+            // the web app Hermes Music serves at /app/ (the iPhone Home Screen app) knows its address
+            url:
+                typeof window !== 'undefined' && window.location.pathname.startsWith('/app/')
+                    ? window.location.origin
+                    : '',
         }),
         {
             name: 'hermes-video',
