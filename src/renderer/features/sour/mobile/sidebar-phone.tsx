@@ -1,4 +1,5 @@
 import styles from '/@/renderer/features/sour/components/sidebar-friends.module.css';
+import { isNativeApp } from '/@/renderer/features/sour/mobile/android';
 import { openDriving } from '/@/renderer/features/sour/mobile/phone-features';
 import {
     openOffline,
@@ -11,9 +12,9 @@ import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { Text } from '/@/shared/components/text/text';
 
-// the phone menu's Phone section (Android app only)
+// the phone menu's Phone section (the phone apps, and Offline in the web app)
 export const SidebarPhone = () => {
-    const items: {
+    const all: {
         icon: Parameters<typeof Icon>[0]['icon'];
         label: string;
         onClick: () => void;
@@ -24,6 +25,8 @@ export const SidebarPhone = () => {
         { icon: 'microphone', label: "What's playing?", onClick: whatsPlaying },
         { icon: 'settings', label: 'Phone settings', onClick: openPhoneSettings },
     ];
+    // the web app (iPhone Home Screen): offline songs only
+    const items = all.filter((item) => isNativeApp() || item.label === 'Offline');
     return (
         <Accordion.Item value="phone">
             <Accordion.Control>

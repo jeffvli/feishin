@@ -79,7 +79,9 @@ export default defineConfig({
             // the Android app (mobile/) ships its files inside the APK; a service worker there would
             // keep serving the old version's files after an update
             disable: process.env.SOUR_MOBILE === '1',
-            filename: 'assets/sw.js',
+            // at the top of the app (not in assets/) so it covers the whole app wherever it's served from,
+            // e.g. Hermes Music's /app/ (the iPhone Home Screen app), and the app opens with no signal
+            filename: 'sw.js',
             injectRegister: 'inline',
             manifest: {
                 background_color: '#FFDCB5',
@@ -117,8 +119,7 @@ export default defineConfig({
                         type: 'image/png',
                     },
                 ],
-                name: 'Feishin',
-                orientation: 'portrait',
+                name: 'Sour Player',
                 screenshots: [
                     {
                         form_factor: 'wide',
@@ -128,19 +129,20 @@ export default defineConfig({
                         type: 'image/webp',
                     },
                 ],
-                short_name: 'Feishin',
-                start_url: '/',
+                short_name: 'Sour Player',
+                start_url: './',
                 theme_color: '#1E003D',
             },
             manifestFilename: 'assets/manifest.webmanifest',
             outDir: path.resolve(__dirname, './out/web/'),
             registerType: 'autoUpdate',
-            scope: '/assets/',
+            scope: './',
             workbox: {
                 cleanupOutdatedCaches: true,
                 clientsClaim: true,
                 globIgnores: ['**/kuromoji/**'],
-                maximumFileSizeToCacheInBytes: 1000000 * 10, // 10 MB
+                globPatterns: ['**/*.{js,css,html,png,ico,svg,webp,woff2,ttf,wasm,webmanifest}'],
+                maximumFileSizeToCacheInBytes: 1000000 * 12, // 12 MB
                 skipWaiting: true,
             },
         }),

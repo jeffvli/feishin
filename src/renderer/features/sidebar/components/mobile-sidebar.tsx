@@ -15,7 +15,7 @@ import {
 } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
 import { SidebarPins } from '/@/renderer/features/sour/components/look';
 import { SidebarFriends, SidebarSour } from '/@/renderer/features/sour/components/sidebar-friends';
-import { isNativeApp } from '/@/renderer/features/sour/mobile/android';
+import { offlineAvailable } from '/@/renderer/features/sour/mobile/offline';
 import { SidebarPhone } from '/@/renderer/features/sour/mobile/sidebar-phone';
 import { useSimpleMode } from '/@/renderer/features/sour/store/sour.store';
 import {
@@ -104,7 +104,7 @@ export const MobileSidebar = () => {
                 >
                     {!simple && <SidebarPins />}
                     {!simple && <SidebarSour />}
-                    {isNativeApp() && <SidebarPhone />}
+                    {offlineAvailable() && <SidebarPhone />}
                     <Accordion.Item value="library">
                         <Accordion.Control>
                             <Text fw={600} variant="secondary">

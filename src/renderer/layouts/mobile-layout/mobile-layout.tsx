@@ -10,6 +10,8 @@ import { FullScreenVisualizer } from '/@/renderer/features/player/components/ful
 import { MobileSidebar } from '/@/renderer/features/sidebar/components/mobile-sidebar';
 import { SourRoot } from '/@/renderer/features/sour/components/sour-root';
 import { MobileNav } from '/@/renderer/features/sour/mobile/mobile-nav';
+import { isWebApp } from '/@/renderer/features/sour/mobile/offline';
+import { WebOffline } from '/@/renderer/features/sour/mobile/web-offline';
 import { toggleStage } from '/@/renderer/features/sour/stage/sour-stage';
 import { PlayerBar } from '/@/renderer/layouts/default-layout/player-bar';
 import { WindowBar } from '/@/renderer/layouts/window-bar';
@@ -69,6 +71,7 @@ export const MobileLayout = ({ shell }: MobileLayoutProps) => {
             </div>
             {/* the Sour Stage, holiday skins, social pop-ups... (same as on computers) */}
             <SourRoot />
+            {isWebApp() && <WebOffline />}
             {!shell && (
                 <Drawer
                     onClose={closeSidebar}
