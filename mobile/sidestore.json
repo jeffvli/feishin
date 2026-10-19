@@ -1,0 +1,38 @@
+{
+  "name": "Sour Player",
+  "identifier": "com.anjalo.sourplayer.source",
+  "subtitle": "The music player for Hermes Music",
+  "sourceURL": "https://raw.githubusercontent.com/Urmomnumber1/feishin/hermes-music-video/mobile/sidestore.json",
+  "iconURL": "https://raw.githubusercontent.com/Urmomnumber1/feishin/hermes-music-video/assets/icons/ios-1024.png",
+  "tintColor": "#5058CC",
+  "apps": [
+    {
+      "name": "Sour Player",
+      "bundleIdentifier": "com.anjalo.sourplayer",
+      "developerName": "Anjalo",
+      "subtitle": "The music player for Hermes Music",
+      "localizedDescription": "Play your Navidrome / Hermes Music library on your iPhone: lock screen and Control Center controls, AirPods buttons, background playback, offline playlists, the Sour Stage, profiles, listen along and Group Play.",
+      "iconURL": "https://raw.githubusercontent.com/Urmomnumber1/feishin/hermes-music-video/assets/icons/ios-1024.png",
+      "tintColor": "#5058CC",
+      "category": "entertainment",
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {
+          "NSLocalNetworkUsageDescription": "Sour Player connects to your music server and Hermes Music on your home network."
+        }
+      },
+      "versions": [
+        {
+          "version": "0.2.0",
+          "buildVersion": "2",
+          "date": "2026-10-19",
+          "localizedDescription": "Music keeps playing in the background and changes songs with the screen locked; lock screen, Control Center and AirPods buttons work.",
+          "downloadURL": "https://github.com/Urmomnumber1/feishin/releases/download/ios-v0.2.0/Sour-Player-0.2.0.ipa",
+          "size": 28954233,
+          "minOSVersion": "15.0"
+        }
+      ]
+    }
+  ],
+  "news": []
+}
