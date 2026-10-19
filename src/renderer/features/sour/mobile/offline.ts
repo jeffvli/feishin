@@ -1,7 +1,7 @@
 import type { QueueSong, Song } from '/@/shared/types/domain-types';
 
 import { api } from '/@/renderer/api';
-import { isNativeApp, sourMedia } from '/@/renderer/features/sour/mobile/android';
+import { isIosApp, isNativeApp, sourMedia } from '/@/renderer/features/sour/mobile/android';
 import { usePhoneStore } from '/@/renderer/features/sour/mobile/phone-store';
 
 // Offline listening: songs of chosen playlists are saved on the phone, and the player uses the saved
@@ -11,6 +11,9 @@ import { usePhoneStore } from '/@/renderer/features/sour/mobile/phone-store';
 // the web app served by Hermes Music (Safari > Add to Home Screen on an iPhone)
 export const isWebApp = () => !isNativeApp() && window.location.pathname.startsWith('/app/');
 export const offlineAvailable = () => isNativeApp() || isWebApp();
+// browser storage: the web app, and the iPhone app (it runs from Hermes over http, where the app's own
+// files can't be played)
+const inBrowserStore = () => isWebApp() || isIosApp();
 
 const CACHE = 'sour-offline';
 const cacheKey = (id: string) => `/app/__offline/${encodeURIComponent(id)}`;
@@ -18,7 +21,7 @@ const cacheKey = (id: string) => `/app/__offline/${encodeURIComponent(id)}`;
 const webUrls = new Map<string, string>();
 
 export const loadWebOffline = async () => {
-    if (!isWebApp() || !('caches' in window)) return;
+    if (!inBrowserStore() || !('caches' in window)) return;
     navigator.storage?.persist?.().catch(() => false); // ask the browser not to clear them
     const cache = await caches.open(CACHE);
     for (const id of Object.keys(usePhoneStore.getState().offline)) {
@@ -32,7 +35,7 @@ const saveCopy = async (
     song: Song,
     url: string,
 ): Promise<null | { path: string; size: number }> => {
-    if (isNativeApp()) {
+    if (!inBrowserStore()) {
         const ext = (song.container || 'mp3').toLowerCase();
         return sourMedia('saveOffline', { ext, id: song.id, url }).catch(() => null);
     }
@@ -53,7 +56,7 @@ const saveCopy = async (
 };
 
 const removeCopy = async (id: string) => {
-    if (isNativeApp()) return sourMedia('removeOffline', { id }).catch(() => undefined);
+    if (!inBrowserStore()) return sourMedia('removeOffline', { id }).catch(() => undefined);
     const link = webUrls.get(id);
     if (link) URL.revokeObjectURL(link);
     webUrls.delete(id);
@@ -69,7 +72,7 @@ const fileUrl = (path: string) => {
 // the saved copy of a song, if there is one (used by the player for every song it plays)
 export const offlineUrl = (song?: null | QueueSong | { id: string }): string | undefined => {
     if (!song) return undefined;
-    if (isWebApp()) return webUrls.get(song.id);
+    if (inBrowserStore()) return webUrls.get(song.id);
     if (!isNativeApp()) return undefined;
     const saved = usePhoneStore.getState().offline[song.id];
     return saved ? fileUrl(saved.path) : undefined;
@@ -184,7 +187,7 @@ export const setPlaylistOffline = async (playlistId: string, serverId: string, o
 };
 
 export const clearOffline = async () => {
-    if (isNativeApp()) await sourMedia('clearOffline').catch(() => undefined);
+    if (!inBrowserStore()) await sourMedia('clearOffline').catch(() => undefined);
     else {
         for (const link of webUrls.values()) URL.revokeObjectURL(link);
         webUrls.clear();

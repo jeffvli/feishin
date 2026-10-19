@@ -31,6 +31,7 @@ public class SourMediaPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "setIcon", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "downloadUpdate", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "installUpdate", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setServer", returnType: CAPPluginReturnPromise),
     ]
 
     private let monitor = NWPathMonitor()
@@ -226,6 +227,36 @@ public class SourMediaPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func setIcon(_ call: CAPPluginCall) { call.resolve() }
 
+    // Your Hermes Music address: the app then runs Sour Player from it (http on your network or
+    // Tailscale), so iOS doesn't block the music server as "insecure" and the app updates with Hermes.
+    // An empty address goes back to the welcome screen.
+    @objc func setServer(_ call: CAPPluginCall) {
+        var text = call.getString("url", "").trimmingCharacters(in: .whitespaces)
+        if text.isEmpty {
+            UserDefaults.standard.removeObject(forKey: SourBridgeViewController.serverKey)
+            DispatchQueue.main.async { _ = self.bridge?.webView?.load(URLRequest(url: URL(string: "capacitor://localhost/")!)) }
+            call.resolve()
+            return
+        }
+        if !text.contains("://") { text = "http://" + text }
+        while text.hasSuffix("/") { text.removeLast() }
+        guard let base = URL(string: text), let app = URL(string: text + "/app/") else {
+            call.reject("That doesn't look like an address")
+            return
+        }
+        var request = URLRequest(url: base.appendingPathComponent("api/status"))
+        request.timeoutInterval = 10
+        URLSession.shared.dataTask(with: request) { _, response, error in
+            guard error == nil, let http = response as? HTTPURLResponse, http.statusCode < 500 else {
+                call.reject("Couldn't reach Hermes Music there. On Tailscale? Make sure it's connected (SideStore's VPN switches it off).")
+                return
+            }
+            UserDefaults.standard.set(app.absoluteString, forKey: SourBridgeViewController.serverKey)
+            call.resolve(["url": app.absoluteString])
+            DispatchQueue.main.async { _ = self.bridge?.webView?.load(URLRequest(url: app)) }
+        }.resume()
+    }
+
     @objc func downloadUpdate(_ call: CAPPluginCall) { call.reject("TestFlight updates Sour Player on iPhone") }
 
     @objc func installUpdate(_ call: CAPPluginCall) { call.reject("TestFlight updates Sour Player on iPhone") }
@@ -233,6 +264,17 @@ public class SourMediaPlugin: CAPPlugin, CAPBridgedPlugin {
 
 // registers the plugin (the storyboard's view controller is set to this class)
 class SourBridgeViewController: CAPBridgeViewController {
+    static let serverKey = "sourHermesApp"
+
+    // start at your Hermes Music's /app/ once it's set (see setServer)
+    override open func instanceDescriptor() -> InstanceDescriptor {
+        let descriptor = super.instanceDescriptor()
+        if let saved = UserDefaults.standard.string(forKey: SourBridgeViewController.serverKey), URL(string: saved) != nil {
+            descriptor.serverURL = saved
+        }
+        return descriptor
+    }
+
     override open func capacitorDidLoad() {
         bridge?.registerPluginInstance(SourMediaPlugin())
     }

@@ -42,6 +42,7 @@ import { RemoteRadioPushHook } from '/@/renderer/features/remote/hooks/use-remot
 import { RemoteSettingsPushHook } from '/@/renderer/features/remote/hooks/use-remote-settings-push';
 import { ComponentErrorBoundary } from '/@/renderer/features/shared/components/component-error-boundary';
 import { AndroidMediaHook } from '/@/renderer/features/sour/mobile/android-media';
+import { isIphone } from '/@/renderer/features/sour/mobile/ios-look';
 import { VisualizerSystemAudioBridgeHook } from '/@/renderer/features/visualizer/components/visualizer-system-audio-bridge';
 import { useSettingsStore } from '/@/renderer/store';
 import {
@@ -145,7 +146,7 @@ export const AudioPlayers = () => {
             <MainPlayerListenerHook />
             <MediaSessionHook />
             <AndroidMediaHook />
-            <PlaybackHotkeysHook />
+            {!isIphone() && <PlaybackHotkeysHook />}
             <RemoteHook />
             <RemoteLibraryHook />
             <RemoteQueuePushHook />

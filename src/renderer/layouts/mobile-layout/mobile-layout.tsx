@@ -9,6 +9,7 @@ import { ContextMenuController } from '/@/renderer/features/context-menu/context
 import { FullScreenVisualizer } from '/@/renderer/features/player/components/full-screen-visualizer';
 import { MobileSidebar } from '/@/renderer/features/sidebar/components/mobile-sidebar';
 import { SourRoot } from '/@/renderer/features/sour/components/sour-root';
+import { isIosApp } from '/@/renderer/features/sour/mobile/android';
 import { MobileNav } from '/@/renderer/features/sour/mobile/mobile-nav';
 import { isWebApp } from '/@/renderer/features/sour/mobile/offline';
 import { WebOffline } from '/@/renderer/features/sour/mobile/web-offline';
@@ -71,7 +72,7 @@ export const MobileLayout = ({ shell }: MobileLayoutProps) => {
             </div>
             {/* the Sour Stage, holiday skins, social pop-ups... (same as on computers) */}
             <SourRoot />
-            {isWebApp() && <WebOffline />}
+            {(isWebApp() || isIosApp()) && <WebOffline />}
             {!shell && (
                 <Drawer
                     onClose={closeSidebar}

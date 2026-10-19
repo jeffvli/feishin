@@ -14,6 +14,17 @@ const edit = (file, change) => {
     fs.writeFileSync(file, after);
 };
 
+// `node setup-ios.mjs --after-sync`: the copied capacitor.config.json lets the app move to your Hermes
+// Music address (and back to the welcome screen) instead of opening it in Safari
+if (process.argv.includes('--after-sync')) {
+    const cfg = path.join(app, 'capacitor.config.json');
+    const json = JSON.parse(fs.readFileSync(cfg, 'utf8'));
+    json.server = { ...(json.server || {}), allowNavigation: ['*'] };
+    fs.writeFileSync(cfg, JSON.stringify(json, null, 2));
+    console.log('iPhone app may navigate to the Hermes Music address');
+    process.exit(0);
+}
+
 // the plugin and the view controller that registers it live in AppDelegate.swift (already part of the
 // Xcode target, so the project file doesn't need editing)
 const swift = fs.readFileSync(path.join(here, 'native-ios', 'SourMedia.swift'), 'utf8');

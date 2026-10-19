@@ -15,6 +15,7 @@ import { openVideoWall } from '/@/renderer/features/hermes-video/components/musi
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { requestApi, type RequestGuess } from '/@/renderer/features/sour/api/sour-api';
 import { RequestQuestion } from '/@/renderer/features/sour/components/request-question';
+import { isIphone } from '/@/renderer/features/sour/mobile/ios-look';
 import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { playSound } from '/@/renderer/features/sour/utils/sounds';
 import { usePlayerSong } from '/@/renderer/store';
@@ -399,8 +400,9 @@ const RequestPanel = () => {
             <Text isMuted size="xs">
                 You can also paste a Spotify, YouTube or YouTube Music link (song, album or
                 playlist), a Spotify profile or YouTube channel link (all its public playlists), or
-                a screenshot of a playlist (Ctrl+V). Hermes Music&#39;s commands work here too: type
-                /help. Downloaded songs show up after Navidrome&#39;s next scan.
+                a screenshot of a playlist{isIphone() ? '' : ' (Ctrl+V)'}. Hermes Music&#39;s
+                commands work here too: type /help. Downloaded songs show up after Navidrome&#39;s
+                next scan.
             </Text>
             {log.length > 0 && (
                 <div className={styles.log}>

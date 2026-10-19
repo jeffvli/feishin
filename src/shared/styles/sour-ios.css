@@ -1,0 +1,205 @@
+/* stylelint-disable selector-class-pattern -- Mantine's own class names */
+
+/* Sour Player on iPhone / iPad: looks and feels like an iOS app (only under .sour-ios, set by
+   features/sour/mobile/ios-look.ts). Everything Sour Player does is still here; this is the look. */
+
+.sour-ios {
+    --ios-bg: #0b0710;
+    --ios-glass: rgb(22 14 28 / 72%);
+    --ios-card: rgb(255 255 255 / 6%);
+    --ios-line: rgb(255 255 255 / 9%);
+    --ios-muted: rgb(235 235 245 / 60%);
+
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+}
+
+.sour-ios body {
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    background: var(--ios-bg);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* no zooming in on a text box: iOS zooms anything under 16px */
+.sour-ios input,
+.sour-ios textarea,
+.sour-ios select {
+    font-size: 16px !important;
+}
+
+/* things that only make sense with a mouse */
+.sour-ios .mantine-Tooltip-tooltip,
+.sour-ios [class*='resize-handle'],
+.sour-ios kbd {
+    display: none !important;
+}
+
+.sour-ios ::-webkit-scrollbar {
+    display: none;
+}
+
+.sour-ios * {
+    scrollbar-width: none;
+}
+
+/* buttons press in a little, like iOS */
+.sour-ios button:active,
+.sour-ios [role='button']:active {
+    transform: scale(0.97);
+    transition: transform 0.08s;
+}
+
+/* ---- the page: large iOS titles */
+.sour-ios [class*='page-header-module-title-wrapper'] {
+    justify-content: flex-start;
+}
+
+.sour-ios [class*='page-header-module-title-wrapper'] h1,
+.sour-ios [class*='page-header-module-title-wrapper'] [class*='title'] {
+    font-size: 30px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.02em;
+}
+
+.sour-ios [class*='mobile-layout-module-main-content'] {
+    overscroll-behavior-y: contain;
+    background: var(--ios-bg);
+}
+
+/* cards and rows: rounder, softer */
+.sour-ios .mantine-Paper-root,
+.sour-ios [class*='card-module'],
+.sour-ios [class*='grid-card'] {
+    border-radius: 14px;
+}
+
+/* ---- the mini player: a floating card above the tab bar, like Apple Music */
+.sour-ios #player-bar {
+    padding: 0 10px 8px;
+    background: transparent !important;
+    backdrop-filter: none !important;
+}
+
+.sour-ios [class*='mobile-playerbar-module-container'] {
+    height: 100%;
+    padding: 8px 10px;
+    background: var(--ios-glass);
+    border: 1px solid var(--ios-line);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 40%);
+    backdrop-filter: blur(24px) saturate(180%);
+}
+
+.sour-ios [class*='mobile-playerbar-module-image'] {
+    width: 54px;
+    height: 54px;
+}
+
+.sour-ios [class*='mobile-playerbar-module-playerbar-image'],
+.sour-ios [class*='mobile-playerbar-module-image'] img {
+    border-radius: 10px;
+}
+
+.sour-ios [class*='mobile-playerbar-module-metadata-stack'] {
+    font-size: 15px;
+}
+
+/* ---- the tab bar */
+.sour-ios nav[class*='mobile-nav-module-nav'] {
+    height: calc(54px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    margin-bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
+    background: var(--ios-glass);
+    border-top: 1px solid var(--ios-line);
+    backdrop-filter: blur(24px) saturate(180%);
+}
+
+.sour-ios nav[class*='mobile-nav-module-nav'] button {
+    gap: 3px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+.sour-ios nav[class*='mobile-nav-module-nav'] svg {
+    width: 25px;
+    height: 25px;
+}
+
+/* ---- sheets: dialogs slide up from the bottom with a handle, like iOS */
+.sour-ios .mantine-Modal-inner {
+    align-items: flex-end !important;
+    padding: 0 !important;
+}
+
+.sour-ios .mantine-Modal-content {
+    height: auto !important;
+    max-height: calc(100% - 44px) !important;
+    background: #17101c !important;
+    border-radius: 18px 18px 0 0 !important;
+    animation: sour-ios-sheet 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.sour-ios .mantine-Modal-content::before {
+    display: block;
+    width: 38px;
+    height: 5px;
+    margin: 8px auto 0;
+    content: '';
+    background: rgb(255 255 255 / 25%);
+    border-radius: 3px;
+}
+
+.sour-ios .mantine-Modal-header {
+    background: transparent !important;
+}
+
+.sour-ios .mantine-Modal-title {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.sour-ios .mantine-Modal-body {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+@keyframes sour-ios-sheet {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+/* ---- the menu: a rounded panel */
+.sour-ios .mantine-Drawer-content {
+    background: #120c16 !important;
+    border-radius: 0 20px 20px 0;
+}
+
+/* ---- inputs and buttons: iOS sized and rounded */
+.sour-ios .mantine-Input-input,
+.sour-ios .mantine-TextInput-input {
+    min-height: 44px;
+    border-radius: 12px;
+}
+
+.sour-ios .mantine-Button-root {
+    min-height: 40px;
+    border-radius: 12px;
+}
+
+/* ---- notifications: rounded banners at the top, like iOS */
+.sour-ios .mantine-Notification-root {
+    background: var(--ios-glass) !important;
+    border: 1px solid var(--ios-line);
+    border-radius: 16px;
+    backdrop-filter: blur(24px) saturate(180%);
+}
+
+/* no holiday critters wandering across a phone screen */
+.sour-ios [class*='holiday-layer-module-canvas'] {
+    display: none;
+}

@@ -1,0 +1,104 @@
+.screen {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: env(safe-area-inset-top, 0) 24px env(safe-area-inset-bottom, 0);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+    color: #fff;
+    background:
+        radial-gradient(120% 70% at 50% 0%, rgb(80 88 204 / 55%), transparent 60%),
+        radial-gradient(90% 60% at 100% 100%, rgb(242 193 78 / 22%), transparent 60%),
+        #0b0710;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 380px;
+}
+
+.icon {
+    width: 84px;
+    height: 84px;
+    margin: 0 auto 6px;
+    border-radius: 20px;
+    box-shadow: 0 12px 40px rgb(0 0 0 / 45%);
+}
+
+.title {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 800;
+    text-align: center;
+    letter-spacing: -0.02em;
+}
+
+.lead {
+    margin: 0 0 18px;
+    font-size: 17px;
+    color: rgb(255 255 255 / 65%);
+    text-align: center;
+}
+
+.label {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgb(255 255 255 / 60%);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.input {
+    width: 100%;
+    padding: 14px 16px;
+    font: inherit;
+    font-size: 17px;
+    color: #fff;
+    outline: none;
+    background: rgb(255 255 255 / 9%);
+    border: 1px solid rgb(255 255 255 / 12%);
+    border-radius: 14px;
+}
+
+.input:focus {
+    border-color: rgb(80 88 204 / 90%);
+}
+
+.hint {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: rgb(255 255 255 / 50%);
+}
+
+.error {
+    margin: 0;
+    font-size: 14px;
+    color: #ff8a80;
+}
+
+.button {
+    padding: 15px;
+    margin-top: 8px;
+    font: inherit;
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+    background: #5058cc;
+    border: none;
+    border-radius: 14px;
+    transition: transform 0.12s;
+}
+
+.button:active {
+    transform: scale(0.98);
+}
+
+.button:disabled {
+    opacity: 0.5;
+}

@@ -48,6 +48,7 @@ import { PeopleButton } from '/@/renderer/features/sour/components/people';
 import { ListenAlong, SocialWatcher } from '/@/renderer/features/sour/components/social';
 import { SourPresence } from '/@/renderer/features/sour/components/sour-presence';
 import { SourStudioButton } from '/@/renderer/features/sour/components/sour-studio';
+import { isIphone } from '/@/renderer/features/sour/mobile/ios-look';
 import {
     SourStageButton,
     toggleStage,
@@ -181,7 +182,7 @@ export const SourWatchers = () => (
         <SourPresence />
         <SocialWatcher />
         <LookEffects />
-        <Shortcuts onRequest={openRequestWindow} />
+        {!isIphone() && <Shortcuts onRequest={openRequestWindow} />}
         <CrossfadeWatcher />
         <AutoVideo />
         <FloatingVideo />

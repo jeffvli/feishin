@@ -24,7 +24,7 @@ export const MobileNav = ({ onMenu }: { onMenu: () => void }) => {
         { icon: 'menu', label: 'Menu', onClick: onMenu },
         {
             active: pathname === AppRoute.HOME,
-            icon: 'library',
+            icon: 'house',
             label: 'Home',
             onClick: () => navigate(AppRoute.HOME),
         },
