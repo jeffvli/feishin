@@ -17,10 +17,11 @@ import { PlayerRepeat, PlayerStatus } from '/@/shared/types/types';
 // changes songs, instead of the usual two that hand over to each other. iOS only lets the element
 // that is already playing carry on in the background, and ties the lock screen / Control Center
 // controls to it - with two, the second song stayed silent and the controls stopped answering.
+// (also the iPhone app itself: the same rule applies inside it)
 export const isIphoneBrowser = () =>
-    !(window as any).Capacitor?.isNativePlatform?.() &&
-    (/iPhone|iPad|iPod/.test(navigator.userAgent) ||
-        (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+    (window as any).Capacitor?.getPlatform?.() === 'ios' ||
+    /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
 export function IosWebPlayer() {
     const audio = useRef<HTMLAudioElement>(null);

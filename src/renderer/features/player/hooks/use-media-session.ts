@@ -305,6 +305,8 @@ export const MediaSessionHook = () => {
     // Conditional rendering here causes unmount/remount cycles that destroy handlers mid-session.
     // Android's WebView has no media session at all (the Android app has its own, see
     // features/sour/mobile), so there is nothing to drive there.
-    if (!mediaSession) return null;
+    // The iPhone app drives the lock screen itself (SourMedia, with iOS's own remote controls);
+    // answering the same buttons here too would skip two songs at a time
+    if (!mediaSession || (window as any).Capacitor?.getPlatform?.() === 'ios') return null;
     return React.createElement(MediaSessionHookInner);
 };
