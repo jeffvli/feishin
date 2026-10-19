@@ -23,6 +23,15 @@
       },
       "versions": [
         {
+          "version": "0.3.0",
+          "buildVersion": "3",
+          "date": "2026-10-19",
+          "localizedDescription": "No more network errors (the app runs from your Hermes Music; type its address the first time). A real iPhone look: tab bar, floating mini player, sheets, large titles. No zooming on text boxes, no keyboard shortcuts.",
+          "downloadURL": "https://github.com/Urmomnumber1/feishin/releases/download/ios-v0.3.0/Sour-Player-0.3.0.ipa",
+          "size": 28961114,
+          "minOSVersion": "15.0"
+        },
+        {
           "version": "0.2.0",
           "buildVersion": "2",
           "date": "2026-10-19",
