@@ -124,6 +124,10 @@ services:
             # Alternatively, to restrict to only localhost, - 127.0.0.1:9180:8190
 ```
 
+#### One-Click Deploy
+
+[![Deploy on RepoCloud](https://d16t0pc4846x52.cloudfront.net/deploylobe.svg)](https://repocloud.io/details/Feishin/)
+
 ### Configuration
 
 1. Upon startup you will be greeted with a prompt to select the path to your MPV binary. If you do not have MPV installed, you can download it [here](https://mpv.io/installation/) or install it using any package manager supported by your OS. After inputting the path, restart the app.
