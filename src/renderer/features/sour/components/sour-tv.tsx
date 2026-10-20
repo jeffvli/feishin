@@ -4,6 +4,7 @@ import { create } from 'zustand';
 
 import styles from './sour-tv.module.css';
 
+import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { groupApi } from '/@/renderer/features/group-play/api/group-play-api';
 import { useGroupPlayStore } from '/@/renderer/features/group-play/store/group-play.store';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
@@ -23,6 +24,7 @@ import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
+import { LibraryItem } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
 // Sour Player TV: an admin's phone, mirrored to the TV (Screen Mirroring / AirPlay on iPhone, Cast
@@ -169,6 +171,15 @@ export const SourTvScreen = () => {
     const status = usePlayerStoreBase((s) => s.player.status);
     const time = useTimestampStoreBase((s) => s.timestamp);
     const profiles = useSourProfiles().data ?? [];
+    // the cover the way the rest of the app gets it (from the music server, big enough for a TV)
+    const cover =
+        useItemImageUrl({
+            id: song?.imageId,
+            imageUrl: song?.imageUrl,
+            itemType: LibraryItem.SONG,
+            serverId: song?._serverId,
+            size: 800,
+        }) || null;
     const [clock, setClock] = useState(() => new Date());
     useEffect(() => {
         if (!open) return undefined;
@@ -185,7 +196,6 @@ export const SourTvScreen = () => {
     const upNext = state.queue.slice(state.index + 1, state.index + 4);
     const duration = song?.duration ? song.duration / 1000 : 0;
     const player = usePlayerStoreBase.getState();
-    const cover = song?.imageUrl || null;
     return (
         <div className={styles.tv}>
             {cover && (
