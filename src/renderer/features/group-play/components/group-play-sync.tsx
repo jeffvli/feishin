@@ -1,4 +1,4 @@
-import { useQueryClient } from '@tanstack/react-query';
+import { type QueryClient, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 
 import {
@@ -20,7 +20,7 @@ import { followKaraoke } from '/@/renderer/features/sour/components/social';
 import { useStage } from '/@/renderer/features/sour/stage/sour-stage';
 import { useSourProfiles, useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { playSound, setSoundBase } from '/@/renderer/features/sour/utils/sounds';
-import { useCurrentServer } from '/@/renderer/store';
+import { useAuthStore, useCurrentServer } from '/@/renderer/store';
 import { addToQueueByData, usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { useTimestampStoreBase } from '/@/renderer/store/timestamp.store';
 import { toast } from '/@/shared/components/toast/toast';
@@ -38,6 +38,33 @@ const groupPosition = (state: GroupState, clockOffset: number) =>
 // Keeps this Feishin in step with a Group Play session (hosted by Hermes Music):
 // members follow the host's song and position; the host reports its player, adds members' songs and
 // carries out what they do with the group's controls.
+// you're the host now: the group's queue becomes your queue (in order, at the host's moment)
+const takeOver = async (hostKey: string, from: string, queryClient: QueryClient) => {
+    const { actions, clockOffset, code, state } = useGroupPlayStore.getState();
+    const serverId = useAuthStore.getState().currentServer?.id;
+    if (!code || !state || !serverId) return;
+    const found = await Promise.all(
+        state.queue.map((q) =>
+            getSongById({ id: q.id, queryClient, serverId })
+                .then((res) => res.items[0] ?? null)
+                .catch(() => null),
+        ),
+    );
+    const nowId = state.queue[state.index]?.id;
+    const items = found.filter((x): x is Song => !!x);
+    const index = Math.max(
+        0,
+        items.findIndex((x) => x.id === nowId),
+    );
+    const player = usePlayerStoreBase.getState();
+    if (items.length) {
+        player.setQueue(items, index, groupPosition(state, clockOffset));
+        if (!state.playing) player.mediaPause();
+    }
+    actions.setSession({ code, hostKey, role: 'host' });
+    toast.success({ message: `${from} passed the group to you - you're the host now` });
+};
+
 export const GroupPlaySync = () => {
     const url = useHermesUrl();
     const code = useGroupPlayStore((state) => state.code);
@@ -121,6 +148,11 @@ export const GroupPlaySync = () => {
                 return;
             }
             actions.setState(state);
+        });
+        // the host passed the group to you: rebuild their queue here, then take over reporting
+        events.addEventListener('host', (event) => {
+            const h = JSON.parse((event as MessageEvent).data) as { from: string; hostKey: string };
+            void takeOver(h.hostKey, h.from, queryClientRef.current);
         });
         events.addEventListener('kicked', () => {
             toast.info({ message: 'The host removed you from the group' });

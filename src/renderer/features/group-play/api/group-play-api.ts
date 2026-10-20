@@ -104,6 +104,9 @@ export const groupApi = {
         post<{ added: number }>(`${base}/api/group/${code}/fill`, { member, songs }),
     guess: (base: string, code: string, member: string, songId: string, name: string) =>
         post<{ ok: boolean }>(`${base}/api/group/${code}/guess`, { member, name, songId }),
+    // pass the group to someone in it; you stay as a listener (the answer is your new member id)
+    handoff: (base: string, code: string, hostKey: string, target: string) =>
+        post<{ member: string }>(`${base}/api/group/${code}/handoff`, { hostKey, target }),
     join: (base: string, code: string, user: string, profile: null | string, spectate = false) =>
         post<Joined>(`${base}/api/group/${code}/join`, { profile, spectate, user }),
     kick: (base: string, code: string, hostKey: string, target: string) =>

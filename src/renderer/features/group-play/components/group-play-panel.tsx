@@ -462,6 +462,18 @@ export const GroupPlayPanel = () => {
             .catch((error: Error) => toast.error({ message: error.message }));
     };
 
+    // pass the group to someone (you stay and listen) instead of ending it
+    const passHost = (target: string, name: string) => {
+        if (!hostKey) return;
+        groupApi
+            .handoff(url, code, hostKey, target)
+            .then((res) => {
+                actions.setSession({ code, member: res.member, role: 'member' });
+                toast.success({ message: `${name} is the host now` });
+            })
+            .catch((error: Error) => toast.error({ message: error.message }));
+    };
+
     const setGuestControl = (on: boolean) => {
         if (!hostKey) return;
         groupApi
@@ -759,6 +771,17 @@ export const GroupPlayPanel = () => {
                                 <span className={styles.person} key={m.id}>
                                     <Avatar name={m.name} small src={memberPicture(m)} />
                                     {m.name}
+                                    {!m.spectate && !state?.tv && (
+                                        <ActionIcon
+                                            icon="crown"
+                                            onClick={() => passHost(m.id, m.name)}
+                                            size="xs"
+                                            tooltip={{
+                                                label: `Make ${m.name} the host (you keep listening)`,
+                                            }}
+                                            variant="subtle"
+                                        />
+                                    )}
                                     <ActionIcon
                                         icon="x"
                                         onClick={() => kick(m.id)}
