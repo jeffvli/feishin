@@ -110,6 +110,14 @@
     transition: transform 0.15s;
 }
 
+.mood-hint {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    opacity: 0.75;
+}
+
 .mood:hover {
     transform: translateY(-3px);
 }

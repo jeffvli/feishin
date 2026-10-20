@@ -6,6 +6,12 @@ import styles from './app-extras.module.css';
 
 import { openPeople } from '/@/renderer/features/sour/components/people';
 import { SongCover, usePlaySong } from '/@/renderer/features/sour/components/profile-bits';
+import {
+    copyNowPlaying,
+    quickMixes,
+    removeQueueDuplicates,
+    toggleClassicLook,
+} from '/@/renderer/features/sour/components/quick-mixes';
 import { openSourStudio } from '/@/renderer/features/sour/components/sour-studio';
 import { toggleStage } from '/@/renderer/features/sour/stage/sour-stage';
 import { type HistoryEntry, useSourStore } from '/@/renderer/features/sour/store/sour.store';
@@ -79,6 +85,13 @@ export const sourCommands = (navigate: (to: string) => void) => [
     { label: 'Sour Library (cover wall, tools)', run: () => navigate(AppRoute.SOUR_LIBRARY) },
     { label: 'People and profiles', run: openPeople },
     { label: 'Queue history', run: openQueueHistory },
+    { label: 'Mix: never heard', run: quickMixes.neverHeard },
+    { label: 'Mix: old favorites', run: quickMixes.oldFavorites },
+    { label: "Mix: the playing song's decade", run: quickMixes.decade },
+    { label: "Mix: the playing song's genre", run: quickMixes.genre },
+    { label: 'Remove duplicates from the queue', run: removeQueueDuplicates },
+    { label: 'Copy what is playing', run: copyNowPlaying },
+    { label: 'Switch between the new and Classic look', run: toggleClassicLook },
 ];
 
 // ---------- startup splash ----------

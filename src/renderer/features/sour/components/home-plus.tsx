@@ -19,6 +19,7 @@ import {
     SongCover,
     usePlaySong,
 } from '/@/renderer/features/sour/components/profile-bits';
+import { quickMixes } from '/@/renderer/features/sour/components/quick-mixes';
 import { currentHoliday } from '/@/renderer/features/sour/skins/holidays';
 import {
     useMyProfile,
@@ -238,9 +239,51 @@ export const MoodTiles = () => {
                     </button>
                 ))}
             </div>
+            <Text className={styles.label}>Quick mixes</Text>
+            <div className={styles.moods}>
+                {QUICK.map((q) => (
+                    <button
+                        className={styles.mood}
+                        key={q.label}
+                        onClick={q.run}
+                        style={{ background: q.color }}
+                        type="button"
+                    >
+                        {q.label}
+                        <span className={styles['mood-hint']}>{q.hint}</span>
+                    </button>
+                ))}
+            </div>
         </section>
     );
 };
+
+const QUICK = [
+    {
+        color: '#3a1f4f',
+        hint: 'Songs you have never played',
+        label: 'Never heard',
+        run: quickMixes.neverHeard,
+    },
+    {
+        color: '#4a2a12',
+        hint: 'Things you played before',
+        label: 'Old favorites',
+        run: quickMixes.oldFavorites,
+    },
+    {
+        color: '#12384a',
+        hint: "The playing song's decade",
+        label: 'This decade',
+        run: quickMixes.decade,
+    },
+    {
+        color: '#1f4a2c',
+        hint: "The playing song's genre",
+        label: 'This genre',
+        run: quickMixes.genre,
+    },
+];
 
 // ---------- friends as big cards ----------
 export const FriendCards = () => {
