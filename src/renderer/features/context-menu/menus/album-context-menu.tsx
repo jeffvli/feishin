@@ -11,6 +11,7 @@ import { SetFavoriteAction } from '/@/renderer/features/context-menu/actions/set
 import { SetRatingAction } from '/@/renderer/features/context-menu/actions/set-rating-action';
 import { ShareAction } from '/@/renderer/features/context-menu/actions/share-action';
 import { ContextMenuPreview } from '/@/renderer/features/context-menu/components/context-menu-preview';
+import { AddCollectionToGroupAction } from '/@/renderer/features/group-play/components/add-to-group-action';
 import {
     AddAlbumToProfileAction,
     PinAction,
@@ -37,6 +38,7 @@ export const AlbumContextMenu = ({ items, type }: AlbumContextMenuProps) => {
             <PlayAlbumRadioAction album={items[0]} disabled={items.length > 1} />
             <ContextMenu.Divider />
             <AddToPlaylistAction items={ids} itemType={LibraryItem.ALBUM} />
+            <AddCollectionToGroupAction ids={ids} itemType={LibraryItem.ALBUM} />
             <AddAlbumToProfileAction albums={items} />
             <PinAction item={items[0]} kind="album" />
             <ContextMenu.Divider />

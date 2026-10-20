@@ -6,6 +6,7 @@ import { EditPlaylistAction } from '/@/renderer/features/context-menu/actions/ed
 import { GetInfoAction } from '/@/renderer/features/context-menu/actions/get-info-action';
 import { PlayAction } from '/@/renderer/features/context-menu/actions/play-action';
 import { ContextMenuPreview } from '/@/renderer/features/context-menu/components/context-menu-preview';
+import { AddCollectionToGroupAction } from '/@/renderer/features/group-play/components/add-to-group-action';
 import {
     HidePlaylistAction,
     PinAction,
@@ -42,6 +43,7 @@ export const PlaylistContextMenu = ({ items, type }: PlaylistContextMenuProps) =
             <PlayAction ids={ids} itemType={LibraryItem.PLAYLIST} />
             <ContextMenu.Divider />
             <AddToPlaylistAction items={ids} itemType={LibraryItem.PLAYLIST} />
+            <AddCollectionToGroupAction ids={ids} itemType={LibraryItem.PLAYLIST} />
             <PinAction item={items[0]} kind="playlist" />
             <PinPlaylistToProfileAction playlist={items[0]} />
             {items.length === 1 && <HidePlaylistAction playlist={items[0]} />}

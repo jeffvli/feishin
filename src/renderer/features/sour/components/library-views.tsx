@@ -7,6 +7,7 @@ import styles from './library-views.module.css';
 
 import { api } from '/@/renderer/api';
 import { ItemImage, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { Card } from '/@/renderer/features/sour/components/hub-panels';
 import { useSourProfiles, useSourStore } from '/@/renderer/features/sour/store/sour.store';
@@ -89,6 +90,12 @@ const hueOf = ([r, g, b]: number[]) => {
     return (h * 60 + 360) % 360;
 };
 
+// right-click an album anywhere in the Sour Library: the normal album menu (play, add to the group, ...)
+const albumMenu = (album: Album) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    ContextMenuController.call({ cmd: { items: [album], type: LibraryItem.ALBUM }, event: e });
+};
+
 const useAlbumColor = (album: Album) => {
     const src = useItemImageUrl({
         id: album.imageId || undefined,
@@ -125,6 +132,7 @@ const AlbumTile = ({
             onClick={() =>
                 navigate(generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: album.id }))
             }
+            onContextMenu={albumMenu(album)}
             title={`${album.name} - ${album.albumArtistName}`}
             type="button"
         >
@@ -167,6 +175,7 @@ const Spine = ({
             onClick={() =>
                 navigate(generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: album.id }))
             }
+            onContextMenu={albumMenu(album)}
             style={{ background: rgb, color: dark ? '#fff' : '#151515' }}
             title={`${album.name} - ${album.albumArtistName}`}
             type="button"
@@ -302,6 +311,7 @@ export const Timeline = () => {
                                             }),
                                         )
                                     }
+                                    onContextMenu={albumMenu(a)}
                                     title={`${a.name} - ${a.albumArtistName}: ${a.playCount ?? 0} plays`}
                                     type="button"
                                 >
@@ -351,6 +361,7 @@ const FolderRow = ({ albums, empty, title }: { albums: Album[]; empty: string; t
                                     generatePath(AppRoute.LIBRARY_ALBUMS_DETAIL, { albumId: a.id }),
                                 )
                             }
+                            onContextMenu={albumMenu(a)}
                             title={`${a.name} - ${a.albumArtistName}`}
                             type="button"
                         >
