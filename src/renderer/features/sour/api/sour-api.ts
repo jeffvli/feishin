@@ -146,6 +146,8 @@ export interface SourProfile {
     status: string;
     // at a Sour Player TV party: nobody can join or listen along
     tv?: null | { event: string; host: string };
+    // Hermes Music's clock when it answered
+    serverNow?: number;
     visits?: { at: number; from: string; fromName: string }[];
     wall: WallNote[];
 }

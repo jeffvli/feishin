@@ -390,6 +390,9 @@ export const ListenAlong = () => {
     const setStore = useSourStore((state) => state.set);
     const playSong = usePlaySong();
     const lastSong = useRef<null | string>(null);
+    const lastSeek = useRef(0);
+    const catchUp = useRef(false);
+    const tickRef = useRef<(() => Promise<void>) | null>(null);
     const profiles = useSourProfiles().data ?? [];
     const friend = profiles.find((p) => p.id === following);
 
@@ -421,7 +424,9 @@ export const ListenAlong = () => {
             const player = usePlayerStoreBase.getState();
             if (Math.abs((player.player.speed || 1) - speed) > 0.001) player.setSpeed(speed);
             followKaraoke(!!p.karaoke);
-            const elapsed = p.playing ? ((Date.now() - p.positionAt) / 1000) * speed : 0;
+            // Hermes Music's clock, not this computer's (a clock a few seconds off used to mean drifting)
+            const offset = p.serverNow ? p.serverNow - Date.now() : 0;
+            const elapsed = p.playing ? ((Date.now() + offset - p.positionAt) / 1000) * speed : 0;
             const target = p.position + elapsed;
             const mine = player.getCurrentSong()?.id;
             if (mine !== p.listening.id) {
@@ -438,24 +443,46 @@ export const ListenAlong = () => {
             const playing = player.player.status === PlayerStatus.PLAYING;
             if (p.playing && !playing) player.mediaPlay();
             if (!p.playing && playing) player.mediaPause();
+            // tighter than before (3 s, every 5 s): small drifts are fixed, seeks at most every 6 s;
+            // "Catch up" seeks right away
             const now = useTimestampStoreBase.getState().timestamp;
-            if (Math.abs(now - target) > 3) player.mediaSeekToTimestamp(target);
+            const off = Math.abs(now - target);
+            const forced = catchUp.current;
+            catchUp.current = false;
+            if ((off > 1.5 && Date.now() - lastSeek.current > 6000) || (forced && off > 0.25)) {
+                lastSeek.current = Date.now();
+                player.mediaSeekToTimestamp(target + 0.2); // a seek takes a moment to land
+            }
         };
+        tickRef.current = tick;
         tick();
-        const timer = setInterval(tick, 5000);
+        const timer = setInterval(tick, 3000);
         return () => clearInterval(timer);
     }, [following, playSong, setStore, url]);
 
     if (!following || !friend) return null;
     return (
-        <Button
-            onClick={() => setStore({ listenAlong: null, listenAlongName: null })}
-            rightSection={<span>&times;</span>}
-            size="compact-xs"
-            variant="light"
-        >
-            With {friend.name}
-        </Button>
+        <Group gap={4} wrap="nowrap">
+            <Button
+                onClick={() => setStore({ listenAlong: null, listenAlongName: null })}
+                rightSection={<span>&times;</span>}
+                size="compact-xs"
+                variant="light"
+            >
+                With {friend.name}
+            </Button>
+            <Button
+                onClick={() => {
+                    catchUp.current = true;
+                    void tickRef.current?.();
+                }}
+                size="compact-xs"
+                title={`Jump to exactly where ${friend.name} is`}
+                variant="subtle"
+            >
+                Catch up
+            </Button>
+        </Group>
     );
 };
 
