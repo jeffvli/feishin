@@ -9,8 +9,11 @@ import { openProfile, ProfileAvatar, SongCover } from '/@/renderer/features/sour
 import { nameColor } from '/@/renderer/features/sour/components/profile-bits';
 import { ProfileHover } from '/@/renderer/features/sour/components/profile-extras';
 import { openSourStudio } from '/@/renderer/features/sour/components/sour-studio';
+import { openSourTv } from '/@/renderer/features/sour/components/sour-tv';
 import { toggleStage } from '/@/renderer/features/sour/stage/sour-stage';
 import { useSourProfiles, useSourStore } from '/@/renderer/features/sour/store/sour.store';
+import { useMyProfile } from '/@/renderer/features/sour/store/sour.store';
+import { useIsMobile } from '/@/renderer/hooks/use-is-mobile';
 import { AppRoute } from '/@/renderer/router/routes';
 import { Accordion } from '/@/shared/components/accordion/accordion';
 import { Group } from '/@/shared/components/group/group';
@@ -97,6 +100,23 @@ export const SidebarFriends = () => {
 };
 
 // Left sidebar: Sour Player's own pages
+// admins on a phone: Sour Player TV (the phone on the TV runs an event's Group Play)
+const TvLink = () => {
+    const admin = !!useMyProfile().data?.perks?.includes('admin');
+    const phone = useIsMobile();
+    if (!admin || !phone) return null;
+    return (
+        <button
+            className={styles.link}
+            onClick={() => window.setTimeout(openSourTv, 320)}
+            type="button"
+        >
+            <Icon icon="tv" size="lg" />
+            Sour Player TV
+        </button>
+    );
+};
+
 export const SidebarSour = () => (
     <Accordion.Item value="sour">
         <Accordion.Control>
@@ -129,6 +149,7 @@ export const SidebarSour = () => (
                 <Icon icon="palette" size="lg" />
                 Sour Studio
             </button>
+            <TvLink />
         </Accordion.Panel>
     </Accordion.Item>
 );
