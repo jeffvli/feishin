@@ -231,6 +231,40 @@
     background: white;
 }
 
+/* the line being sung */
+.lyrics {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6vmin;
+    margin-top: 2.5vmin;
+}
+
+.lyric-now {
+    font-size: clamp(18px, 4.6vmin, 46px);
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--theme-colors-primary, #9be15d);
+    animation: lyric-in 0.35s ease;
+}
+
+.lyric-next {
+    font-size: clamp(13px, 2.8vmin, 26px);
+    font-weight: 600;
+    opacity: 0.55;
+}
+
+@keyframes lyric-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
 /* portrait phones: cover above the words */
 @media (orientation: portrait) {
     .main {

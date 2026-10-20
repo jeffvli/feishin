@@ -1,5 +1,6 @@
 import { closeAllModals, openModal } from '@mantine/modals';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
 import { create } from 'zustand';
 
 import styles from './sour-tv.module.css';
@@ -8,7 +9,9 @@ import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { groupApi } from '/@/renderer/features/group-play/api/group-play-api';
 import { useGroupPlayStore } from '/@/renderer/features/group-play/store/group-play.store';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
+import { lyricsQueries } from '/@/renderer/features/lyrics/api/lyrics-api';
 import { ProfileAvatar } from '/@/renderer/features/sour/components/profile-bits';
+import { toLines } from '/@/renderer/features/sour/stage/sour-stage';
 import {
     useMyProfile,
     useSourProfiles,
@@ -25,12 +28,16 @@ import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { LibraryItem } from '/@/shared/types/domain-types';
+import { type QueueSong } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
 // Sour Player TV: an admin's phone, mirrored to the TV (Screen Mirroring / AirPlay on iPhone, Cast
 // screen on Android), runs Group Play for an in-person event. Only people the admin adds are in it;
 // everyone else sees "Listening to ... on Sour Player TV - <event>" and can't join or listen along.
-export const useSourTv = create<{ open: boolean }>(() => ({ open: false }));
+export const useSourTv = create<{ lyrics: boolean; open: boolean }>(() => ({
+    lyrics: true,
+    open: false,
+}));
 
 export const isTvHost = () => {
     const { role, state } = useGroupPlayStore.getState();
@@ -162,9 +169,38 @@ const openAddMembers = () =>
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
+// the line being sung, big, with the next one under it (synced lyrics only)
+const TvLyrics = ({ song, time }: { song: QueueSong | undefined; time: number }) => {
+    const { data } = useQuery(
+        lyricsQueries.songLyrics(
+            {
+                options: { enabled: !!song?.id },
+                query: { songId: song?.id || '' },
+                serverId: song?._serverId || '',
+            },
+            song,
+        ),
+    );
+    const selected = data?.selected as null | undefined | { lyrics?: unknown };
+    const { lines, synced } = useMemo(() => toLines(selected?.lyrics), [selected]);
+    if (!synced || !lines.length) return null;
+    const nowMs = time * 1000 + (data?.selectedOffsetMs ?? 0);
+    let current = -1;
+    for (let i = 0; i < lines.length; i++) if (lines[i].startMs <= nowMs + 150) current = i;
+    return (
+        <div className={styles.lyrics}>
+            <div className={styles['lyric-now']} key={current}>
+                {current >= 0 ? lines[current].text || '...' : '...'}
+            </div>
+            <div className={styles['lyric-next']}>{lines[current + 1]?.text || ''}</div>
+        </div>
+    );
+};
+
 // The TV screen: big and readable from the couch, landscape or portrait
 export const SourTvScreen = () => {
     const open = useSourTv((s) => s.open);
+    const showLyrics = useSourTv((s) => s.lyrics);
     const state = useGroupPlayStore((s) => s.state);
     const role = useGroupPlayStore((s) => s.role);
     const song = usePlayerSong();
@@ -232,6 +268,7 @@ export const SourTvScreen = () => {
                             </div>
                         </>
                     )}
+                    {showLyrics && <TvLyrics song={song} time={time} />}
                     {!!upNext.length && (
                         <div className={styles.next}>
                             <div className={styles.label}>Up next</div>
@@ -284,6 +321,12 @@ export const SourTvScreen = () => {
                         type="button"
                     >
                         <Icon icon="queue" /> Group Play
+                    </button>
+                    <button
+                        onClick={() => useSourTv.setState({ lyrics: !showLyrics })}
+                        type="button"
+                    >
+                        <Icon icon="microphone" /> {showLyrics ? 'Hide lyrics' : 'Lyrics'}
                     </button>
                     <button onClick={openAddMembers} type="button">
                         <Icon icon="add" /> Add member
