@@ -12,6 +12,7 @@ import { SetRatingAction } from '/@/renderer/features/context-menu/actions/set-r
 import { ShareAction } from '/@/renderer/features/context-menu/actions/share-action';
 import { ContextMenuPreview } from '/@/renderer/features/context-menu/components/context-menu-preview';
 import { AddCollectionToGroupAction } from '/@/renderer/features/group-play/components/add-to-group-action';
+import { ChangeCoverAction } from '/@/renderer/features/sour/components/cover-changer';
 import {
     AddAlbumToProfileAction,
     PinAction,
@@ -51,6 +52,7 @@ export const AlbumContextMenu = ({ items, type }: AlbumContextMenuProps) => {
             <GoToAction items={items} />
             <ContextMenu.Divider />
             <EditMetadataAction albumIds={ids} />
+            <ChangeCoverAction album={items.length === 1 ? items[0] : undefined} />
             <GetInfoAction disabled={items.length === 0} items={items} />
         </ContextMenu.Content>
     );

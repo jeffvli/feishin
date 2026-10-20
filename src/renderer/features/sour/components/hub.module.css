@@ -254,3 +254,38 @@
         grid-template-columns: 1fr;
     }
 }
+
+.cover-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.cover-pick {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    padding: 6px;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.cover-pick:hover {
+    background: rgb(255 255 255 / 5%);
+    border-color: var(--theme-colors-primary, #8bc34a);
+}
+
+.cover-pick img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 6px;
+}

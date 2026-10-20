@@ -159,7 +159,7 @@ const Reports = () => {
                     .join(', ');
                 return `${i + 1}. ${r.text.trim()} (${from})`;
             })
-            .join(String.fromCharCode(10));
+            .join('\n');
         navigator.clipboard
             .writeText(text || 'Nothing here.')
             .then(() =>
