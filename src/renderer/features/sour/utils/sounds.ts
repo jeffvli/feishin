@@ -55,11 +55,36 @@ export const SOUNDBOARD: Array<[string, string]> = [
     ['scratch', '\u{1F4BF}'],
 ];
 
+// Browsers keep sound off until you click somewhere: the soundboard and join sounds others set off
+// used to play into a muted context. The first click anywhere switches it on for good.
+if (typeof window !== 'undefined') {
+    const unlock = () => {
+        audio = audio || new AudioContext();
+        audio.resume().catch(() => undefined);
+        window.removeEventListener('pointerdown', unlock);
+    };
+    window.addEventListener('pointerdown', unlock);
+}
+
+// the Group Play soundboard's own sounds ("c:<id>") are clips kept in Hermes Music
+let soundBase = '';
+export const setSoundBase = (url: string) => {
+    soundBase = url;
+};
+
 export const playSound = (name?: string) => {
     if (!name || name === 'none') return;
+    if (name.startsWith('c:')) {
+        if (!soundBase) return;
+        const clip = new Audio(`${soundBase}/api/sounds/${encodeURIComponent(name.slice(2))}`);
+        clip.volume = 0.8;
+        clip.play().catch(() => undefined);
+        return;
+    }
     try {
         audio = audio || new AudioContext();
         const ctx = audio;
+        if (ctx.state === 'suspended') ctx.resume().catch(() => undefined);
         if (name === 'chime') {
             tone(ctx, 'sine', 880, 880, 0, 0.25);
             tone(ctx, 'sine', 1320, 1320, 0.12, 0.35);

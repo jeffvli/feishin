@@ -162,7 +162,7 @@ export const HostTools = ({ state }: { state: GroupState }) => {
     const url = useHermesUrl();
     const { code, hostKey, played } = useGroupPlayStore();
     const serverId = useCurrentServer()?.id;
-    const set = (changes: { djRotation?: boolean; watchVideo?: boolean }) =>
+    const set = (changes: { djRotation?: boolean; syncLook?: boolean; watchVideo?: boolean }) =>
         code &&
         hostKey &&
         groupApi
@@ -181,6 +181,12 @@ export const HostTools = ({ state }: { state: GroupState }) => {
                 description="Everyone's music video opens and plays along, when a song has one."
                 label="Watch the videos together"
                 onChange={(e) => set({ watchVideo: e.currentTarget.checked })}
+            />
+            <Switch
+                checked={!!state.syncLook}
+                description="Everyone hears Slowed / Normal / Nightcore and karaoke the way you have them."
+                label="Share my speed and karaoke"
+                onChange={(e) => set({ syncLook: e.currentTarget.checked })}
             />
             <Group gap="xs">
                 <Button onClick={openPartyMode} size="xs" variant="default">

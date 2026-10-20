@@ -19,7 +19,7 @@ import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { followKaraoke } from '/@/renderer/features/sour/components/social';
 import { useStage } from '/@/renderer/features/sour/stage/sour-stage';
 import { useSourProfiles, useSourStore } from '/@/renderer/features/sour/store/sour.store';
-import { playSound } from '/@/renderer/features/sour/utils/sounds';
+import { playSound, setSoundBase } from '/@/renderer/features/sour/utils/sounds';
 import { useCurrentServer } from '/@/renderer/store';
 import { addToQueueByData, usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { useTimestampStoreBase } from '/@/renderer/store/timestamp.store';
@@ -139,6 +139,7 @@ export const GroupPlaySync = () => {
         });
         events.addEventListener('sound', (event) => {
             const r = JSON.parse((event as MessageEvent).data) as { by: string; name: string };
+            setSoundBase(url); // custom soundboard clips come from Hermes Music
             playSound(r.name);
         });
         events.addEventListener('countdown', (event) => {

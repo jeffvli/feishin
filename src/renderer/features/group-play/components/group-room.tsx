@@ -1,4 +1,4 @@
-import { openModal } from '@mantine/modals';
+import { closeModal, openModal } from '@mantine/modals';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { useEffect, useState } from 'react';
@@ -15,8 +15,12 @@ import {
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { avatarUrl } from '/@/renderer/features/sour/api/sour-api';
 import { hue, SongCover } from '/@/renderer/features/sour/components/profile-bits';
-import { useSourProfiles, useSourStore } from '/@/renderer/features/sour/store/sour.store';
-import { SOUNDBOARD } from '/@/renderer/features/sour/utils/sounds';
+import {
+    useMyProfile,
+    useSourProfiles,
+    useSourStore,
+} from '/@/renderer/features/sour/store/sour.store';
+import { setSoundBase, SOUNDBOARD } from '/@/renderer/features/sour/utils/sounds';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { Select } from '/@/shared/components/select/select';
@@ -226,20 +230,162 @@ export const RoomActions = ({ state }: { state: GroupState }) => {
                         : ''}
                 </Text>
             </Group>
-            <div className={styles.soundboard}>
-                {SOUNDBOARD.map(([name, emoji]) => (
-                    <button
-                        className={styles.sound}
-                        key={name}
-                        onClick={() => groupApi.sound(url, code, who(), name).catch(fail)}
-                        title={name}
-                        type="button"
-                    >
-                        {emoji}
-                    </button>
-                ))}
-            </div>
+            <Soundboard code={code} url={url} />
         </Stack>
+    );
+};
+
+// ---------- the soundboard: the built-in sounds and everyone's own (add one with +; whoever added a
+// sound or an admin removes it with a right-click / long press) ----------
+interface CustomSound {
+    by: string;
+    byName: string;
+    emoji: string;
+    id: string;
+    name: string;
+}
+
+const readFile = (file: File) =>
+    new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(new Error("couldn't read that file"));
+        reader.readAsDataURL(file);
+    });
+
+const AddSound = ({ onDone, url }: { onDone: () => void; url: string }) => {
+    const me = useSourStore((state) => state.me);
+    const [name, setName] = useState('');
+    const [emoji, setEmoji] = useState('');
+    const [file, setFile] = useState<File | null>(null);
+    const [busy, setBusy] = useState(false);
+    const save = async () => {
+        if (!file || !me) return;
+        setBusy(true);
+        try {
+            const audio = await readFile(file);
+            const res = await fetch(`${url}/api/sounds`, {
+                body: JSON.stringify({
+                    audio,
+                    emoji,
+                    key: me.key,
+                    name: name || file.name,
+                    profile: me.id,
+                }),
+                headers: { 'content-type': 'application/json' },
+                method: 'POST',
+            });
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(json.error || 'Hermes Music said no');
+            toast.success({ message: `${json.emoji} ${json.name} is on the soundboard` });
+            onDone();
+        } catch (error) {
+            fail(error as Error);
+        } finally {
+            setBusy(false);
+        }
+    };
+    return (
+        <Stack gap="sm">
+            <TextInput
+                label="Name"
+                maxLength={24}
+                onChange={(e) => setName(e.currentTarget.value)}
+                value={name}
+            />
+            <TextInput
+                description="One emoji for its button"
+                label="Emoji"
+                maxLength={8}
+                onChange={(e) => setEmoji(e.currentTarget.value)}
+                value={emoji}
+            />
+            <input
+                accept="audio/*"
+                onChange={(e) => setFile(e.currentTarget.files?.[0] ?? null)}
+                type="file"
+            />
+            <Text isMuted size="xs">
+                A short clip (mp3, ogg, wav or m4a, up to 1 MB). Everyone in Group Play can play it.
+            </Text>
+            <Group justify="flex-end">
+                <Button disabled={!file || busy} loading={busy} onClick={save} variant="filled">
+                    Add sound
+                </Button>
+            </Group>
+        </Stack>
+    );
+};
+
+const Soundboard = ({ code, url }: { code: string; url: string }) => {
+    const me = useSourStore((state) => state.me);
+    const admin = !!useMyProfile().data?.perks?.includes('admin');
+    useEffect(() => setSoundBase(url), [url]);
+    const custom = useQuery({
+        queryFn: async () =>
+            (await fetch(`${url}/api/sounds`).then((r) => r.json())) as CustomSound[],
+        queryKey: ['sour-sounds', url],
+        refetchInterval: 60000,
+    });
+    const remove = async (sound: CustomSound) => {
+        if (!me || (sound.by !== me.id && !admin)) return;
+        if (!window.confirm(`Remove ${sound.emoji} ${sound.name} from the soundboard?`)) return;
+        const res = await fetch(`${url}/api/sounds`, {
+            body: JSON.stringify({ key: me.key, profile: me.id, remove: sound.id }),
+            headers: { 'content-type': 'application/json' },
+            method: 'POST',
+        });
+        if (!res.ok) fail(new Error((await res.json().catch(() => ({}))).error || 'Not removed'));
+        custom.refetch();
+    };
+    const openAdd = () => {
+        const id = `add-sound-${Date.now()}`;
+        openModal({
+            children: (
+                <AddSound
+                    onDone={() => {
+                        closeModal(id);
+                        custom.refetch();
+                    }}
+                    url={url}
+                />
+            ),
+            modalId: id,
+            title: 'Add a sound',
+        });
+    };
+    return (
+        <div className={styles.soundboard}>
+            {SOUNDBOARD.map(([name, emoji]) => (
+                <button
+                    className={styles.sound}
+                    key={name}
+                    onClick={() => groupApi.sound(url, code, who(), name).catch(fail)}
+                    title={name}
+                    type="button"
+                >
+                    {emoji}
+                </button>
+            ))}
+            {(custom.data ?? []).map((sound) => (
+                <button
+                    className={styles.sound}
+                    key={sound.id}
+                    onClick={() => groupApi.sound(url, code, who(), `c:${sound.id}`).catch(fail)}
+                    onContextMenu={(e) => {
+                        e.preventDefault();
+                        remove(sound);
+                    }}
+                    title={`${sound.name} (added by ${sound.byName})`}
+                    type="button"
+                >
+                    {sound.emoji}
+                </button>
+            ))}
+            <button className={styles.sound} onClick={openAdd} title="Add a sound" type="button">
+                +
+            </button>
+        </div>
     );
 };
 
