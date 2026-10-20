@@ -154,7 +154,9 @@ const AddMembers = () => {
     );
 };
 
-const openAddMembers = () => openModal({ children: <AddMembers />, title: 'Who is here?' });
+// above the TV screen (it covers everything else)
+const openAddMembers = () =>
+    openModal({ children: <AddMembers />, title: 'Who is here?', zIndex: 500 });
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
 
