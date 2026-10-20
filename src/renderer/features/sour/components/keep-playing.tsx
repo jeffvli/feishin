@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { api } from '/@/renderer/api';
 import { useGroupPlayStore } from '/@/renderer/features/group-play/store/group-play.store';
 import { isBlockedSong, useSourStore } from '/@/renderer/features/sour/store/sour.store';
+import { usePlayerSong } from '/@/renderer/store';
 import { addToQueueByData, usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { useTimestampStoreBase } from '/@/renderer/store/timestamp.store';
 import { toast } from '/@/shared/components/toast/toast';
@@ -14,21 +15,23 @@ import { Play } from '/@/shared/types/types';
 // Never in Group Play or Listen Along, where someone else decides what plays.
 export const KeepPlaying = () => {
     const on = useSourStore((s) => s.look.keepPlaying ?? true);
+    const song = usePlayerSong();
+    const length = useRef(0);
+    length.current = song?.duration ? song.duration / 1000 : 0;
     const done = useRef<null | string>(null);
 
     useEffect(() => {
         if (!on) return undefined;
         return useTimestampStoreBase.subscribe((s) => {
-            const player = usePlayerStoreBase.getState();
-            const queue = player.getQueue().items;
-            const index = player.player.index;
-            const song = queue[index];
-            if (!song || index !== queue.length - 1) return;
-            if (!song.duration || song.duration / 1000 - s.timestamp > 20) return;
-            if (done.current === song._uniqueId) return;
+            // cheap check first (this runs several times a second): only near the end of a song
+            if (!length.current || length.current - s.timestamp > 20) return;
+            const data = usePlayerStoreBase.getState().getPlayerData();
+            const now = data.currentSong;
+            // something comes next (more queue, or repeat): nothing to add
+            if (!now || data.nextSong || done.current === now._uniqueId) return;
             if (useGroupPlayStore.getState().code || useSourStore.getState().listenAlong) return;
-            done.current = song._uniqueId;
-            void addMore(song);
+            done.current = now._uniqueId;
+            void addMore(now);
         });
     }, [on]);
     return null;
@@ -66,19 +69,22 @@ const addMore = async (song: Song) => {
 // Up next: a small heads-up a few seconds before the song ends (Sour Studio > Extras)
 export const UpNextHeadsUp = () => {
     const on = useSourStore((s) => !!s.look.upNext);
+    const song = usePlayerSong();
+    const length = useRef(0);
+    length.current = song?.duration ? song.duration / 1000 : 0;
     const told = useRef<null | string>(null);
     useEffect(() => {
         if (!on) return undefined;
         return useTimestampStoreBase.subscribe((s) => {
-            const player = usePlayerStoreBase.getState();
-            const queue = player.getQueue().items;
-            const song = queue[player.player.index];
-            const next = queue[player.player.index + 1];
-            if (!song || !next || !song.duration || told.current === song._uniqueId) return;
-            const left = song.duration / 1000 - s.timestamp;
-            if (left > 12 || left < 2) return;
-            told.current = song._uniqueId;
-            toast.info({ autoClose: 6000, message: `Up next: ${next.name} - ${next.artistName}` });
+            const left = length.current - s.timestamp;
+            if (!length.current || left > 12 || left < 2) return;
+            const { currentSong, nextSong } = usePlayerStoreBase.getState().getPlayerData();
+            if (!currentSong || !nextSong || told.current === currentSong._uniqueId) return;
+            told.current = currentSong._uniqueId;
+            toast.info({
+                autoClose: 6000,
+                message: `Up next: ${nextSong.name} - ${nextSong.artistName}`,
+            });
         });
     }, [on]);
     return null;
