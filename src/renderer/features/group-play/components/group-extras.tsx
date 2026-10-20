@@ -16,6 +16,7 @@ import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-vid
 import { EmojiPicker } from '/@/renderer/features/sour/components/emoji-picker';
 import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { useCurrentServer } from '/@/renderer/store';
+import { addToQueueByData, usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { useTimestampStoreBase } from '/@/renderer/store/timestamp.store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Button } from '/@/shared/components/button/button';
@@ -26,6 +27,7 @@ import { Switch } from '/@/shared/components/switch/switch';
 import { TextInput } from '/@/shared/components/text-input/text-input';
 import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
+import { Play } from '/@/shared/types/types';
 
 const who = () => {
     const { hostKey, member, role } = useGroupPlayStore.getState();
@@ -158,6 +160,26 @@ export const VoteBar = ({ state }: { state: GroupState }) => {
 };
 
 // ---------- host switches: DJ rotation, watch party, party mode, save the session ----------
+// the host tops the queue up with songs like the one playing (from the music server)
+const addSimilar = async () => {
+    const player = usePlayerStoreBase.getState();
+    const queue = player.getQueue().items;
+    const song = queue[player.player.index];
+    if (!song) return toast.info({ message: 'Play something first' });
+    const inQueue = new Set(queue.map((x) => x.id));
+    const similar = await api.controller
+        .getSimilarSongs({
+            apiClientProps: { serverId: song._serverId },
+            query: { count: 30, songId: song.id },
+        })
+        .catch(() => []);
+    const picks = similar.filter((x) => !inQueue.has(x.id)).slice(0, 10);
+    if (!picks.length) return toast.info({ message: 'No similar songs found for this one' });
+    await addToQueueByData(Play.LAST, picks);
+    toast.success({ message: `Added ${picks.length} songs like ${song.name}` });
+    return undefined;
+};
+
 export const HostTools = ({ state }: { state: GroupState }) => {
     const url = useHermesUrl();
     const { code, hostKey, played } = useGroupPlayStore();
@@ -212,6 +234,9 @@ export const HostTools = ({ state }: { state: GroupState }) => {
                     variant="default"
                 >
                     Save session as playlist ({played.length})
+                </Button>
+                <Button onClick={addSimilar} size="xs" variant="default">
+                    Add similar songs
                 </Button>
             </Group>
         </Stack>

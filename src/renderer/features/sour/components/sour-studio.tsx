@@ -422,6 +422,11 @@ const Extras = () => (
             id="keepPlaying"
             label="Keep playing"
         />
+        <LookSwitch
+            description="A small pop-up with the next song a few seconds before this one ends."
+            id="upNext"
+            label="Up next heads-up"
+        />
     </Stack>
 );
 

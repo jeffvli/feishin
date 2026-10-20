@@ -6,7 +6,7 @@ import {
 } from '/@/renderer/features/group-play/components/group-room';
 import { ExtraShortcuts, Splash } from '/@/renderer/features/sour/components/app-extras';
 import { HolidayLayer } from '/@/renderer/features/sour/components/holiday-layer';
-import { KeepPlaying } from '/@/renderer/features/sour/components/keep-playing';
+import { KeepPlaying, UpNextHeadsUp } from '/@/renderer/features/sour/components/keep-playing';
 import { MiniPlayer } from '/@/renderer/features/sour/components/mini-player';
 import {
     SocialWatchers,
@@ -163,6 +163,7 @@ export const SourRoot = () => (
         </SourSafe>
         <SourSafe name="keep playing">
             <KeepPlaying />
+            <UpNextHeadsUp />
         </SourSafe>
         <SourSafe name="sour tv">
             <SourTvScreen />

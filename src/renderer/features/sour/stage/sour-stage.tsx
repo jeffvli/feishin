@@ -401,6 +401,27 @@ const StageView = () => {
                     size="xs"
                     value={look.lyricStyle}
                 />
+                {/* lyrics text size */}
+                <button
+                    className={styles.tool}
+                    onClick={() =>
+                        setLook({ lyricScale: Math.max(0.7, (look.lyricScale ?? 1) - 0.1) })
+                    }
+                    title="Smaller lyrics"
+                    type="button"
+                >
+                    A-
+                </button>
+                <button
+                    className={styles.tool}
+                    onClick={() =>
+                        setLook({ lyricScale: Math.min(1.8, (look.lyricScale ?? 1) + 0.1) })
+                    }
+                    title="Bigger lyrics"
+                    type="button"
+                >
+                    A+
+                </button>
                 {visualizer === 'soul' && (
                     <button
                         className={clsx(styles.tool, { [styles.on]: soulPlay })}
@@ -635,7 +656,11 @@ const StageView = () => {
                         offsetMs={offset}
                         song={song}
                     />
-                    <div className={clsx(styles.lyrics, styles[look.lyricStyle])} ref={lyricsBox}>
+                    <div
+                        className={clsx(styles.lyrics, styles[look.lyricStyle])}
+                        ref={lyricsBox}
+                        style={{ zoom: look.lyricScale ?? 1 }}
+                    >
                         {lines.length === 0 && (
                             <div className={styles.noLyrics}>No lyrics for this song</div>
                         )}

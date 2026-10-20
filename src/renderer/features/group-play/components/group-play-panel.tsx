@@ -135,6 +135,8 @@ export const GroupPlayPanel = () => {
     const [groupName, setGroupName] = useState('');
     const [busy, setBusy] = useState(false);
     const [watchOnly, setWatchOnly] = useState(false);
+    // start the group with what's in your queue now (instead of an empty one)
+    const [keepQueue, setKeepQueue] = useState(false);
     const openGroups = useQuery({
         enabled: !!url && !code,
         queryFn: () => groupApi.list(url),
@@ -193,10 +195,13 @@ export const GroupPlayPanel = () => {
                     name,
                     sourMe?.id ?? null,
                 );
-                // a group starts with an empty queue; the first song anyone adds starts it
+                // a group starts with an empty queue (the first song anyone adds starts it),
+                // or with your queue as it is when you chose to keep it
                 const player = usePlayerStoreBase.getState();
-                player.mediaStop();
-                player.clearQueue();
+                if (!keepQueue || !player.getQueue().items.length) {
+                    player.mediaStop();
+                    player.clearQueue();
+                }
                 actions.setSession({ code: res.code, hostKey: res.hostKey, role: 'host' });
                 actions.setState(res.state);
             });
@@ -302,6 +307,12 @@ export const GroupPlayPanel = () => {
                             onChange={(e) => setGroupName(e.currentTarget.value)}
                             placeholder="Group name (optional)"
                             value={groupName}
+                        />
+                        <Switch
+                            checked={keepQueue}
+                            description="Everyone starts with the songs you have queued now"
+                            label="Keep my queue"
+                            onChange={(e) => setKeepQueue(e.currentTarget.checked)}
                         />
                         <Button disabled={busy} fullWidth onClick={() => start()} variant="filled">
                             Start

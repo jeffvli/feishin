@@ -56,6 +56,8 @@ export interface SourLook {
     // when the queue runs out, add songs like the last one
     keepPlaying: boolean;
     lemonLoader: boolean;
+    // the Sour Stage's lyrics text size (1 = normal)
+    lyricScale: number;
     lyricStyle: 'centered' | 'huge' | 'karaoke';
     pressFx: boolean;
     reducedMotion: boolean;
@@ -70,6 +72,8 @@ export interface SourLook {
     startupSound: boolean;
     // the whole app's look: the v0.8 redesign, or Classic (how it looked up to v0.7)
     ui: 'classic' | 'new';
+    // a heads-up with the next song a few seconds before this one ends
+    upNext: boolean;
     visualizer: VisualizerStyle;
 }
 
@@ -105,6 +109,7 @@ export const DEFAULT_LOOK: SourLook = {
     iconPack: 'classic',
     keepPlaying: true,
     lemonLoader: true,
+    lyricScale: 1,
     lyricStyle: 'centered',
     pressFx: true,
     reducedMotion: false,
@@ -117,6 +122,7 @@ export const DEFAULT_LOOK: SourLook = {
     stageVinyl: false,
     startupSound: false,
     ui: 'new',
+    upNext: false,
     visualizer: 'bars',
 };
 

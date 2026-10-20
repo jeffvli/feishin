@@ -62,3 +62,24 @@ const addMore = async (song: Song) => {
     await addToQueueByData(Play.LAST, picks);
     toast.info({ message: `Keep playing: added ${picks.length} songs like ${song.name}` });
 };
+
+// Up next: a small heads-up a few seconds before the song ends (Sour Studio > Extras)
+export const UpNextHeadsUp = () => {
+    const on = useSourStore((s) => !!s.look.upNext);
+    const told = useRef<null | string>(null);
+    useEffect(() => {
+        if (!on) return undefined;
+        return useTimestampStoreBase.subscribe((s) => {
+            const player = usePlayerStoreBase.getState();
+            const queue = player.getQueue().items;
+            const song = queue[player.player.index];
+            const next = queue[player.player.index + 1];
+            if (!song || !next || !song.duration || told.current === song._uniqueId) return;
+            const left = song.duration / 1000 - s.timestamp;
+            if (left > 12 || left < 2) return;
+            told.current = song._uniqueId;
+            toast.info({ autoClose: 6000, message: `Up next: ${next.name} - ${next.artistName}` });
+        });
+    }, [on]);
+    return null;
+};
