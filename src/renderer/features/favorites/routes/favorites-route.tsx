@@ -6,6 +6,7 @@ import { FavoritesContent } from '/@/renderer/features/favorites/components/favo
 import { FavoritesHeader } from '/@/renderer/features/favorites/components/favorites-header';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
+import { FavoritesThemed } from '/@/renderer/features/sour/components/playlist-theme';
 import { LibraryItem } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
@@ -55,8 +56,10 @@ const FavoritesRoute = () => {
     return (
         <AnimatedPage>
             <ListContext.Provider value={providerValue}>
-                <FavoritesHeader itemType={itemType} />
-                <FavoritesContent itemType={itemType} />
+                <FavoritesThemed>
+                    <FavoritesHeader itemType={itemType} />
+                    <FavoritesContent itemType={itemType} />
+                </FavoritesThemed>
             </ListContext.Provider>
         </AnimatedPage>
     );

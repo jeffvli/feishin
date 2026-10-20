@@ -13,6 +13,7 @@ import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library
 import { ListSearchInput } from '/@/renderer/features/shared/components/list-search-input';
 import { SongListHeaderFilters } from '/@/renderer/features/songs/components/song-list-header-filters';
 import { useSongListFilters } from '/@/renderer/features/songs/hooks/use-song-list-filters';
+import { FavoritesThemeButton } from '/@/renderer/features/sour/components/playlist-theme';
 import { DropdownMenu } from '/@/shared/components/dropdown-menu/dropdown-menu';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Group } from '/@/shared/components/group/group';
@@ -137,6 +138,7 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
                         </LibraryHeaderBar.Badge>
                     </LibraryHeaderBar>
                     <Group>
+                        <FavoritesThemeButton />
                         <ListSearchInput />
                     </Group>
                 </Flex>

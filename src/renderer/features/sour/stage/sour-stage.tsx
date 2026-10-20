@@ -18,6 +18,7 @@ import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { socialApi } from '/@/renderer/features/sour/api/social-api';
 import { avatarUrl } from '/@/renderer/features/sour/api/sour-api';
 import { openProfile } from '/@/renderer/features/sour/components/people';
+import { favoritesThemeId } from '/@/renderer/features/sour/components/playlist-theme';
 import { hue, ProfileAvatar } from '/@/renderer/features/sour/components/profile-bits';
 import { isNativeApp } from '/@/renderer/features/sour/mobile/android';
 import { usePhoneStore } from '/@/renderer/features/sour/mobile/phone-store';
@@ -86,7 +87,12 @@ const PlayContextWatcher = () => {
         // a playlist was just started from somewhere (its card, the sidebar, a right-click...)
         if (Date.now() - usePlayContext.getState().at < 15000) return;
         const match = window.location.hash.match(/\/playlists\/([^/?#]+)/);
-        usePlayContext.setState({ at: 0, playlistId: match ? decodeURIComponent(match[1]) : null });
+        // started from your Favorites page: your own Favorites theme
+        const fav = /\/favorites/.test(window.location.hash) && favoritesThemeId();
+        usePlayContext.setState({
+            at: 0,
+            playlistId: match ? decodeURIComponent(match[1]) : fav || null,
+        });
     }, [song]);
     return null;
 };
@@ -177,7 +183,13 @@ const StageView = () => {
         queryFn: async () => {
             const res = await fetch(`${hermes}/api/playlist-themes`);
             const json = res.ok ? await res.json() : [];
-            return (Array.isArray(json) ? json : []) as { id: string; image: number }[];
+            return (Array.isArray(json) ? json : []) as {
+                focusX?: number;
+                focusY?: number;
+                id: string;
+                image: number;
+                zoom?: number;
+            }[];
         },
         queryKey: ['sour-playlist-themes', hermes],
         retry: false,
@@ -334,7 +346,15 @@ const StageView = () => {
             {backdrop ? (
                 <div
                     className={styles.backdrop}
-                    style={{ backgroundImage: `url("${backdrop}")` }}
+                    style={{
+                        backgroundImage: `url("${backdrop}")`,
+                        backgroundPosition: `${themed?.focusX ?? 50}% ${themed?.focusY ?? 50}%`,
+                        transform:
+                            (themed?.zoom ?? 100) > 100
+                                ? `scale(${(themed?.zoom ?? 100) / 100})`
+                                : undefined,
+                        transformOrigin: `${themed?.focusX ?? 50}% ${themed?.focusY ?? 50}%`,
+                    }}
                 />
             ) : (
                 cover && (

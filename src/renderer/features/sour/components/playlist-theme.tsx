@@ -5,7 +5,7 @@ import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from 
 import styles from './playlist-theme.module.css';
 
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
-import { readPicture, sourApi } from '/@/renderer/features/sour/api/sour-api';
+import { type PlaylistTheme, readPicture, sourApi } from '/@/renderer/features/sour/api/sour-api';
 import { fontChoices, fontFamily } from '/@/renderer/features/sour/fonts';
 import { useMyProfile, useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { Button } from '/@/shared/components/button/button';
@@ -29,8 +29,100 @@ const usePlaylistTheme = (playlistId: string) => {
     });
 };
 
-// Pick a playlist's colour and picture. Everyone with Sour Player sees it; only the person who
-// themed it can change it.
+// a theme picture placed the way it was framed: the focus point stays in view, zoomed around it
+const frameStyle = (theme: PlaylistTheme, image: string): CSSProperties => {
+    const x = theme.focusX ?? 50;
+    const y = theme.focusY ?? 50;
+    const zoom = theme.zoom ?? 100;
+    return {
+        backgroundImage: `url("${image}")`,
+        backgroundPosition: `${x}% ${y}%`,
+        transform: zoom > 100 ? `scale(${zoom / 100})` : undefined,
+        transformOrigin: `${x}% ${y}%`,
+    };
+};
+
+// Drag on the picture (or click) to choose the part that stays in view; the slider zooms in
+const FramePicker = ({
+    image,
+    onSave,
+    theme,
+}: {
+    image: string;
+    onSave: (frame: { focusX: number; focusY: number; zoom: number }) => void;
+    theme: PlaylistTheme;
+}) => {
+    const [frame, setFrame] = useState({
+        focusX: theme.focusX ?? 50,
+        focusY: theme.focusY ?? 50,
+        zoom: theme.zoom ?? 100,
+    });
+    const dragging = useRef(false);
+    const moveTo = (e: React.PointerEvent<HTMLDivElement>) => {
+        const box = e.currentTarget.getBoundingClientRect();
+        const clamp = (v: number) => Math.round(Math.min(100, Math.max(0, v)));
+        setFrame((f) => ({
+            ...f,
+            focusX: clamp(((e.clientX - box.left) / box.width) * 100),
+            focusY: clamp(((e.clientY - box.top) / box.height) * 100),
+        }));
+    };
+    return (
+        <Stack gap={6}>
+            <Text size="sm">Position (drag on the picture)</Text>
+            <div
+                className={styles.framer}
+                onPointerDown={(e) => {
+                    dragging.current = true;
+                    e.currentTarget.setPointerCapture(e.pointerId);
+                    moveTo(e);
+                }}
+                onPointerMove={(e) => dragging.current && moveTo(e)}
+                onPointerUp={() => {
+                    dragging.current = false;
+                    onSave(frame);
+                }}
+            >
+                <div
+                    className={styles['picture-inner']}
+                    style={frameStyle({ ...theme, ...frame }, image)}
+                />
+                <span
+                    className={styles['framer-dot']}
+                    style={{ left: `${frame.focusX}%`, top: `${frame.focusY}%` }}
+                />
+            </div>
+            <Group gap="xs" wrap="nowrap">
+                <Text size="xs" style={{ whiteSpace: 'nowrap' }}>
+                    Zoom
+                </Text>
+                <Slider
+                    label={(v) => `${v}%`}
+                    max={300}
+                    min={100}
+                    onChange={(zoom) => setFrame((f) => ({ ...f, zoom }))}
+                    onChangeEnd={(zoom) => onSave({ ...frame, zoom })}
+                    style={{ flex: 1 }}
+                    value={frame.zoom}
+                />
+                <Button
+                    onClick={() => {
+                        const reset = { focusX: 50, focusY: 50, zoom: 100 };
+                        setFrame(reset);
+                        onSave(reset);
+                    }}
+                    size="compact-xs"
+                    variant="subtle"
+                >
+                    Reset
+                </Button>
+            </Group>
+        </Stack>
+    );
+};
+
+// Pick a playlist's colour and picture. Everyone with Sour Player sees it and can change it (an
+// admin can lock it).
 const PlaylistThemeEditor = ({ playlistId }: { playlistId: string }) => {
     const url = useHermesUrl();
     const me = useSourStore((state) => state.me);
@@ -46,14 +138,19 @@ const PlaylistThemeEditor = ({ playlistId }: { playlistId: string }) => {
     const [color, setColor] = useState(theme.data?.color || '');
     const [opacity, setOpacity] = useState(theme.data?.opacity ?? 100);
     const perks = useMyProfile().data?.perks ?? [];
+    const admin = perks.includes('admin');
     const [busy, setBusy] = useState(false);
 
     const save = (changes: {
         color?: null | string;
+        focusX?: number;
+        focusY?: number;
         font?: null | string;
         image?: null | string;
+        locked?: boolean;
         opacity?: number;
         remove?: boolean;
+        zoom?: number;
     }) => {
         if (!me) return Promise.resolve();
         setBusy(true);
@@ -117,6 +214,13 @@ const PlaylistThemeEditor = ({ playlistId }: { playlistId: string }) => {
                     </Button>
                 )}
             </Group>
+            {!!theme.data?.image && (
+                <FramePicker
+                    image={`${url}/api/playlist-themes/${encodeURIComponent(playlistId)}/image?v=${theme.data.image}`}
+                    onSave={(frame) => save(frame)}
+                    theme={theme.data}
+                />
+            )}
             <Select
                 data={fontChoices(perks).map((f) =>
                     f.value === 'default' ? { ...f, value: '' } : f,
@@ -143,6 +247,14 @@ const PlaylistThemeEditor = ({ playlistId }: { playlistId: string }) => {
                     />
                 )}
             </Stack>
+            {admin && !!theme.data && !playlistId.startsWith('fav-') && (
+                <Switch
+                    checked={!!theme.data.locked}
+                    description="Only admins can change it while it's locked."
+                    label="Lock this theme"
+                    onChange={(e) => save({ locked: e.currentTarget.checked })}
+                />
+            )}
             <Group justify="space-between">
                 {theme.data ? (
                     <Button
@@ -169,12 +281,39 @@ const PlaylistThemeEditor = ({ playlistId }: { playlistId: string }) => {
     );
 };
 
-export const openPlaylistTheme = (playlistId: string) =>
+export const openPlaylistTheme = (playlistId: string, title = 'Playlist theme') =>
     openModal({
         children: <PlaylistThemeEditor playlistId={playlistId} />,
         size: 'md',
-        title: 'Playlist theme',
+        title,
     });
+
+// ---------- your Favorites get a theme of their own (only yours, shown on your Favorites page and
+// in the Sour Stage when you play from it)
+export const favoritesThemeId = () => {
+    const me = useSourStore.getState().me;
+    return me ? `fav-${me.id}` : null;
+};
+
+export const FavoritesThemed = ({ children }: { children: ReactNode }) => {
+    const me = useSourStore((state) => state.me);
+    if (!me) return <>{children}</>;
+    return <PlaylistThemed playlistId={`fav-${me.id}`}>{children}</PlaylistThemed>;
+};
+
+export const FavoritesThemeButton = () => {
+    const me = useSourStore((state) => state.me);
+    if (!me) return null;
+    return (
+        <Button
+            onClick={() => openPlaylistTheme(`fav-${me.id}`, 'Favorites theme')}
+            size="compact-sm"
+            variant="default"
+        >
+            Theme
+        </Button>
+    );
+};
 
 // Wraps a playlist page: its colour behind everything and its picture at the top, fading into the
 // colour as the song list scrolls down.
@@ -226,11 +365,10 @@ export const PlaylistThemed = ({
             {image && (
                 <div
                     className={styles.picture}
-                    style={{
-                        backgroundImage: `url("${image}")`,
-                        opacity: Math.max(0.12, 1 - scrolled / 500),
-                    }}
-                />
+                    style={{ opacity: Math.max(0.12, 1 - scrolled / 500) }}
+                >
+                    <div className={styles['picture-inner']} style={frameStyle(theme, image)} />
+                </div>
             )}
             <div className={styles.content}>{children}</div>
         </div>

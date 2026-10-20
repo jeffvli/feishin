@@ -14,9 +14,8 @@
     left: 0;
     z-index: 0;
     height: 520px;
+    overflow: hidden;
     pointer-events: none;
-    background-position: center;
-    background-size: cover;
     mask-image: linear-gradient(to bottom, black 0%, rgb(0 0 0 / 60%) 45%, transparent 100%);
     transition: opacity 0.2s;
 }
@@ -32,4 +31,33 @@
 
 .themed h1 {
     font-family: var(--sour-title-font, inherit) !important;
+}
+
+.picture-inner {
+    position: absolute;
+    inset: 0;
+    background-position: center;
+    background-size: cover;
+}
+
+/* the framing picker: a small copy of the page's picture area */
+.framer {
+    position: relative;
+    height: 150px;
+    overflow: hidden;
+    touch-action: none;
+    cursor: crosshair;
+    outline: 1px solid rgb(255 255 255 / 12%);
+    border-radius: 10px;
+}
+
+.framer-dot {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+    border: 2px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px rgb(0 0 0 / 50%);
+    transform: translate(-50%, -50%);
 }

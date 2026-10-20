@@ -51,12 +51,17 @@ export interface Nickname {
 
 export interface PlaylistTheme {
     color: null | string;
+    // where the picture sits: the point kept in view (percent) and the zoom (100 = just fills)
+    focusX?: number;
+    focusY?: number;
     font?: null | string;
     image: number;
+    locked?: boolean;
     // how strong the colour is, 10-100 (%)
     opacity?: number;
     owner: string;
     ownerName: null | string;
+    zoom?: number;
 }
 
 // everything about how a profile looks and what it shows, stored on Hermes Music as one JSON object
@@ -123,20 +128,20 @@ export interface SourProfile {
     gavin?: boolean;
     group: null | { code: string; name: string };
     id: string;
+    karaoke?: boolean;
     lastSeen: null | number;
     listening: GroupSong | null;
     name: string;
     nicknames: Nickname[];
     // where they're listening (Hermes Music 3.5.1+)
     on?: 'computer' | 'phone';
-    karaoke?: boolean;
-    speed?: number;
     online: boolean;
     perks?: string[];
     playing: boolean;
     position: number;
     positionAt: number;
     resume?: null | { at: number; device: string; position: number; song: GroupSong };
+    speed?: number;
     stats?: ProfileStats;
     status: string;
     visits?: { at: number; from: string; fromName: string }[];
@@ -308,10 +313,14 @@ export const sourApi = {
         playlistId: string,
         changes: {
             color?: null | string;
+            focusX?: number;
+            focusY?: number;
             font?: null | string;
             image?: null | string;
+            locked?: boolean;
             opacity?: number;
             remove?: boolean;
+            zoom?: number;
         },
     ) =>
         call<PlaylistTheme>(`${base}/api/playlist-themes/${encodeURIComponent(playlistId)}`, {
