@@ -70,7 +70,7 @@ import { Select } from '/@/shared/components/select/select';
 import { LibraryItem, type SynchronizedLyrics } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
 
-const useStage = create<{ open: boolean }>(() => ({ open: false }));
+export const useStage = create<{ open: boolean }>(() => ({ open: false }));
 
 export const useStageOpen = () => useStage((s) => s.open);
 

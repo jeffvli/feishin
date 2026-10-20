@@ -82,7 +82,7 @@ export const SOUR_FONTS: SourFont[] = [
     bundled('sedgwick-ave', 'Sedgwick Ave', 'cursive'),
     { family: 'Determination, monospace', id: 'determination', label: 'Determination', perk: true },
     // Gavin's own font
-    { family: "'Sour Skyrim', serif", id: 'skyrim', label: 'Skyrim', perk: true },
+    { family: '"Sour Skyrim", serif', id: 'skyrim', label: 'Skyrim', perk: true },
 ];
 
 export const fontFamily = (id?: null | string) =>

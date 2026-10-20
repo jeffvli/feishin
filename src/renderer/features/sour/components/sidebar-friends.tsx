@@ -121,7 +121,11 @@ export const SidebarSour = () => (
                 <Icon icon="sparkles" size="lg" />
                 Sour Stage
             </button>
-            <button className={styles.link} onClick={openSourStudio} type="button">
+            <button
+                className={styles.link}
+                onClick={() => window.setTimeout(openSourStudio, 320)}
+                type="button"
+            >
                 <Icon icon="palette" size="lg" />
                 Sour Studio
             </button>

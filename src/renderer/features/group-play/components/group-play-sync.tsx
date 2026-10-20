@@ -16,6 +16,8 @@ import { openMusicVideo } from '/@/renderer/features/hermes-video/components/mus
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
 import { getSongById } from '/@/renderer/features/player/utils';
 import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
+import { followKaraoke } from '/@/renderer/features/sour/components/social';
+import { useStage } from '/@/renderer/features/sour/stage/sour-stage';
 import { useSourProfiles, useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { playSound } from '/@/renderer/features/sour/utils/sounds';
 import { useCurrentServer } from '/@/renderer/store';
@@ -26,8 +28,12 @@ import { Played, type Song } from '/@/shared/types/domain-types';
 import { Play, PlayerStatus } from '/@/shared/types/types';
 
 // seconds the group's song has played, as of now
+// where the host is now (at the host's speed when everyone follows it)
 const groupPosition = (state: GroupState, clockOffset: number) =>
-    state.position + (state.playing ? (Date.now() + clockOffset - state.updatedAt) / 1000 : 0);
+    state.position +
+    (state.playing
+        ? ((Date.now() + clockOffset - state.updatedAt) / 1000) * (state.speed || 1)
+        : 0);
 
 // Keeps this Feishin in step with a Group Play session (hosted by Hermes Music):
 // members follow the host's song and position; the host reports its player, adds members' songs and
@@ -50,6 +56,7 @@ export const GroupPlaySync = () => {
     const applying = useRef(new Set<string>());
     const applied = useRef<string[]>([]);
     const adding = useRef<Promise<unknown>>(Promise.resolve());
+    const lastSeek = useRef(0);
 
     // closing Sour Player leaves the group straight away (otherwise Hermes Music only notices
     // minutes later and you'd show up twice when you join again); a host closing ends the group
@@ -190,9 +197,19 @@ export const GroupPlaySync = () => {
             const playing = player.player.status === PlayerStatus.PLAYING;
             if (state.playing && !playing) player.mediaPlay();
             if (!state.playing && playing) player.mediaPause();
+            // the host's slowed / nightcore and karaoke, when the host shares them
+            if (state.syncLook) {
+                const speed = state.speed || 1;
+                if (Math.abs((player.player.speed || 1) - speed) > 0.001) player.setSpeed(speed);
+                followKaraoke(!!state.karaoke);
+            }
+            // tighter than before (2.5 s): small drifts are fixed quickly, but not more than every 4 s
             const expected = groupPosition(state, clockOffset);
             const timestamp = useTimestampStoreBase.getState().timestamp;
-            if (Math.abs(timestamp - expected) > 2.5) player.mediaSeekToTimestamp(expected);
+            if (Math.abs(timestamp - expected) > 0.9 && Date.now() - lastSeek.current > 4000) {
+                lastSeek.current = Date.now();
+                player.mediaSeekToTimestamp(expected + 0.15); // a seek takes a moment to land
+            }
         };
         const timer = setInterval(follow, 1000);
         return () => clearInterval(timer);
@@ -238,7 +255,16 @@ export const GroupPlaySync = () => {
                 applied.current.length > 0;
             if (!changed) return;
             const { hostKey } = useGroupPlayStore.getState();
-            const body: Record<string, unknown> = { hostKey, index, playing, position };
+            const body: Record<string, unknown> = {
+                hostKey,
+                index,
+                karaoke:
+                    useStage.getState().open &&
+                    useSourStore.getState().look.lyricStyle === 'karaoke',
+                playing,
+                position,
+                speed: player.player.speed || 1,
+            };
             if (ids !== lastIds) body.queue = items.map(toGroupSong);
             if (applied.current.length) body.applied = applied.current.splice(0);
             last = { at: Date.now(), index, playing, position };

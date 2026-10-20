@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import { create } from 'zustand';
 
 import styles from './group-reactions.module.css';
@@ -32,7 +33,8 @@ export const REACTIONS = ['🔥', '❤️', '😂', '🎉', '😭', '🍋'];
 export const FloatingReactions = () => {
     const list = useReactions((state) => state.list);
     if (!list.length) return null;
-    return (
+    // drawn over the whole window: inside the player bar they were clipped by it (and never seen)
+    return createPortal(
         <div className={styles.layer}>
             {list.map((r) => (
                 <span className={styles.reaction} key={r.id} style={{ left: `${r.left}%` }}>
@@ -40,6 +42,7 @@ export const FloatingReactions = () => {
                     <small>{r.by}</small>
                 </span>
             ))}
-        </div>
+        </div>,
+        document.body,
     );
 };

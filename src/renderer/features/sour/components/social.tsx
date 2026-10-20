@@ -24,6 +24,7 @@ import {
     usePlaySong,
 } from '/@/renderer/features/sour/components/profile-bits';
 import { openRequestQuestion } from '/@/renderer/features/sour/components/request-question';
+import { toggleStage, useStage } from '/@/renderer/features/sour/stage/sour-stage';
 import { useSourProfiles, useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { useCurrentServer, usePlayerSong } from '/@/renderer/store';
 import { addToQueueByData, usePlayerStoreBase } from '/@/renderer/store/player.store';
@@ -369,6 +370,19 @@ export const useBlend = () => {
     };
 };
 
+// karaoke the way the person you follow has it (Listen Along, Group Play): the Sour Stage in karaoke style
+export const followKaraoke = (on: boolean) => {
+    const { look, setLook } = useSourStore.getState();
+    const isOn = useStage.getState().open && look.lyricStyle === 'karaoke';
+    if (on === isOn) return;
+    if (on) {
+        setLook({ lyricStyle: 'karaoke' });
+        toggleStage(true);
+    } else if (look.lyricStyle === 'karaoke') {
+        setLook({ lyricStyle: 'centered' });
+    }
+};
+
 // ---------- listen along: play what a friend is playing, at the same spot ----------
 export const ListenAlong = () => {
     const url = useHermesUrl();
@@ -398,9 +412,13 @@ export const ListenAlong = () => {
                 stop(`${p?.name ?? 'Your friend'} stopped listening`);
                 return;
             }
-            const elapsed = p.playing ? (Date.now() - p.positionAt) / 1000 : 0;
-            const target = p.position + elapsed;
+            // their speed (slowed / nightcore) and karaoke, so you hear the same thing
+            const speed = p.speed || 1;
             const player = usePlayerStoreBase.getState();
+            if (Math.abs((player.player.speed || 1) - speed) > 0.001) player.setSpeed(speed);
+            followKaraoke(!!p.karaoke);
+            const elapsed = p.playing ? ((Date.now() - p.positionAt) / 1000) * speed : 0;
+            const target = p.position + elapsed;
             const mine = player.getCurrentSong()?.id;
             if (mine !== p.listening.id) {
                 if (lastSong.current === p.listening.id) {
@@ -417,7 +435,7 @@ export const ListenAlong = () => {
             if (p.playing && !playing) player.mediaPlay();
             if (!p.playing && playing) player.mediaPause();
             const now = useTimestampStoreBase.getState().timestamp;
-            if (Math.abs(now - target) > 5) player.mediaSeekToTimestamp(target);
+            if (Math.abs(now - target) > 3) player.mediaSeekToTimestamp(target);
         };
         tick();
         const timer = setInterval(tick, 5000);

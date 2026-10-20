@@ -129,6 +129,8 @@ export interface SourProfile {
     nicknames: Nickname[];
     // where they're listening (Hermes Music 3.5.1+)
     on?: 'computer' | 'phone';
+    karaoke?: boolean;
+    speed?: number;
     online: boolean;
     perks?: string[];
     playing: boolean;

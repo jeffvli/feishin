@@ -39,7 +39,8 @@ export const SidebarPhone = () => {
                     <button
                         className={styles.link}
                         key={item.label}
-                        onClick={item.onClick}
+                        // opened once the menu has closed (closing it took the new sheet with it)
+                        onClick={() => window.setTimeout(item.onClick, 320)}
                         type="button"
                     >
                         <Group gap="sm">

@@ -157,6 +157,7 @@ export const groupApi = {
             guestControl?: boolean;
             listed?: boolean;
             roomTheme?: string;
+            syncLook?: boolean;
             themeNight?: null | ThemeNight;
             watchVideo?: boolean;
         },

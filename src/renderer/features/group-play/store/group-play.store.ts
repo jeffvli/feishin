@@ -102,6 +102,8 @@ export interface GroupState {
     hostAvatar: number;
     hostProfile?: null | string;
     index: number;
+    // the host's speed (slowed / nightcore) and karaoke, for everyone when syncLook is on
+    karaoke?: boolean;
     listed: boolean;
     marks?: GroupMark[];
     members: GroupMember[];
@@ -117,6 +119,7 @@ export interface GroupState {
     schedule?: GroupShow[];
     serverNow: number;
     show?: GroupShow | null;
+    speed?: number;
     station?: null | {
         fill: null | { genres?: string[]; toYear?: number };
         kind: string;
@@ -124,6 +127,7 @@ export interface GroupState {
         ownerName: null | string;
         sleep: boolean;
     };
+    syncLook?: boolean;
     themeNight?: null | ThemeNight;
     tokens?: Record<string, number>;
     updatedAt: number;

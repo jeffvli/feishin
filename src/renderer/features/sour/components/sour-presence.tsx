@@ -8,6 +8,7 @@ import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-vid
 import { sourApi } from '/@/renderer/features/sour/api/sour-api';
 import { deviceId } from '/@/renderer/features/sour/components/social';
 import { isNativeApp } from '/@/renderer/features/sour/mobile/android';
+import { useStage } from '/@/renderer/features/sour/stage/sour-stage';
 import { useMyProfile, useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { useCurrentServer } from '/@/renderer/store';
 import { useAuthStore } from '/@/renderer/store/auth.store';
@@ -151,11 +152,16 @@ export const SourPresence = () => {
                 .presence(url, me, {
                     device: deviceId(),
                     group: group && !group.ended ? { code: group.code, name: group.name } : null,
+                    // listen along copies these (a sped up song used to drift and stutter for friends)
+                    karaoke:
+                        useStage.getState().open &&
+                        useSourStore.getState().look.lyricStyle === 'karaoke',
                     listening: shown ? toGroupSong(shown) : null,
                     // shown to friends: "on their phone"
                     on: isNativeApp() ? 'phone' : 'computer',
                     playing: player.player.status === PlayerStatus.PLAYING,
                     position: useTimestampStoreBase.getState().timestamp,
+                    speed: player.player.speed || 1,
                 })
                 .catch((error: Error) => {
                     // Hermes Music was reset or this is a different one: sign in again (unless this
