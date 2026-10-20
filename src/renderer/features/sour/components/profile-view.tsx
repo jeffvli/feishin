@@ -18,6 +18,7 @@ import {
     tasteMatch,
     timeAgo,
 } from '/@/renderer/features/sour/api/sour-api';
+import { albumMenuById } from '/@/renderer/features/sour/components/album-menu';
 import { EmojiPicker } from '/@/renderer/features/sour/components/emoji-picker';
 import {
     activity,
@@ -198,6 +199,11 @@ export const ProfileView = ({
                     <button
                         className={styles.tileButton}
                         onClick={() => openItem(entry)}
+                        onContextMenu={
+                            favoriteKind(entry) === 'album'
+                                ? albumMenuById(favoriteId(entry))
+                                : undefined
+                        }
                         type="button"
                     >
                         <ItemCover entry={entry} round={round} />

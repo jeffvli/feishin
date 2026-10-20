@@ -8,6 +8,7 @@ import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { groupApi } from '/@/renderer/features/group-play/api/group-play-api';
 import { useGroupPlayStore } from '/@/renderer/features/group-play/store/group-play.store';
 import { useHermesUrl } from '/@/renderer/features/hermes-video/store/hermes-video.store';
+import { albumMenuById } from '/@/renderer/features/sour/components/album-menu';
 import { toggleMiniPlayer } from '/@/renderer/features/sour/components/mini-player';
 import { openPeople, openProfile } from '/@/renderer/features/sour/components/people';
 import { ProfileAvatar } from '/@/renderer/features/sour/components/profile-bits';
@@ -245,6 +246,7 @@ export const SidebarPins = () => {
                                     );
                                 else openProfile({ id: p.id, name: p.name });
                             }}
+                            onContextMenu={p.kind === 'album' ? albumMenuById(p.id) : undefined}
                             type="button"
                         >
                             <Text size="sm" truncate>
