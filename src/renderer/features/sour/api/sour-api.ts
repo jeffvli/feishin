@@ -134,7 +134,7 @@ export interface SourProfile {
     name: string;
     nicknames: Nickname[];
     // where they're listening (Hermes Music 3.5.1+)
-    on?: 'computer' | 'phone';
+    on?: 'computer' | 'phone' | 'tv';
     online: boolean;
     perks?: string[];
     playing: boolean;
@@ -144,6 +144,8 @@ export interface SourProfile {
     speed?: number;
     stats?: ProfileStats;
     status: string;
+    // at a Sour Player TV party: nobody can join or listen along
+    tv?: null | { event: string; host: string };
     visits?: { at: number; from: string; fromName: string }[];
     wall: WallNote[];
 }

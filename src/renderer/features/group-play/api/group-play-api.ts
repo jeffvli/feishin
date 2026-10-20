@@ -77,8 +77,21 @@ export const groupApi = {
     ) => post<{ ok: boolean }>(`${base}/api/group/${code}/control`, { cmd, member, ...target }),
     countdown: (base: string, code: string, hostKey: string) =>
         post<{ at: number; serverNow: number }>(`${base}/api/group/${code}/countdown`, { hostKey }),
-    create: (base: string, name: string, user: string, profile: null | string) =>
-        post<Created>(`${base}/api/group/create`, { name, profile, user }),
+    // tv: a Sour Player TV party (admins), named after the event
+    create: (
+        base: string,
+        name: string,
+        user: string,
+        profile: null | string,
+        tv?: { event: string; key: string },
+    ) =>
+        post<Created>(`${base}/api/group/create`, {
+            key: tv?.key,
+            name,
+            profile,
+            tv: tv ? { event: tv.event } : undefined,
+            user,
+        }),
     encore: (base: string, code: string, who: Who) =>
         post<{ happening: boolean; needed: number; votes: number }>(
             `${base}/api/group/${code}/encore`,
@@ -173,6 +186,13 @@ export const groupApi = {
             songs: { artist: string; id: string; plays: number; title: string }[];
         };
     },
+    // Sour Player TV: the host adds (or removes) someone who's at the event
+    tvMember: (
+        base: string,
+        code: string,
+        hostKey: string,
+        change: { add?: string; remove?: string },
+    ) => post<{ members: string[] }>(`${base}/api/group/${code}/tvmember`, { hostKey, ...change }),
     upvote: (base: string, code: string, who: Who, songId: string) =>
         post<{ votes: number }>(`${base}/api/group/${code}/upvote`, { songId, ...who }),
     // a room's owner or DJ: blind round, theme night, room look

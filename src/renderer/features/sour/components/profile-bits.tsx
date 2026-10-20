@@ -116,6 +116,10 @@ export const usePlaySong = () => {
 
 export const activity = (p: SourProfile) => {
     if (!p.online) return p.lastSeen ? `Last online ${timeAgo(p.lastSeen)}` : 'Offline';
+    if (p.tv) {
+        const what = p.listening ? `Listening to ${p.listening.title}` : 'At';
+        return `${what} on Sour Player TV - ${p.tv.event}`;
+    }
     const where = p.on === 'phone' ? ' on their phone' : '';
     if (p.group && p.listening) return `${p.listening.title} - in ${p.group.name}${where}`;
     if (p.listening) {

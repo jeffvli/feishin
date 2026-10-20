@@ -303,7 +303,11 @@ export const ProfileView = ({
                     <SongCover size={56} song={profile.listening} />
                     <Stack gap={0} miw={0}>
                         <Text className={styles.eyebrow}>
-                            {profile.group ? `Listening in ${profile.group.name}` : 'Listening now'}
+                            {profile.tv
+                                ? `On Sour Player TV - ${profile.tv.event}`
+                                : profile.group
+                                  ? `Listening in ${profile.group.name}`
+                                  : 'Listening now'}
                             {profile.on === 'phone' ? ' - on their phone' : ''}
                         </Text>
                         <Text fw={700} truncate>

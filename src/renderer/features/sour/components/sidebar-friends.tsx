@@ -50,7 +50,7 @@ export const SidebarFriends = () => {
                                 {p.listening.title}
                             </Text>
                             <Text isMuted size="xs" truncate>
-                                {p.listening.artist}
+                                {p.tv ? `Sour Player TV - ${p.tv.event}` : p.listening.artist}
                             </Text>
                         </>
                     ) : (

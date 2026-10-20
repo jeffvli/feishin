@@ -412,6 +412,10 @@ export const ListenAlong = () => {
                 stop(`${p?.name ?? 'Your friend'} stopped listening`);
                 return;
             }
+            if (p.tv) {
+                stop(`${p.name} is at ${p.tv.event} on Sour Player TV`);
+                return;
+            }
             // their speed (slowed / nightcore) and karaoke, so you hear the same thing
             const speed = p.speed || 1;
             const player = usePlayerStoreBase.getState();

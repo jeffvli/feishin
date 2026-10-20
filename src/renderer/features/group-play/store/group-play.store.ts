@@ -130,6 +130,8 @@ export interface GroupState {
     syncLook?: boolean;
     themeNight?: null | ThemeNight;
     tokens?: Record<string, number>;
+    // a Sour Player TV party: its event name and the people there (profile ids)
+    tv?: null | { event: string; members: string[] };
     updatedAt: number;
     upvotes?: Record<string, number>;
     votes?: number;

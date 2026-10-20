@@ -6,6 +6,7 @@ import { useHermesVideoStore } from '/@/renderer/features/hermes-video/store/her
 import { useSourStore } from '/@/renderer/features/sour/store/sour.store';
 import { ConfirmModal } from '/@/shared/components/modal/modal';
 import { Text } from '/@/shared/components/text/text';
+import { toast } from '/@/shared/components/toast/toast';
 
 // Listening along with a friend and being in Group Play (or on a Sour Radio station) both decide what
 // plays, and together they kept fixing each other's position. Switching from one to the other asks first.
@@ -71,7 +72,17 @@ export const leaveGroupFirst = async () => {
     return true;
 };
 
-export const startListenAlong = async (friend: { id: string; name: string }) => {
+export const startListenAlong = async (friend: {
+    id: string;
+    name: string;
+    tv?: null | { event: string };
+}) => {
+    if (friend.tv) {
+        toast.info({
+            message: `${friend.name} is at ${friend.tv.event} on Sour Player TV - you can't listen along to that`,
+        });
+        return false;
+    }
     if (!(await leaveGroupFirst())) return false;
     useSourStore.getState().set({ listenAlong: friend.id, listenAlongName: friend.name });
     return true;
