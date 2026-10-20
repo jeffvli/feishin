@@ -147,8 +147,38 @@ const Reports = () => {
     const shown = (list.data ?? []).filter((r) =>
         show === 'all' ? true : show === 'open' ? !r.done : r.kind === show,
     );
+    // copy the open (or, under All, every) bug or idea as a numbered list to paste anywhere
+    const copyKind = (kind: 'bug' | 'idea') => {
+        const rows = (list.data ?? []).filter(
+            (r) => r.kind === kind && (show === 'all' || !r.done),
+        );
+        const text = rows
+            .map((r, i) => {
+                const from = [r.byName, r.platform, r.version && `v${r.version}`]
+                    .filter(Boolean)
+                    .join(', ');
+                return `${i + 1}. ${r.text.trim()} (${from})`;
+            })
+            .join(String.fromCharCode(10));
+        navigator.clipboard
+            .writeText(text || 'Nothing here.')
+            .then(() =>
+                toast.success({
+                    message: `Copied ${rows.length} ${kind === 'bug' ? 'bugs' : 'ideas'}`,
+                }),
+            )
+            .catch(() => toast.error({ message: 'Could not copy' }));
+    };
     return (
         <Stack gap="sm">
+            <Group gap="xs" justify="flex-end">
+                <Button onClick={() => copyKind('bug')} size="compact-sm" variant="default">
+                    Copy bugs
+                </Button>
+                <Button onClick={() => copyKind('idea')} size="compact-sm" variant="default">
+                    Copy ideas
+                </Button>
+            </Group>
             <SegmentedControl
                 data={[
                     { label: 'Open', value: 'open' },
