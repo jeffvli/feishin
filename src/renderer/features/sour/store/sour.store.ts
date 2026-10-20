@@ -53,6 +53,8 @@ export interface SourLook {
     homeBackgroundDim: number;
     hoverPreview: boolean;
     iconPack: string;
+    // when the queue runs out, add songs like the last one
+    keepPlaying: boolean;
     lemonLoader: boolean;
     lyricStyle: 'centered' | 'huge' | 'karaoke';
     pressFx: boolean;
@@ -66,6 +68,8 @@ export interface SourLook {
     stageScene: 'drive' | 'none' | 'rain' | 'snow' | 'stars';
     stageVinyl: boolean;
     startupSound: boolean;
+    // the whole app's look: the v0.8 redesign, or Classic (how it looked up to v0.7)
+    ui: 'classic' | 'new';
     visualizer: VisualizerStyle;
 }
 
@@ -99,6 +103,7 @@ export const DEFAULT_LOOK: SourLook = {
     homeBackgroundDim: 45,
     hoverPreview: false,
     iconPack: 'classic',
+    keepPlaying: true,
     lemonLoader: true,
     lyricStyle: 'centered',
     pressFx: true,
@@ -111,6 +116,7 @@ export const DEFAULT_LOOK: SourLook = {
     stageScene: 'none',
     stageVinyl: false,
     startupSound: false,
+    ui: 'new',
     visualizer: 'bars',
 };
 

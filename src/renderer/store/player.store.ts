@@ -15,7 +15,7 @@ import {
     useTimestampStoreBase,
 } from '/@/renderer/store/timestamp.store';
 import { migratePlayerStorePersist, playerStoreStorage } from '/@/renderer/store/utils';
-import { shuffleInPlace } from '/@/renderer/utils/shuffle';
+import { shuffleInPlace, spreadShuffle } from '/@/renderer/utils/shuffle';
 import { PlayerData, QueueData, QueueSong, Song } from '/@/shared/types/domain-types';
 import {
     CrossfadeStyle,
@@ -1594,7 +1594,10 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 const afterItems = state.queue.default.slice(currentQueueIndex + 1);
 
                                 const shuffledBefore = shuffleInPlace([...beforeItems]);
-                                const shuffledAfter = shuffleInPlace([...afterItems]);
+                                // Sour Player: smart shuffle (artists spread out)
+                                const artist = (id: string) =>
+                                    (state.queue.songs[id]?.artistName || '').toLowerCase();
+                                const shuffledAfter = spreadShuffle([...afterItems], artist);
 
                                 state.queue.default = [
                                     ...shuffledBefore,

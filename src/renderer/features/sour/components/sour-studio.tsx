@@ -204,6 +204,19 @@ const Layout = () => {
         <Stack gap="md">
             <Stack gap={4}>
                 <Text fw={600} size="sm">
+                    App look
+                </Text>
+                <SegmentedControl
+                    data={[
+                        { label: 'New (v0.8)', value: 'new' },
+                        { label: 'Classic (v0.7)', value: 'classic' },
+                    ]}
+                    onChange={(v) => setLook({ ui: v as SourLook['ui'] })}
+                    value={look.ui ?? 'new'}
+                />
+            </Stack>
+            <Stack gap={4}>
+                <Text fw={600} size="sm">
                     Player bar
                 </Text>
                 <SegmentedControl
@@ -403,6 +416,11 @@ const Extras = () => (
             description="Hover a cover in Sour Player's own lists for a second to hear a bit of it."
             id="hoverPreview"
             label="Hover previews"
+        />
+        <LookSwitch
+            description="When the queue runs out, songs like the last one are added so the music doesn't stop."
+            id="keepPlaying"
+            label="Keep playing"
         />
     </Stack>
 );

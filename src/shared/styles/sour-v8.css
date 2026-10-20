@@ -1,0 +1,186 @@
+/* stylelint-disable selector-class-pattern, no-descending-specificity */
+
+/*
+ * Sour Player v0.8 look ("New" in Sour Studio > Layout). Everything sits under .sour-v8 on <html>, so
+ * "Classic" is exactly the v0.7 app. The iPhone has its own look (sour-ios.css) and is left alone.
+ *
+ * The idea: floating rounded panels on a softly tinted backdrop, a glass player bar, roomier type,
+ * pill buttons and cards that lift when you point at them.
+ */
+
+.sour-v8:not(.sour-ios) {
+    --v8-gap: 8px;
+    --v8-radius: 16px;
+    --v8-panel: color-mix(in srgb, var(--theme-colors-surface) 82%, transparent);
+    --v8-line: color-mix(in srgb, var(--theme-colors-border) 55%, transparent);
+    --v8-glow: color-mix(in srgb, var(--theme-colors-primary) 16%, transparent);
+}
+
+/* the backdrop behind the panels: the theme's base with a glow of the accent colour */
+.sour-v8:not(.sour-ios) body,
+.sour-v8:not(.sour-ios) #default-layout {
+    background:
+        radial-gradient(1200px 600px at 12% -10%, var(--v8-glow), transparent 60%),
+        radial-gradient(900px 500px at 100% 110%, color-mix(in srgb, var(--theme-colors-primary) 8%, transparent), transparent 60%),
+        var(--theme-colors-background);
+}
+
+/* ---------- panels: sidebar, page and queue float with a gap around them ---------- */
+.sour-v8:not(.sour-ios) #main-content {
+    gap: var(--v8-gap);
+    padding: var(--v8-gap) var(--v8-gap) 0;
+    background: transparent;
+}
+
+.sour-v8:not(.sour-ios) #sidebar,
+.sour-v8:not(.sour-ios) #sidebar-queue {
+    overflow: hidden;
+    background: var(--v8-panel);
+    border: 1px solid var(--v8-line);
+    border-radius: var(--v8-radius);
+}
+
+.sour-v8:not(.sour-ios) #main-content > div:not(#sidebar, #sidebar-queue, [class*='resize']) {
+    overflow: hidden;
+    background: var(--v8-panel);
+    border: 1px solid var(--v8-line);
+    border-radius: var(--v8-radius);
+}
+
+/* ---------- player bar: a glass strip floating above the bottom edge ---------- */
+.sour-v8:not(.sour-ios) #player-bar {
+    padding: var(--v8-gap);
+    background: transparent !important;
+}
+
+.sour-v8:not(.sour-ios) #player-bar > div {
+    width: auto;
+    overflow: hidden;
+    background: color-mix(in srgb, var(--theme-colors-surface) 70%, transparent);
+    border: 1px solid var(--v8-line);
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgb(0 0 0 / 30%);
+    backdrop-filter: blur(22px) saturate(1.5);
+}
+
+/* ---------- type: bigger, bolder page titles ---------- */
+.sour-v8:not(.sour-ios) h1,
+.sour-v8:not(.sour-ios) [class*='library-header'] h1 {
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+/* ---------- buttons and inputs: pills ---------- */
+.sour-v8:not(.sour-ios) .mantine-Button-root,
+.sour-v8:not(.sour-ios) .mantine-SegmentedControl-root,
+.sour-v8:not(.sour-ios) .mantine-SegmentedControl-indicator {
+    border-radius: 999px;
+}
+
+.sour-v8:not(.sour-ios) .mantine-Button-root {
+    font-weight: 600;
+    transition:
+        transform 0.12s ease,
+        filter 0.12s ease;
+}
+
+.sour-v8:not(.sour-ios) .mantine-Button-root:active {
+    transform: scale(0.97);
+}
+
+.sour-v8:not(.sour-ios) .mantine-TextInput-input,
+.sour-v8:not(.sour-ios) .mantine-Select-input,
+.sour-v8:not(.sour-ios) .mantine-Autocomplete-input,
+.sour-v8:not(.sour-ios) .mantine-Textarea-input {
+    border-radius: 12px;
+}
+
+/* ---------- cards and covers: rounder, lift on hover ---------- */
+.sour-v8:not(.sour-ios) [class*='item-card-module-container'] {
+    padding: 8px;
+    border-radius: 14px;
+    transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.sour-v8:not(.sour-ios) [class*='item-card-module-container']:hover {
+    background: color-mix(in srgb, var(--theme-colors-foreground) 6%, transparent);
+    box-shadow: 0 12px 30px rgb(0 0 0 / 25%);
+    transform: translateY(-3px);
+}
+
+.sour-v8:not(.sour-ios) [class*='item-card-module-image-container'],
+.sour-v8:not(.sour-ios) [class*='item-card-module-image-container'] img {
+    border-radius: 10px;
+}
+
+/* ---------- sidebar: roomy links with a lit-up current page ---------- */
+.sour-v8:not(.sour-ios) [class*='sidebar-item-module-link'] {
+    border-radius: 10px;
+    transition: background 0.15s ease;
+}
+
+.sour-v8:not(.sour-ios) [class*='sidebar-item-module-link']:hover {
+    background: color-mix(in srgb, var(--theme-colors-foreground) 7%, transparent);
+}
+
+.sour-v8:not(.sour-ios) [class*='sidebar-item-module-active'] {
+    color: var(--theme-colors-foreground);
+    background: color-mix(in srgb, var(--theme-colors-primary) 22%, transparent) !important;
+    box-shadow: inset 3px 0 0 var(--theme-colors-primary);
+}
+
+/* ---------- player bar: rounder cover ---------- */
+.sour-v8:not(.sour-ios) [class*='left-controls-module-image-wrapper'],
+.sour-v8:not(.sour-ios) [class*='left-controls-module-image-wrapper'] img {
+    border-radius: 10px;
+}
+
+/* ---------- song lists: rounded rows ---------- */
+.sour-v8:not(.sour-ios) [role='row'] {
+    border-radius: 10px;
+}
+
+/* ---------- menus and dialogs: glass, rounder ---------- */
+.sour-v8:not(.sour-ios) .mantine-Modal-content,
+.sour-v8:not(.sour-ios) .mantine-Drawer-content {
+    background: color-mix(in srgb, var(--theme-colors-surface) 86%, transparent);
+    border: 1px solid var(--v8-line);
+    border-radius: 22px;
+    backdrop-filter: blur(24px) saturate(1.4);
+}
+
+.sour-v8:not(.sour-ios) .mantine-Modal-header {
+    background: transparent;
+}
+
+.sour-v8:not(.sour-ios) .mantine-Modal-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+}
+
+.sour-v8:not(.sour-ios) .mantine-Menu-dropdown,
+.sour-v8:not(.sour-ios) .mantine-Popover-dropdown {
+    background: color-mix(in srgb, var(--theme-colors-surface) 85%, transparent);
+    border: 1px solid var(--v8-line);
+    border-radius: 14px;
+    box-shadow: 0 16px 40px rgb(0 0 0 / 35%);
+    backdrop-filter: blur(20px) saturate(1.4);
+}
+
+.sour-v8:not(.sour-ios) .mantine-Menu-item {
+    border-radius: 9px;
+}
+
+/* ---------- scrollbars: thin ---------- */
+.sour-v8:not(.sour-ios) ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.sour-v8:not(.sour-ios) ::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--theme-colors-foreground) 18%, transparent);
+    border-radius: 8px;
+}

@@ -6,6 +6,7 @@ import {
 } from '/@/renderer/features/group-play/components/group-room';
 import { ExtraShortcuts, Splash } from '/@/renderer/features/sour/components/app-extras';
 import { HolidayLayer } from '/@/renderer/features/sour/components/holiday-layer';
+import { KeepPlaying } from '/@/renderer/features/sour/components/keep-playing';
 import { MiniPlayer } from '/@/renderer/features/sour/components/mini-player';
 import {
     SocialWatchers,
@@ -70,6 +71,7 @@ const LookSwitches = () => {
         root.classList.toggle('sour-sidebar-right', look.sidebarRight);
         root.classList.toggle('sour-fade-covers', look.fadeCovers && !look.reducedMotion);
         root.classList.toggle('sour-lemon-loader', look.lemonLoader && !simple);
+        root.classList.toggle('sour-v8', look.ui !== 'classic');
     }, [look]);
 
     useEffect(() => {
@@ -158,6 +160,9 @@ export const SourRoot = () => (
         </SourSafe>
         <SourSafe name="mini player">
             <MiniPlayer />
+        </SourSafe>
+        <SourSafe name="keep playing">
+            <KeepPlaying />
         </SourSafe>
         <SourSafe name="sour tv">
             <SourTvScreen />

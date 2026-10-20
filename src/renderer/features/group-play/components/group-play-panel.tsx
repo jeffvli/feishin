@@ -559,6 +559,11 @@ export const GroupPlayPanel = () => {
                         </Text>
                     )}
                 </Stack>
+                {!isRadio && !canControl && role === 'member' && nowPlaying && (
+                    <Button onClick={voteSkip} size="xs" variant="default">
+                        {`Vote to skip${state?.votes ? ` (${state.votes} of ${state.votesNeeded})` : ''}`}
+                    </Button>
+                )}
                 {isRadio && nowPlaying && (
                     <Stack gap={4}>
                         <Button onClick={voteSkip} size="xs" variant="default">
@@ -609,7 +614,9 @@ export const GroupPlayPanel = () => {
                         : `${state.dj.name} picks the next song`}
                 </Text>
             )}
-            {isRadio && state && <VoteBar state={state} />}
+            {state && (isRadio || (!!state.votes && !state.guestControl)) && (
+                <VoteBar state={state} />
+            )}
             {state && <ThemeNightBanner state={state} />}
             {state && <CoverFlow hideNow={hideNow} state={state} />}
             <ReactionBar />
