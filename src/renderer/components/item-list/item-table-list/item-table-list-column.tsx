@@ -31,6 +31,7 @@ import { AlbumArtistsColumn } from '/@/renderer/components/item-list/item-table-
 import { AlbumColumn } from '/@/renderer/components/item-list/item-table-list/columns/album-column';
 import { AlbumGroupColumn } from '/@/renderer/components/item-list/item-table-list/columns/album-group-column';
 import { ArtistsColumn } from '/@/renderer/components/item-list/item-table-list/columns/artists-column';
+import { CodecColumn } from '/@/renderer/components/item-list/item-table-list/columns/codec-column';
 import { ComposerColumn } from '/@/renderer/components/item-list/item-table-list/columns/composer-column';
 import { CountColumn } from '/@/renderer/components/item-list/item-table-list/columns/count-column';
 import {
@@ -247,6 +248,9 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
             case TableColumn.DISC_NUMBER:
             case TableColumn.SAMPLE_RATE:
                 return <NumericColumn {...props} {...dragProps} controls={controls} type={type} />;
+
+            case TableColumn.CODEC:
+                return <CodecColumn {...props} {...dragProps} controls={controls} type={type} />;
 
             case TableColumn.COMPOSER:
                 return <ComposerColumn {...props} {...dragProps} controls={controls} type={type} />;
