@@ -3,6 +3,10 @@
 - Never use the em dash "—". Use plain dash "-" instead.
 - On an explicit commit request: `git add` the changes, run `pnpm lint:staged`, then commit. It lints only staged TS/TSX/CSS/SCSS via eslint+stylelint and auto-fixes; typecheck runs in CI (`test.yml`), not locally. Do not stage or run it outside a commit request.
 
+## Tests
+
+Vitest, node env, config in `vitest.config.ts`. Colocate as `*.test.ts`, import `describe/it/expect` from `vitest`. Keep tested logic in pure modules (no store/`window.api` imports) instead of mocking. Run `pnpm test`.
+
 ## Agent skills
 
 ### Issue tracker

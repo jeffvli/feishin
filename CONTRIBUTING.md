@@ -20,6 +20,7 @@ Useful development commands include:
 - `pnpm run dev:watch` - Start the electron app development environment with main process autoreloading
 - `pnpm run package:dev` - Quick unpacked production build
 - `pnpm run build:remote` - Manually rebuild the remote app if you make changes
+- `pnpm test` - Run unit tests (Vitest). Tests live next to the code as `*.test.ts`
 
 ## AI Disclosure
 
