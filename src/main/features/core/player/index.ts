@@ -11,6 +11,7 @@ import { store } from '../settings';
 
 import { isMacOS, isWindows } from '/@/main/env';
 import { PlayerData } from '/@/shared/types/domain-types';
+import { parseStreamTitle } from '/@/shared/utils/parse-stream-title';
 
 declare module 'node-mpv';
 
@@ -641,15 +642,7 @@ ipcMain.handle(
                         null;
 
                     if (combinedTitle && typeof combinedTitle === 'string') {
-                        // Try to parse "Artist - Title" format
-                        const match = combinedTitle.match(/^(.*?)\s*[-–—]\s*(.+)$/);
-                        if (match) {
-                            artist = match[1].trim() || null;
-                            title = match[2].trim() || null;
-                        } else {
-                            // If no separator found, treat the whole thing as title
-                            title = combinedTitle;
-                        }
+                        ({ artist, title } = parseStreamTitle(combinedTitle));
                     }
                 } else if (!title) {
                     // If we have artist but no title, try to get from combined format
@@ -674,9 +667,9 @@ ipcMain.handle(
                         combinedTitle !== title
                     ) {
                         // Try to parse artist from combined format
-                        const match = combinedTitle.match(/^(.*?)\s*[-–—]\s*(.+)$/);
-                        if (match && match[2].trim() === title) {
-                            artist = match[1].trim() || null;
+                        const parsed = parseStreamTitle(combinedTitle);
+                        if (parsed.title === title) {
+                            artist = parsed.artist;
                         }
                     }
                 }
