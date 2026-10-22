@@ -177,3 +177,173 @@ describe('jfNormalize.song', () => {
         ).toMatchObject({ playCount: 3, resumePositionMs: 5, userFavorite: true });
     });
 });
+
+const rawAlbum = {
+    AlbumArtist: 'Album Artist',
+    AlbumArtists: [{ Id: 'aa-1', Name: 'Album Artist' }],
+    ArtistItems: [],
+    DateCreated: '2024-01-02T03:04:05Z',
+    GenreItems: [{ Id: 'g-1', Name: 'Rock' }],
+    Id: 'al-1',
+    ImageTags: { Primary: 'album-tag' },
+    Name: 'Album',
+    ProductionYear: 2001,
+    RunTimeTicks: 18_000_000_000,
+};
+
+const normalizeAlbum = (overrides: Record<string, unknown> = {}) =>
+    jfNormalize.album(
+        { ...rawAlbum, ...overrides } as unknown as Parameters<typeof jfNormalize.album>[0],
+        server,
+    );
+
+describe('jfNormalize.album', () => {
+    it('maps core fields', () => {
+        expect(normalizeAlbum()).toMatchObject({
+            _serverType: ServerType.JELLYFIN,
+            albumArtistName: 'Album Artist',
+            duration: 1_800_000,
+            id: 'al-1',
+            imageId: 'al-1',
+            name: 'Album',
+            playCount: 0,
+            recordLabels: [],
+            releaseDate: '2001',
+            releaseYear: 2001,
+            songCount: null,
+            sortName: 'Album',
+            updatedAt: '2024-01-02T03:04:05Z',
+            userFavorite: false,
+        });
+    });
+
+    it('falls back to album artists when there are no track artists', () => {
+        expect(normalizeAlbum().artists.map((a) => a.id)).toEqual(['aa-1']);
+        expect(
+            normalizeAlbum({ ArtistItems: [{ Id: 'ar-1', Name: 'A' }] }).artists.map((a) => a.id),
+        ).toEqual(['ar-1']);
+    });
+
+    it('has no image without a primary image tag', () => {
+        expect(normalizeAlbum({ ImageTags: {} }).imageId).toBeNull();
+    });
+
+    it('maps optional fields', () => {
+        expect(
+            normalizeAlbum({
+                ChildCount: 12,
+                DateLastMediaAdded: '2024-06-01',
+                ProviderIds: { MusicBrainzAlbum: 'mbz-1', MusicBrainzReleaseGroup: 'mbz-rg' },
+                SortName: 'album, the',
+                Studios: [{ Id: 's-1', Name: 'Label' }],
+                Tags: ['live'],
+                UserData: { IsFavorite: true, PlayCount: 4 },
+            }),
+        ).toMatchObject({
+            mbzId: 'mbz-1',
+            mbzReleaseGroupId: 'mbz-rg',
+            playCount: 4,
+            recordLabels: ['Label'],
+            songCount: 12,
+            sortName: 'album, the',
+            tags: { live: [] },
+            updatedAt: '2024-06-01',
+            userFavorite: true,
+        });
+    });
+
+    it('normalizes embedded songs', () => {
+        expect(normalizeAlbum({ Songs: [rawSong] }).songs?.map((s) => s.id)).toEqual(['song-1']);
+    });
+});
+
+describe('jfNormalize.albumArtist', () => {
+    const rawArtist = {
+        AlbumCount: 3,
+        Id: 'aa-1',
+        ImageTags: { Primary: 'artist-tag' },
+        Name: 'Album Artist',
+        Overview: 'Bio',
+        RunTimeTicks: 0,
+        SongCount: 30,
+    };
+
+    const normalizeArtist = (overrides: Record<string, unknown> = {}) =>
+        jfNormalize.albumArtist(
+            { ...rawArtist, ...overrides } as unknown as Parameters<
+                typeof jfNormalize.albumArtist
+            >[0],
+            server,
+        );
+
+    it('maps core fields', () => {
+        expect(normalizeArtist()).toMatchObject({
+            albumCount: 3,
+            biography: 'Bio',
+            id: 'aa-1',
+            imageId: 'aa-1',
+            name: 'Album Artist',
+            similarArtists: [],
+            songCount: 30,
+            uploadedImage: 'artist-tag',
+        });
+    });
+
+    it('defaults missing counts and biography to null', () => {
+        expect(
+            normalizeArtist({ AlbumCount: undefined, Overview: '', SongCount: undefined }),
+        ).toMatchObject({ albumCount: null, biography: null, songCount: null });
+    });
+
+    it('maps similar artists and skips Various Artists', () => {
+        const artist = normalizeArtist({
+            similarArtists: {
+                Items: [
+                    { Id: 'va', Name: 'Various Artists' },
+                    { Id: 'aa-2', ImageTags: {}, Name: 'Other', UserData: { IsFavorite: true } },
+                ],
+            },
+        });
+        expect(artist.similarArtists).toEqual([
+            expect.objectContaining({ id: 'aa-2', imageId: null, userFavorite: true }),
+        ]);
+    });
+});
+
+describe('jfNormalize.playlist', () => {
+    it('maps core fields', () => {
+        expect(
+            jfNormalize.playlist(
+                {
+                    ChildCount: 5,
+                    Id: 'pl-1',
+                    ImageTags: {},
+                    Name: 'Playlist',
+                    Overview: 'Desc',
+                    RunTimeTicks: 600_000_000,
+                } as unknown as Parameters<typeof jfNormalize.playlist>[0],
+                server,
+            ),
+        ).toMatchObject({
+            description: 'Desc',
+            duration: 60_000,
+            id: 'pl-1',
+            imageId: null,
+            name: 'Playlist',
+            songCount: 5,
+        });
+    });
+});
+
+describe('jfNormalize.folder', () => {
+    it('names folders without a name', () => {
+        expect(
+            jfNormalize.folder(
+                { Id: 'f-1', ParentId: 'root' } as unknown as Parameters<
+                    typeof jfNormalize.folder
+                >[0],
+                server,
+            ),
+        ).toMatchObject({ id: 'f-1', name: 'Unknown folder', parentId: 'root' });
+    });
+});
