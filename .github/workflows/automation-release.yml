@@ -15,6 +15,14 @@ on:
                 description: Optional base or exact version, for example 0.1.4-beta.14
                 required: false
                 type: string
+            release_title:
+                description: Optional funny release subtitle, for example Permission to Rock
+                required: false
+                type: string
+            release_intro:
+                description: Optional funny introduction shown above the generated change list
+                required: false
+                type: string
 
 permissions:
     contents: write
@@ -80,6 +88,19 @@ jobs:
 
             - name: Set application version
               run: node scripts/automation/set-version.mjs "${{ steps.version.outputs.version }}"
+
+            - name: Prepare release notes
+              id: release-notes
+              shell: pwsh
+              env:
+                  KATIESAMP_RELEASE_CHANNEL: ${{ inputs.channel }}
+                  KATIESAMP_RELEASE_INTRO: ${{ inputs.release_intro }}
+                  KATIESAMP_RELEASE_TITLE: ${{ inputs.release_title }}
+                  KATIESAMP_RELEASE_VERSION: ${{ steps.version.outputs.version }}
+              run: |
+                  $releaseNotes = node scripts/automation/generate-release-notes.mjs | ConvertFrom-Json
+                  $releaseNotes.notes | Set-Content -LiteralPath '.release-intro.md'
+                  "title=$($releaseNotes.title)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
             - name: Download the previous beta installer
               if: inputs.channel == 'beta'
@@ -172,15 +193,19 @@ jobs:
 
             - name: Publish GitHub release
               shell: pwsh
+              env:
+                  KATIESAMP_RELEASE_TITLE: ${{ steps.release-notes.outputs.title }}
               run: |
                   $assets = Get-ChildItem dist -File |
                       Where-Object { $_.Extension -in '.exe', '.blockmap', '.yml', '.txt' } |
                       ForEach-Object { $_.FullName }
+                  $releaseIntro = Get-Content -LiteralPath '.release-intro.md' -Raw
                   $arguments = @(
                       'release', 'create', '${{ steps.version.outputs.tag }}',
                       '--target', '${{ github.sha }}',
-                      '--title', 'KatiesAmp ${{ steps.version.outputs.tag }}',
-                      '--generate-notes'
+                      '--title', $env:KATIESAMP_RELEASE_TITLE,
+                      '--generate-notes',
+                      '--notes', $releaseIntro
                   )
                   if ('${{ inputs.channel }}' -eq 'beta') {
                       $arguments += '--prerelease'
