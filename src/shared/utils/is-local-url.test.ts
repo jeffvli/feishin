@@ -29,6 +29,10 @@ describe('isLocalUrl', () => {
         'http://172.32.0.1',
         'http://192.169.0.1',
         'http://[2001:db8::1]',
+        // Regression: domains starting with an IPv6 local prefix were treated as local
+        'https://fdroid.org',
+        'https://fc-example.com',
+        'https://fe80example.net',
         'not a url',
         '',
     ])('treats %s as remote', (url) => {

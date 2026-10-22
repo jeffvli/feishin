@@ -27,13 +27,16 @@ export const isLocalUrl = (value: string): boolean => {
             if (a === 172 && b >= 16 && b <= 31) return true;
         }
 
-        // IPv6 unique local / link-local (fc00::/7, fe80::/10)
+        // IPv6 unique local / link-local (fc00::/7, fe80::/10). Only check IPv6 literals, so
+        // domain names such as fdroid.org are not treated as local
         const normalized = hostname.replace(/^\[|\]$/g, '').toLowerCase();
-        if (normalized.startsWith('fc') || normalized.startsWith('fd')) {
-            return true;
-        }
-        if (/^fe[89ab]/.test(normalized)) {
-            return true;
+        if (normalized.includes(':')) {
+            if (normalized.startsWith('fc') || normalized.startsWith('fd')) {
+                return true;
+            }
+            if (/^fe[89ab]/.test(normalized)) {
+                return true;
+            }
         }
 
         return false;
