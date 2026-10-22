@@ -7,6 +7,8 @@ test.beforeEach(async ({ page }) => {
 test('@full opens the fullscreen queue by default and toggles it from the player bar', async ({
     page,
 }) => {
+    await expect(page.getByRole('button', { name: 'Cast to device' })).toHaveCount(0);
+
     const album = page.locator('#left-sidebar').getByText('Automation Album', { exact: true });
     await expect(album).toBeVisible({ timeout: 15_000 });
     await album.click({ button: 'right' });

@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Outlet } from 'react-router';
 
 import { useOfflinePlaylistSync } from '/@/renderer/features/playlists/hooks/use-offline-playlist-sync';
+import { useServerLibraryAccessSync } from '/@/renderer/features/shared/hooks/use-server-library-controls';
 import { useServerAuthenticated } from '/@/renderer/hooks/use-server-authenticated';
 import { useCurrentServerId } from '/@/renderer/store';
 import { Center } from '/@/shared/components/center/center';
@@ -13,6 +14,7 @@ export const AuthenticationOutlet = () => {
     const queryClient = useQueryClient();
     const serverId = useCurrentServerId();
     useOfflinePlaylistSync(authState === AuthState.VALID, queryClient, serverId);
+    useServerLibraryAccessSync(authState === AuthState.VALID);
 
     if (authState === AuthState.LOADING) {
         return (

@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import { PopoverPlayQueue } from '/@/renderer/features/now-playing/components/popover-play-queue';
 import { OfflineDownloadManager } from '/@/renderer/features/offline/components/offline-download-manager';
-import { DlnaCastButton } from '/@/renderer/features/player/components/dlna-cast-button';
 import { DlnaVolumeButton } from '/@/renderer/features/player/components/dlna/volume-button';
 import { PlayerConfig } from '/@/renderer/features/player/components/player-config';
 import { CustomPlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
@@ -77,7 +76,6 @@ export const RightControls = () => {
         <Flex align="flex-end" direction="column" h="100%" px="1rem" py="0.5rem">
             <Group h="calc(100% / 3)">{showRatings && <RatingButton />}</Group>
             <Group align="center" gap="xs" wrap="nowrap">
-                <DlnaCastButton />
                 <OfflineDownloadManager />
                 <PlayerConfig />
                 <LyricsButton />
