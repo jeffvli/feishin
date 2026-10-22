@@ -254,6 +254,39 @@ describe('sortAlbumList', () => {
         ]);
     });
 
+    // Regression: sorted by the nonexistent `albumArtist` field, so only the name was used
+    it('sorts by album artist case-insensitively, then by name', () => {
+        const list = [
+            album('zeta-b', { albumArtistName: 'Zeta', name: 'B' }),
+            album('alpha', { albumArtistName: 'alpha', name: 'C' }),
+            album('zeta-a', { albumArtistName: 'Zeta', name: 'A' }),
+        ];
+        expect(ids(sortAlbumList(list, AlbumListSort.ALBUM_ARTIST, SortOrder.ASC))).toEqual([
+            'alpha',
+            'zeta-a',
+            'zeta-b',
+        ]);
+        expect(ids(sortAlbumList(list, AlbumListSort.ALBUM_ARTIST, SortOrder.DESC))).toEqual([
+            'zeta-a',
+            'zeta-b',
+            'alpha',
+        ]);
+    });
+
+    // Regression: sorted by the nonexistent `starred` field, so the order never changed
+    it('sorts favorites first when descending', () => {
+        const list = [
+            album('x', { userFavorite: false }),
+            album('y', { userFavorite: true }),
+            album('z', { userFavorite: false }),
+        ];
+        expect(ids(sortAlbumList(list, AlbumListSort.FAVORITED, SortOrder.DESC))).toEqual([
+            'y',
+            'x',
+            'z',
+        ]);
+    });
+
     it('reverses the fetched order for descending ID without mutating the input', () => {
         const list = [album('x'), album('y')];
         expect(ids(sortAlbumList(list, AlbumListSort.ID, SortOrder.DESC))).toEqual(['y', 'x']);
@@ -274,6 +307,14 @@ describe('sortAlbumArtistList', () => {
         expect(
             ids(sortAlbumArtistList(list, AlbumArtistListSort.ALBUM_COUNT, SortOrder.DESC)),
         ).toEqual(['c', 'a', 'b']);
+    });
+
+    // Regression: sorted by the nonexistent `starred` field, so the order never changed
+    it('sorts favorites first when descending', () => {
+        const list = [artist('x', { userFavorite: false }), artist('y', { userFavorite: true })];
+        expect(
+            ids(sortAlbumArtistList(list, AlbumArtistListSort.FAVORITED, SortOrder.DESC)),
+        ).toEqual(['y', 'x']);
     });
 
     it('sorts by name case-insensitively', () => {
