@@ -367,3 +367,128 @@ describe('sortRadioList', () => {
         expect(ids(stations)).toEqual(['1', '2']);
     });
 });
+
+describe('sortSongList by numeric and flag fields', () => {
+    // Ties fall back to album, disc and track
+    const list = [
+        song('a', {
+            bpm: 120,
+            duration: 300,
+            playCount: 5,
+            releaseYear: 2001,
+            trackNumber: 2,
+            year: 2001,
+        }),
+        song('b', {
+            bpm: 90,
+            duration: 200,
+            playCount: 9,
+            releaseYear: 1999,
+            trackNumber: 3,
+            year: 1999,
+        }),
+        song('c', {
+            bpm: 120,
+            duration: 300,
+            playCount: 5,
+            releaseYear: 2001,
+            trackNumber: 1,
+            year: 2001,
+        }),
+    ];
+
+    it.each([
+        [SongListSort.BPM, ['b', 'c', 'a']],
+        [SongListSort.DURATION, ['b', 'c', 'a']],
+        [SongListSort.PLAY_COUNT, ['c', 'a', 'b']],
+        [SongListSort.RELEASE_YEAR, ['b', 'c', 'a']],
+        [SongListSort.YEAR, ['b', 'c', 'a']],
+    ])('sorts by %s ascending', (sortBy, expected) => {
+        expect(ids(sortSongList(list, sortBy, SortOrder.ASC))).toEqual(expected);
+    });
+
+    it('sorts favorites and ratings, then by name', () => {
+        const rated = [
+            song('x', { name: 'beta', userFavorite: true, userRating: 3 }),
+            song('y', { name: 'gamma', userFavorite: false, userRating: 5 }),
+            song('z', { name: 'Alpha', userFavorite: true, userRating: 3 }),
+        ];
+        expect(ids(sortSongList(rated, SongListSort.FAVORITED, SortOrder.DESC))).toEqual([
+            'x',
+            'z',
+            'y',
+        ]);
+        expect(ids(sortSongList(rated, SongListSort.RATING, SortOrder.DESC))).toEqual([
+            'y',
+            'x',
+            'z',
+        ]);
+    });
+
+    it('sorts by the first genre', () => {
+        const tagged = [
+            song('x', { genres: [{ name: 'Rock' }] as Song['genres'] }),
+            song('y', { genres: [{ name: 'ambient' }] as Song['genres'] }),
+        ];
+        expect(ids(sortSongList(tagged, SongListSort.GENRE, SortOrder.ASC))).toEqual(['y', 'x']);
+    });
+
+    it('returns the input for an unknown sort', () => {
+        expect(sortSongList(list, 'unknown' as SongListSort, SortOrder.ASC)).toBe(list);
+    });
+});
+
+describe('sortAlbumList by numeric and date fields', () => {
+    const list = [
+        album('x', {
+            createdAt: '2024-02-01',
+            duration: 3000,
+            lastPlayedAt: '2024-05-01',
+            playCount: 2,
+            songCount: 12,
+            sortName: 'Zeta',
+            userRating: 4,
+        }),
+        album('y', {
+            createdAt: '2024-01-01',
+            duration: 1000,
+            lastPlayedAt: '2024-06-01',
+            playCount: 7,
+            songCount: 8,
+            sortName: 'Alpha',
+            userRating: 2,
+        }),
+    ];
+
+    it.each([
+        [AlbumListSort.DURATION, ['y', 'x']],
+        [AlbumListSort.PLAY_COUNT, ['x', 'y']],
+        [AlbumListSort.RATING, ['y', 'x']],
+        [AlbumListSort.RECENTLY_ADDED, ['y', 'x']],
+        [AlbumListSort.RECENTLY_PLAYED, ['x', 'y']],
+        [AlbumListSort.SONG_COUNT, ['y', 'x']],
+        [AlbumListSort.SORT_NAME, ['y', 'x']],
+    ])('sorts by %s ascending', (sortBy, expected) => {
+        expect(ids(sortAlbumList(list, sortBy, SortOrder.ASC))).toEqual(expected);
+    });
+
+    it('shuffles without losing albums', () => {
+        expect(ids(sortAlbumList(list, AlbumListSort.RANDOM, SortOrder.ASC)).sort()).toEqual([
+            'x',
+            'y',
+        ]);
+    });
+});
+
+describe('sortAlbumArtistList by rating', () => {
+    it('sorts by rating', () => {
+        const list = [
+            { id: 'x', name: 'x', userRating: 2 },
+            { id: 'y', name: 'y', userRating: 5 },
+        ] as AlbumArtist[];
+        expect(ids(sortAlbumArtistList(list, AlbumArtistListSort.RATING, SortOrder.DESC))).toEqual([
+            'y',
+            'x',
+        ]);
+    });
+});
