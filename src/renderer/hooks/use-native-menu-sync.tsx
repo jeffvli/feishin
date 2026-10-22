@@ -17,6 +17,7 @@ import {
     usePlayerHydrated,
     usePlayerRepeat,
     usePlayerShuffle,
+    usePlayerSong,
     usePlayerStatus,
 } from '/@/renderer/store';
 import { PlayerShuffle } from '/@/shared/types/types';
@@ -34,6 +35,7 @@ export const useNativeMenuSync = () => {
     const playerRepeat = usePlayerRepeat();
     const playerShuffle = usePlayerShuffle();
     const playerStatus = usePlayerStatus();
+    const playerSong = usePlayerSong();
 
     useEffect(() => {
         if (!isElectron()) {
@@ -135,6 +137,17 @@ export const useNativeMenuSync = () => {
         ipc?.send('update-repeat', playerRepeat);
         ipc?.send('update-shuffle', playerShuffle !== PlayerShuffle.NONE);
     }, [playerHydrated, playerRepeat, playerShuffle, playerStatus]);
+
+    useEffect(() => {
+        if (!isElectron()) {
+            return;
+        }
+
+        ipc?.send(
+            'update-tray-song',
+            playerSong ? `${playerSong.artistName} - ${playerSong.name}` : '',
+        );
+    }, [playerSong]);
 
     useEffect(() => {
         if (!isElectron()) {
