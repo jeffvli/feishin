@@ -315,6 +315,18 @@ describe('ndNormalize.album', () => {
         });
     });
 
+    // Regression: remixers replaced the album artists, as Navidrome sends roles sorted by name
+    it('does not add remixers to the album artists list', () => {
+        const album = normalizeAlbum({
+            participants: {
+                artist: [{ id: 'ar-1', name: 'A' }],
+                remixer: [{ id: 'rx-1', name: 'Remixer' }],
+            },
+        });
+        expect(album.artists.map((a) => a.id)).toEqual(['ar-1']);
+        expect(album.participants).toEqual({});
+    });
+
     it('normalizes embedded songs', () => {
         const album = ndNormalize.album({
             ...ndType._response.album.parse(rawAlbum),
