@@ -11,6 +11,11 @@ export default defineConfig({
         },
     },
     test: {
+        coverage: {
+            include: ['src/**/*.{ts,tsx}'],
+            provider: 'v8',
+            reporter: ['text', 'html'],
+        },
         environment: 'node',
         include: ['src/**/*.test.ts'],
     },
