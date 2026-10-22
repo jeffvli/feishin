@@ -7,6 +7,7 @@ import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/
 import { usePlaybackType, usePlayerStoreBase, useSettingsStore } from '/@/renderer/store';
 import { logger } from '/@/renderer/utils/logger';
 import { PlayerStatus, PlayerType } from '/@/shared/types/types';
+import { parseStreamTitle } from '/@/shared/utils/parse-stream-title';
 
 export type RadioCurrentStationArt = {
     id: string;
@@ -263,21 +264,9 @@ export const useRadioMetadata = () => {
                         streamTitle = stats.icy.StreamTitle;
                     }
 
-                    // Parse the combined format into title and artist
-                    let artist: null | string = null;
-                    let title: null | string = null;
-
-                    if (streamTitle) {
-                        // Try to parse "Artist - Title" format
-                        const match = streamTitle.match(/^(.*?)\s*[-–—]\s*(.+)$/);
-                        if (match) {
-                            artist = match[1].trim() || null;
-                            title = match[2].trim() || null;
-                        } else {
-                            // If no separator found, treat the whole thing as title
-                            title = streamTitle;
-                        }
-                    }
+                    const { artist, title } = streamTitle
+                        ? parseStreamTitle(streamTitle)
+                        : { artist: null, title: null };
 
                     setMetadata(title || artist ? { artist, title } : null);
                 },
