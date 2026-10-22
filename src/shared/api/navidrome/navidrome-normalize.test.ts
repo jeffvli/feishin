@@ -429,3 +429,50 @@ describe('ndNormalize.playlist', () => {
         expect(playlist.imageId).toBe('pl-1&_=u1');
     });
 });
+
+describe('ndNormalize.internetRadioStation', () => {
+    const station = (fields: Record<string, unknown> = {}) =>
+        ndNormalize.internetRadioStation(
+            ndType._response.radioStation.parse({
+                createdAt: '2024-01-01',
+                id: 'r1',
+                name: 'Radio',
+                streamUrl: 'https://stream.example/radio.mp3',
+                updatedAt: 'u1',
+                ...fields,
+            }),
+        );
+
+    it('maps core fields', () => {
+        expect(station()).toMatchObject({
+            homepageUrl: null,
+            id: 'r1',
+            imageId: 'r1',
+            name: 'Radio',
+            streamUrl: 'https://stream.example/radio.mp3',
+            uploadedImage: null,
+        });
+    });
+
+    it('treats a blank homepage as missing', () => {
+        expect(station({ homePageUrl: '  ' }).homepageUrl).toBeNull();
+        expect(station({ homePageUrl: 'https://radio.example' }).homepageUrl).toBe(
+            'https://radio.example',
+        );
+    });
+
+    it('busts the image cache for uploaded images', () => {
+        expect(station({ uploadedImage: 'logo.png' }).imageId).toBe('r1&_=u1');
+    });
+});
+
+describe('ndNormalize.genre', () => {
+    it('keeps missing counts as null', () => {
+        expect(ndNormalize.genre({ id: 'g-1', name: 'Rock' }, null)).toMatchObject({
+            albumCount: null,
+            id: 'g-1',
+            name: 'Rock',
+            songCount: null,
+        });
+    });
+});

@@ -254,3 +254,57 @@ describe('ssNormalize.playlist', () => {
         expect(normalizePlaylist({ changed: 'c1', coverArt: undefined }).imageId).toBeNull();
     });
 });
+
+describe('ssNormalize.folder', () => {
+    it('splits children into subfolders and songs', () => {
+        const folder = ssNormalize.folder({
+            child: [{ ...rawSong, id: 'dir-1', isDir: true, title: 'Disc 1' }, rawSong],
+            coverArt: 'cover',
+            id: 5,
+            parent: 'root',
+            title: 'Album',
+        } as unknown as Parameters<typeof ssNormalize.folder>[0]);
+
+        expect(folder).toMatchObject({
+            id: '5',
+            imageId: 'cover',
+            name: 'Album',
+            parentId: 'root',
+        });
+        expect(folder.children?.folders.map((f) => [f.id, f.name])).toEqual([['dir-1', 'Disc 1']]);
+        expect(folder.children?.songs.map((s) => s.id)).toEqual(['song-1']);
+    });
+
+    it('has empty children for an empty folder', () => {
+        expect(
+            ssNormalize.folder({ id: 'f', title: 'Empty' } as unknown as Parameters<
+                typeof ssNormalize.folder
+            >[0]).children,
+        ).toEqual({ folders: [], songs: [] });
+    });
+});
+
+describe('ssNormalize.genre and internetRadioStation', () => {
+    it('uses the genre name as its id', () => {
+        expect(
+            ssNormalize.genre({ albumCount: 2, songCount: 20, value: 'Rock' }, null),
+        ).toMatchObject({ albumCount: 2, id: 'Rock', name: 'Rock', songCount: 20 });
+    });
+
+    it('maps radio stations', () => {
+        expect(
+            ssNormalize.internetRadioStation({
+                id: 'r1',
+                name: 'Radio',
+                streamUrl: 'https://stream.example/radio.mp3',
+            }),
+        ).toEqual({
+            homepageUrl: null,
+            id: 'r1',
+            imageId: null,
+            imageUrl: null,
+            name: 'Radio',
+            streamUrl: 'https://stream.example/radio.mp3',
+        });
+    });
+});

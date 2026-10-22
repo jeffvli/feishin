@@ -4,8 +4,10 @@ import {
     getFeatures,
     hasFeature,
     hasFeatureWithVersion,
+    replacePathPrefix,
     sortAlbumArtistList,
     sortAlbumList,
+    sortRadioList,
     sortSongList,
     sortSongsByFetchedOrder,
     VersionInfo,
@@ -15,7 +17,9 @@ import {
     AlbumArtist,
     AlbumArtistListSort,
     AlbumListSort,
+    InternetRadioStation,
     LibraryItem,
+    RadioListSort,
     ServerListItem,
     Song,
     SongListSort,
@@ -323,5 +327,43 @@ describe('sortAlbumArtistList', () => {
             'y',
             'x',
         ]);
+    });
+});
+
+describe('replacePathPrefix', () => {
+    it('maps a server path to a local path', () => {
+        expect(replacePathPrefix('/music/Artist/song.flac', '/music', 'Z:')).toBe(
+            'Z:/Artist/song.flac',
+        );
+    });
+
+    it('only replaces a matching prefix', () => {
+        expect(replacePathPrefix('/data/music/song.flac', '/music', '/mnt')).toBe(
+            '/mnt/data/music/song.flac',
+        );
+    });
+
+    it('returns the path unchanged without a mapping', () => {
+        expect(replacePathPrefix('/music/song.flac')).toBe('/music/song.flac');
+    });
+
+    it('strips the prefix when there is no replacement', () => {
+        expect(replacePathPrefix('/music/song.flac', '/music')).toBe('/song.flac');
+    });
+});
+
+describe('sortRadioList', () => {
+    const stations = [
+        { id: '1', name: 'beta' },
+        { id: '2', name: 'Alpha' },
+    ] as InternetRadioStation[];
+
+    it('sorts by name case-insensitively', () => {
+        expect(ids(sortRadioList(stations, RadioListSort.NAME, SortOrder.ASC))).toEqual(['2', '1']);
+    });
+
+    it('reverses the fetched order for descending ID without mutating the input', () => {
+        expect(ids(sortRadioList(stations, RadioListSort.ID, SortOrder.DESC))).toEqual(['2', '1']);
+        expect(ids(stations)).toEqual(['1', '2']);
     });
 });
