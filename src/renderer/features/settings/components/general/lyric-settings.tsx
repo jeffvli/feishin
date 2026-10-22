@@ -56,7 +56,6 @@ export const LyricSettings = memo(() => {
             description: t('setting.preferLocalLyrics', {
                 context: 'description',
             }),
-            isHidden: !isElectron(),
             title: t('setting.preferLocalLyrics'),
         },
         {
@@ -70,7 +69,6 @@ export const LyricSettings = memo(() => {
             description: t('setting.lyricFetch', {
                 context: 'description',
             }),
-            isHidden: !isElectron(),
             title: t('setting.lyricFetch'),
         },
         {
@@ -78,7 +76,11 @@ export const LyricSettings = memo(() => {
                 <MultiSelect
                     aria-label="Lyric providers"
                     clearable
-                    data={Object.values(LyricSource)}
+                    data={
+                        isElectron()
+                            ? Object.values(LyricSource)
+                            : [LyricSource.LRCLIB, LyricSource.SIMPMUSIC]
+                    }
                     defaultValue={settings.sources}
                     onChange={(e: string[]) => {
                         localSettings?.set('lyrics', e);
@@ -90,7 +92,6 @@ export const LyricSettings = memo(() => {
             description: t('setting.lyricFetchProvider', {
                 context: 'description',
             }),
-            isHidden: !isElectron(),
             title: t('setting.lyricFetchProvider'),
         },
         {
