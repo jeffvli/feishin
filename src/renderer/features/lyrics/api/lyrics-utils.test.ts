@@ -8,9 +8,15 @@ import {
     getCurrentWordIndex,
     getDefaultStructuredIndex,
     getLineEndMs,
+    getLyricLineText,
     getLyricsLayers,
+    getOverlayCueLinesForLine,
+    getOverlayLayerKey,
     getWordProgress,
+    lyricsHasWordCues,
+    normalizeLyrics,
     normalizeLyricsLine,
+    overlayLineHasWordCues,
 } from '/@/renderer/features/lyrics/api/lyrics-utils';
 import {
     LyricsKind,
@@ -180,5 +186,53 @@ describe('structured lyric layers', () => {
         expect(formatStructuredLyricLabel(main)).toBe('jpn');
         expect(formatStructuredLyricLabel(translation)).toBe('eng (translation)');
         expect(formatStructuredLyricLabel(unsynced)).toBe('eng');
+    });
+});
+
+describe('lyric line helpers', () => {
+    it('normalizes a mix of tuples and line objects', () => {
+        expect(normalizeLyrics([[0, 'a'], { startMs: 10, text: 'b' }] as never)).toEqual([
+            { startMs: 0, text: 'a' },
+            { startMs: 10, text: 'b' },
+        ]);
+        expect(getLyricLineText([5, 'tuple'])).toBe('tuple');
+    });
+
+    it('detects word cues', () => {
+        const withWords = { cueLines: [cueLine], startMs: 1000, text: 'hello world' };
+        const withoutWords = {
+            cueLines: [{ ...cueLine, words: [] }],
+            startMs: 1000,
+            text: 'hello world',
+        };
+
+        expect(lyricsHasWordCues([lines[0], withWords])).toBe(true);
+        expect(lyricsHasWordCues([lines[0], withoutWords])).toBe(false);
+        expect(overlayLineHasWordCues(withWords)).toBe(true);
+        expect(overlayLineHasWordCues(undefined)).toBe(false);
+    });
+
+    it('returns overlay cue lines only when the matching line has word cues', () => {
+        const overlay: SynchronizedLyricLine[] = [
+            { cueLines: [cueLine], startMs: 1000, text: 'hello world' },
+            { cueLines: [{ ...cueLine, words: [] }], startMs: 5000, text: 'no words' },
+        ];
+
+        expect(getOverlayCueLinesForLine(overlay, 1000)).toEqual([cueLine]);
+        expect(getOverlayCueLinesForLine(overlay, 5000)).toBeNull();
+        expect(getOverlayCueLinesForLine(null, 1000)).toBeNull();
+    });
+
+    it('keys overlay layers by kind and language', () => {
+        expect(
+            getOverlayLayerKey({
+                kind: 'translation',
+                lang: 'fin',
+                synced: true,
+            } as StructuredLyric),
+        ).toBe('translation:fin');
+        expect(getOverlayLayerKey({ lang: 'eng', synced: false } as StructuredLyric)).toBe(
+            'main:eng',
+        );
     });
 });
