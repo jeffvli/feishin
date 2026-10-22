@@ -1,11 +1,4 @@
-import {
-    expect,
-    getSongCell,
-    login,
-    navigateTo,
-    packageVersion,
-    test,
-} from '../fixtures/katiesamp-test.mjs';
+import { expect, login, navigateTo, packageVersion, test } from '../fixtures/katiesamp-test.mjs';
 
 test('@full shows the ready update action beside the current version', async ({
     electronApp,
@@ -105,7 +98,7 @@ test('@full home exposes the configured music folder selector', async ({ page })
     await expect(page.getByRole('option', { name: "Katie O'Brien's Music" })).toBeVisible();
 });
 
-test('@full automatically updates a removed music folder without expiring the login', async ({
+test('@full updates a removed music folder after playback is paused', async ({
     mockJellyfin,
     page,
 }) => {
@@ -114,17 +107,22 @@ test('@full automatically updates a removed music folder without expiring the lo
     const selector = page.getByRole('combobox', { name: 'Select music folder' });
     await expect(selector).toHaveValue("Katie O'Brien's Music");
 
-    await navigateTo(page, '/library/songs');
-    const song = getSongCell(page, 'Automation Track 1');
-    await expect(song).toBeVisible({ timeout: 15_000 });
-    await song.dblclick();
+    await navigateTo(page, '/library/albums/album-1');
+    const albumHeading = page.getByRole('heading', { level: 1, name: 'Automation Album' });
+    await expect(albumHeading).toBeVisible({ timeout: 15_000 });
+    await albumHeading.locator('..').getByRole('button', { exact: true, name: 'Play' }).click();
     await navigateTo(page, '/');
-    await expect(page.getByText('Automation Track 1', { exact: true })).toBeVisible();
+    const playerBar = page.locator('.media-player');
+    const pauseButton = playerBar.getByRole('button', { name: 'Pause' });
+    await expect(playerBar.getByText('Automation Track 1', { exact: true })).toBeVisible();
+    await expect(pauseButton).toBeVisible();
+    await pauseButton.click();
 
     mockJellyfin.setMusicFolders([{ id: 'music-folder-2', name: 'Replacement Music' }]);
     await page.clock.runFor('01:00');
+
     await expect(selector).toHaveValue('Replacement Music');
-    await expect(page.getByText('Automation Track 1', { exact: true })).toHaveCount(0);
+    await expect(playerBar.getByRole('button', { name: 'Play' })).toBeDisabled();
 
     mockJellyfin.setDeniedItemIds(['album-1']);
     await page.evaluate(() => {

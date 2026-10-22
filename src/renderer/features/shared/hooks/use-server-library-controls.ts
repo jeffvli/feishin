@@ -1,14 +1,81 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router';
 
 import { controller } from '/@/renderer/api/controller';
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { startScanWatch, useScanStatus } from '/@/renderer/features/shared/hooks/use-scan-status';
+import { resolveMusicFolderAccessChange } from '/@/renderer/features/shared/utils/music-folder-access';
+import { AppRoute } from '/@/renderer/router/routes';
 import { useAuthStoreActions, useCurrentServer } from '/@/renderer/store';
-import { usePlayerStoreBase } from '/@/renderer/store/player.store';
+import { usePlayerStatus, usePlayerStoreBase } from '/@/renderer/store/player.store';
+import { logger } from '/@/renderer/utils/logger';
 import { hasFeature } from '/@/shared/api/utils';
 import { toast } from '/@/shared/components/toast/toast';
 import { ServerFeature } from '/@/shared/types/features-types';
+import { PlayerStatus } from '/@/shared/types/types';
+
+export const useServerLibraryAccessSync = (enabled: boolean) => {
+    const currentServer = useCurrentServer();
+    const navigate = useNavigate();
+    const playerStatus = usePlayerStatus();
+    const queryClient = useQueryClient();
+    const { setMusicFolderId } = useAuthStoreActions();
+    const musicFoldersQuery = useQuery(
+        currentServer
+            ? sharedQueries.musicFolders({
+                  options: { enabled },
+                  query: null,
+                  serverId: currentServer.id,
+              })
+            : { enabled: false, queryKey: ['disabled', 'music-folders'] },
+    );
+
+    useEffect(() => {
+        const musicFolders = musicFoldersQuery.data;
+        if (!enabled || !currentServer || !musicFolders) return;
+
+        const resolution = resolveMusicFolderAccessChange({
+            availableIds: musicFolders.items.map((folder) => folder.id),
+            isPlaying: playerStatus === PlayerStatus.PLAYING,
+            selectedIds: currentServer.musicFolderId || [],
+        });
+
+        if (!resolution) return;
+
+        if (resolution.deferred) {
+            logger.info(
+                'Music folder access refresh deferred until playback is paused or stopped',
+                {
+                    serverId: currentServer.id,
+                },
+            );
+            return;
+        }
+
+        if (resolution.clearQueue) {
+            usePlayerStoreBase.getState().clearQueue();
+        }
+
+        setMusicFolderId(resolution.replacementIds);
+        queryClient.removeQueries({
+            predicate: (query) =>
+                query.queryKey[0] === currentServer.id && query.queryKey[1] !== 'musicFolders',
+        });
+
+        if (resolution.clearQueue) {
+            navigate(AppRoute.HOME, { replace: true });
+        }
+    }, [
+        currentServer,
+        enabled,
+        musicFoldersQuery.data,
+        navigate,
+        playerStatus,
+        queryClient,
+        setMusicFolderId,
+    ]);
+};
 
 export const useServerLibraryControls = () => {
     const currentServer = useCurrentServer();
@@ -34,38 +101,6 @@ export const useServerLibraryControls = () => {
             ) || [],
         [currentServer?.musicFolderId, musicFolders?.items],
     );
-
-    useEffect(() => {
-        if (!currentServer || !musicFolders) return;
-
-        const selectedIds = currentServer.musicFolderId || [];
-        const availableIds = new Set(musicFolders.items.map((folder) => folder.id));
-        const accessibleSelectedIds = selectedIds.filter((id) => availableIds.has(id));
-        const lostFolderAccess = accessibleSelectedIds.length < selectedIds.length;
-
-        if (accessibleSelectedIds.length === selectedIds.length) {
-            if (selectedIds.length > 0 || musicFolders.items.length !== 1) return;
-        }
-
-        const replacementIds =
-            accessibleSelectedIds.length > 0
-                ? accessibleSelectedIds
-                : musicFolders.items[0]
-                  ? [musicFolders.items[0].id]
-                  : undefined;
-
-        if (lostFolderAccess) {
-            const player = usePlayerStoreBase.getState();
-            player.mediaStop();
-            player.clearQueue();
-        }
-
-        setMusicFolderId(replacementIds);
-        queryClient.removeQueries({
-            predicate: (query) =>
-                query.queryKey[0] === currentServer.id && query.queryKey[1] !== 'musicFolders',
-        });
-    }, [currentServer, musicFolders, queryClient, setMusicFolderId]);
 
     const toggleMusicFolder = useCallback(
         (musicFolderId: string) => {
