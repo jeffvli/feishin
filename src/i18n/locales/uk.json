@@ -557,7 +557,9 @@
         "sleepTimer_cancel": "Скасувати таймер",
         "scrobbleForceSubmit": "Примусово надіслати скробл",
         "nextAlbum": "Alt+Клік — наступний альбом",
-        "previousAlbum": "Alt+Клік — попередній альбом"
+        "previousAlbum": "Alt+Клік — попередній альбом",
+        "queueSection_queue": "Черга",
+        "queueSection_upNext": "Далі"
     },
     "page": {
         "albumArtistDetail": {
@@ -1343,7 +1345,9 @@
         "imagePlaceholderPriority_optionBlurhash": "BlurHash",
         "imagePlaceholderPriority_optionDominantColor": "Домінувальний колір",
         "imagePlaceholderPriority_optionOff": "Вимкнено",
-        "imagePlaceholderPriority_optionThumbhash": "ThumbHash"
+        "imagePlaceholderPriority_optionThumbhash": "ThumbHash",
+        "upNextQueue_description": "Функція «Відтворити наступним» додає пісні до розділу «Далі» після поточної пісні в порядку їх додавання. Пісні з розділу «Далі» залишаються наступними навіть після перемішування або заміни черги відтворення. Вимкніть цю функцію, щоб кожна пісня, додана через «Відтворити наступним», ставала одразу після поточної пісні.",
+        "upNextQueue": "Черга «Далі»"
     },
     "table": {
         "column": {

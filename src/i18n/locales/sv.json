@@ -14,7 +14,7 @@
         "removeFromQueue": "Ta bort från kön",
         "deselectAll": "Avmarkera alla",
         "moveToBottom": "Flytta längst ned",
-        "setRating": "Ange betyg",
+        "setRating": "Betygsätt",
         "removeFromFavorites": "Ta bort från $t(entity.favorite, {\"count\": 2})",
         "downloadStarted": "Nedladdning av {{count}} objekt har startats",
         "moveToNext": "Flytta till nästa",
@@ -29,14 +29,20 @@
         "viewMore": "Visa mer",
         "openIn": {
             "lastfm": "Öppna i Last.fm",
-            "musicbrainz": "Öppna i MusicBrainz"
+            "musicbrainz": "Öppna i MusicBrainz",
+            "listenbrainz": "Öppna i ListenBrainz",
+            "qobuz": "Öppna i Qobuz",
+            "spotify": "Öppna i Spotify"
         },
         "createRadioStation": "Skapa $t(entity.radioStation, {\"count\": 1})",
         "deleteRadioStation": "Ta bort $t(entity.radioStation, {\"count\": 1})",
         "addOrRemoveFromSelection": "Lägg till i eller ta bort från markeringen",
         "selectRangeOfItems": "Markera ett intervall av objekt",
         "selectAll": "Markera alla",
-        "openApplicationDirectory": "Öppna programmappen"
+        "openApplicationDirectory": "Öppna programmappen",
+        "createPlaylistFromQueue": "Skapa $t(entity.playlist, {\"count\": 1}) från kön",
+        "collapseAllFolders": "Fäll ihop alla mappar",
+        "expandAllFolders": "Utöka alla mappar"
     },
     "common": {
         "backward": "Bakåt",
@@ -68,7 +74,7 @@
         "name": "Namn",
         "maximize": "Maximera",
         "decrease": "Minska",
-        "ok": "OK",
+        "ok": "Ok",
         "description": "Beskrivning",
         "configure": "Konfigurera",
         "path": "Sökväg",
@@ -77,7 +83,7 @@
         "enable": "Aktivera",
         "clear": "Rensa",
         "forward": "Framåt",
-        "delete": "Ta bort",
+        "delete": "Radera",
         "cancel": "Avbryt",
         "forceRestartRequired": "Starta om för att tillämpa ändringarna … stäng aviseringen för att starta om",
         "setting_one": "Inställning",
@@ -129,7 +135,7 @@
         "view": "Visa",
         "externalLinks": "Externa länkar",
         "faster": "Snabbare",
-        "mbid": "MusicBrainz ID",
+        "mbid": "MusicBrainz-ID",
         "noFilters": "Inga filter konfigurerade",
         "preview": "Förhandsgranska",
         "private": "Privat",
@@ -148,7 +154,23 @@
         "gridRows": "Rutnätsrader",
         "tableColumns": "Tabellkolumner",
         "itemsMore": "{{count}} fler",
-        "countSelected": "Markerade: {{count}}"
+        "countSelected": "{{count}} markerade",
+        "back": "Tillbaka",
+        "openFolder": "Öppna mapp",
+        "grouping": "Gruppering",
+        "numberOfResults": "{{numberOfResults}} resultat",
+        "retry": "Försök igen",
+        "newVersionAvailable": "En ny version finns tillgänglig",
+        "scanFolderCount": "{{count}} mappar",
+        "scanItemCount": "{{count}} objekt",
+        "scanningLibrary": "Skannar bibliotek…",
+        "saveAndClose": "Spara och stäng",
+        "example": "Exempel",
+        "rename": "Byt namn",
+        "lastScan": "Senaste skanning {{date}}",
+        "filter_multiple": "Flera",
+        "filter_single": "En",
+        "mood": "Stämning"
     },
     "error": {
         "remotePortWarning": "Starta om servern för att tillämpa den nya porten",
@@ -164,7 +186,7 @@
         "sessionExpiredError": "Din session har löpt ut",
         "remoteEnableError": "Det gick inte att utföra åtgärden ”$t(common.enable)” på fjärrservern",
         "localFontAccessDenied": "Åtkomst till lokala teckensnitt nekades",
-        "serverNotSelectedError": "Ingen server har valts",
+        "serverNotSelectedError": "Ingen server har markerats",
         "remoteDisableError": "Det gick inte att utföra åtgärden ”$t(common.disable)” på fjärrservern",
         "mpvRequired": "MPV krävs",
         "audioDeviceFetchError": "Ett fel uppstod när ljudenheterna skulle hämtas",
@@ -176,14 +198,21 @@
         "networkError": "Ett nätverksfel uppstod",
         "notificationDenied": "Behörigheten att visa aviseringar nekades. Den här inställningen har därför ingen effekt",
         "openError": "Filen kunde inte öppnas",
-        "settingsSyncError": "Skillnader hittades mellan inställningarna för renderingsprocessen och huvudprocessen. Starta om programmet för att tillämpa ändringarna"
+        "settingsSyncError": "Skillnader hittades mellan inställningarna för renderingsprocessen och huvudprocessen. Starta om programmet för att tillämpa ändringarna",
+        "invalidJson": "Ogiltig JSON",
+        "noNetwork": "Server är otillgänglig",
+        "noNetworkDescription": "Kunde inte ansluta till servern",
+        "saveQueueFailed": "Kunde inte spara kön",
+        "playbackPausedDueToError": "Uppspelning pausades på grund av ett fel",
+        "jellyfinQuickConnectNotActive": "Snabbanslutning är inte aktiverat på den här servern",
+        "jellyfinQuickConnectDeactivated": "Begäran för Snabbanslutning har gått ut"
     },
     "filter": {
         "mostPlayed": "Mest spelade",
         "comment": "Kommentar",
         "playCount": "Antal spelningar",
         "recentlyUpdated": "Nyligen uppdaterade",
-        "channels": "$t(common.channel_other)",
+        "channels": "$t(common.channel, {\"count\": 2})",
         "isCompilation": "Är ett samlingsalbum",
         "recentlyPlayed": "Nyligen spelade",
         "isRated": "Är betygsatt",
@@ -221,7 +250,12 @@
         "songCount": "Antal låtar",
         "criticRating": "Kritikerbetyg",
         "albumCount": "Antal $t(entity.album, {\"count\": 2})",
-        "explicitStatus": "$t(common.explicitStatus)"
+        "explicitStatus": "$t(common.explicitStatus)",
+        "matchAnd": "Och",
+        "matchOr": "Eller",
+        "date": "Datum",
+        "sortName": "Sortera namn",
+        "year": "År"
     },
     "form": {
         "deletePlaylist": {
@@ -250,7 +284,15 @@
             "ignoreCors": "Ignorera CORS ($t(common.restartRequired))",
             "error_savePassword": "Ett fel uppstod när lösenordet skulle sparas",
             "input_preferInstantMix": "Föredra Instant Mix",
-            "input_preferInstantMixDescription": "Använd endast Instant Mix för att hitta liknande låtar. Detta är användbart om du har insticksmoduler som ändrar beteendet"
+            "input_preferInstantMixDescription": "Använd endast Instant Mix för att hitta liknande låtar. Detta är användbart om du har insticksmoduler som ändrar beteendet",
+            "input_enableAudiobooks": "Aktivera ljudböcker",
+            "input_jellyfinQuickConnectCodeCopied": "Kopierad",
+            "input_jellyfinQuickConnectCodeCopy": "Kopiera kod",
+            "input_jellyfinSignInMethod": "Logga in med",
+            "input_jellyfinSignInMethodPassword": "Lösenord",
+            "input_jellyfinQuickConnectOpen": "Öppna snabbanslutning",
+            "input_jellyfinQuickConnect": "Snabbanslutning",
+            "input_jellyfinSignInMethodQuickConnect": "Snabbanslutning"
         },
         "addToPlaylist": {
             "success": "Lade till $t(entity.trackWithCount, {\"count\": {{message}} }) till $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",
@@ -266,7 +308,9 @@
         },
         "queryEditor": {
             "input_optionMatchAll": "Matcha alla villkor",
-            "input_optionMatchAny": "Matcha minst ett villkor"
+            "input_optionMatchAny": "Matcha minst ett villkor",
+            "resetToDefault": "Återställ till standard",
+            "clearFilters": "Rensa filter"
         },
         "lyricSearch": {
             "input_name": "$t(common.name)",
@@ -287,6 +331,40 @@
             "input_homepageUrl": "Webbplatsens URL",
             "input_name": "Namn",
             "input_streamUrl": "Strömnings-URL"
+        },
+        "queueChangeConfirmation": {
+            "description": "Det här kommer att ta bort alla objekt från den nuvarande kön."
+        },
+        "createPrefilledPlaylist": {
+            "title": "Skapa $t(entity.playlist, {\"count\": 1}) från markerade låtar"
+        },
+        "lyricsExport": {
+            "export": "Exportera låttext",
+            "input_synced": "Exportera synkroniserad låttext",
+            "input_offset": "$t(setting.lyricOffset)"
+        },
+        "shareItem": {
+            "allowDownloading": "Tillåt nedladdning",
+            "copyToClipboard": "Kopiera till urklippet: Ctrl+C, enter",
+            "description": "Beskrivning"
+        },
+        "shuffleAll": {
+            "title": "Spela slumpmässig",
+            "input_kind_albums": "Album",
+            "input_kind_songs": "Låtar",
+            "input_limit_albums": "Hur många album?",
+            "input_limit_songs": "Hur många låtar?",
+            "input_genre": "$t(entity.genre, {\"count\": 1})",
+            "input_limit": "Hur många låtar?",
+            "input_minYear": "Från år",
+            "input_maxYear": "Till år",
+            "input_played": "Spela filter",
+            "input_played_optionAll": "Alla spår",
+            "input_played_optionUnplayed": "Endast ospelade spår",
+            "input_played_optionPlayed": "Endast spelade spår"
+        },
+        "privateMode": {
+            "title": "Privat läge"
         }
     },
     "page": {
@@ -301,10 +379,16 @@
                 "lyricGap": "Radavstånd för låttext",
                 "synchronized": "Synkroniserad",
                 "showLyricProvider": "Visa låttextleverantör",
-                "unsynchronized": "Osynkroniserad"
+                "unsynchronized": "Osynkroniserad",
+                "dynamicIsImage": "Aktivera bakgrundsbild",
+                "useImageAspectRatio": "Använd bildens bildformat"
             },
             "lyrics": "Låttext",
-            "related": "Relaterat"
+            "related": "Relaterat",
+            "lyricLanguage": "Språk",
+            "showPronunciation": "Uttal",
+            "showTranslation": "Översättning",
+            "noLyrics": "Inga låttexter hittades"
         },
         "appMenu": {
             "selectServer": "Välj server",
@@ -316,7 +400,14 @@
             "quit": "$t(common.quit)",
             "goBack": "Gå tillbaka",
             "goForward": "Gå framåt",
-            "collapseSidebar": "Fäll ihop sidofältet"
+            "collapseSidebar": "Fäll ihop sidofältet",
+            "rescanLibrary": "Skanna biblioteket igen",
+            "logout": "Logga ut",
+            "privateModeOff": "Stäng av privat läge",
+            "privateModeOn": "Sätt på privat läge",
+            "selectMusicFolder": "Markera musikmapp",
+            "noMusicFolder": "Ingen musikmapp vald",
+            "multipleMusicFolders": "{{count}} musikmappar valda"
         },
         "contextMenu": {
             "addToPlaylist": "$t(action.addToPlaylist)",
@@ -333,7 +424,7 @@
             "addLast": "$t(player.addLast)",
             "addFavorite": "$t(action.addToFavorites)",
             "play": "$t(player.play)",
-            "numberSelected": "Markerade: {{count}}",
+            "numberSelected": "{{count}} markerade",
             "removeFromQueue": "$t(action.removeFromQueue)",
             "download": "Ladda ned",
             "moveItems": "$t(action.moveItems)",
@@ -344,32 +435,70 @@
             "goTo": "Gå till",
             "goToAlbum": "Gå till $t(entity.album, {\"count\": 1})",
             "goToAlbumArtist": "Gå till $t(entity.albumArtist, {\"count\": 1})",
-            "showDetails": "Visa information"
+            "showDetails": "Visa information",
+            "editMetadata": "Ändra metadata"
         },
         "albumDetail": {
             "moreFromArtist": "Mer från samma $t(entity.artist, {\"count\": 1})",
-            "moreFromGeneric": "Mer från {{item}}"
+            "moreFromGeneric": "Mer från {{item}}",
+            "released": "Utgiven"
         },
         "albumArtistList": {
             "title": "$t(entity.albumArtist, {\"count\": 2})"
         },
         "albumList": {
-            "title": "$t(entity.album, {\"count\": 2})"
+            "title": "$t(entity.album, {\"count\": 2})",
+            "artistAlbums": "Album av {{artist}}",
+            "genreAlbums": "”{{genre}}” $t(entity.album, {\"count\": 2})"
         },
         "sidebar": {
-            "nowPlaying": "Nu spelas"
+            "nowPlaying": "Nu spelas",
+            "albums": "Album",
+            "albumArtists": "Albumartiser",
+            "artists": "Artister",
+            "favorites": "Favoriter",
+            "folders": "Mappar",
+            "genres": "Genrer",
+            "home": "Hem",
+            "radio": "Radiostationer",
+            "myLibrary": "Mitt bibliotek",
+            "playlists": "Spellista",
+            "search": "Sök",
+            "settings": "Inställningar",
+            "shared": "Delade spellistor",
+            "tracks": "Spår",
+            "collections": "Samlingar"
         },
         "home": {
             "mostPlayed": "Mest spelade",
             "newlyAdded": "Nytillkomna utgåvor",
             "explore": "Utforska ditt bibliotek",
-            "recentlyPlayed": "Nyligen spelade"
+            "recentlyPlayed": "Nyligen spelade",
+            "genres": "$t(entity.genre, {\"count\": 2})",
+            "playlists": "Spellistor",
+            "title": "$t(common.home)",
+            "recentlyReleased": "Nyligen utgivet"
         },
         "setting": {
             "playbackTab": "Uppspelning",
             "generalTab": "Allmänt",
             "hotkeysTab": "Kortkommandon",
-            "windowTab": "Fönster"
+            "windowTab": "Fönster",
+            "updates": "Uppdatering",
+            "cache": "Cache",
+            "application": "Applikation",
+            "theme": "Tema",
+            "controls": "Kontroller",
+            "sidebar": "Sidofält",
+            "exportImport": "Importera/exportera",
+            "audio": "Ljud",
+            "lyrics": "Låttext",
+            "discord": "Discord",
+            "advanced": "Avancerat",
+            "remote": "Fjärranslutning",
+            "lyricsTranslation": "Översättning av låttext",
+            "analytics": "Statistik",
+            "transcoding": "Transkodning"
         },
         "globalSearch": {
             "commands": {
@@ -383,7 +512,63 @@
             "url": "URL",
             "username": "Användarnamn",
             "editServerDetailsTooltip": "Redigera serveruppgifter",
-            "removeServer": "Ta bort server"
+            "removeServer": "Ta bort server",
+            "title": "Hantera servrar",
+            "serverDetails": "Serverdetaljer"
+        },
+        "albumArtistDetail": {
+            "about": "Om {{artist}}",
+            "favoriteSongs": "Favorit låtar",
+            "viewDiscography": "Visa diskografi",
+            "topSongs": "Topp låtar",
+            "topSongsCommunity": "Gemenskap",
+            "topSongsFrom": "Topp låtar från {{title}}",
+            "favoriteSongsFrom": "Favoritlåtar från {{title}}",
+            "viewAll": "Visa alla",
+            "viewAllTracks": "Visa alla $t(entity.track, {\"count\": 2})",
+            "recentReleases": "Nya utgåvor",
+            "groupingTypeAll": "Alla typer av utgåvor"
+        },
+        "radioList": {
+            "title": "Radiostationer"
+        },
+        "favorites": {
+            "title": "$t(entity.favorite, {\"count\": 2})"
+        },
+        "windowBar": {
+            "paused": "(Pausad) ",
+            "privateMode": "(Privat läge)"
+        },
+        "itemDetail": {
+            "serverSuggestions": "Server",
+            "copyPath": "Kopiera sökväg till urklippet",
+            "openFile": "Visa spår i filhanteraren",
+            "emptyFields": "Fält kan inte vara tomma",
+            "tagsTab": "Taggar",
+            "addTagConfig": "Lägg till tagg…",
+            "readPartialFailure": "Kunde inte läsa metadata från {{count}} av {{total}} file/filer",
+            "writePartialFailure": "Misslyckades med att spara {{count}} fil/filer",
+            "customValues": "Anpassade värden",
+            "multipleValues": "(Flera värden)"
+        },
+        "trackList": {
+            "artistTracks": "Spår av {{artist}}",
+            "genreTracks": "”{{genre}}” $t(entity.track, {\"count\": 2})",
+            "title": "$t(entity.track, {\"count\": 2})"
+        },
+        "playlistList": {
+            "title": "$t(entity.playlist, {\"count\": 2})"
+        },
+        "genreList": {
+            "showAlbums": "Visa $t(entity.genre, {\"count\": 1}) $t(entity.album, {\"count\": 2})",
+            "showTracks": "Visa $t(entity.genre, {\"count\": 1}) $t(entity.track, {\"count\": 2})",
+            "title": "$t(entity.genre, {\"count\": 2})"
+        },
+        "folderList": {
+            "title": "$t(entity.folder, {\"count\": 2})"
+        },
+        "collections": {
+            "saveAsCollection": "Spara som samling"
         }
     },
     "entity": {
@@ -448,13 +633,40 @@
         "queue_moveToTop": "Flytta markeringen högst upp",
         "queue_moveToBottom": "Flytta markeringen längst ned",
         "addLast": "Lägg till sist i kön",
-        "mute": "Stäng av ljudet"
+        "mute": "Stäng av ljudet",
+        "lyrics": "Låttext",
+        "nextAlbum": "Alt+klick för nästa album",
+        "playSimilarSongs": "Spela liknande låtar",
+        "previousAlbum": "Alt+klick för föregående album",
+        "restoreQueueFromServer": "Återställ kö från servern",
+        "saveQueueToServer": "Spara kön till servern",
+        "skip": "Hoppa över",
+        "queueSection_queue": "Köa",
+        "pause": "Pausa",
+        "viewQueue": "Visa kö",
+        "sleepTimer": "Sovtimer",
+        "sleepTimer_minutes": "{{count}} min",
+        "sleepTimer_hours": "{{count}} h",
+        "sleepTimer_custom": "Anpassad",
+        "sleepTimer_off": "Av",
+        "sleepTimer_timeRemaining": "{{time}} återstår",
+        "sleepTimer_setCustom": "Ställ in timer",
+        "sleepTimer_cancel": "Avbryt timer",
+        "skip_back": "Hoppa bakåt",
+        "skip_forward": "Hoppa framåt"
     },
     "datetime": {
         "minuteShort": "min",
         "secondShort": "s",
         "hourShort": "h",
-        "dayShort": "d"
+        "dayShort": "d",
+        "minuteLong": "Minut",
+        "hourLong": "Timme",
+        "dayLong": "Dag",
+        "weekLong": "Vecka",
+        "monthLong": "Månad",
+        "yearLong": "År",
+        "secondLong": "Sekund"
     },
     "filterOperator": {
         "after": "Är efter",
@@ -475,6 +687,344 @@
         "notContains": "Innehåller inte",
         "notInPlaylist": "Finns inte i",
         "notInTheLast": "Är inte inom de senaste",
-        "startsWith": "Börjar med"
+        "startsWith": "Börjar med",
+        "isMissing": "Saknas",
+        "isPresent": "Är närvarande"
+    },
+    "setting": {
+        "useThemeAccentColor_description": "Använd huvudfärgen från det valda temat istället för den anpassade accentfärgen",
+        "audioDevice_description": "Välj ljudenhet för uppspelning",
+        "audioPlayer_description": "Välj ljudspelare för uppspelning",
+        "audioPlayer": "Ljudspelare",
+        "clearCache": "Renska webbläsarcachen",
+        "clearQueryCache": "Rensa Feishin-cache",
+        "customCss": "Anpassad CSS",
+        "customCssEnable": "Aktivera anpassad CSS",
+        "automaticUpdates": "Automatiska uppdateringar",
+        "autoDJ_mode_albums": "Album",
+        "autoDJ_mode_songs": "Låtar",
+        "autoDJ_strategy_option_similar": "Liknande",
+        "accentColor": "Accentfärg",
+        "useThemeAccentColor": "Använd temats accentfärg",
+        "hotkey_zoomIn": "Zooma in",
+        "hotkey_zoomOut": "Zooma ut",
+        "language_description": "Ställer in språket för applikationen $t(common.restartRequired)",
+        "lyricFetch": "Hämta låttexter från internet",
+        "lyricFetch_description": "Hämta låttexter från utvalda leverantörer",
+        "lyricFetchProvider": "Leverantörer att hämta låttexter från",
+        "lyricFetchProvider_description": "Välj leverantörer att hämta låttexter från",
+        "logLevel_optionInfo": "Info",
+        "logLevel_optionInfoDescription": "Inkluderar info, varningar och fel",
+        "logLevel_optionDebug": "Felsök",
+        "musicbrainz_description": "Visar länkar till MusicBrainz på artist-/albumsidor, när MusicBrainz-ID finns",
+        "musicbrainz": "Visa MusicBrainz-länkar",
+        "qobuz_description": "Visar länkar till Qobuz på artist-/albumsidor",
+        "qobuz": "Visa Qobuz länkar",
+        "spotify_description": "Visar länkar till Spotify på artist-/albumsidor",
+        "spotify": "Visa Spotify-länkar",
+        "nativeSpotify_description": "Öppna Spotify-appen istället för din webbläsare",
+        "nativeSpotify": "Använd Spotify-appen",
+        "neteaseTranslation_description": "När aktiverad hämtas och visas översatta låttexter från NetEase om tillgängligt",
+        "neteaseTranslation": "Aktivera NetEase-översättningar",
+        "pathReplace_optionRemovePrefix": "Ta bort prefix",
+        "pathReplace_optionAddPrefix": "Lägg till prefix",
+        "playButtonBehavior_optionAddLast": "$t(player.addLast)",
+        "playButtonBehavior_optionAddNext": "$t(player.addNext)",
+        "playButtonBehavior_optionPlay": "$t(player.play)",
+        "playButtonBehavior_optionPlayShuffled": "$t(player.shuffle)",
+        "imageResolution_optionHeader": "Rubrik",
+        "imageResolution_optionSidebar": "Sidofält",
+        "preferLocalLyrics": "Föredra lokala låttexter",
+        "preferLocalLyrics_description": "Föredra lokala låttexter över externa låttexter när tillgängligt",
+        "showRatings": "Visa sjärnor",
+        "windowBarTrackinfo": "Spårinfo i fönstertiteln",
+        "windowBarTrackinfo_description": "Visa det nuvarande spårets titel och artist, köplats och uppspelningsstatus i fönstertiteln.",
+        "themeLight": "Tema (ljust)",
+        "transcode": "Aktivera transkodning",
+        "themeDark": "Tema (mörkt)",
+        "theme": "Tema",
+        "customThemes": "Anpassade teman",
+        "customThemeWarnings": "Varningar",
+        "customThemeErrors": "Fel",
+        "startMinimized": "Starta minimerad",
+        "releaseChannel_optionBeta": "Beta",
+        "releaseChannel_optionLatest": "Senaste",
+        "discordLinkType_none": "$t(common.none)",
+        "equalizerPreamp": "Förförstärkare",
+        "equalizer": "Equalizer",
+        "equalizerPreset": "Förinställning",
+        "scrobbleMinimumMode_optionPercentage": "Procent",
+        "scrobbleMinimumMode_optionSeconds": "Sekunder",
+        "scrobbleMinimumMode_optionBoth": "Båda",
+        "replayGainMode_optionAlbum": "$t(entity.album, {\"count\": 1})",
+        "replayGainMode_optionNone": "$t(common.none)",
+        "replayGainMode_optionTrack": "$t(entity.track, {\"count\": 1})",
+        "hotkey_playbackPlayPause": "Spela / pausa",
+        "hotkey_playbackPrevious": "Föregående spår",
+        "hotkey_playbackPreviousAlbum": "Föregående album",
+        "hotkey_rate1": "Betygsätt 1 stjärna",
+        "hotkey_rate2": "Betygsätt 2 stjärnor",
+        "hotkey_rate3": "Betygsätt 3 stjärnor",
+        "hotkey_rate4": "Betygsätt 4 stjärnor",
+        "hotkey_rate5": "Betygsätt 5 stjärnor",
+        "hotkey_playbackNext": "Nästa spår",
+        "hotkey_playbackNextAlbum": "Nästa album",
+        "hotkey_playbackPause": "Pausa",
+        "hotkey_playbackPlay": "Spela",
+        "font": "Teckensnitt",
+        "exportImportSettings_importBtn": "Importera inställningar",
+        "exportImportSettings_importModalTitle": "Importera Feishin-inställningar",
+        "enableAutoTranslation": "Aktivera automatisk översättning",
+        "discordDisplayType_artistname": "Artistnamn",
+        "audioDevice": "Ljudenhet",
+        "equalizerPresetGroupBuiltIn": "Inbyggd",
+        "equalizerPresetGroupCustom": "Anpassad",
+        "equalizerPresetNamePlaceholder": "Förinställnings namn...",
+        "equalizerPresetSelectPlaceholder": "Välj förinställning",
+        "equalizerSavePreset": "Spara förinställning",
+        "equalizerSavePreset_description": "Spara de nuvarande EQ-inställningarna som en namngiven förinställning",
+        "exportImportSettings_control_description": "Exportera och importera inställningar via JSON",
+        "exportImportSettings_control_exportText": "Exportera inställningar",
+        "exportImportSettings_control_importText": "Importera inställningar",
+        "exportImportSettings_control_title": "Importera / exportera inställningar",
+        "externalLinks": "Visa externa länkar",
+        "externalLinks_description": "Aktiverar visning av externa länkar (Last.fm, MusicBrainz) på artist-/albumsidor",
+        "fontType_optionBuiltIn": "Inbyggt typsnitt",
+        "fontType_optionCustom": "Anpassat typsnitt",
+        "hotkey_rate0": "Rensa betyg",
+        "hotkey_skipBackward": "Hoppa bakåt",
+        "hotkey_skipForward": "Hoppa framåt",
+        "hotkey_volumeDown": "Sänk volym",
+        "hotkey_volumeUp": "Höj volym",
+        "hotkey_volumeMute": "Tysta volym",
+        "imagePlaceholderPriority_optionOff": "Av",
+        "language": "Språk",
+        "lastfm": "Visa Last.fm-länkar",
+        "listenbrainz_description": "Visa länkar till ListenBrainz på artist-/albumsidor",
+        "listenbrainz": "Visa ListenBrainz-länkar",
+        "mpvExtraParameters_help": "En per rad",
+        "imageResolution": "Bildupplösning",
+        "imageResolution_optionTable": "Tabell",
+        "showFavorites": "Visa favoriter",
+        "blurExplicitImages": "Blurra grova bilder",
+        "blurExplicitImages_description": "Album och låtar som taggats som grova kommer att blurras",
+        "preservePitch": "Bevara tonhöjd",
+        "preservePitch_description": "Bevarar tonhöjden när uppspelningshastigheten ändras",
+        "showSkipButton": "Visa \"hoppa över\"-knapparna",
+        "showSkipButtons": "Visa \"hoppa över\"-knapparna",
+        "sidebarPlaylistFolders": "Aktivera mappar",
+        "sidePlayQueueLayout_optionVertical": "Vertikal",
+        "sidePlayQueueLayout_optionHorizontal": "Horisontell",
+        "theme_description": "Ställer in temat som används i applikationen",
+        "themeDark_description": "Ställer in det mörka temat som används i applikationen",
+        "themeLight_description": "Ställer in det ljusa temat som används i applikationen",
+        "queryBuilderCustomFields_inputTag": "Tagg",
+        "queryBuilderCustomFields": "Anpassade fält",
+        "autoDJ_strategy_option_library_random": "Slumpmässig",
+        "autoDJ_allowDuplicates": "Tillåt dubbletter",
+        "accentColor_description": "Ställer in applikationens accentfärg",
+        "discordDisplayType_songname": "Låtnamn",
+        "exportImportSettings_offendingKeyError": "”{{offendingKey}}” är inkorrekt – {{reason}}",
+        "autoDJ_mode": "Läge",
+        "autoDJ_enabled": "Aktivera Auto-DJ",
+        "autoDJ_onlySimilar": "Endast liknande",
+        "hotkey_navigateHome": "Navigera hem",
+        "lastfm_description": "Visar länkar till Last.fm på artist-/albumsidor",
+        "playerbarWaveformAlign_optionCenter": "Centrera",
+        "replayGainPreamp": "{{ReplayGain}} förstärkare (dB)"
+    },
+    "visualizer": {
+        "options": {
+            "frequencyScale": {
+                "none": "Ingen"
+            },
+            "gradient": {
+                "classic": "Klassisk",
+                "prism": "Prisma",
+                "rainbow": "Regnbåge",
+                "steelblue": "Stålblå",
+                "orangered": "Orangeröd"
+            },
+            "weightingFilter": {
+                "none": "Ingen",
+                "a": "A",
+                "b": "B",
+                "c": "C",
+                "d": "D",
+                "z": "Z"
+            }
+        },
+        "lowResolution": "Låg upplösning",
+        "systemAudioConsentDecline": "Neka",
+        "systemAudioConsentAllow": "Tillåt",
+        "general": "Allmänt",
+        "remove": "Ta bort",
+        "position": "Position",
+        "level": "Nivå",
+        "maxFPS": "Max FPS",
+        "horizontal": "Horisontell",
+        "vertical": "Vertikal",
+        "pasteFromClipboard": "Klistra in från urklippet",
+        "applyConfiguration": "Tillämpa konfigurering",
+        "includeAllPresets": "Inkludera alla förinställningar",
+        "ignoredPresets": "Ignorera förinställningar",
+        "copyConfiguration": "Kopiera konfiguration",
+        "pasteConfiguration": "Klistra in konfiguration",
+        "presets": "Förinställningar",
+        "selectPreset": "Välj förinställning",
+        "applyPreset": "Tillämpa förinställning",
+        "saveAsPreset": "Spara som förinställning",
+        "updatePreset": "Uppdatera förinställning",
+        "configCopied": "Konfiguration kopierades till urklippet",
+        "configCopyFailed": "Misslyckades att kopiera konfiguration",
+        "mode": "Läge",
+        "mode1To8": "Läge 1–8",
+        "mode10": "Läge 10",
+        "opacity": "Opacitet",
+        "addColor": "Lägg till färg",
+        "radius": "Radie",
+        "builtIn": "Inbyggd",
+        "presetNamePlaceholder": "Ange förinställningens namn",
+        "presetName": "Förinställnings namn",
+        "showFPS": "Visa FPS",
+        "pasteConfigurationPlaceholder": "Klistra in JSON-konfiguration här...",
+        "colors": "Färger",
+        "colorMode": "Färgläge",
+        "minimumFrequency": "Minsta frekvens",
+        "maximumFrequency": "Största frekvens",
+        "frequencyScale": "Frekvensskala",
+        "sensitivity": "Känslighet"
+    },
+    "dlna": {
+        "group": {
+            "add": "Lägg till",
+            "addSpeaker": "Lägg till högtalare",
+            "addSpeakers": "Lägg till högtalare",
+            "addToGroup": "Lägg till i grupp",
+            "cancel": "Avbryt",
+            "failedToAddTitle": "Kunde inte lägga till högtalare",
+            "refresh": "Uppdatera",
+            "remove": "Ta bort",
+            "searching": "Söker…",
+            "connect": "Anslut"
+        },
+        "speakerProperties": {
+            "loading": "Läser in…",
+            "loudness": "Ljudstyrka",
+            "treble": "Diskant",
+            "bass": "Bas"
+        },
+        "connected": "ansluten",
+        "connecting": "Ansluter…",
+        "createGroup": "Skapa grupp"
+    },
+    "table": {
+        "config": {
+            "general": {
+                "size_default": "Standard",
+                "size_compact": "Kompakt",
+                "size_large": "Stor",
+                "alignLeft": "Vänsterjustera",
+                "alignCenter": "Centrera",
+                "alignRight": "Högerjustera",
+                "pinToLeft": "Fäst till vänster",
+                "pinToRight": "Fäst till höger",
+                "moveUp": "Flytta uppåt",
+                "moveDown": "Flytta nedåt",
+                "advancedSettings": "Advancerade inställningar",
+                "showHeader": "Visa rubrik",
+                "size": "$t(common.size)",
+                "gap": "$t(common.gap)",
+                "albumGroupShowFavoriteRating": "Visa favoriter och betyg",
+                "itemsPerRow": "Objekt per rad",
+                "pagination_itemsPerPage": "Objekt per sida",
+                "pagination": "Sidindelning",
+                "pagination_infinite": "Oändligt",
+                "pagination_paginate": "Sidindelat",
+                "alternateRowColors": "Alternera radfärger",
+                "horizontalBorders": "Radkanter",
+                "verticalBorders": "Kolumnkanter"
+            },
+            "view": {
+                "grid": "Rutnät",
+                "list": "Lista",
+                "table": "Tabell"
+            },
+            "label": {
+                "sampleRate": "$t(common.sampleRate)",
+                "size": "$t(common.size)",
+                "songCount": "$t(entity.track, {\"count\": 2})",
+                "title": "$t(common.title)",
+                "titleArtist": "$t(common.title) (artist)",
+                "year": "$t(common.year)",
+                "releaseYear": "Utgivningsår",
+                "releaseDate": "Utgivningsdatum",
+                "rating": "$t(common.rating)",
+                "path": "$t(common.path)",
+                "note": "$t(common.note)",
+                "owner": "$t(common.owner)",
+                "image": "Bild",
+                "lastPlayed": "Senast spelad",
+                "duration": "$t(common.duration)",
+                "favorite": "$t(common.favorite)",
+                "genre": "$t(entity.genre, {\"count\": 1})",
+                "composer": "Kompositör",
+                "date": "Datum",
+                "dateAdded": "Datum tillagd",
+                "albumCount": "$t(entity.album, {\"count\": 2})",
+                "albumArtist": "$t(entity.albumArtist, {\"count\": 1})",
+                "artist": "$t(entity.artist, {\"count\": 1})",
+                "biography": "$t(common.biography)",
+                "bitDepth": "$t(common.bitDepth)",
+                "bitrate": "$t(common.bitrate)",
+                "bpm": "$t(common.bpm)",
+                "channels": "$t(common.channel, {\"count\": 2})",
+                "codec": "$t(common.codec)",
+                "actions": "$t(common.action, {\"count\": 2})",
+                "album": "$t(entity.album, {\"count\": 1})",
+                "titleCombined": "$t(common.title) (kombinerat)",
+                "trackNumber": "Spårnummer"
+            }
+        },
+        "column": {
+            "trackNumber": "Spår",
+            "owner": "Ägare",
+            "year": "År",
+            "size": "Storlek",
+            "songCount": "Spår",
+            "title": "Titel",
+            "releaseDate": "Utgivningsdatum",
+            "releaseYear": "Utgivningsår",
+            "rating": "Betyg",
+            "playCount": "Spelningar",
+            "path": "Sökväg",
+            "lastPlayed": "Senast spelad",
+            "genre": "Genre",
+            "date": "Datum",
+            "favorite": "Favorit",
+            "dateAdded": "Datum tillagd",
+            "comment": "Kommentar",
+            "codec": "Kodec",
+            "bpm": "BPM",
+            "artist": "Artist",
+            "biography": "Biografi",
+            "album": "Album",
+            "albumArtist": "Albumartist",
+            "albumCount": "Album",
+            "bitrate": "Bitrate"
+        }
+    },
+    "releaseType": {
+        "primary": {
+            "ep": "EP",
+            "album": "$t(entity.album, {\"count\": 1})",
+            "single": "Singel"
+        },
+        "secondary": {
+            "audiobook": "Ljudbok"
+        }
+    },
+    "dragDropZone": {
+        "error_oneFileOnly": "Vänligen markera endast 1 fil"
     }
 }

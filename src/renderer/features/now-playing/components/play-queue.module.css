@@ -7,12 +7,20 @@
 
 .group-row {
     display: flex;
+    gap: var(--theme-spacing-xs);
     align-items: center;
     width: 100%;
     height: 100%;
     padding: 0 var(--theme-spacing-md);
     text-transform: uppercase;
     user-select: none;
+}
+
+.group-row-label {
+    flex-shrink: 0;
+    color: var(--theme-colors-foreground);
+    letter-spacing: 0.06em;
+    white-space: nowrap;
 }
 
 .drop-zone {

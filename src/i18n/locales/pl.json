@@ -789,7 +789,9 @@
         "scrobbleForceSubmit": "Wymuś scrobble",
         "sleepTimer_endOfAlbum": "Koniec aktualnego albumu",
         "nextAlbum": "Alt+kliknięcie aby odtworzyć następny album",
-        "previousAlbum": "Alt+kliknięcie aby odtworzyć poprzedni album"
+        "previousAlbum": "Alt+kliknięcie aby odtworzyć poprzedni album",
+        "queueSection_queue": "Kolejka",
+        "queueSection_upNext": "Następne"
     },
     "setting": {
         "crossfadeStyle_description": "Wybierz styl przejścia, który ma być używany do odtwarzania dźwięku",
@@ -1280,7 +1282,9 @@
         "imagePlaceholderPriority_optionDominantColor": "Kolor dominujący",
         "imagePlaceholderPriority_optionOff": "Wyłączony",
         "imagePlaceholderPriority_optionBlurhash": "BlurHash",
-        "imagePlaceholderPriority_optionThumbhash": "ThumbHash"
+        "imagePlaceholderPriority_optionThumbhash": "ThumbHash",
+        "upNextQueue_description": "Odtwarzaj następnie dodaje piosenki do sekcji Następne po aktualnej piosence, w kolejności w której zostały dodane. Następne zostaje po wymieszaniu kolejki lub jej zamianie. Wyłącz aby, dodawać Odtwarzaj następnie prosto po aktualnej piosence",
+        "upNextQueue": "Kolejka następnych"
     },
     "table": {
         "config": {

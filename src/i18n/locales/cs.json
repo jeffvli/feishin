@@ -52,7 +52,9 @@
         "scrobbleForceSubmit": "Vynutit scrobble",
         "sleepTimer_endOfAlbum": "Konec aktuálního alba",
         "nextAlbum": "Alt+kliknutí pro daší album",
-        "previousAlbum": "Alt+kliknutí pro předchozí album"
+        "previousAlbum": "Alt+kliknutí pro předchozí album",
+        "queueSection_queue": "Fronta",
+        "queueSection_upNext": "Další na řadě"
     },
     "setting": {
         "crossfadeStyle_description": "Vyberte způsob prolnutí u přehrávače zvuku",
@@ -543,7 +545,9 @@
         "imagePlaceholderPriority_optionThumbhash": "ThumbHash",
         "transcodeNote": "Překódování je provedeno serverem a použije se od další skladby",
         "transcodeSampleRate_description": "Maximální vzorkovací frekvence překódovaného zvuku v Hz, např. 192000. Ponechte prázdné pro zachování zdrojové frekvence. Platí pouze pro Jellyfin",
-        "transcodeSampleRate": "Maximální vzorkovací frekvence k překódování"
+        "transcodeSampleRate": "Maximální vzorkovací frekvence k překódování",
+        "upNextQueue_description": "Přehrát jako další přidá skladbu do sekce Další na řadě po aktuální skladbě, v pořadí, ve kterém byly přidány. Další na řadě zůstane další, když je fronta zamíchána nebo nahrazena. Zakažte pro vložení každého Přehrát jako další po aktuální skladbě",
+        "upNextQueue": "Fronta dalších na řadě"
     },
     "action": {
         "editPlaylist": "Upravit $t(entity.playlist, {\"count\": 1})",
