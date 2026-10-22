@@ -72,6 +72,19 @@ describe('convertQueryGroupToNDQuery', () => {
         ).toEqual({ all: [] });
     });
 
+    // Regression: nested groups sent booleans as strings, which Navidrome < 0.62.0 never matches
+    it('converts boolean fields in nested groups', () => {
+        expect(
+            convertQueryGroupToNDQuery(
+                group(
+                    'all',
+                    [],
+                    [group('any', [rule('loved', 'is', 'true'), rule('missing', 'is', 'false')])],
+                ),
+            ),
+        ).toEqual({ all: [{ any: [{ is: { loved: true } }, { is: { missing: false } }] }] });
+    });
+
     it('nests groups after the rules', () => {
         expect(
             convertQueryGroupToNDQuery(
@@ -117,6 +130,12 @@ describe('convertNDQueryToQueryGroup', () => {
             ],
             type: 'all',
         });
+    });
+
+    // Regression: saving an opened smart playlist turned nested booleans into strings
+    it('round-trips booleans in nested groups', () => {
+        const query = { all: [{ any: [{ is: { loved: true } }, { is: { compilation: false } }] }] };
+        expect(convertQueryGroupToNDQuery(convertNDQueryToQueryGroup(query))).toEqual(query);
     });
 
     it('round-trips a query', () => {
