@@ -13,3 +13,4 @@
 - [x] Fix repeat-off playback so a playlist stops at the end instead of repeating.
 - [ ] Set the new default application settings on installation.
 - [x] Add administrator password protection for Application Settings, Manage Servers, and column/layout configuration, while leaving music-folder selection unlocked.
+- [x] Hide the Cast to devices (DLNA) control from the KatiesAmp player bar.
