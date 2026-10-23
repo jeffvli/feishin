@@ -70,7 +70,20 @@ test('@nightly displays live progress, supports cancellation, and retries the ba
     await expect(page.getByText('Downloading for offline playback', { exact: true })).toHaveCount(
         0,
     );
-    await expect(page.getByRole('button', { name: 'Downloads, 1 active download' })).toBeVisible();
+    const activeDownloadsButton = page.getByRole('button', {
+        name: 'Downloads, 1 active download',
+    });
+    await expect(activeDownloadsButton).toBeVisible();
+    await expect
+        .poll(() => activeDownloadsButton.evaluate((element) => getComputedStyle(element).overflow))
+        .toBe('visible');
+    await expect
+        .poll(() =>
+            activeDownloadsButton.evaluate(
+                (element) => getComputedStyle(element, '::after').content,
+            ),
+        )
+        .toBe('"1"');
     await expect(panel.getByRole('progressbar')).toBeVisible();
     await panel.getByRole('button', { name: 'Cancel' }).click();
     await waitForTaskState(page, 'cancelled');
