@@ -3,6 +3,8 @@ import isElectron from 'is-electron';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import styles from './offline-download-manager.module.css';
+
 import { api } from '/@/renderer/api';
 import {
     refreshOfflineDownloads,
@@ -68,9 +70,18 @@ export const OfflineDownloadManager = () => {
     const hasActiveTask = tasks.some(
         (task) => task.state === 'downloading' || task.state === 'queued',
     );
+    const activeTaskCount = tasks.filter(
+        (task) => task.state === 'downloading' || task.state === 'queued',
+    ).length;
     const hasTerminalTask = tasks.some(
         (task) => task.state !== 'downloading' && task.state !== 'queued',
     );
+    const downloadsLabel = hasActiveTask
+        ? t('offline.downloadsActive', {
+              count: activeTaskCount,
+              defaultValue: 'Downloads, {{count}} active downloads',
+          })
+        : t('offline.downloads', 'Downloads');
 
     if (!isElectron()) return null;
 
@@ -138,13 +149,17 @@ export const OfflineDownloadManager = () => {
         <Popover position="top-end" withArrow>
             <Popover.Target>
                 <ActionIcon
-                    aria-label={t('offline.downloads', 'Downloads')}
+                    aria-label={downloadsLabel}
+                    className={styles.trigger}
+                    data-active-count={
+                        hasActiveTask ? (activeTaskCount > 99 ? '99+' : activeTaskCount) : undefined
+                    }
                     icon="download"
                     iconProps={{ color: hasActiveTask ? 'primary' : undefined, size: 'lg' }}
                     onClick={(event) => event.stopPropagation()}
                     size="sm"
                     tooltip={{
-                        label: t('offline.downloads', 'Downloads'),
+                        label: downloadsLabel,
                         openDelay: 0,
                     }}
                     variant="subtle"

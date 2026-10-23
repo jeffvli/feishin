@@ -56,7 +56,7 @@ test('@nightly displays live progress, supports cancellation, and retries the ba
     mockJellyfin,
     page,
 }) => {
-    mockJellyfin.setAudioDelay(80);
+    mockJellyfin.setAudioDelay(500);
     await login(page);
     await downloadAlbum(page);
     const panel = await openDownloads(page);
@@ -67,6 +67,10 @@ test('@nightly displays live progress, supports cancellation, and retries the ba
             return task && task.bytesDownloaded > 0 && task.bytesDownloaded < task.bytesTotal;
         })
         .toBe(true);
+    await expect(page.getByText('Downloading for offline playback', { exact: true })).toHaveCount(
+        0,
+    );
+    await expect(page.getByRole('button', { name: 'Downloads, 1 active download' })).toBeVisible();
     await expect(panel.getByRole('progressbar')).toBeVisible();
     await panel.getByRole('button', { name: 'Cancel' }).click();
     await waitForTaskState(page, 'cancelled');
@@ -77,6 +81,7 @@ test('@nightly displays live progress, supports cancellation, and retries the ba
     await waitForTaskState(page, 'complete');
     await expect(panel.getByText('complete', { exact: true })).toBeVisible();
     await expect(panel.getByRole('progressbar', { exact: true, name: '100%' })).toBeVisible();
+    await expect(page.getByText('6 items are available offline', { exact: true })).toBeVisible();
 });
 
 test('@nightly exposes a failed download and successfully retries it', async ({
@@ -87,6 +92,7 @@ test('@nightly exposes a failed download and successfully retries it', async ({
     await login(page);
     await downloadAlbum(page);
     await waitForTaskState(page, 'error');
+    await expect(page.getByText(/Download failed with HTTP 503/)).toBeVisible();
     const panel = await openDownloads(page);
 
     await expect(panel.getByText('error', { exact: true })).toBeVisible();
@@ -120,6 +126,9 @@ test('@nightly restores completed download history after an application restart'
         const panel = await openDownloads(restartedPage);
         await expect(panel.getByText('Automation Track 1', { exact: true })).toBeVisible();
         await expect(panel.getByText('complete', { exact: true })).toBeVisible();
+        await expect(
+            restartedPage.getByText('1 item is available offline', { exact: true }),
+        ).toHaveCount(0);
     } finally {
         await restartedApp.close().catch(() => {});
     }

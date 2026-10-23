@@ -2,79 +2,64 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useOfflineDownloadStore } from '/@/renderer/features/offline/offline-download.store';
-import { Progress } from '/@/shared/components/progress/progress';
-import { Stack } from '/@/shared/components/stack/stack';
-import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { OfflineDownloadTask } from '/@/shared/types/offline';
 
-const getProgress = (task: OfflineDownloadTask) => {
-    const value =
-        task.bytesTotal > 0
-            ? task.bytesDownloaded / task.bytesTotal
-            : task.total > 0
-              ? task.completed / task.total
-              : 1;
-    return Math.round(Math.min(1, Math.max(0, value)) * 100);
-};
-
-const ProgressMessage = ({ task }: { task: OfflineDownloadTask }) => {
-    const progress = getProgress(task);
-    return (
-        <Stack gap="xs">
-            <Text size="sm" truncate>
-                {task.name}
-            </Text>
-            <Progress aria-label={`${progress}%`} size="sm" value={progress} />
-            <Text isMuted size="xs">
-                {task.completed} / {task.total}
-            </Text>
-        </Stack>
-    );
-};
+const isActive = (task: OfflineDownloadTask) =>
+    task.state === 'queued' || task.state === 'downloading';
 
 export const OfflineDownloadNotifications = () => {
     const { t } = useTranslation();
     const tasks = useOfflineDownloadStore((state) => Object.values(state.tasks));
-    const shown = useRef(new Set<string>());
+    const completionQueue = useRef(new Map<string, OfflineDownloadTask>());
+    const completionTimer = useRef<null | ReturnType<typeof setTimeout>>(null);
+    const seenActive = useRef(new Set<string>());
     const terminal = useRef(new Set<string>());
 
     useEffect(() => {
+        const newlyActive: OfflineDownloadTask[] = [];
+
         for (const task of tasks) {
             if (task.silent || terminal.current.has(task.id)) continue;
             const id = `offline-download-${task.id}`;
-            const active = task.state === 'queued' || task.state === 'downloading';
 
-            if (active) {
-                const notification = {
-                    autoClose: false as const,
-                    id,
-                    loading: true,
-                    message: <ProgressMessage task={task} />,
-                    title: t('offline.downloadProgress', 'Downloading for offline playback'),
-                    withCloseButton: false,
-                };
-                if (shown.current.has(task.id)) toast.update(notification);
-                else {
-                    toast.info(notification);
-                    shown.current.add(task.id);
+            if (isActive(task)) {
+                if (!seenActive.current.has(task.id)) {
+                    seenActive.current.add(task.id);
+                    newlyActive.push(task);
                 }
                 continue;
             }
 
             if (task.state === 'complete') {
-                if (shown.current.has(task.id)) {
-                    toast.update({
-                        autoClose: 3000,
-                        id,
-                        loading: false,
-                        message: t('offline.downloadComplete', {
-                            count: task.total,
-                            defaultValue: '{{count}} items are available offline',
-                        }),
-                        title: t('offline.downloadCompleteTitle', 'Download complete'),
-                        withCloseButton: true,
-                    });
+                if (seenActive.current.has(task.id)) {
+                    completionQueue.current.set(task.id, task);
+                    completionTimer.current ??= setTimeout(() => {
+                        const completedTasks = [...completionQueue.current.values()];
+                        completionQueue.current.clear();
+                        completionTimer.current = null;
+
+                        if (completedTasks.length === 1) {
+                            toast.success({
+                                autoClose: 4000,
+                                message: t('offline.downloadComplete', {
+                                    count: completedTasks[0].total,
+                                    defaultValue: '{{count}} items are available offline',
+                                }),
+                                title: t('offline.downloadCompleteTitle', 'Download complete'),
+                            });
+                            return;
+                        }
+
+                        toast.success({
+                            autoClose: 4000,
+                            message: t('offline.downloadsComplete', {
+                                count: completedTasks.length,
+                                defaultValue: '{{count}} downloads are available offline',
+                            }),
+                            title: t('offline.downloadsCompleteTitle', 'Downloads complete'),
+                        });
+                    }, 250);
                 }
                 terminal.current.add(task.id);
                 continue;
@@ -89,9 +74,7 @@ export const OfflineDownloadNotifications = () => {
                     title: t('offline.downloadCancelledTitle', 'Download cancelled'),
                     withCloseButton: true,
                 };
-                if (shown.current.has(task.id)) toast.update(cancellation);
-                else toast.info(cancellation);
-                shown.current.add(task.id);
+                toast.info(cancellation);
                 terminal.current.add(task.id);
                 continue;
             }
@@ -104,12 +87,32 @@ export const OfflineDownloadNotifications = () => {
                 title: t('offline.downloadFailedTitle', 'Download failed'),
                 withCloseButton: true,
             };
-            if (shown.current.has(task.id)) toast.update(failure);
-            else toast.error(failure);
-            shown.current.add(task.id);
+            toast.error(failure);
             terminal.current.add(task.id);
         }
+
+        if (newlyActive.length > 0) {
+            const activeTasks = tasks.filter((task) => !task.silent && isActive(task));
+            toast.hide('offline-download-started');
+            toast.info({
+                autoClose: 3000,
+                id: 'offline-download-started',
+                message: t('offline.downloadStarted', {
+                    count: activeTasks.length,
+                    defaultValue: '{{count}} downloads were added to Downloads',
+                    name: activeTasks[0]?.name,
+                }),
+                title: t('offline.downloadStartedTitle', 'Download started'),
+            });
+        }
     }, [t, tasks]);
+
+    useEffect(
+        () => () => {
+            if (completionTimer.current) clearTimeout(completionTimer.current);
+        },
+        [],
+    );
 
     return null;
 };
