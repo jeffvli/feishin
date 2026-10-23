@@ -1,0 +1,24 @@
+.trigger {
+    position: relative;
+}
+
+.trigger[data-active-count]::after {
+    position: absolute;
+    top: -0.35rem;
+    right: -0.4rem;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1rem;
+    height: 1rem;
+    padding: 0 0.2rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--theme-colors-primary-contrast);
+    pointer-events: none;
+    content: attr(data-active-count);
+    background: var(--theme-colors-primary-filled);
+    border-radius: 999px;
+}
