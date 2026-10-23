@@ -42,7 +42,8 @@
         "openApplicationDirectory": "Öppna programmappen",
         "createPlaylistFromQueue": "Skapa $t(entity.playlist, {\"count\": 1}) från kön",
         "collapseAllFolders": "Fäll ihop alla mappar",
-        "expandAllFolders": "Utöka alla mappar"
+        "expandAllFolders": "Utöka alla mappar",
+        "goToCurrent": "Gå till nuvarande objekt"
     },
     "common": {
         "backward": "Bakåt",
@@ -319,7 +320,8 @@
         },
         "editPlaylist": {
             "title": "Redigera $t(entity.playlist, {\"count\": 1})",
-            "publicJellyfinNote": "Jellyfin visar av någon anledning inte om en spellista är offentlig. Markera följande alternativ om du vill att spellistan ska förbli offentlig"
+            "publicJellyfinNote": "Jellyfin visar av någon anledning inte om en spellista är offentlig. Markera följande alternativ om du vill att spellistan ska förbli offentlig",
+            "success": "$t(entity.playlist, {\"count\": 1}) uppdaterades"
         },
         "largeFetchConfirmation": {
             "title": "Lägg till objekt i kön",
@@ -346,7 +348,8 @@
         "shareItem": {
             "allowDownloading": "Tillåt nedladdning",
             "copyToClipboard": "Kopiera till urklippet: Ctrl+C, enter",
-            "description": "Beskrivning"
+            "description": "Beskrivning",
+            "setExpiration_serverDefault": "Serverstandard"
         },
         "shuffleAll": {
             "title": "Spela slumpmässig",
@@ -365,6 +368,9 @@
         },
         "privateMode": {
             "title": "Privat läge"
+        },
+        "editRadioStation": {
+            "success": "Radiostation uppdaterades"
         }
     },
     "page": {
@@ -388,7 +394,8 @@
             "lyricLanguage": "Språk",
             "showPronunciation": "Uttal",
             "showTranslation": "Översättning",
-            "noLyrics": "Inga låttexter hittades"
+            "noLyrics": "Inga låttexter hittades",
+            "upNext": "Härnäst"
         },
         "appMenu": {
             "selectServer": "Välj server",
@@ -518,7 +525,7 @@
         },
         "albumArtistDetail": {
             "about": "Om {{artist}}",
-            "favoriteSongs": "Favorit låtar",
+            "favoriteSongs": "Favoritlåtar",
             "viewDiscography": "Visa diskografi",
             "topSongs": "Topp låtar",
             "topSongsCommunity": "Gemenskap",
@@ -527,7 +534,8 @@
             "viewAll": "Visa alla",
             "viewAllTracks": "Visa alla $t(entity.track, {\"count\": 2})",
             "recentReleases": "Nya utgåvor",
-            "groupingTypeAll": "Alla typer av utgåvor"
+            "groupingTypeAll": "Alla typer av utgåvor",
+            "appearsOn": "Är med i"
         },
         "radioList": {
             "title": "Radiostationer"
@@ -549,7 +557,11 @@
             "readPartialFailure": "Kunde inte läsa metadata från {{count}} av {{total}} file/filer",
             "writePartialFailure": "Misslyckades med att spara {{count}} fil/filer",
             "customValues": "Anpassade värden",
-            "multipleValues": "(Flera värden)"
+            "multipleValues": "(Flera värden)",
+            "addField": "Lägg till fält…",
+            "addCustomValue": "Lägg till anpassat värde…",
+            "copiedPath": "Sökväg kopierades",
+            "fileNotWritable": "Filen är otillgänglig eller oskrivbar"
         },
         "trackList": {
             "artistTracks": "Spår av {{artist}}",
@@ -653,7 +665,9 @@
         "sleepTimer_setCustom": "Ställ in timer",
         "sleepTimer_cancel": "Avbryt timer",
         "skip_back": "Hoppa bakåt",
-        "skip_forward": "Hoppa framåt"
+        "skip_forward": "Hoppa framåt",
+        "sleepTimer_endOfAlbum": "Slutet av nuvarande album",
+        "unfavorite": "Ta bort favoritmarkering"
     },
     "datetime": {
         "minuteShort": "min",
@@ -831,7 +845,22 @@
         "hotkey_navigateHome": "Navigera hem",
         "lastfm_description": "Visar länkar till Last.fm på artist-/albumsidor",
         "playerbarWaveformAlign_optionCenter": "Centrera",
-        "replayGainPreamp": "{{ReplayGain}} förstärkare (dB)"
+        "replayGainPreamp": "{{ReplayGain}} förstärkare (dB)",
+        "audioDeviceDefault": "Systemstandard",
+        "equalizerPresetDeletePlaceholder": "Radera anpassad...",
+        "playbackStyle_optionNormal": "Normal",
+        "sidebarPlaylistFolderView": "Mappvy",
+        "homeFeatureStyle_optionSingle": "Enskild",
+        "pathReplace": "Ny sökväg",
+        "pathReplace_description": "Byt ut din servers standard-sökväg",
+        "queryBuilderCustomFields_inputLabel": "Etikett",
+        "zoom": "Zoomprocent",
+        "autoDJ_mode_description": "Välj att antingen lägga till låtar eller hela album till kön",
+        "artistConfiguration": "Albumartists sidkonfiguration",
+        "artistConfiguration_description": "Konfigurera vilka objekt som visas och i vilken ordning på albumartistens sida",
+        "hotkey_favoriteCurrentSong": "Favoritmarkera $t(common.currentSong)",
+        "hotkey_favoritePreviousSong": "Favoritmarkera $t(common.previousSong)",
+        "showFavorites_description": "Bestämmer om favoritknappen (hjärtat) visas i gränssnittet"
     },
     "visualizer": {
         "options": {
@@ -916,7 +945,10 @@
         },
         "connected": "ansluten",
         "connecting": "Ansluter…",
-        "createGroup": "Skapa grupp"
+        "createGroup": "Skapa grupp",
+        "disconnectAndContinue": "Frånkoppla och fortsätt",
+        "disconnect": "Frånkoppla",
+        "searching": "Söker efter enheter…"
     },
     "table": {
         "config": {
@@ -943,7 +975,9 @@
                 "pagination_paginate": "Sidindelat",
                 "alternateRowColors": "Alternera radfärger",
                 "horizontalBorders": "Radkanter",
-                "verticalBorders": "Kolumnkanter"
+                "verticalBorders": "Kolumnkanter",
+                "itemSize": "Objektstorlek (px)",
+                "tableColumns": "Tabellkolumner"
             },
             "view": {
                 "grid": "Rutnät",
