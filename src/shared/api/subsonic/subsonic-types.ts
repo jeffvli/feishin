@@ -108,12 +108,13 @@ const user = z.object({
 const authenticate = user;
 
 const authenticateParameters = z.object({
+    apiKey: z.string().optional(),
     c: z.string(),
     f: z.string(),
     p: z.string().optional(),
     s: z.string().optional(),
     t: z.string().optional(),
-    u: z.string(),
+    u: z.string().optional(),
     username: z.string(),
     v: z.string(),
 });
@@ -906,6 +907,19 @@ const jukeboxControl = z.object({
     jukeboxStatus: jukeboxStatus.optional(),
 });
 
+const tokenInfoParams = z.object({
+    apiKey: z.string(),
+    c: z.string(),
+    f: z.string(),
+    v: z.string(),
+});
+
+const tokenInfo = z.object({
+    tokenInfo: z.object({
+        username: z.string(),
+    }),
+});
+
 export const ssType = {
     _body: {
         getTranscodeDecision: transcodeDecisionRequestBody,
@@ -949,6 +963,7 @@ export const ssType = {
         similarSongs2: similarSongs2Parameters,
         startScan: startScanParameters,
         structuredLyrics: structuredLyricsParameters,
+        tokenInfo: tokenInfoParams,
         topSongsList: topSongsListParameters,
         updateInternetRadioStation: updateInternetRadioStationParameters,
         updatePlaylist: updatePlaylistParameters,
@@ -1009,6 +1024,7 @@ export const ssType = {
         song,
         startScan,
         structuredLyrics,
+        tokenInfo,
         topSongsList,
         updateInternetRadioStation,
         user,
