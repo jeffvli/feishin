@@ -148,9 +148,13 @@ const getArtists = (
 
                 if (role === 'albumartist') {
                     albumArtists = roleList;
-                } else if (role === 'remixer' && includeRemixers) {
-                    remixers = roleList;
-                    participants['remixer'] = remixers;
+                } else if (role === 'remixer') {
+                    // Keep this nested: with `&& includeRemixers` in the outer condition, album
+                    // remixers fall through to the artist branch and replace the artists
+                    if (includeRemixers) {
+                        remixers = roleList;
+                        participants['remixer'] = remixers;
+                    }
                 } else {
                     artists = roleList;
                 }

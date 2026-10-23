@@ -17,27 +17,26 @@ if (process.env.NODE_ENV === 'development') {
     };
 }
 
-export const hotkeyToElectronAccelerator = (hotkey: string) => {
-    let accelerator = hotkey;
-
-    const replacements = {
-        arrowdown: 'Down',
-        arrowleft: 'Left',
-        arrowright: 'Right',
-        arrowup: 'Up',
-        mod: 'CmdOrCtrl',
-        numpad: 'num',
-        numpadadd: 'numadd',
-        numpaddecimal: 'numdec',
-        numpaddivide: 'numdiv',
-        numpadenter: 'numenter',
-        numpadmultiply: 'nummult',
-        numpadsubtract: 'numsub',
-    };
-
-    Object.keys(replacements).forEach((key) => {
-        accelerator = accelerator.replace(key, replacements[key as keyof typeof replacements]);
-    });
-
-    return accelerator;
+// Electron throws on key names it does not know, so map whole keys rather than substrings: a
+// substring replace turned 'numpaddecimal' into 'numdecimal'. Names follow the hotkey recorder
+// (keyboardCodeToHotkeyKey) on one side and Electron's accelerator key codes on the other.
+const ACCELERATOR_KEYS: Record<string, string> = {
+    arrowdown: 'Down',
+    arrowleft: 'Left',
+    arrowright: 'Right',
+    arrowup: 'Up',
+    equal: '=',
+    minus: '-',
+    mod: 'CmdOrCtrl',
+    numpadadd: 'numadd',
+    numpaddecimal: 'numdec',
+    numpaddivide: 'numdiv',
+    numpadmultiply: 'nummult',
+    numpadsubtract: 'numsub',
 };
+
+export const hotkeyToElectronAccelerator = (hotkey: string) =>
+    hotkey
+        .split('+')
+        .map((key) => ACCELERATOR_KEYS[key] ?? key.replace(/^numpad(?=\d$)/, 'num'))
+        .join('+');

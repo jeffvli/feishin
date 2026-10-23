@@ -1018,9 +1018,18 @@ ipcMain.on(
                     data[shortcut as BindingActions].hotkey,
                 );
 
-                globalShortcut.register(accelerator, () => {
-                    HOTKEY_ACTIONS[shortcut as BindingActions]();
-                });
+                // An invalid accelerator throws; skip it so the remaining shortcuts still register
+                try {
+                    globalShortcut.register(accelerator, () => {
+                        HOTKEY_ACTIONS[shortcut as BindingActions]();
+                    });
+                } catch (error) {
+                    log.warn('Failed to register global shortcut', {
+                        accelerator,
+                        error,
+                        shortcut,
+                    });
+                }
             }
         }
 

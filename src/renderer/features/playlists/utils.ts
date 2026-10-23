@@ -86,6 +86,17 @@ export function playlistSongsToAlbums(songs: Song[]): PlaylistAlbumRow[] {
     return rows;
 }
 
+// The query builder stores boolean values as 'true'/'false' strings. Navidrome compares boolean
+// fields against SQLite integers, so a string never matches; only v0.62.0+ coerces strings
+// (navidrome/navidrome#5450). Convert at every nesting level, not just the top-level rules.
+const toNDRuleValue = (field: string, value: unknown) => {
+    const isBooleanField = NDSongQueryFields.some(
+        (queryField) => queryField.value === field && queryField.type === 'boolean',
+    );
+
+    return isBooleanField ? value === 'true' : value;
+};
+
 export const parseQueryBuilderChildren = (groups: QueryBuilderGroup[], data: any[]) => {
     if (groups.length === 0) {
         return data;
@@ -103,7 +114,10 @@ export const parseQueryBuilderChildren = (groups: QueryBuilderGroup[], data: any
             if (rule.field && rule.operator) {
                 const [table, field] = rule.field.split('.');
                 const operator = mapDatePickerOperatorToApi(rule.operator);
-                const value = field !== 'releaseDate' ? rule.value : new Date(rule.value);
+                const value =
+                    field !== 'releaseDate'
+                        ? toNDRuleValue(table, rule.value)
+                        : new Date(rule.value);
 
                 switch (table) {
                     default:
@@ -140,16 +154,7 @@ export const convertQueryGroupToNDQuery = (filter: QueryBuilderGroup) => {
         if (rule.field && rule.operator) {
             const [field] = rule.field.split('.');
             const operator = mapDatePickerOperatorToApi(rule.operator);
-            let value = rule.value;
-
-            const booleanFields = NDSongQueryFields.filter(
-                (queryField) => queryField.type === 'boolean',
-            ).map((field) => field.value);
-
-            // Convert string values to boolean
-            if (booleanFields.includes(field)) {
-                value = value === 'true';
-            }
+            const value = toNDRuleValue(field, rule.value);
 
             switch (field) {
                 default:

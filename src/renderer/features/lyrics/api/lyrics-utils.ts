@@ -219,3 +219,47 @@ export const formatStructuredLyricLabel = (lyric: StructuredLyric): string => {
     const kind = getStructuredKind(lyric);
     return kind === 'main' ? lyric.lang : `${lyric.lang} (${kind})`;
 };
+
+// Match LRC lyrics format by https://github.com/ustbhuangyi/lyric-parser
+// [mm:ss.SSS] text
+const timeExp = /\[(\d{2,}):(\d{2})(?:\.(\d{2,3}))?]([^\n]+)(\n|$)/g;
+
+// Match karaoke lyrics format returned by NetEase
+// [SSS,???] text
+const alternateTimeExp = /\[(\d*),(\d*)]([^\n]+)(\n|$)/g;
+
+export const formatLyrics = (lyrics: string) => {
+    const synchronizedLines = lyrics.matchAll(timeExp);
+    const formattedLyrics: SynchronizedLyrics = [];
+
+    for (const line of synchronizedLines) {
+        const [, minute, sec, ms, text] = line;
+        const minutes = parseInt(minute, 10);
+        const seconds = parseInt(sec, 10);
+        let milis = 0;
+        if (ms) {
+            milis = ms.length === 3 ? parseInt(ms, 10) : parseInt(ms, 10) * 10;
+        }
+
+        const timeInMilis = (minutes * 60 + seconds) * 1000 + milis;
+
+        formattedLyrics.push({ startMs: timeInMilis, text });
+    }
+
+    if (formattedLyrics.length > 0) return formattedLyrics;
+
+    const alternateSynchronizedLines = lyrics.matchAll(alternateTimeExp);
+    for (const line of alternateSynchronizedLines) {
+        const [, timeInMilis, , text] = line;
+        const cleanText = text
+            .replaceAll(/\(\d+,\d+\)/g, '')
+            .replaceAll(/\s,/g, ',')
+            .replaceAll(/\s\./g, '.');
+        formattedLyrics.push({ startMs: Number(timeInMilis), text: cleanText });
+    }
+
+    if (formattedLyrics.length > 0) return formattedLyrics;
+
+    // If no synchronized lyrics were found, return the original lyrics
+    return lyrics;
+};
