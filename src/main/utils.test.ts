@@ -14,4 +14,16 @@ describe('hotkeyToElectronAccelerator', () => {
     ])('converts %j to %j', (hotkey, expected) => {
         expect(hotkeyToElectronAccelerator(hotkey)).toBe(expected);
     });
+
+    // Regression: substring replacement produced names Electron rejects (e.g. 'numdecimal')
+    it.each([
+        ['mod+numpaddecimal', 'CmdOrCtrl+numdec'],
+        ['mod+numpadsubtract', 'CmdOrCtrl+numsub'],
+        ['mod+numpadmultiply', 'CmdOrCtrl+nummult'],
+        ['mod+numpaddivide', 'CmdOrCtrl+numdiv'],
+        ['mod+equal', 'CmdOrCtrl+='],
+        ['mod+shift+minus', 'CmdOrCtrl+shift+-'],
+    ])('converts %j to a valid accelerator %j', (hotkey, expected) => {
+        expect(hotkeyToElectronAccelerator(hotkey)).toBe(expected);
+    });
 });
