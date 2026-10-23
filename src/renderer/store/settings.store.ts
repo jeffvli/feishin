@@ -2301,7 +2301,9 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                         },
                         reset: () => {
                             localStorage.removeItem('store_settings');
-                            window.location.reload();
+                            void window.api.localSettings
+                                .setSync('menu_language', null)
+                                .finally(() => window.location.reload());
                         },
                         resetSampleRate: () => {
                             set((state) => {
