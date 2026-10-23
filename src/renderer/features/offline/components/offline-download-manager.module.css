@@ -2,6 +2,10 @@
     position: relative;
 }
 
+.trigger[data-active-count] {
+    overflow: visible;
+}
+
 .trigger[data-active-count]::after {
     position: absolute;
     top: -0.35rem;
