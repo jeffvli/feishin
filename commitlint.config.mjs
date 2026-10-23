@@ -10,6 +10,7 @@ const config = {
                 'api',
                 'ci',
                 'deps',
+                'deps-dev',
                 'i18n',
                 'library',
                 'lyrics',
