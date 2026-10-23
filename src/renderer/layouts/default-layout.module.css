@@ -21,3 +21,8 @@
     grid-template-rows: 30px calc(100vh - 120px) 90px;
     grid-template-rows: 30px calc(100dvh - 120px) 90px;
 }
+
+/* Kept mounted (just hidden) in mini player mode so page state and hotkeys survive */
+.hidden {
+    display: none;
+}
