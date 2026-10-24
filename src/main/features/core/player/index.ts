@@ -117,9 +117,7 @@ const DEFAULT_MPV_PARAMETERS = (extraParameters?: string[]) => {
 
     if (!extraParameters?.some((param) => param.startsWith('--stream-lavf-o'))) {
         // Keep normal EOF terminal for finite music files; reconnecting at EOF can delay Opus startup.
-        parameters.push(
-            '--stream-lavf-o=reconnect=1,reconnect_streamed=1,reconnect_delay_max=5',
-        );
+        parameters.push('--stream-lavf-o=reconnect=1,reconnect_streamed=1,reconnect_delay_max=5');
     }
 
     return parameters;
