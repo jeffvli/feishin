@@ -22,8 +22,8 @@ import {
 } from 'electron';
 import electronLocalShortcut from 'electron-localshortcut';
 import { AppImageUpdater, autoUpdater, MacUpdater, NsisUpdater } from 'electron-updater';
-import { access, constants } from 'fs';
-import path, { join } from 'path';
+import { access, readdir } from 'fs/promises';
+import path, { basename, dirname, extname, join } from 'path';
 import semver from 'semver';
 
 import packageJson from '../../package.json';
@@ -1227,18 +1227,27 @@ if (!singleInstance) {
 
 // Register 'open-item' handler globally, ensuring it is only registered once
 if (!ipcMain.eventNames().includes('open-item')) {
-    ipcMain.handle('open-item', async (_event, path: string) => {
-        return new Promise<void>((resolve, reject) => {
-            access(path, constants.F_OK, (error) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
+    ipcMain.handle('open-item', async (_event, itemPath: string) => {
+        try {
+            await access(itemPath);
+            shell.showItemInFolder(itemPath);
+            return;
+        } catch {
+            // The server may expose a transcoded copy (e.g. song.ogg for a local song.flac)
+        }
 
-                shell.showItemInFolder(path);
-                resolve();
-            });
-        });
+        const dir = dirname(itemPath);
+        const stem = basename(itemPath, extname(itemPath)).toLowerCase();
+        const entries = await readdir(dir); // rejects if the folder is missing too
+        const sibling = entries.find(
+            (name) => basename(name, extname(name)).toLowerCase() === stem,
+        );
+
+        if (sibling) {
+            shell.showItemInFolder(join(dir, sibling));
+        } else {
+            await shell.openPath(dir);
+        }
     });
 }
 
