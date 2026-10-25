@@ -7,7 +7,8 @@ import { z } from 'zod';
 
 import { createAuthHeader, jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { useRadioStore } from '/@/renderer/features/radio/store/radio-store';
-import { isShuffleEnabled, usePlayerStoreBase } from '/@/renderer/store/player.store';
+import { isShuffleEnabled } from '/@/renderer/store/player-queue-utils';
+import { usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { getServerUrl, normalizeServerUrl } from '/@/renderer/utils/normalize-server-url';
 import { jfNormalize } from '/@/shared/api/jellyfin/jellyfin-normalize';
 import { JFSongListSort, JFSortOrder, jfType } from '/@/shared/api/jellyfin/jellyfin-types';

@@ -2,6 +2,7 @@
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
   "include": [
     "electron.vite.config.*",
+    "vitest.config.ts",
     "vite.kuromoji-plugin.ts",
     "vite.react-plugin.ts",
     "src/main/**/*",

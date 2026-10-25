@@ -3,6 +3,10 @@ import { QueryClient } from '@tanstack/react-query';
 import { api } from '/@/renderer/api';
 import { queryKeys } from '/@/renderer/api/query-keys';
 import { folderQueries } from '/@/renderer/features/folders/api/folder-api';
+import {
+    isActivePlayerFilter,
+    matchesPlayerFilterValue,
+} from '/@/renderer/features/player/utils/player-filters';
 import { PlayerFilter, useSettingsStore } from '/@/renderer/store';
 import { logger } from '/@/renderer/utils/logger';
 import { resolveSongPath } from '/@/renderer/utils/resolve-song-path';
@@ -365,57 +369,9 @@ const getSongFieldValue = (song: Song, field: string): boolean | null | number |
     }
 };
 
-const matchesFilter = (song: Song, filter: PlayerFilter): boolean => {
-    const songValue = getSongFieldValue(song, filter.field);
-    const filterValue = filter.value;
-
-    // Handle null/undefined values
-    if (songValue === null || songValue === undefined) {
-        return false;
-    }
-
-    switch (filter.operator) {
-        case 'contains':
-            return String(songValue).toLowerCase().includes(String(filterValue).toLowerCase());
-        case 'endsWith':
-            return String(songValue).toLowerCase().endsWith(String(filterValue).toLowerCase());
-        case 'is':
-            return String(songValue).toLowerCase() === String(filterValue).toLowerCase();
-        case 'isNot':
-            return String(songValue).toLowerCase() !== String(filterValue).toLowerCase();
-        case 'lt':
-            return Number(songValue) < Number(filterValue);
-        case 'notContains':
-            return !String(songValue).toLowerCase().includes(String(filterValue).toLowerCase());
-        case 'regex': {
-            try {
-                const regex = new RegExp(String(filterValue), 'i');
-                return regex.test(String(songValue));
-            } catch {
-                // Invalid regex pattern, don't match
-                return false;
-            }
-        }
-        case 'gt':
-            return Number(songValue) > Number(filterValue);
-        case 'startsWith':
-            return String(songValue).toLowerCase().startsWith(String(filterValue).toLowerCase());
-        default:
-            return true;
-    }
-};
-
 export const filterSongsByPlayerFilters = (songs: Song[], filters: PlayerFilter[]): Song[] => {
     // Filter out invalid filters (missing field, operator, or value)
-    const validFilters = filters.filter(
-        (filter) =>
-            Boolean(filter.isEnabled) &&
-            filter.field &&
-            filter.operator &&
-            filter.value !== undefined &&
-            filter.value !== null &&
-            filter.value !== '',
-    );
+    const validFilters = filters.filter(isActivePlayerFilter);
 
     // If no valid filters, return all songs
     if (validFilters.length === 0) {
@@ -427,7 +383,9 @@ export const filterSongsByPlayerFilters = (songs: Song[], filters: PlayerFilter[
 
     // Filter OUT songs that match any of the filters (exclude matching songs)
     const filtered = songs.filter((song) => {
-        const matchingFilter = validFilters.find((filter) => matchesFilter(song, filter));
+        const matchingFilter = validFilters.find((filter) =>
+            matchesPlayerFilterValue(getSongFieldValue(song, filter.field), filter),
+        );
         if (matchingFilter) {
             filteredSongs.push({ filter: matchingFilter, song });
             return false;

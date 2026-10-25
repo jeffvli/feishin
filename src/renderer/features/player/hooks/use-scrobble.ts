@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { usePlayerEvents } from '/@/renderer/features/player/audio-player/hooks/use-player-events';
 import { useSendScrobble } from '/@/renderer/features/player/mutations/scrobble-mutation';
+import { checkScrobbleConditions } from '/@/renderer/features/player/utils/scrobble-conditions';
 import {
     getServerById,
     publishScrobbleDebug,
@@ -87,39 +88,6 @@ const SCROBBLE_RESTART_PREVIOUS_MIN_SEC = 10;
 
 // Max seconds between timestamp samples to count as continuous play (above poll interval, below a teleport).
 const MAX_LISTEN_DELTA_SEC = 5;
-
-const checkScrobbleConditions = (args: {
-    minimumMode: 'both' | 'percentage' | 'seconds';
-    scrobbleAtDurationMs: number;
-    scrobbleAtPercentage: number;
-    songCompletedDurationMs: number;
-    songDurationMs: number;
-}) => {
-    const {
-        minimumMode,
-        scrobbleAtDurationMs,
-        scrobbleAtPercentage,
-        songCompletedDurationMs,
-        songDurationMs,
-    } = args;
-    const percentageOfSongCompleted = songDurationMs
-        ? (songCompletedDurationMs / songDurationMs) * 100
-        : 0;
-
-    const shouldScrobbleBasedOnPercentage = percentageOfSongCompleted >= scrobbleAtPercentage;
-    const shouldScrobbleBasedOnDuration = songCompletedDurationMs >= scrobbleAtDurationMs;
-
-    switch (minimumMode) {
-        case ScrobbleMinimumMode.BOTH:
-            return shouldScrobbleBasedOnPercentage || shouldScrobbleBasedOnDuration;
-        case ScrobbleMinimumMode.PERCENTAGE:
-            return shouldScrobbleBasedOnPercentage;
-        case ScrobbleMinimumMode.SECONDS:
-            return shouldScrobbleBasedOnDuration;
-        default:
-            return shouldScrobbleBasedOnPercentage || shouldScrobbleBasedOnDuration;
-    }
-};
 
 export const useScrobble = () => {
     const scrobbleSettings = usePlaybackSettings().scrobble;

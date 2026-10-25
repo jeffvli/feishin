@@ -19,6 +19,22 @@ jobs:
             - name: Lint Files
               run: pnpm run lint
 
+    test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v6
+
+            - name: Install Node.js and PNPM
+              uses: pnpm/action-setup@v4
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Run unit tests
+              run: pnpm test
+
     commitlint:
         runs-on: ubuntu-latest
 

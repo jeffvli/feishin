@@ -8,3 +8,4 @@ release
 .idea
 .scratch
 tsconfig.*.tsbuildinfo
+coverage
