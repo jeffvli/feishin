@@ -1182,6 +1182,22 @@ if (!singleInstance) {
                 });
             });
 
+            // Chromium 43 enforces Local Network Access: a request from the file:// renderer
+            // to a private address needs this permission, which is denied without a handler,
+            // so a server on a LAN address cannot be reached at all (jeffvli/feishin#2430).
+            const ALLOWED_PERMISSIONS = new Set([
+                'local-fonts',
+                'local-network',
+                'local-network-access',
+                'loopback-network',
+            ]);
+            session.defaultSession.setPermissionCheckHandler((_wc, permission) =>
+                ALLOWED_PERMISSIONS.has(permission),
+            );
+            session.defaultSession.setPermissionRequestHandler((_wc, permission, callback) =>
+                callback(ALLOWED_PERMISSIONS.has(permission)),
+            );
+
             session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
                 callback({
                     responseHeaders: {
