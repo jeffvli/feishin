@@ -39,6 +39,9 @@ const BAND_WIDTHS: Record<number, number> = {
     16000: 1.5,
 };
 
+// Rates accepted by the EQ stage. All are high enough for the 16 kHz band.
+const EQ_SAMPLE_RATES = [44100, 48000, 88200, 96000, 176400, 192000, 352800, 384000];
+
 /**
  * Returns the MPV `af` property value for the given EQ + compressor settings.
  * An empty string clears all filters (pass-through).
@@ -53,6 +56,14 @@ export function buildMpvAudioFilters(eq: EqSettings, compressor: CompressorSetti
         // foobar2000, and hardware EQs. The UI preamp slider exists for this purpose.
         if (eq.preamp !== 0) {
             parts.push(`volume=${eq.preamp}dB`);
+        }
+
+        // A band at or above Nyquist (e.g. 16 kHz on a 32 kHz track) makes the
+        // biquad unstable and outputs garbage. Resample anything below 44.1 kHz
+        // up to the nearest listed rate so every band stays below Nyquist;
+        // listed rates pass through untouched.
+        if (eq.bands.some((band) => band.gain !== 0)) {
+            parts.push(`lavfi=[aformat=sample_rates=${EQ_SAMPLE_RATES.join('|')}]`);
         }
 
         // One parametric EQ filter per non-zero band
