@@ -11,6 +11,7 @@ import {
 } from '/@/renderer/features/settings/components/settings-section';
 import { useCurrentServer, useMpvInitialized, usePlayerStatus } from '/@/renderer/store';
 import {
+    useGeneralSettings,
     usePlaybackSettings,
     usePlaybackType,
     useSettingsStoreActions,
@@ -27,6 +28,7 @@ import { PlayerStatus, PlayerType } from '/@/shared/types/types';
 
 const ipc = isElectron() ? window.api.ipc : null;
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
+const localSettings = isElectron() ? window.api.localSettings : null;
 
 const getAudioDevices = async () => {
     const devices = await navigator.mediaDevices.enumerateDevices();
@@ -121,6 +123,7 @@ export const AudioSettings = memo(() => {
         playbackType === PlayerType.LOCAL ? settings.mpvAudioDeviceId : settings.audioDeviceId;
     const isCasting = settings.type === PlayerType.DLNA;
     const isLocalPlayer = settings.type === PlayerType.LOCAL || settings.type === PlayerType.WEB;
+    const restoresQueue = useGeneralSettings().resume;
 
     // Dynamically build the options for the dropdown
     const selectData = [
@@ -240,6 +243,29 @@ export const AudioSettings = memo(() => {
             isHidden: !isElectron(),
             note: isLocalPlayer ? undefined : t('setting.resumeAfterSleep', { context: 'note' }),
             title: t('setting.resumeAfterSleep'),
+        },
+        {
+            control: (
+                <Switch
+                    defaultChecked={settings.resumeAfterStart && restoresQueue}
+                    disabled={!isLocalPlayer}
+                    onChange={(e) => {
+                        const checked = e.currentTarget.checked;
+                        // Resuming needs the saved queue, so turn on "Save play queue" with it
+                        if (checked) {
+                            localSettings?.set('resume', true);
+                        }
+                        setSettings({
+                            ...(checked && { general: { resume: true } }),
+                            playback: { resumeAfterStart: checked },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.resumeAfterStart', { context: 'description' }),
+            isHidden: !isElectron(),
+            note: isLocalPlayer ? undefined : t('setting.resumeAfterSleep', { context: 'note' }),
+            title: t('setting.resumeAfterStart'),
         },
         {
             control: (

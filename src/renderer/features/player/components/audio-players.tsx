@@ -21,6 +21,7 @@ import {
     InitialTimestampRestoreHook,
     QueueRestoreTimestampHook,
 } from '/@/renderer/features/player/hooks/use-queue-restore';
+import { ResumeOnStartHook } from '/@/renderer/features/player/hooks/use-resume-on-start';
 import { ResumePositionHook } from '/@/renderer/features/player/hooks/use-resume-position';
 import { ScrobbleHook } from '/@/renderer/features/player/hooks/use-scrobble';
 import { UpdateCurrentSongHook } from '/@/renderer/features/player/hooks/use-update-current-song';
@@ -137,6 +138,7 @@ export const AudioPlayers = () => {
             <ScrobbleHook />
             <PowerSaveBlockerHook />
             <PauseOnSleepHook />
+            <ResumeOnStartHook />
             <DiscordRpcHook />
             <MPRISHook />
             <MainPlayerListenerHook />
