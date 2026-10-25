@@ -14,6 +14,7 @@ import { AutoDJHook } from '/@/renderer/features/player/hooks/use-auto-dj';
 import { AutosaveHook } from '/@/renderer/features/player/hooks/use-autosave';
 import { MediaSessionHook } from '/@/renderer/features/player/hooks/use-media-session';
 import { MPRISHook } from '/@/renderer/features/player/hooks/use-mpris';
+import { PauseOnSleepHook } from '/@/renderer/features/player/hooks/use-pause-on-sleep';
 import { PlaybackHotkeysHook } from '/@/renderer/features/player/hooks/use-playback-hotkeys';
 import { PowerSaveBlockerHook } from '/@/renderer/features/player/hooks/use-power-save-blocker';
 import {
@@ -135,6 +136,7 @@ export const AudioPlayers = () => {
             <SleepTimerHook />
             <ScrobbleHook />
             <PowerSaveBlockerHook />
+            <PauseOnSleepHook />
             <DiscordRpcHook />
             <MPRISHook />
             <MainPlayerListenerHook />

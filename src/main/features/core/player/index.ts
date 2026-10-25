@@ -798,6 +798,7 @@ const cleanupMpv = async (force = false) => {
 powerMonitor.on('suspend', () => {
     suppressRendererPlaybackEvents = true;
     playbackEventGeneration += 1;
+    getMainWindow()?.webContents.send('renderer-system-suspend');
 });
 
 // When the OS resumes from sleep, any network stream mpv had open is likely dead

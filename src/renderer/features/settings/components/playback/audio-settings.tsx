@@ -120,6 +120,7 @@ export const AudioSettings = memo(() => {
     const audioDeviceId =
         playbackType === PlayerType.LOCAL ? settings.mpvAudioDeviceId : settings.audioDeviceId;
     const isCasting = settings.type === PlayerType.DLNA;
+    const isLocalPlayer = settings.type === PlayerType.LOCAL || settings.type === PlayerType.WEB;
 
     // Dynamically build the options for the dropdown
     const selectData = [
@@ -222,6 +223,23 @@ export const AudioSettings = memo(() => {
             description: t('setting.preservePitch', { context: 'description' }),
             isHidden: settings.type !== PlayerType.WEB,
             title: t('setting.preservePitch'),
+        },
+        {
+            control: (
+                <Switch
+                    defaultChecked={settings.resumeAfterSleep}
+                    disabled={!isLocalPlayer}
+                    onChange={(e) => {
+                        setSettings({
+                            playback: { resumeAfterSleep: e.currentTarget.checked },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.resumeAfterSleep', { context: 'description' }),
+            isHidden: !isElectron(),
+            note: isLocalPlayer ? undefined : t('setting.resumeAfterSleep', { context: 'note' }),
+            title: t('setting.resumeAfterSleep'),
         },
         {
             control: (
