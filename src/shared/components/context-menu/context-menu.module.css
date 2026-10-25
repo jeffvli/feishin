@@ -79,6 +79,10 @@
     opacity: 0.6;
 }
 
+.disabled-with-tooltip {
+    pointer-events: auto;
+}
+
 .item.selected {
     &::before {
         position: absolute;
