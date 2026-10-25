@@ -216,7 +216,7 @@ interface BackgroundOverlayProps {
     opacity: number;
 }
 
-const BackgroundOverlay = memo(({ dynamicBackground, opacity }: BackgroundOverlayProps) => {
+export const BackgroundOverlay = memo(({ dynamicBackground, opacity }: BackgroundOverlayProps) => {
     if (!dynamicBackground) {
         return null;
     }
