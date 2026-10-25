@@ -366,6 +366,7 @@ let forceQuit = false;
 let powerSaveBlockerId: null | number = null;
 let menuBuilder: MenuBuilder | null = null;
 let currentPlaybackStatus: PlayerStatus = PlayerStatus.PAUSED;
+let currentTraySong = '';
 let currentPrivateMode = false;
 let currentRepeatMode: PlayerRepeat = PlayerRepeat.NONE;
 let currentSidebarCollapsed = false;
@@ -527,6 +528,23 @@ const createWinThumbarButtons = () => {
     }
 };
 
+// Badge the tray icon with playback status and show the current song in its tooltip.
+// macOS uses a monochrome template image, so it keeps the static icon.
+const updateTray = () => {
+    if (!tray) return;
+
+    tray.setToolTip(currentTraySong ? currentTraySong.slice(0, 127) : 'Feishin');
+
+    if (isMacOS()) return;
+
+    let iconName = 'icon';
+    if (currentPlaybackStatus === PlayerStatus.PLAYING) iconName = 'tray-playing';
+    else if (currentPlaybackStatus === PlayerStatus.PAUSED && currentTraySong)
+        iconName = 'tray-paused';
+
+    tray.setImage(getAssetPath(`icons/${iconName}.${isLinux() ? 'png' : 'ico'}`));
+};
+
 const createTray = () => {
     let trayIcon: Electron.NativeImage | string;
 
@@ -599,8 +617,8 @@ const createTray = () => {
         });
     }
 
-    tray.setToolTip('Feishin');
     tray.setContextMenu(contextMenu);
+    updateTray();
 };
 
 const validateUrl = (url: string): boolean => {
@@ -1252,10 +1270,16 @@ if (!ipcMain.eventNames().includes('open-application-directory')) {
 
 ipcMain.on('update-playback', (_event, status: PlayerStatus) => {
     currentPlaybackStatus = status;
+    updateTray();
 
     if (!isMacOS()) return;
 
     updateMainMenu();
+});
+
+ipcMain.on('update-tray-song', (_event, song: string) => {
+    currentTraySong = song;
+    updateTray();
 });
 
 ipcMain.on('update-repeat', (_event, repeat: PlayerRepeat) => {
