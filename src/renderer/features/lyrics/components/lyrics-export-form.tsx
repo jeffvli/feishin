@@ -57,8 +57,8 @@ export const LyricsExportForm = ({ lyrics, offsetMs, synced }: LyricsExportFormP
     });
 
     const displayedLyrics = useMemo(() => {
-        return lyricsMetadataToLrc(lyrics, offsetMs, synced);
-    }, [lyrics, offsetMs, synced]);
+        return lyricsMetadataToLrc(lyrics, form.values.offsetMs, form.values.synced);
+    }, [form.values.offsetMs, form.values.synced, lyrics]);
 
     const exportLyrics = useCallback(() => {
         const extension = form.values.synced ? '.lrc' : '.txt';
