@@ -45,6 +45,6 @@
 
 ### Desktop (recommended)
 
-Download the [latest desktop client](https://github.com/jeffvli/feishin/releases). The desktop client is the recommended way to use the app. It supports both the MPV and web player backends, as well as includes built-in fetching for lyrics.
+Download the [latest desktop client](https://github.com/kevlaws/KatiesAmp/releases). The desktop client is the recommended way to use the app. It supports both the MPV and web player backends, as well as includes built-in fetching for lyrics.
 
 
