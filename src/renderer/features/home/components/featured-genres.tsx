@@ -17,7 +17,7 @@ import { useCurrentServer, useCurrentServerId } from '/@/renderer/store';
 import { Button } from '/@/shared/components/button/button';
 import { Group } from '/@/shared/components/group/group';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
-import { Genre, GenreListSort, Played, SortOrder } from '/@/shared/types/domain-types';
+import { Genre, GenreListSort, Played, ServerType, SortOrder } from '/@/shared/types/domain-types';
 import { Play } from '/@/shared/types/types';
 import { stringToColor } from '/@/shared/utils/string-to-color';
 
@@ -158,7 +158,8 @@ const GenrePlayButton = ({ genre }: { genre: Genre }) => {
                     return api.controller.getRandomSongList({
                         apiClientProps: { serverId },
                         query: {
-                            genre: genre.id,
+                            genre:
+                                genre._serverType === ServerType.JELLYFIN ? genre.id : genre.name,
                             limit: 100,
                             played: Played.All,
                         },
