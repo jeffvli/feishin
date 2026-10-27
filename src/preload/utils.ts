@@ -100,6 +100,10 @@ const mainMessageListener = (
     ipcRenderer.on('toast-from-main', (_, data) => cb(data));
 };
 
+const rendererSystemSuspend = (cb: () => void) => {
+    ipcRenderer.on('renderer-system-suspend', () => cb());
+};
+
 const download = (url: string) => {
     ipcRenderer.send('download-url', url);
 };
@@ -197,6 +201,7 @@ export const utils = {
     rendererOpenManageServers,
     rendererOpenReleaseNotes,
     rendererOpenSettings,
+    rendererSystemSuspend,
     rendererTogglePrivateMode,
     rendererToggleSidebar,
     rendererUpdateAvailable,

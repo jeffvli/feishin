@@ -14,12 +14,14 @@ import { AutoDJHook } from '/@/renderer/features/player/hooks/use-auto-dj';
 import { AutosaveHook } from '/@/renderer/features/player/hooks/use-autosave';
 import { MediaSessionHook } from '/@/renderer/features/player/hooks/use-media-session';
 import { MPRISHook } from '/@/renderer/features/player/hooks/use-mpris';
+import { PauseOnSleepHook } from '/@/renderer/features/player/hooks/use-pause-on-sleep';
 import { PlaybackHotkeysHook } from '/@/renderer/features/player/hooks/use-playback-hotkeys';
 import { PowerSaveBlockerHook } from '/@/renderer/features/player/hooks/use-power-save-blocker';
 import {
     InitialTimestampRestoreHook,
     QueueRestoreTimestampHook,
 } from '/@/renderer/features/player/hooks/use-queue-restore';
+import { ResumeOnStartHook } from '/@/renderer/features/player/hooks/use-resume-on-start';
 import { ResumePositionHook } from '/@/renderer/features/player/hooks/use-resume-position';
 import { ScrobbleHook } from '/@/renderer/features/player/hooks/use-scrobble';
 import { UpdateCurrentSongHook } from '/@/renderer/features/player/hooks/use-update-current-song';
@@ -135,6 +137,8 @@ export const AudioPlayers = () => {
             <SleepTimerHook />
             <ScrobbleHook />
             <PowerSaveBlockerHook />
+            <PauseOnSleepHook />
+            <ResumeOnStartHook />
             <DiscordRpcHook />
             <MPRISHook />
             <MainPlayerListenerHook />
