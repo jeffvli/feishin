@@ -1,8 +1,7 @@
 import { isAxiosError } from 'axios';
 import isElectron from 'is-electron';
-import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { api } from '/@/renderer/api';
@@ -15,7 +14,6 @@ import { AuthState } from '/@/shared/types/types';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
-const MIN_AUTH_DELAY_MS = 1000;
 const MAX_NETWORK_RETRIES = 1;
 const NETWORK_RETRY_DELAY_MS = 500;
 
@@ -53,8 +51,6 @@ export const useServerAuthenticated = () => {
 
     const authenticateServer = useCallback(
         async (serverWithAuth: NonNullable<ReturnType<typeof getServerById>>, retryAttempt = 0) => {
-            const authStartTime = Date.now();
-
             try {
                 setReady(AuthState.LOADING);
 
@@ -134,13 +130,6 @@ export const useServerAuthenticated = () => {
                         serverType: serverWithAuth.type,
                         userId: userInfo.id,
                     });
-
-                    const elapsedTime = Date.now() - authStartTime;
-                    const remainingDelay = Math.max(0, MIN_AUTH_DELAY_MS - elapsedTime);
-
-                    if (remainingDelay > 0) {
-                        await new Promise((resolve) => setTimeout(resolve, remainingDelay));
-                    }
 
                     setReady(AuthState.VALID);
                     return;
@@ -237,14 +226,6 @@ export const useServerAuthenticated = () => {
                                 username: authData.username,
                             });
 
-                            // Ensure minimum delay before completing authentication
-                            const elapsedTime = Date.now() - authStartTime;
-                            const remainingDelay = Math.max(0, MIN_AUTH_DELAY_MS - elapsedTime);
-
-                            if (remainingDelay > 0) {
-                                await new Promise((resolve) => setTimeout(resolve, remainingDelay));
-                            }
-
                             setReady(AuthState.VALID);
                             return;
                         }
@@ -322,14 +303,6 @@ export const useServerAuthenticated = () => {
         [updateServer, setCurrentServer],
     );
 
-    const debouncedAuth = useMemo(
-        () =>
-            debounce((serverWithAuth: NonNullable<ReturnType<typeof getServerById>>) => {
-                authenticateServer(serverWithAuth).catch(console.error);
-            }, 300),
-        [authenticateServer],
-    );
-
     useEffect(() => {
         if (!serverId) {
             logger.info('Server authentication invalid', {
@@ -354,12 +327,9 @@ export const useServerAuthenticated = () => {
             }
 
             setReady(AuthState.LOADING);
-            debouncedAuth(serverWithAuth);
+            authenticateServer(serverWithAuth).catch(console.error);
         }
-        return () => {
-            debouncedAuth.cancel();
-        };
-    }, [debouncedAuth, serverId]);
+    }, [authenticateServer, serverId]);
 
     return ready;
 };
