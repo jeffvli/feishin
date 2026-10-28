@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { createAuthHeader, jfApiClient } from '/@/renderer/api/jellyfin/jellyfin-api';
 import { useRadioStore } from '/@/renderer/features/radio/store/radio-store';
 import { isShuffleEnabled, usePlayerStoreBase } from '/@/renderer/store/player.store';
+import { logger } from '/@/renderer/utils/logger';
 import { getServerUrl, normalizeServerUrl } from '/@/renderer/utils/normalize-server-url';
 import { jfNormalize } from '/@/shared/api/jellyfin/jellyfin-normalize';
 import { JFSongListSort, JFSortOrder, jfType } from '/@/shared/api/jellyfin/jellyfin-types';
@@ -615,31 +616,53 @@ export const JellyfinController: InternalControllerEndpoint = {
             },
         });
 
-        const songsRes = await jfApiClient(apiClientProps).getSongList({
-            params: {
-                userId: apiClientProps.server.userId,
-            },
-            query: {
-                EnableUserData: true,
-                Fields: JF_FIELDS.SONG,
-                IncludeItemTypes: getSongItemTypes(apiClientProps.server),
-                ParentId: query.id,
-                Recursive: true,
-                SortBy: 'ParentIndexNumber,IndexNumber,SortName',
-                SortOrder: JFSortOrder.ASC,
-                StartIndex: 0,
-                UserId: apiClientProps.server.userId,
-            },
-        });
+        const userId = apiClientProps.server.userId;
+        const getAlbumSongs = (recursive: boolean) =>
+            jfApiClient(apiClientProps).getSongList({
+                params: {
+                    userId,
+                },
+                query: {
+                    EnableUserData: true,
+                    Fields: JF_FIELDS.SONG,
+                    IncludeItemTypes: getSongItemTypes(apiClientProps.server),
+                    ParentId: query.id,
+                    Recursive: recursive,
+                    SortBy: 'ParentIndexNumber,IndexNumber,SortName',
+                    SortOrder: JFSortOrder.ASC,
+                    StartIndex: 0,
+                    UserId: userId,
+                },
+            });
 
-        if (res.status !== 200 || songsRes.status !== 200) {
+        // Jellyfin 12 resolves recursive queries through its AncestorIds table, which can lose
+        // rows for some songs. Direct children are resolved by ParentId, so merge them in.
+        const [songsRes, childSongsRes] = await Promise.all([
+            getAlbumSongs(true),
+            getAlbumSongs(false),
+        ]);
+
+        if (res.status !== 200 || songsRes.status !== 200 || childSongsRes.status !== 200) {
             throw new Error('Failed to get album detail');
         }
 
-        return jfNormalize.album(
-            { ...res.body, Songs: songsRes.body.Items },
-            apiClientProps.server,
-        );
+        let songs = songsRes.body.Items;
+        const songIds = new Set(songs.map((song) => song.Id));
+        const missingSongs = childSongsRes.body.Items.filter((song) => !songIds.has(song.Id));
+
+        if (missingSongs.length > 0) {
+            logger.warn('Jellyfin recursive album query missed songs, merged direct children', {
+                albumId: query.id,
+                missing: missingSongs.length,
+            });
+            songs = orderBy(
+                [...songs, ...missingSongs],
+                ['ParentIndexNumber', 'IndexNumber', 'SortName'],
+                ['asc', 'asc', 'asc'],
+            );
+        }
+
+        return jfNormalize.album({ ...res.body, Songs: songs }, apiClientProps.server);
     },
     getAlbumList: async (args) => {
         const { apiClientProps, query } = args;
