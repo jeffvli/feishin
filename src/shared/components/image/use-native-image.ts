@@ -106,7 +106,7 @@ export function useNativeImage({
                     throw new Error(`Failed to load image: ${response.status}`);
                 }
 
-        // Subsonic-compatible servers answer missing artwork with HTTP 200
+                // Subsonic-compatible servers answer missing artwork with HTTP 200
                 // carrying a non-image error document (for example an XML error
                 // envelope) instead of a 4xx status. Feeding such a body to <img>
                 // through an object URL leaves a permanently broken image, so reject
@@ -118,12 +118,12 @@ export function useNativeImage({
                     contentType &&
                     !contentType.toLowerCase().startsWith('image/') &&
                     !contentType.toLowerCase().startsWith('application/octet-stream')
-    ) {
+            ) {
                     throw new Error(
                         `Failed to load image: unexpected content type ${contentType}`,
-                        );
+                                );
                 }
-        
+    
                 const blob = await response.blob();
 
                 if (abortController.signal.aborted) {
