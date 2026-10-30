@@ -1130,6 +1130,8 @@ function startPositionPolling() {
                     !recentAppSeek
                 ) {
                     dlnaLog(`Polling: looped same track (gapless 1-loop)`);
+                    // The device consumed the queued copy, so the app must be able to queue it again.
+                    lastQueuedNextUri = '';
                     lastAutoAdvancedAt = Date.now();
                     lastAutoAdvancedUri = posInfo.trackUri;
                     trackLoadedAt = Date.now();
@@ -1963,6 +1965,15 @@ ipcMain.on('dlna-set-next-url', async (_event, data: { metadata: TrackMetadata; 
             return;
         }
         const lanUrl = rewriteUrlForLan(data.url);
+        // The app can send the same next track twice in quick succession (e.g. after an
+        // auto-advance). Kodi appends every SetNextAVTransportURI to its playlist instead of
+        // replacing the queued item, so a repeat call queues a duplicate. When that duplicate
+        // starts, the position-based prev detection sees the same URI restart at 0 and steps
+        // back, looping the queue between two tracks.
+        if (lanUrl === lastQueuedNextUri) {
+            dlnaLog(`Next track already queued, skipping: ${data.metadata.title}`);
+            return;
+        }
         lastQueuedNextUri = lanUrl;
         const lanArtUrl = data.metadata?.albumArtUrl
             ? rewriteUrlForLan(data.metadata.albumArtUrl)
@@ -1975,6 +1986,8 @@ ipcMain.on('dlna-set-next-url', async (_event, data: { metadata: TrackMetadata; 
         );
         dlnaLog(`Set next track: ${data.metadata.title}`);
     } catch (err) {
+        // Not queued on the device, so let the next attempt with this track through.
+        lastQueuedNextUri = '';
         dlnaLog(`Failed to set next track ${data?.metadata?.title || ''}`, err);
     }
 });
