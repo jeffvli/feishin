@@ -14,6 +14,7 @@ import Store from 'electron-store';
 import { promises as fs, watch as fsWatch } from 'fs';
 import path from 'path';
 
+import { isLinux } from '/@/main/env';
 import log from '/@/main/logger';
 import { Platform, type TitleTheme } from '/@/shared/types/types';
 
@@ -108,7 +109,9 @@ export const store = new Store<any>({
     defaults: {
         disable_auto_updates: false,
         enableNeteaseTranslation: false,
-        global_media_hotkeys: true,
+        // Linux desktops already send media keys to the MPRIS player. Registering them as
+        // global shortcuts too makes Wayland desktops such as GNOME ask the user to approve them.
+        global_media_hotkeys: !isLinux(),
         lyrics: ['NetEase', 'lrclib.net'],
         mediaSession: false,
         playbackType: 'web',

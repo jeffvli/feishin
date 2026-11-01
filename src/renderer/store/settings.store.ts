@@ -1485,7 +1485,8 @@ const initialState: SettingsState = {
             zoomIn: { allowGlobal: true, hotkey: '', isGlobal: false },
             zoomOut: { allowGlobal: true, hotkey: '', isGlobal: false },
         },
-        globalMediaHotkeys: true,
+        // Matches the main process default: Linux uses MPRIS for media keys.
+        globalMediaHotkeys: !utils?.isLinux(),
     },
     lists: {
         ['albumDetail']: {
