@@ -1485,7 +1485,6 @@ const initialState: SettingsState = {
             zoomIn: { allowGlobal: true, hotkey: '', isGlobal: false },
             zoomOut: { allowGlobal: true, hotkey: '', isGlobal: false },
         },
-        // Matches the main process default: Linux uses MPRIS for media keys.
         globalMediaHotkeys: !utils?.isLinux(),
     },
     lists: {

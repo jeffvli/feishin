@@ -109,8 +109,9 @@ export const store = new Store<any>({
     defaults: {
         disable_auto_updates: false,
         enableNeteaseTranslation: false,
-        // Linux desktops already send media keys to the MPRIS player. Registering them as
-        // global shortcuts too makes Wayland desktops such as GNOME ask the user to approve them.
+        // On Linux, Feishin is an MPRIS player, and desktops such as GNOME and KDE send media keys
+        // to it. Registering the keys as global shortcuts too makes GNOME on Wayland ask the user
+        // to approve them.
         global_media_hotkeys: !isLinux(),
         lyrics: ['NetEase', 'lrclib.net'],
         mediaSession: false,
