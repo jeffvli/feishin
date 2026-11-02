@@ -1463,7 +1463,8 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         previousIndex = queue.items.length - 1;
                     } else if (player.repeat === PlayerRepeat.NONE && isFirstTrack) {
                         // Repeat none: stay on first track if already there
-                        previousIndex = currentIndex;
+                        eventEmitter.emit('PLAYER_SEEK_TO_TIMESTAMP', { timestamp: 0 });
+                        return;
                     } else if (toPreviousAlbum) {
                         previousIndex = Math.max(
                             0,
