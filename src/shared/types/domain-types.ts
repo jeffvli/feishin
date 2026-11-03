@@ -1440,7 +1440,7 @@ export type RandomSongListArgs = BaseEndpointArgs & {
 };
 
 export type RandomSongListQuery = {
-    genre?: string;
+    genre?: Pick<Genre, 'id' | 'name'>;
     limit?: number;
     maxYear?: number;
     minYear?: number;
