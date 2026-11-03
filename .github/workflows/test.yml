@@ -16,6 +16,9 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
+            - name: Check Navidrome authentication
+              run: node --test scripts/test-navidrome-auth.mjs
+
             - name: Lint Files
               run: pnpm run lint
 
