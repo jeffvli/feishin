@@ -1,0 +1,68 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.header {
+    flex-shrink: 0;
+    padding: 12px 16px;
+    text-align: center;
+    border-bottom: 1px solid var(--theme-colors-border);
+}
+
+.title {
+    overflow: hidden;
+    font-size: 1rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.artist {
+    margin-top: 2px;
+    font-size: 0.8rem;
+    color: var(--theme-colors-text-secondary);
+}
+
+.body {
+    flex: 1;
+    padding: 24px 16px 64px;
+    overflow-y: auto;
+    text-align: center;
+    scroll-behavior: smooth;
+}
+
+.line,
+.line-active {
+    padding: 6px 0;
+    line-height: 1.35;
+    transition: color 250ms ease, transform 250ms ease, opacity 250ms ease;
+}
+
+.line {
+    color: var(--theme-colors-text-secondary);
+    opacity: 0.7;
+}
+
+.line-active {
+    color: var(--theme-colors-primary);
+    font-weight: 700;
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.center {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    color: var(--theme-colors-text-secondary);
+    text-align: center;
+}
+
+.dim {
+    opacity: 0.7;
+}
