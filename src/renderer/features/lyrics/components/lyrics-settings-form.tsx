@@ -416,7 +416,6 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
                 context: 'description',
             }),
             id: 'preferLocalLyrics',
-            isHidden: !isElectron(),
             label: t('setting.preferLocalLyrics'),
         },
         {
@@ -430,7 +429,6 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
                 context: 'description',
             }),
             id: 'fetch',
-            isHidden: !isElectron(),
             label: t('setting.lyricFetch'),
         },
         {
@@ -438,7 +436,11 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
                 <MultiSelect
                     aria-label="Lyric providers"
                     clearable
-                    data={Object.values(LyricSource)}
+                    data={
+                        isElectron()
+                            ? Object.values(LyricSource)
+                            : [LyricSource.LRCLIB, LyricSource.SIMPMUSIC]
+                    }
                     defaultValue={lyricsSettings.sources}
                     onChange={(e: string[]) => {
                         localSettings?.set('lyrics', e);
@@ -451,7 +453,6 @@ export const LyricsSettingsForm = ({ settingsKey }: LyricsSettingsFormProps) => 
                 context: 'description',
             }),
             id: 'sources',
-            isHidden: !isElectron(),
             label: t('setting.lyricFetchProvider'),
         },
         {
