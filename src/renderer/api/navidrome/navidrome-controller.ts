@@ -778,7 +778,34 @@ export const NavidromeController: InternalControllerEndpoint = {
 
         return SubsonicController.getPlayQueue(args);
     },
-    getRandomSongList: SubsonicController.getRandomSongList,
+    getRandomSongList: async (args) => {
+        const { apiClientProps, query } = args;
+
+        const res = await ssApiClient(apiClientProps).getRandomSongList({
+            query: {
+                fromYear: query.minYear,
+                genre: query.genre,
+                musicFolderId: query.musicFolderId,
+                size: query.limit,
+                toYear: query.maxYear,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get random songs');
+        }
+
+        const results = res.body.randomSongs?.song || [];
+        const normalizedResults = results.map((song) =>
+            ssNormalize.song(song, apiClientProps.server),
+        );
+
+        return {
+            items: normalizedResults,
+            startIndex: 0,
+            totalRecordCount: normalizedResults.length,
+        };
+    },
     getRoles: async ({ apiClientProps }) =>
         hasFeature(apiClientProps.server, ServerFeature.BFR) ? NAVIDROME_ROLES : [],
     getScanStatus: SubsonicController.getScanStatus,

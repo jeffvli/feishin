@@ -393,7 +393,7 @@ const search3Parameters = z.object({
 const randomSongListParameters = z.object({
     fromYear: z.number().optional(),
     genre: z.string().optional(),
-    musicFolderId: z.string().optional(),
+    musicFolderId: z.union([z.string(), z.array(z.string())]).optional(),
     size: z.number().optional(),
     toYear: z.number().optional(),
 });
