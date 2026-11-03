@@ -374,6 +374,10 @@ axiosClient.interceptors.response.use(
     (error) => {
         if (error.response && error.response.status === 401) {
             const currentServer = useAuthStore.getState().currentServer;
+            const failedRequest = {
+                credential: error.config?.authCredential,
+                serverId: error.config?.authServerId,
+            };
 
             if (localSettings && currentServer?.savePassword) {
                 return localSettings
@@ -435,6 +439,7 @@ axiosClient.interceptors.response.use(
                         });
 
                         error.config.headers['x-nd-authorization'] = `Bearer ${newCredential}`;
+                        error.config.authCredential = newCredential;
 
                         authSuccess = true;
 
@@ -449,7 +454,7 @@ axiosClient.interceptors.response.use(
                                     'Network error during reauthentication - preserving credentials',
                                 );
                             } else {
-                                limitedFail(currentServer);
+                                limitedFail(failedRequest);
                             }
                         }
 
@@ -464,7 +469,7 @@ axiosClient.interceptors.response.use(
             if (isAxiosError(error) && error.code === 'ERR_NETWORK') {
                 logger.warn('Network error during authentication - preserving credentials');
             } else {
-                limitedFail(currentServer);
+                limitedFail(failedRequest);
             }
         }
 
@@ -499,6 +504,8 @@ export const ndApiClient = (args: {
                 if (shouldDelay) await waitForResult();
 
                 const result = await axiosClient.request({
+                    authCredential: token,
+                    authServerId: server?.id,
                     data: body,
                     headers: {
                         ...headers,

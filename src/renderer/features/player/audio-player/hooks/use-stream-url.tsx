@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 
 import { api } from '/@/renderer/api';
-import { TranscodingConfig } from '/@/renderer/store';
+import { TranscodingConfig, useAuthStore } from '/@/renderer/store';
 import { QueueSong } from '/@/shared/types/domain-types';
 
 export function useSongUrl(
@@ -10,13 +10,23 @@ export function useSongUrl(
     current: boolean,
     transcode: Partial<TranscodingConfig>,
 ): string | undefined {
-    const prior = useRef(['', '']);
+    // Stream URLs embed the server credential. Key on it so a logout/re-login never keeps
+    // replaying a URL with a stale credential (Navidrome temporarily rejects even valid
+    // credentials after repeated failed attempts), and skip resolving while logged out.
+    const credential = useAuthStore((state) =>
+        song?._serverId ? state.serverList[song._serverId]?.credential : undefined,
+    );
+    const prior = useRef(['', '', '']);
     const shouldReusePrior = Boolean(
-        song?._serverId && current && prior.current[0] === song._uniqueId && prior.current[1],
+        song?._serverId &&
+        current &&
+        prior.current[0] === song._uniqueId &&
+        prior.current[1] &&
+        prior.current[2] === credential,
     );
 
     const { data: queryStreamUrl } = useQuery({
-        enabled: Boolean(song?._serverId) && !shouldReusePrior,
+        enabled: Boolean(song?._serverId && credential) && !shouldReusePrior,
         queryFn: () =>
             api.controller.getStreamUrl({
                 apiClientProps: { serverId: song!._serverId },
@@ -32,6 +42,7 @@ export function useSongUrl(
             song?._serverId,
             'stream-url',
             song?.id,
+            credential,
             shouldReusePrior ? 'reuse-prior' : transcode.bitrate,
             shouldReusePrior ? 'reuse-prior' : transcode.format,
             shouldReusePrior ? 'reuse-prior' : transcode.maxSampleRate,
@@ -41,8 +52,8 @@ export function useSongUrl(
     });
 
     useEffect(() => {
-        if (!song?._serverId) {
-            prior.current = ['', ''];
+        if (!song?._serverId || !credential) {
+            prior.current = ['', '', ''];
             return;
         }
 
@@ -51,14 +62,8 @@ export function useSongUrl(
         }
 
         // Save resolved URL to avoid restarting current track on transcode setting changes.
-        prior.current = [song._uniqueId, queryStreamUrl];
-    }, [song?._serverId, song?._uniqueId, queryStreamUrl]);
-
-    useEffect(() => {
-        if (!song?._serverId) {
-            prior.current = ['', ''];
-        }
-    }, [song?._serverId]);
+        prior.current = [song._uniqueId, queryStreamUrl, credential];
+    }, [song?._serverId, song?._uniqueId, queryStreamUrl, credential]);
 
     return shouldReusePrior ? prior.current[1] : queryStreamUrl;
 }

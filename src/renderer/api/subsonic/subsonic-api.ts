@@ -405,7 +405,11 @@ axiosClient.interceptors.response.use(
                 const isAuthError = numericCode === SUBSONIC_AUTH_ERROR_CODE;
 
                 if (isAuthenticated && isAuthError) {
-                    authenticationFailure(currentServer, errorMessage);
+                    authenticationFailure({
+                        credential: response.config.authCredential,
+                        message: errorMessage,
+                        serverId: response.config.authServerId,
+                    });
                 } else if (isAuthenticated) {
                     toast.error({
                         message: errorMessage,
@@ -514,6 +518,8 @@ export const ssApiClient = (args: {
             }
 
             const request: AxiosRequestConfig = {
+                authCredential: server?.credential,
+                authServerId: server?.id,
                 headers,
                 signal,
                 // In cases where we have a fallback, don't notify the error
