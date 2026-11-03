@@ -469,8 +469,19 @@ export const sortAlbumList = (albums: Album[], sortBy: AlbumListSort, sortOrder:
         case AlbumListSort.ALBUM_ARTIST:
             results = orderBy(
                 results,
-                ['albumArtist', (v) => v.name.toLowerCase()],
+                [(v) => v.albumArtistName.toLowerCase(), (v) => v.name.toLowerCase()],
                 [order, 'asc'],
+            );
+            break;
+        case AlbumListSort.ALBUM_ARTIST_YEAR_ALBUM:
+            results = orderBy(
+                results,
+                [
+                    (v) => v.albumArtistName.toLowerCase(),
+                    (v) => v.releaseYear ?? v.originalYear ?? 0,
+                    (v) => v.name.toLowerCase(),
+                ],
+                [order, order, order],
             );
             break;
         case AlbumListSort.DURATION:
