@@ -1,8 +1,13 @@
 import { t } from 'i18next';
 import { useCallback, useState } from 'react';
-import { ZodError } from 'zod';
+import { z, ZodError } from 'zod';
 
 import { DiffVisualiser } from '/@/renderer/components/settings-diff-visualiser/settings-diff-visualiser';
+import {
+    ExportedRadioStations,
+    ExportedRadioStationsSchema,
+    importRadioStations,
+} from '/@/renderer/features/radio/store/radio-store';
 import {
     migrateSettings,
     type SettingsState,
@@ -29,13 +34,19 @@ export const ExportImportSettingsModal = () => {
 
     const [currentScreen, setCurrentScreen] = useState<SCREENS>(SCREENS.FILE_PICKER);
     const [selectedSettingsFile, setSettingsFile] = useState<SettingsState>();
+    const [selectedRadioStations, setRadioStations] = useState<ExportedRadioStations>();
 
     const onItemSelected = useCallback((itemContents: string) => {
-        const settingsFile = JSON.parse(itemContents) as VersionedSettings;
+        const settingsFile = JSON.parse(itemContents) as VersionedSettings & {
+            radioStations?: unknown;
+        };
         // eslint-disable-next-line @typescript-eslint/no-unused-vars -- Version needs to be omitted from the settings object
-        const { version, ...settings } = settingsFile;
+        const { radioStations, version, ...settings } = settingsFile;
         const parsedResult = settings as SettingsState;
         setSettingsFile(parsedResult);
+        setRadioStations(
+            radioStations ? ExportedRadioStationsSchema.parse(radioStations) : undefined,
+        );
         setCurrentScreen(SCREENS.DIFF_VISUALS);
     }, []);
 
@@ -55,9 +66,18 @@ export const ExportImportSettingsModal = () => {
 
             const migratedSettings = migrateSettings(content, content?.version || 0);
             const validationRes = ValidationSettingsStateSchema.safeParse(migratedSettings);
+            const radioValidationRes = z
+                .object({ radioStations: ExportedRadioStationsSchema.optional() })
+                .safeParse(content);
 
-            if (!validationRes.success) {
-                const error = validationRes.error as ZodError;
+            const failedValidation = !validationRes.success
+                ? validationRes
+                : !radioValidationRes.success
+                  ? radioValidationRes
+                  : undefined;
+
+            if (failedValidation) {
+                const error = failedValidation.error as ZodError;
                 const firstError = error.errors.pop();
 
                 const dotPath = firstError?.path.join('.');
@@ -82,9 +102,12 @@ export const ExportImportSettingsModal = () => {
     const onImportClick = useCallback(() => {
         if (selectedSettingsFile) {
             setSettings(selectedSettingsFile);
+            if (selectedRadioStations) {
+                importRadioStations(selectedRadioStations);
+            }
             setCurrentScreen(SCREENS.IMPORT_COMPLETE);
         }
-    }, [selectedSettingsFile, setSettings]);
+    }, [selectedRadioStations, selectedSettingsFile, setSettings]);
 
     return (
         <>
