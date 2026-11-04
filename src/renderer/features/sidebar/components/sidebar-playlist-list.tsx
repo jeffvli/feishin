@@ -2,7 +2,16 @@ import { openContextModal } from '@mantine/modals';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { motion } from 'motion/react';
-import { createContext, memo, MouseEvent, useCallback, useContext, useMemo, useState } from 'react';
+import {
+    createContext,
+    memo,
+    MouseEvent,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router';
 
@@ -31,6 +40,7 @@ import {
     usePlaylistFolderViewState,
     usePlaylistNavigationState,
 } from '/@/renderer/features/sidebar/components/playlist-folder-tree';
+import { useAppFocus } from '/@/renderer/hooks/use-app-focus';
 import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { useDragMonitor } from '/@/renderer/hooks/use-drag-monitor';
 import { AppRoute } from '/@/renderer/router/routes';
@@ -455,6 +465,14 @@ const useSidebarPlaylistItems = (scope: 'owned' | 'shared') => {
             serverId: server?.id,
         }),
     );
+
+    // Playlists can change outside the app, and this list stays mounted for the whole session.
+    const isAppFocused = useAppFocus();
+    const { refetch } = playlistsQuery;
+
+    useEffect(() => {
+        if (isAppFocused) refetch({ cancelRefetch: false });
+    }, [isAppFocused, refetch]);
 
     const [playlistOrder, setPlaylistOrder] = useLocalStorage<string[]>({
         defaultValue: [],
