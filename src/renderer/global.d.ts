@@ -23,6 +23,7 @@ declare global {
         FS_FONT_SYSTEM?: string;
         FS_FONT_TYPE?: string;
         FS_GENERAL_ACCENT?: string;
+        FS_GENERAL_ACCENT_FROM_ART?: string;
         FS_GENERAL_ALBUM_BACKGROUND?: string;
         FS_GENERAL_ALBUM_BACKGROUND_BLUR?: string;
         FS_GENERAL_ARTIST_BACKGROUND?: string;

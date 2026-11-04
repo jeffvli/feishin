@@ -64,6 +64,7 @@ type PlayerProperties = {
 };
 
 type SettingsProperties = {
+    'settings.accentFromArt': boolean;
     'settings.albumBackground': boolean;
     'settings.artistBackground': boolean;
     'settings.autoDJ': boolean;
@@ -136,6 +137,7 @@ const getSettingsProperties = (): SettingsProperties => {
     const settings = useSettingsStore.getState();
 
     return {
+        'settings.accentFromArt': settings.general.accentFromArt,
         'settings.albumBackground': settings.general.albumBackground,
         // 'settings.albumBackgroundBlur': settings.general.albumBackgroundBlur,
         'settings.artistBackground': settings.general.artistBackground,

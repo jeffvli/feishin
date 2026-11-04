@@ -511,6 +511,7 @@ export const GeneralSettingsSchema = z.object({
                 message: 'Accent must be a valid rgb() color string',
             },
         ),
+    accentFromArt: z.boolean(),
     albumBackground: z.boolean(),
     albumBackgroundBlur: z.number(),
     albumGroupImageSize: z.number(),
@@ -1333,6 +1334,7 @@ const initialState: SettingsState = {
     },
     general: {
         accent: 'rgb(53, 116, 252)',
+        accentFromArt: false,
         albumBackground: false,
         albumBackgroundBlur: 6,
         albumGroupImageSize: 0,
@@ -2933,10 +2935,16 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     });
                 }
 
+                if (version < 35) {
+                    if (state.general.accentFromArt === undefined) {
+                        state.general.accentFromArt = false;
+                    }
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 34,
+            version: 35,
         },
     ),
 );
