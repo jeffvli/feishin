@@ -1,6 +1,8 @@
 import { FastAverageColor, FastAverageColorIgnoredColor } from 'fast-average-color';
 import { useEffect, useRef, useState } from 'react';
 
+import { ACCENT_ALGORITHMS, AccentCandidate, RgbColor } from '/@/shared/themes/pick-accent-color';
+
 const ignoredColors: FastAverageColorIgnoredColor = [
     [255, 255, 255, 255, 90], // White
     [255, 255, 255, 255, 50], // Light gray
@@ -32,6 +34,36 @@ export const getFastAverageColor = async (args: {
                 });
         });
     });
+};
+
+// ponytail: one decode per algorithm, so three per cover. The art accent
+// collector dedupes by image key, so a cover is sampled once per play.
+export const getArtColorCandidates = async (src: null | string): Promise<AccentCandidate[]> => {
+    if (!src) {
+        return [];
+    }
+
+    const fac = new FastAverageColor();
+
+    const results = await Promise.all(
+        ACCENT_ALGORITHMS.map(async (algorithm) => {
+            try {
+                const color = await fac.getColorAsync(src, {
+                    algorithm,
+                    ignoredColor: ignoredColors,
+                    mode: 'speed',
+                });
+
+                return [{ algorithm, rgb: color.value.slice(0, 3) as RgbColor }];
+            } catch {
+                return [];
+            }
+        }),
+    );
+
+    fac.destroy();
+
+    return results.flat();
 };
 
 export const useFastAverageColor = (args: {
