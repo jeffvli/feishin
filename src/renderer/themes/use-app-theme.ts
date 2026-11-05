@@ -4,16 +4,19 @@ import { generateColors } from '@mantine/colors-generator';
 import { useMantineColorScheme } from '@mantine/core';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useArtAccentCandidates } from '/@/renderer/store/art-accent.store';
 import { useCustomThemes } from '/@/renderer/store/custom-themes.store';
 import {
     useAccent,
     useFontSettings,
+    useGeneralSettings,
     useNativeAspectRatio,
     useThemeSettings,
 } from '/@/renderer/store/settings.store';
 import { createMantineTheme } from '/@/renderer/themes/mantine-theme';
 import { getAppTheme } from '/@/shared/themes/app-theme';
 import { AppTheme, AppThemeConfiguration } from '/@/shared/themes/app-theme-types';
+import { parseRgb, pickAccentColor, rgbString } from '/@/shared/themes/pick-accent-color';
 import { FontType } from '/@/shared/types/types';
 
 export const THEME_DATA = [
@@ -53,6 +56,8 @@ export const THEME_DATA = [
 
 export const useAppTheme = (overrideTheme?: AppTheme) => {
     const accent = useAccent();
+    const { accentFromArt } = useGeneralSettings();
+    const candidates = useArtAccentCandidates();
     const nativeImageAspect = useNativeAspectRatio();
     const { builtIn, custom, system, type } = useFontSettings();
     // Not read directly, but its identity changes whenever the custom
@@ -160,11 +165,27 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
 
     const appTheme: AppThemeConfiguration = useMemo(() => {
         const themeProperties = getAppTheme(selectedTheme);
+        const themeBackground = themeProperties.colors?.background;
 
-        // Use theme's primary color if useThemeAccentColor is enabled, otherwise use custom accent
-        const primaryColor = useThemeAccentColor
-            ? themeProperties.colors?.primary || themeProperties.colors?.['state-info'] || accent
-            : accent;
+        const artColor = accentFromArt
+            ? pickAccentColor(candidates, {
+                  background: parseRgb(
+                      typeof themeBackground === 'string' ? themeBackground : null,
+                  ),
+                  mode: themeProperties.mode ?? 'dark',
+              })
+            : null;
+
+        // Album art color wins over theme and custom accents while enabled.
+        // Otherwise use theme's primary color if useThemeAccentColor is enabled,
+        // otherwise use custom accent
+        const primaryColor =
+            (artColor ? rgbString(artColor) : undefined) ??
+            (useThemeAccentColor
+                ? themeProperties.colors?.primary ||
+                  themeProperties.colors?.['state-info'] ||
+                  accent
+                : accent);
 
         // Use theme's primary shade if useThemePrimaryShade is enabled, otherwise use slider value (0-9)
         const effectivePrimaryShade: MantineThemeOverride['primaryShade'] = useThemePrimaryShade
@@ -190,6 +211,8 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps -- customThemes is read indirectly via getAppTheme's registry lookup, not referenced directly above
     }, [
         accent,
+        accentFromArt,
+        candidates,
         customThemes,
         primaryShade,
         selectedTheme,
@@ -197,12 +220,12 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
         useThemePrimaryShade,
     ]);
 
+    const primaryThemeColor = appTheme.colors?.primary ?? accent;
+
     useEffect(() => {
         const root = document.documentElement;
         const themeProperties = getAppTheme(selectedTheme);
-        const primaryColor = useThemeAccentColor
-            ? themeProperties.colors?.primary || themeProperties.colors?.['state-info'] || accent
-            : accent;
+        const primaryColor = primaryThemeColor;
         const effectivePrimaryShade: MantineThemeOverride['primaryShade'] = useThemePrimaryShade
             ? themeProperties.mantineOverride?.primaryShade
             : ({ dark: primaryShade, light: primaryShade } as MantineThemeOverride['primaryShade']);
@@ -224,8 +247,8 @@ export const useAppTheme = (overrideTheme?: AppTheme) => {
         customThemes,
         isDarkTheme,
         primaryShade,
+        primaryThemeColor,
         selectedTheme,
-        useThemeAccentColor,
         useThemePrimaryShade,
     ]);
 
@@ -306,6 +329,8 @@ export const useColorScheme = () => {
 
 export const useAppThemeColors = () => {
     const accent = useAccent();
+    const { accentFromArt } = useGeneralSettings();
+    const candidates = useArtAccentCandidates();
     const getCurrentTheme = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
     const [isDarkTheme] = useState(getCurrentTheme());
     // Not read directly, but its identity changes whenever the custom
@@ -333,11 +358,27 @@ export const useAppThemeColors = () => {
 
     const appTheme: AppThemeConfiguration = useMemo(() => {
         const themeProperties = getAppTheme(selectedTheme);
+        const themeBackground = themeProperties.colors?.background;
 
-        // Use theme's primary color if useThemeAccentColor is enabled, otherwise use custom accent
-        const primaryColor = useThemeAccentColor
-            ? themeProperties.colors?.primary || themeProperties.colors?.['state-info'] || accent
-            : accent;
+        const artColor = accentFromArt
+            ? pickAccentColor(candidates, {
+                  background: parseRgb(
+                      typeof themeBackground === 'string' ? themeBackground : null,
+                  ),
+                  mode: themeProperties.mode ?? 'dark',
+              })
+            : null;
+
+        // Album art color wins over theme and custom accents while enabled.
+        // Otherwise use theme's primary color if useThemeAccentColor is enabled,
+        // otherwise use custom accent
+        const primaryColor =
+            (artColor ? rgbString(artColor) : undefined) ??
+            (useThemeAccentColor
+                ? themeProperties.colors?.primary ||
+                  themeProperties.colors?.['state-info'] ||
+                  accent
+                : accent);
 
         // Use theme's primary shade if useThemePrimaryShade is enabled, otherwise use slider value (0-9)
         const effectivePrimaryShade: MantineThemeOverride['primaryShade'] = useThemePrimaryShade
@@ -358,6 +399,8 @@ export const useAppThemeColors = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps -- customThemes is read indirectly via getAppTheme's registry lookup, not referenced directly above
     }, [
         accent,
+        accentFromArt,
+        candidates,
         customThemes,
         primaryShade,
         selectedTheme,
