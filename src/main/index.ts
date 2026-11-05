@@ -935,9 +935,24 @@ app.commandLine.appendSwitch('js-flags', '--expose-gc');
 
 // Must duplicate with the one in renderer process settings.store.ts
 enum BindingActions {
+    BROWSER_BACK = 'browserBack',
+    BROWSER_FORWARD = 'browserForward',
+    FAVORITE_CURRENT_ADD = 'favoriteCurrentAdd',
+    FAVORITE_CURRENT_REMOVE = 'favoriteCurrentRemove',
+    FAVORITE_CURRENT_TOGGLE = 'favoriteCurrentToggle',
+    FAVORITE_PREVIOUS_ADD = 'favoritePreviousAdd',
+    FAVORITE_PREVIOUS_REMOVE = 'favoritePreviousRemove',
+    FAVORITE_PREVIOUS_TOGGLE = 'favoritePreviousToggle',
     GLOBAL_SEARCH = 'globalSearch',
+    LIST_NAVIGATE_TO_PAGE = 'listNavigateToPage',
+    LIST_PLAY_DEFAULT = 'listPlayDefault',
+    LIST_PLAY_LAST = 'listPlayLast',
+    LIST_PLAY_NEXT = 'listPlayNext',
+    LIST_PLAY_NOW = 'listPlayNow',
+    LIST_SHOW_PLAYING_SONG = 'listShowPlayingSong',
     LOCAL_SEARCH = 'localSearch',
     MUTE = 'volumeMute',
+    NAVIGATE_HOME = 'navigateHome',
     NEXT = 'next',
     NEXT_ALBUM = 'nextAlbum',
     PAUSE = 'pause',
@@ -945,6 +960,12 @@ enum BindingActions {
     PLAY_PAUSE = 'playPause',
     PREVIOUS = 'previous',
     PREVIOUS_ALBUM = 'previousAlbum',
+    RATE_0 = 'rate0',
+    RATE_1 = 'rate1',
+    RATE_2 = 'rate2',
+    RATE_3 = 'rate3',
+    RATE_4 = 'rate4',
+    RATE_5 = 'rate5',
     SHUFFLE = 'toggleShuffle',
     SKIP_BACKWARD = 'skipBackward',
     SKIP_FORWARD = 'skipForward',
@@ -954,6 +975,8 @@ enum BindingActions {
     TOGGLE_REPEAT = 'toggleRepeat',
     VOLUME_DOWN = 'volumeDown',
     VOLUME_UP = 'volumeUp',
+    ZOOM_IN = 'zoomIn',
+    ZOOM_OUT = 'zoomOut',
 }
 
 const getMenuAccelerator = (
@@ -968,9 +991,30 @@ const getMenuAccelerator = (
 };
 
 const HOTKEY_ACTIONS: Record<BindingActions, () => void> = {
+    [BindingActions.BROWSER_BACK]: () => {},
+    [BindingActions.BROWSER_FORWARD]: () => {},
+    [BindingActions.FAVORITE_CURRENT_ADD]: () =>
+        getMainWindow()?.webContents.send('renderer-player-favorite-current-add'),
+    [BindingActions.FAVORITE_CURRENT_REMOVE]: () =>
+        getMainWindow()?.webContents.send('renderer-player-favorite-current-remove'),
+    [BindingActions.FAVORITE_CURRENT_TOGGLE]: () =>
+        getMainWindow()?.webContents.send('renderer-player-favorite-current-toggle'),
+    [BindingActions.FAVORITE_PREVIOUS_ADD]: () =>
+        getMainWindow()?.webContents.send('renderer-player-favorite-previous-add'),
+    [BindingActions.FAVORITE_PREVIOUS_REMOVE]: () =>
+        getMainWindow()?.webContents.send('renderer-player-favorite-previous-remove'),
+    [BindingActions.FAVORITE_PREVIOUS_TOGGLE]: () =>
+        getMainWindow()?.webContents.send('renderer-player-favorite-previous-toggle'),
     [BindingActions.GLOBAL_SEARCH]: () => {},
+    [BindingActions.LIST_NAVIGATE_TO_PAGE]: () => {},
+    [BindingActions.LIST_PLAY_DEFAULT]: () => {},
+    [BindingActions.LIST_PLAY_LAST]: () => {},
+    [BindingActions.LIST_PLAY_NEXT]: () => {},
+    [BindingActions.LIST_PLAY_NOW]: () => {},
+    [BindingActions.LIST_SHOW_PLAYING_SONG]: () => {},
     [BindingActions.LOCAL_SEARCH]: () => {},
     [BindingActions.MUTE]: () => getMainWindow()?.webContents.send('renderer-player-volume-mute'),
+    [BindingActions.NAVIGATE_HOME]: () => {},
     [BindingActions.NEXT]: () => getMainWindow()?.webContents.send('renderer-player-next'),
     [BindingActions.NEXT_ALBUM]: () =>
         getMainWindow()?.webContents.send('renderer-player-next-album'),
@@ -981,6 +1025,12 @@ const HOTKEY_ACTIONS: Record<BindingActions, () => void> = {
     [BindingActions.PREVIOUS]: () => getMainWindow()?.webContents.send('renderer-player-previous'),
     [BindingActions.PREVIOUS_ALBUM]: () =>
         getMainWindow()?.webContents.send('renderer-player-previous-album'),
+    [BindingActions.RATE_0]: () => {},
+    [BindingActions.RATE_1]: () => {},
+    [BindingActions.RATE_2]: () => {},
+    [BindingActions.RATE_3]: () => {},
+    [BindingActions.RATE_4]: () => {},
+    [BindingActions.RATE_5]: () => {},
     [BindingActions.SHUFFLE]: () =>
         getMainWindow()?.webContents.send('renderer-player-toggle-shuffle'),
     [BindingActions.SKIP_BACKWARD]: () =>
@@ -996,6 +1046,8 @@ const HOTKEY_ACTIONS: Record<BindingActions, () => void> = {
         getMainWindow()?.webContents.send('renderer-player-volume-down'),
     [BindingActions.VOLUME_UP]: () =>
         getMainWindow()?.webContents.send('renderer-player-volume-up'),
+    [BindingActions.ZOOM_IN]: () => {},
+    [BindingActions.ZOOM_OUT]: () => {},
 };
 
 ipcMain.on(
@@ -1019,7 +1071,7 @@ ipcMain.on(
                 );
 
                 globalShortcut.register(accelerator, () => {
-                    HOTKEY_ACTIONS[shortcut as BindingActions]();
+                    HOTKEY_ACTIONS[shortcut as BindingActions]?.();
                 });
             }
         }
