@@ -42,7 +42,13 @@ import {
     DEFAULT_WINDOW_BOUNDS,
     resolveWindowBounds,
 } from '/@/main/utils/window-bounds';
-import { PlayerRepeat, PlayerStatus, PlayerType, TitleTheme } from '/@/shared/types/types';
+import {
+    BindingActions,
+    PlayerRepeat,
+    PlayerStatus,
+    PlayerType,
+    TitleTheme,
+} from '/@/shared/types/types';
 
 const ALPHA_UPDATER_CONFIG: {
     bucket: string;
@@ -933,29 +939,6 @@ app.commandLine.appendSwitch('gtk-version', '3');
 // Enable garbage collection API
 app.commandLine.appendSwitch('js-flags', '--expose-gc');
 
-// Must duplicate with the one in renderer process settings.store.ts
-enum BindingActions {
-    GLOBAL_SEARCH = 'globalSearch',
-    LOCAL_SEARCH = 'localSearch',
-    MUTE = 'volumeMute',
-    NEXT = 'next',
-    NEXT_ALBUM = 'nextAlbum',
-    PAUSE = 'pause',
-    PLAY = 'play',
-    PLAY_PAUSE = 'playPause',
-    PREVIOUS = 'previous',
-    PREVIOUS_ALBUM = 'previousAlbum',
-    SHUFFLE = 'toggleShuffle',
-    SKIP_BACKWARD = 'skipBackward',
-    SKIP_FORWARD = 'skipForward',
-    STOP = 'stop',
-    TOGGLE_FULLSCREEN_PLAYER = 'toggleFullscreenPlayer',
-    TOGGLE_QUEUE = 'toggleQueue',
-    TOGGLE_REPEAT = 'toggleRepeat',
-    VOLUME_DOWN = 'volumeDown',
-    VOLUME_UP = 'volumeUp',
-}
-
 const getMenuAccelerator = (
     data: Record<BindingActions, { allowGlobal: boolean; hotkey: string; isGlobal: boolean }>,
     action: BindingActions,
@@ -967,9 +950,19 @@ const getMenuAccelerator = (
     return hotkeyToElectronAccelerator(hotkey);
 };
 
-const HOTKEY_ACTIONS: Record<BindingActions, () => void> = {
-    [BindingActions.GLOBAL_SEARCH]: () => {},
-    [BindingActions.LOCAL_SEARCH]: () => {},
+const HOTKEY_ACTIONS: Partial<Record<BindingActions, () => void>> = {
+    [BindingActions.FAVORITE_CURRENT_ADD]: () =>
+        getMainWindow()?.webContents.send('renderer-player-favorite-current-add'),
+    [BindingActions.FAVORITE_CURRENT_REMOVE]: () =>
+        getMainWindow()?.webContents.send('renderer-player-favorite-current-remove'),
+    [BindingActions.FAVORITE_CURRENT_TOGGLE]: () =>
+        getMainWindow()?.webContents.send('renderer-player-favorite-current-toggle'),
+    [BindingActions.FAVORITE_PREVIOUS_ADD]: () =>
+        getMainWindow()?.webContents.send('renderer-player-favorite-previous-add'),
+    [BindingActions.FAVORITE_PREVIOUS_REMOVE]: () =>
+        getMainWindow()?.webContents.send('renderer-player-favorite-previous-remove'),
+    [BindingActions.FAVORITE_PREVIOUS_TOGGLE]: () =>
+        getMainWindow()?.webContents.send('renderer-player-favorite-previous-toggle'),
     [BindingActions.MUTE]: () => getMainWindow()?.webContents.send('renderer-player-volume-mute'),
     [BindingActions.NEXT]: () => getMainWindow()?.webContents.send('renderer-player-next'),
     [BindingActions.NEXT_ALBUM]: () =>
@@ -981,6 +974,12 @@ const HOTKEY_ACTIONS: Record<BindingActions, () => void> = {
     [BindingActions.PREVIOUS]: () => getMainWindow()?.webContents.send('renderer-player-previous'),
     [BindingActions.PREVIOUS_ALBUM]: () =>
         getMainWindow()?.webContents.send('renderer-player-previous-album'),
+    [BindingActions.RATE_0]: () => getMainWindow()?.webContents.send('renderer-player-rate', 0),
+    [BindingActions.RATE_1]: () => getMainWindow()?.webContents.send('renderer-player-rate', 1),
+    [BindingActions.RATE_2]: () => getMainWindow()?.webContents.send('renderer-player-rate', 2),
+    [BindingActions.RATE_3]: () => getMainWindow()?.webContents.send('renderer-player-rate', 3),
+    [BindingActions.RATE_4]: () => getMainWindow()?.webContents.send('renderer-player-rate', 4),
+    [BindingActions.RATE_5]: () => getMainWindow()?.webContents.send('renderer-player-rate', 5),
     [BindingActions.SHUFFLE]: () =>
         getMainWindow()?.webContents.send('renderer-player-toggle-shuffle'),
     [BindingActions.SKIP_BACKWARD]: () =>
@@ -988,8 +987,6 @@ const HOTKEY_ACTIONS: Record<BindingActions, () => void> = {
     [BindingActions.SKIP_FORWARD]: () =>
         getMainWindow()?.webContents.send('renderer-player-skip-forward'),
     [BindingActions.STOP]: () => getMainWindow()?.webContents.send('renderer-player-stop'),
-    [BindingActions.TOGGLE_FULLSCREEN_PLAYER]: () => {},
-    [BindingActions.TOGGLE_QUEUE]: () => {},
     [BindingActions.TOGGLE_REPEAT]: () =>
         getMainWindow()?.webContents.send('renderer-player-toggle-repeat'),
     [BindingActions.VOLUME_DOWN]: () =>
@@ -1007,20 +1004,16 @@ ipcMain.on(
         // Since we're not tracking the previous shortcuts, we need to unregister all of them
         globalShortcut.unregisterAll();
 
-        for (const shortcut of Object.keys(data)) {
-            const isGlobalHotkey = data[shortcut as BindingActions].isGlobal;
-            const isValidHotkey =
-                data[shortcut as BindingActions].hotkey &&
-                data[shortcut as BindingActions].hotkey !== '';
+        for (const [shortcut, binding] of Object.entries(data)) {
+            if (binding?.isGlobal && binding.hotkey) {
+                const accelerator = hotkeyToElectronAccelerator(binding.hotkey);
+                const action = HOTKEY_ACTIONS[shortcut as BindingActions];
 
-            if (isGlobalHotkey && isValidHotkey) {
-                const accelerator = hotkeyToElectronAccelerator(
-                    data[shortcut as BindingActions].hotkey,
-                );
-
-                globalShortcut.register(accelerator, () => {
-                    HOTKEY_ACTIONS[shortcut as BindingActions]();
-                });
+                if (accelerator && action) {
+                    globalShortcut.register(accelerator, () => {
+                        action();
+                    });
+                }
             }
         }
 

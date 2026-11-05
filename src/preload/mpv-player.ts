@@ -186,6 +186,34 @@ const rendererPlayerFallback = (cb: (data: boolean) => void) => {
     ipcRenderer.on('renderer-player-fallback', (_, data) => cb(data));
 };
 
+const rendererFavoriteCurrentAdd = (cb: () => void) => {
+    ipcRenderer.on('renderer-player-favorite-current-add', () => cb());
+};
+
+const rendererFavoriteCurrentRemove = (cb: () => void) => {
+    ipcRenderer.on('renderer-player-favorite-current-remove', () => cb());
+};
+
+const rendererFavoriteCurrentToggle = (cb: () => void) => {
+    ipcRenderer.on('renderer-player-favorite-current-toggle', () => cb());
+};
+
+const rendererFavoritePreviousAdd = (cb: () => void) => {
+    ipcRenderer.on('renderer-player-favorite-previous-add', () => cb());
+};
+
+const rendererFavoritePreviousRemove = (cb: () => void) => {
+    ipcRenderer.on('renderer-player-favorite-previous-remove', () => cb());
+};
+
+const rendererFavoritePreviousToggle = (cb: () => void) => {
+    ipcRenderer.on('renderer-player-favorite-previous-toggle', () => cb());
+};
+
+const rendererRate = (cb: (rating: number) => void) => {
+    ipcRenderer.on('renderer-player-rate', (_, rating) => cb(rating));
+};
+
 const rendererMpvReconnect = (cb: () => void) => {
     ipcRenderer.on('renderer-mpv-reconnect', () => cb());
 };
@@ -221,6 +249,12 @@ export const mpvPlayerListener = {
     rendererAutoNext,
     rendererCurrentTime,
     rendererError,
+    rendererFavoriteCurrentAdd,
+    rendererFavoriteCurrentRemove,
+    rendererFavoriteCurrentToggle,
+    rendererFavoritePreviousAdd,
+    rendererFavoritePreviousRemove,
+    rendererFavoritePreviousToggle,
     rendererMpvReconnect,
     rendererNext,
     rendererNextAlbum,
@@ -231,6 +265,7 @@ export const mpvPlayerListener = {
     rendererPrevious,
     rendererPreviousAlbum,
     rendererQuit,
+    rendererRate,
     rendererSkipBackward,
     rendererSkipForward,
     rendererStop,
