@@ -11,7 +11,7 @@ import { ItemListKey } from '/@/shared/types/types';
 
 export const useSortOrderFilter = (
     defaultValue: null | string,
-    listKey: ItemListKey | string,
+    listKey: ItemListKey,
     filterKey: string = FILTER_KEYS.SHARED.SORT_ORDER,
 ) => {
     const server = useCurrentServer();

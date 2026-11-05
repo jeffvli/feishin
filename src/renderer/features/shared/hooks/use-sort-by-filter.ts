@@ -10,7 +10,7 @@ import { ItemListKey } from '/@/shared/types/types';
 
 export const useSortByFilter = <TSortBy>(
     defaultValue: string,
-    listKey: ItemListKey | string,
+    listKey: ItemListKey,
     filterKey: string = FILTER_KEYS.SHARED.SORT_BY,
 ) => {
     const server = useCurrentServer();

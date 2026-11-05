@@ -7,7 +7,7 @@ interface ListSortOrderToggleButtonProps {
     defaultSortOrder: SortOrder;
     disabled?: boolean;
     filterKey?: string;
-    listKey: ItemListKey | string;
+    listKey: ItemListKey;
 }
 
 export const ListSortOrderToggleButton = ({

@@ -25,7 +25,7 @@ interface ListSortByDropdownProps {
     filterKey?: string;
     includeId?: boolean;
     itemType: LibraryItem;
-    listKey: ItemListKey | string;
+    listKey: ItemListKey;
     onChange?: (value: string) => void;
     target?: React.ReactNode;
 }
