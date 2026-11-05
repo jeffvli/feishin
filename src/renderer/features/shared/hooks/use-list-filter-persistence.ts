@@ -1,5 +1,6 @@
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
 import { ItemListKey } from '/@/shared/types/types';
+
 export interface ListFilterPersistence {
     [listKey: string]: {
         [filterKey: string]: string | undefined;
