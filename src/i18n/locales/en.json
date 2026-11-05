@@ -860,6 +860,8 @@
         "autosaveCount_description": "How many track changes before the queue is saved. 1 (minimum) means every song change",
         "accentColor_description": "Sets the accent color for the application",
         "accentColor": "Accent color",
+        "accentFromArt": "Accent color from album art",
+        "accentFromArt_description": "Sets the accent color from the currently playing album cover. Takes priority over the theme accent color while enabled, and falls back to the accent color above when a cover has no usable color.",
         "useThemeAccentColor": "Use theme accent color",
         "useThemeAccentColor_description": "Use the primary color defined in the selected theme instead of the custom accent color",
         "useThemePrimaryShade": "Use theme primary shade",
