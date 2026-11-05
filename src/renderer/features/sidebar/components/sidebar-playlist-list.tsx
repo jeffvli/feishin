@@ -78,6 +78,22 @@ const getPlaylistOrderKey = (serverId: string | undefined, scope: 'owned' | 'sha
     return `playlist_order:${sid}:${scope}`;
 };
 
+export const useSidebarAccordionState = (defaultValue: string[]) => {
+    const [value, setValue] = useLocalStorage<string[]>({
+        defaultValue,
+        key: 'feishin:sidebar-accordion-state',
+    });
+
+    const handleChange = useCallback(
+        (nextValue: null | string | string[]) => {
+            setValue(Array.isArray(nextValue) ? nextValue : nextValue ? [nextValue] : []);
+        },
+        [setValue],
+    );
+
+    return [value, handleChange] as const;
+};
+
 export const SidebarPlaylistAddDragContext = createContext(false);
 
 const isAddToPlaylistDragSource = (source: DragData) => {
