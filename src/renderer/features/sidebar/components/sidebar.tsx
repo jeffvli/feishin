@@ -19,6 +19,7 @@ import {
     SidebarPlaylistAddDragContext,
     SidebarPlaylistList,
     SidebarSharedPlaylistList,
+    useSidebarAccordionState,
     useSidebarPlaylistAddDragMonitor,
 } from '/@/renderer/features/sidebar/components/sidebar-playlist-list';
 import {
@@ -65,6 +66,11 @@ const SidebarPlaylistSection = () => {
 
 export const Sidebar = () => {
     const { t } = useTranslation();
+    const [accordionValue, handleAccordionChange] = useSidebarAccordionState([
+        'library',
+        'collections',
+        'playlists',
+    ]);
 
     const sidebarPlaylistList = useSidebarPlaylistList();
 
@@ -136,8 +142,9 @@ export const Sidebar = () => {
                         item: styles.accordionItem,
                         root: styles.accordionRoot,
                     }}
-                    defaultValue={['library', 'collections', 'playlists']}
                     multiple
+                    onChange={handleAccordionChange}
+                    value={accordionValue}
                 >
                     <Accordion.Item value="library">
                         <Accordion.Control>
