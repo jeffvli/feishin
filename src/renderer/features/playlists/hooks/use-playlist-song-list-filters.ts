@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { useSearchParams } from 'react-router';
+import { useParams, useSearchParams } from 'react-router';
 
 import { useSearchTermFilter } from '/@/renderer/features/shared/hooks/use-search-term-filter';
 import { useSortByFilter } from '/@/renderer/features/shared/hooks/use-sort-by-filter';
@@ -18,16 +18,32 @@ import { runInUrlTransition } from '/@/renderer/utils/url-transition';
 import { SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
+export const getPlaylistSongSortFilterKey = (playlistId: string) =>
+    `playlistSongSort:${playlistId}`;
+
 export const usePlaylistSongListFilters = () => {
+    const params = useParams<{ playlistId: string }>();
+    const currentPlaylistId = params.playlistId;
     const albumArtistIdsMode = useAppStore((state) => state.albumArtistIdsMode);
     const artistIdsMode = useAppStore((state) => state.artistIdsMode);
     const genreIdsMode = useAppStore((state) => state.genreIdsMode);
     const setAlbumArtistIdsModeStore = useAppStore((state) => state.actions.setAlbumArtistIdsMode);
     const setArtistIdsModeStore = useAppStore((state) => state.actions.setArtistIdsMode);
     const setGenreIdsModeStore = useAppStore((state) => state.actions.setGenreIdsMode);
-    const { sortBy } = useSortByFilter<SongListSort>(SongListSort.ID, ItemListKey.PLAYLIST_SONG);
+    const sortFilterKey = currentPlaylistId
+        ? getPlaylistSongSortFilterKey(currentPlaylistId)
+        : undefined;
+    const { sortBy } = useSortByFilter<SongListSort>(
+        SongListSort.ID,
+        sortFilterKey ?? ItemListKey.PLAYLIST_SONG,
+        sortFilterKey,
+    );
 
-    const { sortOrder } = useSortOrderFilter(SortOrder.ASC, ItemListKey.PLAYLIST_SONG);
+    const { sortOrder } = useSortOrderFilter(
+        SortOrder.ASC,
+        sortFilterKey ?? ItemListKey.PLAYLIST_SONG,
+        sortFilterKey,
+    );
 
     const { searchTerm, setSearchTerm } = useSearchTermFilter('');
 

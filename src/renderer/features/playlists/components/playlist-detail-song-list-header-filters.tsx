@@ -14,7 +14,10 @@ import { useListContext } from '/@/renderer/context/list-context';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
 import { ClientSideSongFilters } from '/@/renderer/features/playlists/components/client-side-song-filters';
-import { usePlaylistSongListFilters } from '/@/renderer/features/playlists/hooks/use-playlist-song-list-filters';
+import {
+    getPlaylistSongSortFilterKey,
+    usePlaylistSongListFilters,
+} from '/@/renderer/features/playlists/hooks/use-playlist-song-list-filters';
 import { FilterButton } from '/@/renderer/features/shared/components/filter-button';
 import {
     ListConfigMenu,
@@ -125,6 +128,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
     const playlistTarget = usePlaylistTarget();
     const { setPlaylistBehavior } = useSettingsStoreActions();
     const serverId = useCurrentServerId();
+    const sortFilterKey = getPlaylistSongSortFilterKey(playlistId);
 
     const detailQuery = useQuery(playlistsQueries.detail({ query: { id: playlistId }, serverId }));
 
@@ -189,6 +193,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 <ListSortByDropdown
                     defaultSortByValue={SongListSort.ID}
                     disabled={isEditMode}
+                    filterKey={sortFilterKey}
                     itemType={LibraryItem.PLAYLIST_SONG}
                     listKey={ItemListKey.PLAYLIST_SONG}
                 />
@@ -196,6 +201,7 @@ export const PlaylistDetailSongListHeaderFilters = ({
                 <ListSortOrderToggleButton
                     defaultSortOrder={SortOrder.ASC}
                     disabled={isEditMode}
+                    filterKey={sortFilterKey}
                     listKey={ItemListKey.PLAYLIST_SONG}
                 />
                 <Divider orientation="vertical" />

@@ -1,6 +1,4 @@
 import { useLocalStorage } from '/@/shared/hooks/use-local-storage';
-import { ItemListKey } from '/@/shared/types/types';
-
 export interface ListFilterPersistence {
     [listKey: string]: {
         [filterKey: string]: string | undefined;
@@ -11,7 +9,7 @@ const getPersistenceKey = (serverId: string) => {
     return `${serverId}-filters`;
 };
 
-export const useListFilterPersistence = (serverId: string, listKey: ItemListKey) => {
+export const useListFilterPersistence = (serverId: string, listKey: string) => {
     const [persistedFilters, setPersistedFilters] = useLocalStorage<ListFilterPersistence>({
         defaultValue: {},
         key: getPersistenceKey(serverId),

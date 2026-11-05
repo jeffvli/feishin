@@ -8,28 +8,32 @@ import { parseStringParam, setSearchParam } from '/@/renderer/utils/query-params
 import { runInUrlTransition } from '/@/renderer/utils/url-transition';
 import { ItemListKey } from '/@/shared/types/types';
 
-export const useSortByFilter = <TSortBy>(defaultValue: string, listKey: ItemListKey) => {
+export const useSortByFilter = <TSortBy>(
+    defaultValue: string,
+    listKey: ItemListKey | string,
+    filterKey: string = FILTER_KEYS.SHARED.SORT_BY,
+) => {
     const server = useCurrentServer();
     const { getFilter, setFilter } = useListFilterPersistence(server.id, listKey);
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const persisted = getFilter(FILTER_KEYS.SHARED.SORT_BY);
+    const persisted = getFilter(filterKey);
 
     const sortBy = useMemo(() => {
-        const value = parseStringParam(searchParams, FILTER_KEYS.SHARED.SORT_BY);
+        const value = parseStringParam(searchParams, filterKey);
         return (value ?? persisted ?? defaultValue ?? undefined) as TSortBy;
-    }, [searchParams, persisted, defaultValue]);
+    }, [defaultValue, filterKey, persisted, searchParams]);
 
     const handleSetSortBy = (sortBy: string) => {
         runInUrlTransition(() => {
             setSearchParams(
                 (prev) => {
-                    const newParams = setSearchParam(prev, FILTER_KEYS.SHARED.SORT_BY, sortBy);
+                    const newParams = setSearchParam(prev, filterKey, sortBy);
                     return newParams;
                 },
                 { replace: true },
             );
-            setFilter(FILTER_KEYS.SHARED.SORT_BY, sortBy);
+            setFilter(filterKey, sortBy);
         });
     };
 
