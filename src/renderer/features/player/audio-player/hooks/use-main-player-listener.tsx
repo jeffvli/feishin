@@ -1,10 +1,17 @@
 import { t } from 'i18next';
 import isElectron from 'is-electron';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { useIsRadioActive, useRadioStore } from '/@/renderer/features/radio/hooks/use-radio-player';
-import { usePlayerActions, useVolumeWheelStep } from '/@/renderer/store';
+import { useSetFavorite } from '/@/renderer/features/shared/hooks/use-set-favorite';
+import {
+    usePlayerActions,
+    usePlayerData,
+    usePlayerSong,
+    useVolumeWheelStep,
+} from '/@/renderer/store';
 import { toast } from '/@/shared/components/toast/toast';
+import { LibraryItem } from '/@/shared/types/domain-types';
 
 const mpvPlayer = isElectron() ? window.api.mpvPlayer : null;
 const mpvPlayerListener = isElectron() ? window.api.mpvPlayerListener : null;
@@ -23,6 +30,15 @@ const toggleRadioPlayPause = () => {
 export const useMainPlayerListener = () => {
     const isRadioActive = useIsRadioActive();
     const volumeWheelStep = useVolumeWheelStep();
+    const currentSong = usePlayerSong();
+    const { previousSong } = usePlayerData();
+    const setFavorite = useSetFavorite();
+
+    const currentSongRef = useRef(currentSong);
+    currentSongRef.current = currentSong;
+    const previousSongRef = useRef(previousSong);
+    previousSongRef.current = previousSong;
+
     const {
         decreaseVolume,
         increaseVolume,
@@ -146,6 +162,42 @@ export const useMainPlayerListener = () => {
             decreaseVolume(volumeWheelStep);
         });
 
+        mpvPlayerListener.rendererFavoriteCurrentAdd(() => {
+            const song = currentSongRef.current;
+            if (!song?.id) return;
+            setFavorite(song._serverId || '', [song.id], LibraryItem.SONG, true);
+        });
+
+        mpvPlayerListener.rendererFavoriteCurrentRemove(() => {
+            const song = currentSongRef.current;
+            if (!song?.id) return;
+            setFavorite(song._serverId || '', [song.id], LibraryItem.SONG, false);
+        });
+
+        mpvPlayerListener.rendererFavoriteCurrentToggle(() => {
+            const song = currentSongRef.current;
+            if (!song?.id) return;
+            setFavorite(song._serverId || '', [song.id], LibraryItem.SONG, !song.userFavorite);
+        });
+
+        mpvPlayerListener.rendererFavoritePreviousAdd(() => {
+            const song = previousSongRef.current;
+            if (!song?.id) return;
+            setFavorite(song._serverId || '', [song.id], LibraryItem.SONG, true);
+        });
+
+        mpvPlayerListener.rendererFavoritePreviousRemove(() => {
+            const song = previousSongRef.current;
+            if (!song?.id) return;
+            setFavorite(song._serverId || '', [song.id], LibraryItem.SONG, false);
+        });
+
+        mpvPlayerListener.rendererFavoritePreviousToggle(() => {
+            const song = previousSongRef.current;
+            if (!song?.id) return;
+            setFavorite(song._serverId || '', [song.id], LibraryItem.SONG, !song.userFavorite);
+        });
+
         mpvPlayerListener.rendererError((message: string) => {
             handleMpvError(message);
         });
@@ -164,6 +216,12 @@ export const useMainPlayerListener = () => {
             ipc?.removeAllListeners('renderer-player-volume-mute');
             ipc?.removeAllListeners('renderer-player-volume-up');
             ipc?.removeAllListeners('renderer-player-volume-down');
+            ipc?.removeAllListeners('renderer-player-favorite-current-add');
+            ipc?.removeAllListeners('renderer-player-favorite-current-remove');
+            ipc?.removeAllListeners('renderer-player-favorite-current-toggle');
+            ipc?.removeAllListeners('renderer-player-favorite-previous-add');
+            ipc?.removeAllListeners('renderer-player-favorite-previous-remove');
+            ipc?.removeAllListeners('renderer-player-favorite-previous-toggle');
             ipc?.removeAllListeners('renderer-player-error');
         };
     }, [
@@ -181,6 +239,7 @@ export const useMainPlayerListener = () => {
         mediaStop,
         mediaToggleMute,
         mediaTogglePlayPause,
+        setFavorite,
         toggleRepeat,
         toggleShuffle,
         volumeWheelStep,
