@@ -18,8 +18,11 @@ import { runInUrlTransition } from '/@/renderer/utils/url-transition';
 import { SongListSort, SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
-export const getPlaylistSongSortFilterKey = (playlistId: string) =>
-    `playlistSongSort:${playlistId}`;
+export const getPlaylistSongSortByFilterKey = (playlistId: string) =>
+    `playlistSongSortBy:${playlistId}`;
+
+export const getPlaylistSongSortOrderFilterKey = (playlistId: string) =>
+    `playlistSongSortOrder:${playlistId}`;
 
 export const usePlaylistSongListFilters = () => {
     const params = useParams<{ playlistId: string }>();
@@ -30,19 +33,22 @@ export const usePlaylistSongListFilters = () => {
     const setAlbumArtistIdsModeStore = useAppStore((state) => state.actions.setAlbumArtistIdsMode);
     const setArtistIdsModeStore = useAppStore((state) => state.actions.setArtistIdsMode);
     const setGenreIdsModeStore = useAppStore((state) => state.actions.setGenreIdsMode);
-    const sortFilterKey = currentPlaylistId
-        ? getPlaylistSongSortFilterKey(currentPlaylistId)
+    const sortByFilterKey = currentPlaylistId
+        ? getPlaylistSongSortByFilterKey(currentPlaylistId)
+        : undefined;
+    const sortOrderFilterKey = currentPlaylistId
+        ? getPlaylistSongSortOrderFilterKey(currentPlaylistId)
         : undefined;
     const { sortBy } = useSortByFilter<SongListSort>(
         SongListSort.ID,
-        sortFilterKey ?? ItemListKey.PLAYLIST_SONG,
-        sortFilterKey,
+        ItemListKey.PLAYLIST_SONG,
+        sortByFilterKey,
     );
 
     const { sortOrder } = useSortOrderFilter(
         SortOrder.ASC,
-        sortFilterKey ?? ItemListKey.PLAYLIST_SONG,
-        sortFilterKey,
+        ItemListKey.PLAYLIST_SONG,
+        sortOrderFilterKey,
     );
 
     const { searchTerm, setSearchTerm } = useSearchTermFilter('');
