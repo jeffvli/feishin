@@ -1,10 +1,11 @@
 import axios from 'axios';
+import { XMLParser } from 'fast-xml-parser';
 
 import { plexHeaders, plexRequest, plexUrl } from '/@/renderer/api/plex/plex-api';
 import { logger } from '/@/renderer/utils/logger';
 import {
     plexAccount,
-    plexContainer,
+    plexIdentity,
     plexOAuthServer,
     PlexOAuthServer,
     plexPin,
@@ -36,7 +37,16 @@ const getIdentity = async (url: string, signal?: AbortSignal) => {
         signal,
         timeout: 5000,
     });
-    return plexContainer.parse(response.data).MediaContainer.machineIdentifier;
+    // Some Plex servers return XML for /identity even when JSON was requested.
+    const data =
+        typeof response.data === 'string'
+            ? new XMLParser({
+                  attributeNamePrefix: '',
+                  ignoreAttributes: false,
+                  processEntities: false,
+              }).parse(response.data)
+            : response.data;
+    return plexIdentity.parse(data).MediaContainer.machineIdentifier;
 };
 
 const connectServer = async (

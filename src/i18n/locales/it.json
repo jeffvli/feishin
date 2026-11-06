@@ -706,6 +706,7 @@
         "remotePortError": "Si è verificato un errore nell'impostare la porta del server remoto",
         "serverRequired": "Server richiesto",
         "authenticationFailed": "Autenticazione fallita",
+        "plexConnectionTimeout": "La connessione a Plex è scaduta. Verifica che il browser possa raggiungere il server Plex e prova ad accedere di nuovo.",
         "plexOAuthExpired": "L'autorizzazione Plex è scaduta. Accedi di nuovo.",
         "apiRouteError": "Impossibile indirizzare la richiesta",
         "genericError": "Si è verificato un errore",

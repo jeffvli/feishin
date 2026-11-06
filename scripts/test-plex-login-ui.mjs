@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-// Run after build:electron and Electron installation. Uses an isolated, headless profile and fake Plex responses.
+// Run after build:electron, or build:web with --web. Requires Electron; uses mocked Plex responses.
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { mkdtempSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { createServer as createHttpServer } from 'node:http';
 import { createServer } from 'node:net';
 import path from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -11,6 +12,52 @@ import WebSocket from 'ws';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const profile = mkdtempSync('/tmp/opencode/feishin-plex-ui-');
+const web = process.argv.includes('--web');
+const timeoutTest = process.argv.includes('--timeout');
+let webServer;
+let appPath = root;
+if (web) {
+    webServer = createHttpServer((request, response) => {
+        if (request.url === '/settings.js') {
+            response.setHeader('Content-Type', 'application/javascript');
+            response.end(
+                'window.SERVER_TYPE="plex";window.SERVER_NAME="Plex";window.SERVER_LOCK="true";window.SERVER_URL="";',
+            );
+            return;
+        }
+        const file =
+            request.url === '/' ? 'index.html' : new URL(request.url, 'http://localhost').pathname;
+        try {
+            const content = readFileSync(path.join(root, 'out/web', file));
+            const mime = {
+                '.css': 'text/css',
+                '.html': 'text/html',
+                '.js': 'application/javascript',
+                '.svg': 'image/svg+xml',
+            };
+            response.setHeader(
+                'Content-Type',
+                mime[path.extname(file)] || 'application/octet-stream',
+            );
+            response.end(content);
+        } catch {
+            response.writeHead(404).end();
+        }
+    });
+    await new Promise((resolve) => webServer.listen(0, '127.0.0.1', resolve));
+    appPath = path.join(profile, 'browser.cjs');
+    writeFileSync(
+        appPath,
+        `
+        const { app, BrowserWindow } = require('electron');
+        app.whenReady().then(() => {
+            const win = new BrowserWindow({ show: false, webPreferences: { sandbox: true, nodeIntegration: false } });
+            win.webContents.setUserAgent(win.webContents.getUserAgent().replace(/Electron\\/\\S+ /, ''));
+            win.loadURL('http://feishin.test:${webServer.address().port}');
+        });
+    `,
+    );
+}
 const listener = createServer();
 await new Promise((resolve) => listener.listen(0, '127.0.0.1', resolve));
 const port = listener.address().port;
@@ -18,7 +65,8 @@ await new Promise((resolve) => listener.close(resolve));
 const child = spawn(
     process.env.ELECTRON_BINARY || path.join(root, 'node_modules/electron/dist/electron'),
     [
-        root,
+        appPath,
+        '--host-resolver-rules=MAP feishin.test 127.0.0.1',
         '--ozone-platform=headless',
         '--disable-gpu',
         `--remote-debugging-port=${port}`,
@@ -92,6 +140,11 @@ try {
         const { request, requestId } = event.params;
         requests.push(request.url);
         const url = new URL(request.url);
+        if (
+            url.hostname === 'plex-ui-unreachable.example' ||
+            (timeoutTest && url.hostname !== 'plex.tv')
+        )
+            return;
         let body;
         if (url.hostname === 'plex.tv') {
             if (url.pathname.startsWith('/api/v2/pins'))
@@ -107,13 +160,25 @@ try {
                     accessToken: `fake-server-token-${index}`,
                     clientIdentifier: `machine-${index}`,
                     connections: [
+                        ...(web
+                            ? [
+                                  {
+                                      local: false,
+                                      relay: false,
+                                      uri: 'https://plex-ui-unreachable.example',
+                                  },
+                              ]
+                            : []),
                         { local: false, relay: false, uri: `https://plex-ui-${index}.example` },
                     ],
                     name,
                     owned: index === 0,
                     provides: 'server',
                 }));
-        } else if (url.pathname === '/identity' || url.pathname === '/')
+        } else if (web && url.pathname === '/identity')
+            body =
+                '<?xml version="1.0" encoding="UTF-8"?><MediaContainer size="0" claimed="1" machineIdentifier="machine-1" version="1.40.0"/>';
+        else if (url.pathname === '/identity' || url.pathname === '/')
             body = { MediaContainer: { machineIdentifier: 'machine-1', version: '1.40.0' } };
         else if (url.pathname === '/library/sections')
             body = {
@@ -121,11 +186,16 @@ try {
             };
         else body = { MediaContainer: { Metadata: [], size: 0, totalSize: 0 } };
         await send('Fetch.fulfillRequest', {
-            body: Buffer.from(JSON.stringify(body)).toString('base64'),
+            body: Buffer.from(typeof body === 'string' ? body : JSON.stringify(body)).toString(
+                'base64',
+            ),
             requestId,
             responseCode: request.method === 'OPTIONS' ? 204 : 200,
             responseHeaders: [
-                { name: 'Content-Type', value: 'application/json' },
+                {
+                    name: 'Content-Type',
+                    value: typeof body === 'string' ? 'application/xml' : 'application/json',
+                },
                 { name: 'Access-Control-Allow-Origin', value: '*' },
                 { name: 'Access-Control-Allow-Headers', value: '*' },
                 { name: 'Access-Control-Allow-Methods', value: 'GET, POST, OPTIONS' },
@@ -156,15 +226,22 @@ try {
             { urlPattern: 'https://plex-ui-*.example/*' },
         ],
     });
-    await waitFor(
-        'Array.from(document.querySelectorAll("label")).some(label => label.textContent.trim() === "Plex")',
-    );
-    await evaluate(
-        'Array.from(document.querySelectorAll("label")).find(label => label.textContent.trim() === "Plex").click()',
-    );
+    if (!web) {
+        await waitFor(
+            'Array.from(document.querySelectorAll("label")).some(label => label.textContent.trim() === "Plex")',
+        );
+        await evaluate(
+            'Array.from(document.querySelectorAll("label")).find(label => label.textContent.trim() === "Plex").click()',
+        );
+    }
     await waitFor(
         '!!Array.from(document.querySelectorAll("button")).find(button => /Sign in with Plex|Accedi con Plex/.test(button.textContent))',
     );
+    if (web) {
+        assert.equal(await evaluate('window.isSecureContext'), false);
+        assert.equal(await evaluate('typeof window.api'), 'undefined');
+        assert.equal(await evaluate('navigator.userAgent.includes("Electron")'), false);
+    }
     assert.equal(
         await evaluate(
             'document.querySelectorAll("form input:not([type=radio]):not([type=hidden])").length',
@@ -178,6 +255,11 @@ try {
         ),
         false,
     );
+    if (timeoutTest) {
+        await evaluate(
+            'const originalTimeout = window.setTimeout; window.setTimeout = (fn, ms, ...args) => originalTimeout(fn, ms === 30000 ? 100 : ms, ...args);',
+        );
+    }
     await evaluate(
         'window.open = url => { window.__plexOpened = url; return null; }; Array.from(document.querySelectorAll("button")).find(button => /Sign in with Plex|Accedi con Plex/.test(button.textContent)).click()',
     );
@@ -193,20 +275,38 @@ try {
     await evaluate(
         'Array.from(document.querySelectorAll("button")).find(button => button.textContent.includes("Shared music")).click()',
     );
-    await waitFor(
-        'JSON.parse(localStorage.getItem("store_authentication") || "{}").state?.currentServer?.plexServerId === "machine-1"',
-    );
-    const server = await evaluate(
-        'JSON.parse(localStorage.getItem("store_authentication")).state.currentServer',
-    );
-    assert.equal(server.url, 'https://plex-ui-1.example');
-    assert.equal(server.name, 'Shared music');
-    assert.equal(server.username, 'UI listener');
-    assert.equal(server.credential, 'fake-server-token-1');
-    console.log(
-        'Plex UI passed: no endpoint fields, enabled one-click browser login, account server selection and discovered connection saved.',
-    );
+    if (timeoutTest) {
+        await waitFor('document.body.innerText.includes("Plex connection timed out")');
+        assert.equal(
+            await evaluate(
+                '!!JSON.parse(localStorage.getItem("store_authentication") || "{}").state?.currentServer',
+            ),
+            false,
+        );
+        await waitFor(
+            'Array.from(document.querySelectorAll("button")).some(button => /Sign in with Plex/.test(button.textContent) && !button.disabled)',
+        );
+        console.log(
+            'Plex web timeout passed: stalled connection cancelled, no credentials saved and sign-in available again.',
+        );
+    } else {
+        await waitFor(
+            'JSON.parse(localStorage.getItem("store_authentication") || "{}").state?.currentServer?.plexServerId === "machine-1"',
+        );
+        const server = await evaluate(
+            'JSON.parse(localStorage.getItem("store_authentication")).state.currentServer',
+        );
+        assert.equal(server.url, 'https://plex-ui-1.example');
+        assert.equal(server.name, web ? 'Plex' : 'Shared music');
+        assert.equal(server.username, 'UI listener');
+        assert.equal(server.credential, 'fake-server-token-1');
+        if (web) await waitFor('!location.hash.includes("action-required")');
+        console.log(
+            'Plex UI passed: no endpoint fields, enabled one-click browser login, account server selection and discovered connection saved.',
+        );
+    }
 } finally {
     socket?.close();
     child.kill('SIGTERM');
+    webServer?.close();
 }

@@ -89,6 +89,10 @@ export const plexContainer = z.object({
 
 export type PlexMetadata = z.infer<typeof plexMetadata>;
 
+export const plexIdentity = z.object({
+    MediaContainer: z.object({ machineIdentifier: z.string().min(1) }),
+});
+
 export const plexPin = z.object({
     authToken: z.string().min(1).nullish(),
     code: z.string().min(1),

@@ -536,6 +536,7 @@ let localAvailable = true;
 let remoteAvailable = true;
 let musicAvailable = true;
 let wrongIdentity = false;
+let identityXml = false;
 const discoveredResources = [
     {
         accessToken: 'server-scoped-token',
@@ -615,6 +616,8 @@ axios.defaults.adapter = async (config) => {
                           : 'machine-1',
                 },
             };
+            if (identityXml)
+                data = `<?xml version="1.0" encoding="UTF-8"?><MediaContainer size="0" claimed="1" machineIdentifier="${data.MediaContainer.machineIdentifier}" version="1.40.0"/>`;
         } else {
             assert.ok(url.pathname.endsWith('/library/sections'));
             assert.notEqual(
@@ -692,6 +695,12 @@ assert.deepEqual(oauthResult, {
     userId: '42',
     username: 'Plex listener',
 });
+identityXml = true;
+assert.equal((await api.authenticate('', connectArgs)).url, 'http://192.168.1.25:32400');
+wrongIdentity = true;
+assert.equal((await api.authenticate('', connectArgs)).url, 'http://192.168.1.25:32400');
+wrongIdentity = false;
+identityXml = false;
 localAvailable = false;
 assert.equal((await api.authenticate('', connectArgs)).url, 'https://remote-plex.example/proxy');
 remoteAvailable = false;

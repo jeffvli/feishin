@@ -84,6 +84,12 @@ export const PlexOAuthButton = ({
     ) => {
         if (!controller || controller.signal.aborted) return;
         setConnecting(server.id);
+        // Bound the whole connection phase too, not just each individual HTTP request.
+        const connectionTimeout = setTimeout(() => {
+            if (controller.signal.aborted) return;
+            stop();
+            toast.error({ message: t('error.plexConnectionTimeout') });
+        }, 30000);
         try {
             const data: PlexAuthenticationResponse = await api.controller.authenticate(
                 url,
@@ -106,6 +112,8 @@ export const PlexOAuthButton = ({
             toast.error({
                 message: error instanceof Error ? error.message : t('error.authenticationFailed'),
             });
+        } finally {
+            clearTimeout(connectionTimeout);
         }
     };
 

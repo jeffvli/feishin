@@ -223,6 +223,7 @@
         "apiRouteError": "Unable to route request",
         "audioDeviceFetchError": "An error occurred when trying to get audio devices",
         "authenticationFailed": "Authentication failed",
+        "plexConnectionTimeout": "Plex connection timed out. Check that your browser can reach the Plex server and try signing in again.",
         "plexOAuthExpired": "Plex authorization expired. Please sign in again.",
         "badAlbum": "You are seeing this page because this song is not part of an album. You are most likely seeing this issue if you have a song at the top level of your music folder. Jellyfin only groups tracks if they are in a folder",
         "badValue": "Invalid option \"{{value}}\". This value no longer exists",
