@@ -14,6 +14,8 @@ const root = fileURLToPath(new URL('..', import.meta.url));
 const profile = mkdtempSync('/tmp/opencode/feishin-plex-ui-');
 const web = process.argv.includes('--web');
 const timeoutTest = process.argv.includes('--timeout');
+const proxyTest = process.argv.includes('--proxy');
+const proxyRequests = [];
 let webServer;
 let appPath = root;
 if (web) {
@@ -21,8 +23,31 @@ if (web) {
         if (request.url === '/settings.js') {
             response.setHeader('Content-Type', 'application/javascript');
             response.end(
-                'window.SERVER_TYPE="plex";window.SERVER_NAME="Plex";window.SERVER_LOCK="true";window.SERVER_URL="";',
+                `window.SERVER_TYPE="plex";window.SERVER_NAME="Plex";window.SERVER_LOCK="true";window.SERVER_URL=${proxyTest ? 'location.origin + "/plex"' : '""'};`,
             );
+            return;
+        }
+        if (proxyTest && request.url.startsWith('/plex/')) {
+            proxyRequests.push(request.url);
+            response.setHeader('Access-Control-Allow-Origin', 'https://app.plex.tv');
+            if (request.url === '/plex/identity') {
+                response.setHeader('Content-Type', 'application/xml');
+                response.end('<MediaContainer machineIdentifier="machine-1"/>');
+            } else {
+                assert.equal(request.headers['x-plex-token'], 'fake-server-token-1');
+                response.setHeader('Content-Type', 'application/json');
+                response.end(
+                    JSON.stringify({
+                        MediaContainer: {
+                            Directory: [{ key: '7', title: 'Music', type: 'artist' }],
+                            machineIdentifier: 'machine-1',
+                            Metadata: [],
+                            size: 0,
+                            totalSize: 0,
+                        },
+                    }),
+                );
+            }
             return;
         }
         const file =
@@ -265,16 +290,18 @@ try {
     );
     await waitFor('!!window.__plexOpened');
     assert.equal(new URL(await evaluate('window.__plexOpened')).origin, 'https://app.plex.tv');
-    await waitFor(
-        'Array.from(document.querySelectorAll("button")).some(button => button.textContent.includes("Shared music"))',
-    );
-    assert.ok(
-        requests.every((url) => new URL(url).hostname === 'plex.tv'),
-        'Server discovery must work before contacting any media endpoint',
-    );
-    await evaluate(
-        'Array.from(document.querySelectorAll("button")).find(button => button.textContent.includes("Shared music")).click()',
-    );
+    if (!proxyTest) {
+        await waitFor(
+            'Array.from(document.querySelectorAll("button")).some(button => button.textContent.includes("Shared music"))',
+        );
+        assert.ok(
+            requests.every((url) => new URL(url).hostname === 'plex.tv'),
+            'Server discovery must work before contacting any media endpoint',
+        );
+        await evaluate(
+            'Array.from(document.querySelectorAll("button")).find(button => button.textContent.includes("Shared music")).click()',
+        );
+    }
     if (timeoutTest) {
         await waitFor('document.body.innerText.includes("Plex connection timed out")');
         assert.equal(
@@ -296,11 +323,24 @@ try {
         const server = await evaluate(
             'JSON.parse(localStorage.getItem("store_authentication")).state.currentServer',
         );
-        assert.equal(server.url, 'https://plex-ui-1.example');
+        assert.equal(
+            server.url,
+            proxyTest
+                ? `http://feishin.test:${webServer.address().port}/plex`
+                : 'https://plex-ui-1.example',
+        );
         assert.equal(server.name, web ? 'Plex' : 'Shared music');
         assert.equal(server.username, 'UI listener');
         assert.equal(server.credential, 'fake-server-token-1');
         if (web) await waitFor('!location.hash.includes("action-required")');
+        if (proxyTest) {
+            assert.ok(proxyRequests.includes('/plex/identity'));
+            assert.ok(proxyRequests.includes('/plex/library/sections'));
+            assert.ok(
+                requests.every((url) => new URL(url).hostname === 'plex.tv'),
+                'Proxy mode must not contact discovered media origins directly',
+            );
+        }
         console.log(
             'Plex UI passed: no endpoint fields, enabled one-click browser login, account server selection and discovered connection saved.',
         );

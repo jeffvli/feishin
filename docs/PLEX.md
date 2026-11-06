@@ -16,6 +16,26 @@ For manual authentication, use a token belonging to the Plex user whose library 
 
 For a locked web deployment, set `SERVER_TYPE=plex` and `SERVER_LOCK=true`, optionally with `SERVER_NAME`. Browser sign-in works without `SERVER_URL`; setting it restricts discovery to that server. Manual token login requires a configured URL. Browser deployments need access to plex.tv and a reachable server with compatible HTTPS and CORS settings; Feishin cannot bypass browser mixed-content restrictions.
 
+## Docker: Plex-only same-origin proxy
+
+If Plex returns CORS headers that allow only `https://app.plex.tv`, enable the optional proxy in Feishin's Docker container:
+
+```yaml
+environment:
+    SERVER_TYPE: "plex"
+    SERVER_NAME: "Plex"
+    SERVER_LOCK: "true"
+    SERVER_URL: "https://music.example.com/plex"
+    PLEX_PROXY_URL: "http://plex:32400"
+```
+
+- `SERVER_URL` is the browser-visible URL of **Feishin**, followed by `/plex`, not the direct Plex URL. For a local deployment it can be `http://192.168.1.150:9180/plex`. With `PUBLIC_PATH=/music/`, use `https://music.example.com/music/plex`.
+- `PLEX_PROXY_URL` is the single Plex origin reachable **from the container**, such as `http://192.168.1.150:32400` or a Docker service hostname. Only HTTP/HTTPS origins are accepted, without credentials, query strings or a path. HTTPS upstream certificates are verified.
+- The proxy is disabled by default and is enabled only when `SERVER_TYPE=plex` and `PLEX_PROXY_URL` is a valid origin. Jellyfin, Navidrome and Subsonic clients are unchanged. No destination supplied by a browser request can override the configured upstream.
+- Identity discovery, library requests, artwork, playback, downloads and listening reports all use the same-origin URL. Browser/PIN sign-in still contacts plex.tv directly and requires no token in Compose. Sign in again after changing a saved direct server URL to the proxy URL.
+- Plex must require token authentication for requests from the Feishin container. Do not add the container's address or Docker subnet to Plex's list of networks allowed without authentication. Except for `/identity`, proxy requests require a token, which Plex validates. Do not expose Plex through this proxy if its authentication is bypassed for the container's IP.
+- Proxy request/error logging is disabled to avoid recording playback tokens in URL query strings. If a separate public reverse proxy fronts Feishin, configure that proxy to redact query strings for `/plex/` too. Cookies are not forwarded to Plex.
+
 ## Supported
 
 - Artists, albums (including all discs and tracks), songs, genres, search and library selection.
@@ -44,5 +64,7 @@ Run `node scripts/test-plex-playback.mjs` to check the player event wiring with 
 After building Electron and installing its binary, run `node scripts/test-plex-login-ui.mjs` on Linux for a headless UI check with an isolated profile and mocked Plex responses. It checks the endpoint-free login screen, automatic browser opening, server selection and saved credentials. A live Plex account and server are still needed to verify browser approval, server-version-specific behavior and actual audio playback.
 
 After `pnpm build:web`, run `node scripts/test-plex-login-ui.mjs --web` to check the locked Docker/web login over HTTP, including fallback from an unresponsive connection, XML server identity responses and navigation out of the login screen. Run it again with `--web --timeout` to check that a stalled connection is cancelled without saving credentials and that sign-in becomes available again. Both modes require Electron as a headless browser; `ELECTRON_BINARY` can point to an existing binary.
+
+Use `--web --proxy` to verify same-origin sign-in with Plex responses that advertise the incompatible `https://app.plex.tv` CORS origin. Run `NGINX_BINARY=/path/to/nginx node scripts/test-plex-proxy.mjs` to test the actual nginx template: fixed upstream, authentication forwarding, byte-range streaming, playlist mutations, redirects, subpaths and isolation from other backends.
 
 References: Plex's [authentication guide](https://forums.plex.tv/t/authenticating-with-plex/609370) and the [resources endpoint](https://www.plexopedia.com/plex-media-server/api-plextv/resources/).

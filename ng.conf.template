@@ -1,3 +1,18 @@
+# Opt-in, fixed Plex origin only. Never use a request parameter as a proxy destination.
+map "${SERVER_TYPE}:${PLEX_PROXY_URL}" $plex_upstream {
+  default "";
+  "~*^plex:(?<plex_proxy_origin>https?://(?:[a-z0-9_-]+(?:\.[a-z0-9_-]+)*|\[[0-9a-f:]+\])(?::[0-9]{1,5})?)/?$" $plex_proxy_origin;
+}
+
+map "${PUBLIC_PATH}" $plex_proxy_prefix {
+  "~^(?<plex_public_prefix>.*?)/?$" $plex_public_prefix/plex;
+}
+
+map $args $plex_query_token {
+  default "";
+  "~*(^|&)X-Plex-Token=[^&]+" present;
+}
+
 server {
   listen 9180;
   listen [::]:9180;
@@ -12,6 +27,41 @@ server {
   gzip_proxied      expired no-cache no-store private auth;
   gzip_types        text/plain text/css application/json application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript;
   gzip_comp_level   9;
+
+  location ~ ^${PUBLIC_PATH}/?plex(/.*)$ {
+    if ($plex_upstream = "") { return 404; }
+
+    # Discovery needs only /identity. All other requests must carry a Plex token;
+    # Plex remains responsible for validating the token and its permissions.
+    set $plex_proxy_auth "$http_x_plex_token$plex_query_token";
+    if ($uri ~ "^${PUBLIC_PATH}/?plex/identity/?$") { set $plex_proxy_auth identity; }
+    if ($plex_proxy_auth = "") { return 401; }
+    set $plex_location_prefix $plex_proxy_prefix;
+
+    # Preserve query strings and Range headers for streaming, seeking and downloads.
+    rewrite ^${PUBLIC_PATH}/?plex(/.*)$ $1 break;
+    resolver 127.0.0.11 valid=30s ipv6=off;
+    proxy_pass $plex_upstream;
+    proxy_http_version 1.1;
+    proxy_set_header Host $proxy_host;
+    proxy_set_header Origin "";
+    proxy_set_header Referer "";
+    proxy_set_header Cookie "";
+    proxy_hide_header Set-Cookie;
+    proxy_hide_header Access-Control-Allow-Origin;
+    proxy_ssl_server_name on;
+    proxy_ssl_verify on;
+    proxy_ssl_trusted_certificate /etc/ssl/certs/ca-certificates.crt;
+    proxy_buffering off;
+    proxy_read_timeout 300s;
+    absolute_redirect off;
+    proxy_redirect ~^https?://[^/]+(/.*)$ $plex_location_prefix$1;
+    proxy_redirect ~^(/.*)$ $plex_location_prefix$1;
+
+    # Playback URLs contain tokens. Do not include them in nginx request/error logs.
+    access_log off;
+    error_log /dev/null;
+  }
 
   location ${PUBLIC_PATH} {
     alias /usr/share/nginx/html/;
