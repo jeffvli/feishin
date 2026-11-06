@@ -83,7 +83,14 @@ export const ArtAccentEffect = () => {
             .catch((error) => {
                 if (isMounted && processingKeyRef.current === currentImageKey) {
                     processingKeyRef.current = null;
-                    logger.warn('Album art accent sampling failed', { error });
+                    logger.warn('Album art accent sampling failed', {
+                        error: String(error),
+                        imageKey: currentImageKey,
+                    });
+                    // Record the failed cover with empty candidates so the dead url
+                    // is not re-decoded on every render and the theme falls back to
+                    // the saved accent instead of keeping the previous cover's color.
+                    useArtAccentStore.getState().setCandidates(currentImageKey, []);
                 }
             });
 

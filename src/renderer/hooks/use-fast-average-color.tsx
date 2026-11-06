@@ -45,25 +45,29 @@ export const getArtColorCandidates = async (src: null | string): Promise<AccentC
 
     const fac = new FastAverageColor();
 
-    const results = await Promise.all(
+    const results = await Promise.allSettled(
         ACCENT_ALGORITHMS.map(async (algorithm) => {
-            try {
-                const color = await fac.getColorAsync(src, {
-                    algorithm,
-                    ignoredColor: ignoredColors,
-                    mode: 'speed',
-                });
+            const color = await fac.getColorAsync(src, {
+                algorithm,
+                ignoredColor: ignoredColors,
+                mode: 'speed',
+            });
 
-                return [{ algorithm, rgb: color.value.slice(0, 3) as RgbColor }];
-            } catch {
-                return [];
-            }
+            return [{ algorithm, rgb: color.value.slice(0, 3) as RgbColor }];
         }),
     );
 
     fac.destroy();
 
-    return results.flat();
+    // Partial success still yields usable candidates; if every algorithm
+    // failed (dead url, CORS, decode error) throw so callers can log it
+    // instead of silently treating a broken cover as a colorless one.
+    const failures = results.filter((result) => result.status === 'rejected');
+    if (failures.length === results.length) {
+        throw failures[0].reason;
+    }
+
+    return results.flatMap((result) => (result.status === 'fulfilled' ? result.value : []));
 };
 
 export const useFastAverageColor = (args: {
