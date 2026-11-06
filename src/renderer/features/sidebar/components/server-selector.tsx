@@ -6,6 +6,7 @@ import styles from './server-selector.module.css';
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
 import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
+import PlexLogo from '/@/renderer/features/servers/assets/plex.svg';
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
 import { useScanStatus } from '/@/renderer/features/shared/hooks/use-scan-status';
 import { ServerSelectorItems } from '/@/renderer/features/sidebar/components/server-selector-items';
@@ -74,7 +75,9 @@ export const ServerSelector = () => {
             ? NavidromeLogo
             : currentServer.type === ServerType.JELLYFIN
               ? JellyfinLogo
-              : OpenSubsonicLogo;
+              : currentServer.type === ServerType.PLEX
+                ? PlexLogo
+                : OpenSubsonicLogo;
 
     return (
         <DropdownMenu offset={0} position="right-start" withinPortal={false}>

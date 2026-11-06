@@ -11,8 +11,14 @@ import {
     restoreRatingQueryData,
 } from '/@/renderer/features/shared/mutations/rating-optimistic-updates';
 import { MutationHookArgs } from '/@/renderer/lib/react-query';
+import { getServerById } from '/@/renderer/store/auth.store';
 import { toast } from '/@/shared/components/toast/toast';
-import { LibraryItem, RatingResponse, SetRatingArgs } from '/@/shared/types/domain-types';
+import {
+    LibraryItem,
+    RatingResponse,
+    ServerType,
+    SetRatingArgs,
+} from '/@/shared/types/domain-types';
 
 const setRatingMutationKey = ['set-rating'];
 
@@ -58,6 +64,18 @@ export const useSetRatingMutation = (args: MutationHookArgs) => {
             return applyRatingOptimisticUpdates(queryClient, variables, variables.query.rating);
         },
         onSuccess: (_data, variables) => {
+            const serverId = variables.apiClientProps.serverId;
+            if (getServerById(serverId)?.type === ServerType.PLEX) {
+                eventEmitter.emit('USER_FAVORITE', {
+                    favorite: variables.query.rating === 5,
+                    id: variables.query.id,
+                    itemType: variables.query.type,
+                    serverId,
+                });
+                queryClient.invalidateQueries({
+                    predicate: (query) => query.queryKey[0] === serverId,
+                });
+            }
             if (
                 variables.query.type === LibraryItem.SONG ||
                 variables.query.type === LibraryItem.PLAYLIST_SONG ||

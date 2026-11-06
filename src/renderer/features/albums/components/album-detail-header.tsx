@@ -44,7 +44,8 @@ export const AlbumDetailHeader = forwardRef<HTMLDivElement>((_props, ref) => {
     const showRating =
         showRatings &&
         (detailQuery?.data?._serverType === ServerType.NAVIDROME ||
-            detailQuery?.data?._serverType === ServerType.SUBSONIC);
+            detailQuery?.data?._serverType === ServerType.SUBSONIC ||
+            detailQuery?.data?._serverType === ServerType.PLEX);
 
     const { addToQueueByData, addToQueueByFetch } = usePlayer();
     const playButtonBehavior = usePlayButtonBehavior();

@@ -36,6 +36,7 @@ export enum LibraryItem {
 export enum ServerType {
     JELLYFIN = 'jellyfin',
     NAVIDROME = 'navidrome',
+    PLEX = 'plex',
     SUBSONIC = 'subsonic',
 }
 
@@ -93,6 +94,7 @@ export type ServerListItem = {
     isAdmin?: boolean;
     musicFolderId?: string[];
     name: string;
+    plexServerId?: string;
     preferInstantMix?: boolean;
     preferRemoteUrl?: boolean;
     remoteUrl?: string;
@@ -262,6 +264,7 @@ export type AuthenticationResponse = {
     credential: string;
     isAdmin?: boolean;
     ndCredential?: string;
+    plexServerId?: string;
     userId: null | string;
     username: string;
 };
@@ -1620,7 +1623,7 @@ export type ControllerEndpoint = {
     getArtistList: (args: ArtistListArgs) => Promise<ArtistListResponse>;
     getArtistListCount: (args: ArtistListCountArgs) => Promise<number>;
     getArtistRadio: (args: ArtistRadioArgs) => Promise<Song[]>;
-    getDownloadUrl: (args: DownloadArgs) => string;
+    getDownloadUrl: (args: DownloadArgs) => Promise<string> | string;
     getFavoriteSongs: (args: FavoriteSongListArgs) => Promise<FavoriteSongListResponse>;
     getFolder: (args: FolderArgs) => Promise<FolderResponse>;
     getGenreList: (args: GenreListArgs) => Promise<GenreListResponse>;
@@ -1771,7 +1774,7 @@ export type InternalControllerEndpoint = {
     getArtistList: (args: ReplaceApiClientProps<ArtistListArgs>) => Promise<ArtistListResponse>;
     getArtistListCount: (args: ReplaceApiClientProps<ArtistListCountArgs>) => Promise<number>;
     getArtistRadio: (args: ReplaceApiClientProps<ArtistRadioArgs>) => Promise<Song[]>;
-    getDownloadUrl: (args: ReplaceApiClientProps<DownloadArgs>) => string;
+    getDownloadUrl: (args: ReplaceApiClientProps<DownloadArgs>) => Promise<string> | string;
     getFavoriteSongs: (
         args: ReplaceApiClientProps<FavoriteSongListArgs>,
     ) => Promise<FavoriteSongListResponse>;
@@ -2096,6 +2099,7 @@ export type UserInfoResponse = {
 
 type BaseEndpointArgsWithServer = {
     apiClientProps: {
+        forceRemoteUrl?: boolean;
         server: null | ServerListItemWithCredential;
         serverId: string;
         signal?: AbortSignal;

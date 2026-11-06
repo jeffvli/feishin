@@ -1,6 +1,6 @@
 # API
 
-Server library data layer (Jellyfin / Navidrome / Subsonic). Read when adding or changing fetches, mutations, normalize, or query keys.
+Server library data layer (Jellyfin / Navidrome / Plex / Subsonic). Read when adding or changing fetches, mutations, normalize, or query keys.
 
 ## Layers
 
@@ -8,8 +8,8 @@ Server library data layer (Jellyfin / Navidrome / Subsonic). Read when adding or
 |-------|------|-----|
 | Feature queries / mutations | `src/renderer/features/<feature>/api/`, `.../mutations/` | `queryOptions` / `useMutation`; call `api.controller` |
 | Facade | `src/renderer/api` → `controller.ts` | Pick backend from current server (`ServerType`) |
-| Backend client + controller | `src/renderer/api/{jellyfin,navidrome,subsonic}/` | HTTP + map to controller endpoints |
-| Types + normalize | `src/shared/api/{jellyfin,navidrome,subsonic}/` | Zod/types + `*Normalize` → domain |
+| Backend client + controller | `src/renderer/api/{jellyfin,navidrome,plex,subsonic}/` | HTTP + map to controller endpoints |
+| Types + normalize | `src/shared/api/{jellyfin,navidrome,plex,subsonic}/` | Zod/types + `*Normalize` → domain |
 | Domain contracts | `src/shared/types/domain-types.ts` | `ControllerEndpoint` shapes features rely on |
 | Query keys | `src/renderer/api/query-keys.ts` | `[serverId, resource, …]`; use `splitPaginatedQuery` for list/count |
 

@@ -12,15 +12,18 @@ import {
 import JellyfinIcon from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeIcon from '/@/renderer/features/servers/assets/navidrome.png';
 import SubsonicIcon from '/@/renderer/features/servers/assets/opensubsonic.png';
+import PlexIcon from '/@/renderer/features/servers/assets/plex.svg';
 import { IgnoreCorsSslSwitches } from '/@/renderer/features/servers/components/ignore-cors-ssl-switches';
 import { JellyfinQuickConnectButton } from '/@/renderer/features/servers/components/jellyfin-quick-connect-button';
 import {
     JellyfinSignInMethod,
     JellyfinSignInMethodPicker,
 } from '/@/renderer/features/servers/components/jellyfin-sign-in-method-picker';
+import { PlexOAuthButton } from '/@/renderer/features/servers/components/plex-oauth-button';
 import { useJellyfinQuickConnect } from '/@/renderer/features/servers/hooks/use-jellyfin-quick-connect';
 import { useAuthStoreActions, useServerList } from '/@/renderer/store';
 import { normalizeServerUrl } from '/@/renderer/utils/normalize-server-url';
+import { Button } from '/@/shared/components/button/button';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
@@ -86,6 +89,10 @@ const SERVER_TYPES: Record<ServerType, ServerDetails> = {
         icon: NavidromeIcon,
         name: 'Navidrome',
     },
+    [ServerType.PLEX]: {
+        icon: PlexIcon,
+        name: 'Plex',
+    },
     [ServerType.SUBSONIC]: {
         icon: SubsonicIcon,
         name: 'OpenSubsonic',
@@ -104,6 +111,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const { t } = useTranslation();
     const focusTrapRef = useFocusTrap(true);
     const [isLoading, setIsLoading] = useState(false);
+    const [plexManual, setPlexManual] = useState(false);
     const { addServer, setCurrentServer } = useAuthStoreActions();
     const serverList = useServerList();
     const { servers: discovered } = useAutodiscovery();
@@ -133,9 +141,15 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
     const [signInMethod, setSignInMethod] = useState<JellyfinSignInMethod>('password');
     const showQuickConnect =
         form.values.type === ServerType.JELLYFIN && signInMethod === 'quickConnect';
+    const isPlexAccount = form.values.type === ServerType.PLEX && !plexManual;
 
     const isSubmitDisabled =
-        !form.values.name || !form.values.url || (!showQuickConnect && !form.values.username);
+        !form.values.name ||
+        !form.values.url ||
+        (!showQuickConnect &&
+            (form.values.type === ServerType.PLEX
+                ? !form.values.password.trim()
+                : !form.values.username));
 
     const {
         code: quickConnectCode,
@@ -187,7 +201,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         form.setValues({ ...server });
     };
 
-    const handleSubmit = form.onSubmit(async (values) => {
+    const submit = async (values: typeof form.values, authentication?: AuthenticationResponse) => {
         if (serverLock && Object.keys(serverList).length >= 1) {
             toast.error({
                 message: t('error.serverLockSingleServer'),
@@ -205,15 +219,17 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
 
         try {
             setIsLoading(true);
-            const data: AuthenticationResponse | undefined = await authFunction(
-                values.url,
-                {
-                    legacy: values.legacyAuth,
-                    password: values.password,
-                    username: values.username,
-                },
-                values.type as ServerType,
-            );
+            const data: AuthenticationResponse | undefined =
+                authentication ??
+                (await authFunction(
+                    values.url,
+                    {
+                        legacy: values.legacyAuth,
+                        password: values.password,
+                        username: values.username,
+                    },
+                    values.type as ServerType,
+                ));
 
             if (!data) {
                 return toast.error({
@@ -226,6 +242,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                 id: nanoid(),
                 isAdmin: data.isAdmin,
                 name: values.name,
+                plexServerId: data.plexServerId,
                 type: values.type as ServerType,
                 url: normalizeServerUrl(values.url),
                 userId: data.userId,
@@ -280,7 +297,9 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
         }
 
         return setIsLoading(false);
-    });
+    };
+
+    const handleSubmit = form.onSubmit((values) => submit(values));
 
     return (
         <>
@@ -309,151 +328,204 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                         disabled={serverLock}
                         onChange={(value) => {
                             form.setFieldValue('type', value);
+                            setPlexManual(false);
                             if (value !== ServerType.JELLYFIN) stopQuickConnect();
                         }}
                         p="md"
                         value={form.values.type}
                         withItemsBorders={false}
                     />
-                    <Group grow>
-                        <TextInput
-                            data-autofocus
-                            disabled={serverLock}
-                            label={t('form.addServer.input', {
-                                context: 'name',
-                            })}
-                            required
-                            {...form.getInputProps('name')}
-                        />
-                        <TextInput
-                            disabled={serverLock}
-                            label={t('form.addServer.input', {
-                                context: 'url',
-                            })}
-                            required
-                            {...form.getInputProps('url')}
-                        />
-                    </Group>
-                    <TextInput
-                        description={t('form.addServer.input', {
-                            context: 'remoteUrlDescription',
-                        })}
-                        disabled={serverLock}
-                        label={t('form.addServer.input', {
-                            context: 'remoteUrl',
-                        })}
-                        placeholder={t('form.addServer.input', {
-                            context: 'remoteUrlPlaceholder',
-                        })}
-                        {...form.getInputProps('remoteUrl')}
-                    />
-                    {form.values.remoteUrl && (
-                        <Checkbox
-                            label={t('form.addServer.input', {
-                                context: 'preferRemoteUrl',
-                            })}
-                            {...form.getInputProps('preferRemoteUrl', {
-                                type: 'checkbox',
-                            })}
-                        />
-                    )}
-                    {isElectron() && (
+                    {isPlexAccount ? (
                         <>
-                            <Divider />
-                            <IgnoreCorsSslSwitches />
-                            <Divider />
-                        </>
-                    )}
-                    {form.values.type === ServerType.JELLYFIN && (
-                        <JellyfinSignInMethodPicker
-                            onChange={(method) => {
-                                setSignInMethod(method);
-                                if (method !== 'quickConnect') stopQuickConnect();
-                            }}
-                            value={signInMethod}
-                        />
-                    )}
-                    {!showQuickConnect && (
-                        <>
-                            <TextInput
-                                label={t('form.addServer.input', {
-                                    context: 'username',
-                                })}
-                                required
-                                {...form.getInputProps('username')}
-                            />
-                            <PasswordInput
-                                description={
-                                    form.values.type === ServerType.NAVIDROME &&
-                                    t('form.addServer.input', { context: 'passwordNoSSO' })
+                            <PlexOAuthButton
+                                disabled={isLoading}
+                                onAuthenticated={async (data) => {
+                                    await submit(
+                                        {
+                                            ...form.values,
+                                            name: serverLock ? form.values.name : data.name,
+                                            password: '',
+                                            preferRemoteUrl: false,
+                                            remoteUrl: '',
+                                            savePassword: undefined,
+                                            url: data.url,
+                                        },
+                                        data,
+                                    );
+                                }}
+                                onLoadingChange={setIsLoading}
+                                url={
+                                    serverLock
+                                        ? (localSettings
+                                              ? localSettings.env.SERVER_URL
+                                              : window.SERVER_URL) || ''
+                                        : ''
                                 }
-                                label={t('form.addServer.input', {
-                                    context: 'password',
-                                })}
-                                {...form.getInputProps('password')}
                             />
+                            <Button
+                                onClick={() => setPlexManual(true)}
+                                type="button"
+                                variant="subtle"
+                            >
+                                {t('form.addServer.input', { context: 'plexOAuthOrToken' })}
+                            </Button>
                         </>
-                    )}
-                    {localSettings && form.values.type === ServerType.NAVIDROME && (
-                        <Checkbox
-                            label={t('form.addServer.input', {
-                                context: 'savePassword',
-                            })}
-                            {...form.getInputProps('savePassword', {
-                                type: 'checkbox',
-                            })}
-                        />
-                    )}
-                    {form.values.type === ServerType.SUBSONIC && (
-                        <Checkbox
-                            disabled={serverLock}
-                            label={t('form.addServer.input', {
-                                context: 'legacyAuthentication',
-                            })}
-                            {...form.getInputProps('legacyAuth', { type: 'checkbox' })}
-                        />
-                    )}
-                    {form.values.type === ServerType.JELLYFIN && (
+                    ) : (
                         <>
-                            <Checkbox
+                            {form.values.type === ServerType.PLEX && (
+                                <Button
+                                    onClick={() => setPlexManual(false)}
+                                    type="button"
+                                    variant="subtle"
+                                >
+                                    {t('form.addServer.input', { context: 'plexOAuth' })}
+                                </Button>
+                            )}
+                            <Group grow>
+                                <TextInput
+                                    data-autofocus
+                                    disabled={serverLock}
+                                    label={t('form.addServer.input', {
+                                        context: 'name',
+                                    })}
+                                    required
+                                    {...form.getInputProps('name')}
+                                />
+                                <TextInput
+                                    disabled={serverLock}
+                                    label={t('form.addServer.input', {
+                                        context: 'url',
+                                    })}
+                                    required
+                                    {...form.getInputProps('url')}
+                                />
+                            </Group>
+                            <TextInput
                                 description={t('form.addServer.input', {
-                                    context: 'preferInstantMixDescription',
+                                    context: 'remoteUrlDescription',
                                 })}
+                                disabled={serverLock}
                                 label={t('form.addServer.input', {
-                                    context: 'preferInstantMix',
+                                    context: 'remoteUrl',
                                 })}
-                                {...form.getInputProps('preferInstantMix', {
-                                    type: 'checkbox',
+                                placeholder={t('form.addServer.input', {
+                                    context: 'remoteUrlPlaceholder',
                                 })}
+                                {...form.getInputProps('remoteUrl')}
                             />
-                            <Checkbox
-                                description={t('form.addServer.input', {
-                                    context: 'enableAudiobooksDescription',
-                                })}
-                                label={t('form.addServer.input', {
-                                    context: 'enableAudiobooks',
-                                })}
-                                {...form.getInputProps('enableAudiobooks', {
-                                    type: 'checkbox',
-                                })}
-                            />
+                            {form.values.remoteUrl && (
+                                <Checkbox
+                                    label={t('form.addServer.input', {
+                                        context: 'preferRemoteUrl',
+                                    })}
+                                    {...form.getInputProps('preferRemoteUrl', {
+                                        type: 'checkbox',
+                                    })}
+                                />
+                            )}
+                            {isElectron() && (
+                                <>
+                                    <Divider />
+                                    <IgnoreCorsSslSwitches />
+                                    <Divider />
+                                </>
+                            )}
+                            {form.values.type === ServerType.JELLYFIN && (
+                                <JellyfinSignInMethodPicker
+                                    onChange={(method) => {
+                                        setSignInMethod(method);
+                                        if (method !== 'quickConnect') stopQuickConnect();
+                                    }}
+                                    value={signInMethod}
+                                />
+                            )}
+                            {!showQuickConnect && (
+                                <>
+                                    <TextInput
+                                        label={t('form.addServer.input', {
+                                            context: 'username',
+                                        })}
+                                        required={form.values.type !== ServerType.PLEX}
+                                        {...form.getInputProps('username')}
+                                    />
+                                    <PasswordInput
+                                        description={
+                                            form.values.type === ServerType.NAVIDROME &&
+                                            t('form.addServer.input', { context: 'passwordNoSSO' })
+                                        }
+                                        label={t('form.addServer.input', {
+                                            context:
+                                                form.values.type === ServerType.PLEX
+                                                    ? 'plexToken'
+                                                    : 'password',
+                                        })}
+                                        required={form.values.type === ServerType.PLEX}
+                                        {...form.getInputProps('password')}
+                                    />
+                                </>
+                            )}
+                            {localSettings && form.values.type === ServerType.NAVIDROME && (
+                                <Checkbox
+                                    label={t('form.addServer.input', {
+                                        context: 'savePassword',
+                                    })}
+                                    {...form.getInputProps('savePassword', {
+                                        type: 'checkbox',
+                                    })}
+                                />
+                            )}
+                            {form.values.type === ServerType.SUBSONIC && (
+                                <Checkbox
+                                    disabled={serverLock}
+                                    label={t('form.addServer.input', {
+                                        context: 'legacyAuthentication',
+                                    })}
+                                    {...form.getInputProps('legacyAuth', { type: 'checkbox' })}
+                                />
+                            )}
+                            {form.values.type === ServerType.JELLYFIN && (
+                                <>
+                                    <Checkbox
+                                        description={t('form.addServer.input', {
+                                            context: 'preferInstantMixDescription',
+                                        })}
+                                        label={t('form.addServer.input', {
+                                            context: 'preferInstantMix',
+                                        })}
+                                        {...form.getInputProps('preferInstantMix', {
+                                            type: 'checkbox',
+                                        })}
+                                    />
+                                    <Checkbox
+                                        description={t('form.addServer.input', {
+                                            context: 'enableAudiobooksDescription',
+                                        })}
+                                        label={t('form.addServer.input', {
+                                            context: 'enableAudiobooks',
+                                        })}
+                                        {...form.getInputProps('enableAudiobooks', {
+                                            type: 'checkbox',
+                                        })}
+                                    />
+                                </>
+                            )}
+                            {showQuickConnect && (
+                                <JellyfinQuickConnectButton
+                                    code={quickConnectCode}
+                                    disabled={!form.values.name || !form.values.url}
+                                    isLoading={isQuickConnectLoading}
+                                    onStart={() => startQuickConnect(form.values.url)}
+                                    onStop={stopQuickConnect}
+                                    url={form.values.url}
+                                />
+                            )}
                         </>
-                    )}
-                    {showQuickConnect && (
-                        <JellyfinQuickConnectButton
-                            code={quickConnectCode}
-                            disabled={!form.values.name || !form.values.url}
-                            isLoading={isQuickConnectLoading}
-                            onStart={() => startQuickConnect(form.values.url)}
-                            onStop={stopQuickConnect}
-                            url={form.values.url}
-                        />
                     )}
                     <Group grow justify="flex-end">
                         {onCancel && (
                             <ModalButton onClick={onCancel}>{t('common.cancel')}</ModalButton>
                         )}
-                        {!showQuickConnect && (
+                        {!showQuickConnect && !isPlexAccount && (
                             <ModalButton
                                 disabled={isSubmitDisabled}
                                 loading={isLoading}

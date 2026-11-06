@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import i18n from '/@/i18n/i18n';
 import { api } from '/@/renderer/api';
+import { PlexOAuthButton } from '/@/renderer/features/servers/components/plex-oauth-button';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { getServerById, useAuthStoreActions } from '/@/renderer/store';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
@@ -14,6 +15,7 @@ import { ModalButton } from '/@/shared/components/modal/model-shared';
 import { PasswordInput } from '/@/shared/components/password-input/password-input';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextInput } from '/@/shared/components/text-input/text-input';
+import { Text } from '/@/shared/components/text/text';
 import { toast } from '/@/shared/components/toast/toast';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
 import { useFocusTrap } from '/@/shared/hooks/use-focus-trap';
@@ -68,7 +70,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
     const isSubsonic = form.values.type === ServerType.SUBSONIC;
     const isNavidrome = form.values.type === ServerType.NAVIDROME;
 
-    const handleSubmit = form.onSubmit(async (values) => {
+    const submit = async (values: typeof form.values, authentication?: AuthenticationResponse) => {
         try {
             setIsLoading(true);
 
@@ -80,7 +82,11 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
 
             // Skip authentication if username hasn't changed, password is empty, and URL/type haven't changed
             const canSkipAuth =
-                !usernameChanged && !passwordProvided && !urlChanged && !typeChanged;
+                !authentication &&
+                !usernameChanged &&
+                !passwordProvided &&
+                !urlChanged &&
+                !typeChanged;
 
             let data: AuthenticationResponse | undefined;
             let serverItem: ServerListItemWithCredential;
@@ -111,15 +117,17 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     });
                 }
 
-                data = await authFunction(
-                    values.url,
-                    {
-                        legacy: values.legacyAuth,
-                        password: values.password,
-                        username: values.username,
-                    },
-                    values.type,
-                );
+                data =
+                    authentication ??
+                    (await authFunction(
+                        values.url,
+                        {
+                            legacy: values.legacyAuth,
+                            password: values.password,
+                            username: values.username,
+                        },
+                        values.type,
+                    ));
 
                 if (!data) {
                     return toast.error({
@@ -132,6 +140,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     id: server.id,
                     isAdmin: data.isAdmin,
                     name: values.name,
+                    plexServerId: data.plexServerId ?? server.plexServerId,
                     type: values.type,
                     url: values.url,
                     userId: data.userId,
@@ -214,7 +223,9 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
 
         if (isUpdate) closeAllModals();
         return setIsLoading(false);
-    });
+    };
+
+    const handleSubmit = form.onSubmit((values) => submit(values));
 
     return (
         <form onSubmit={handleSubmit}>
@@ -258,18 +269,33 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                         {form.isDirty('preferRemoteUrl') && <ModifiedFieldIndicator />}
                     </Group>
                 )}
+                {form.values.type === ServerType.PLEX && (
+                    <>
+                        <PlexOAuthButton
+                            disabled={isLoading || !form.values.name}
+                            onAuthenticated={async (data) => {
+                                await submit({ ...form.values, url: data.url }, data);
+                            }}
+                            onLoadingChange={setIsLoading}
+                            serverId={server.plexServerId}
+                        />
+                        <Text size="sm">
+                            {t('form.addServer.input', { context: 'plexOAuthOrToken' })}
+                        </Text>
+                    </>
+                )}
                 <TextInput
                     label={t('form.addServer.input', {
                         context: 'username',
                     })}
-                    required
+                    required={form.values.type !== ServerType.PLEX}
                     rightSection={form.isDirty('username') && <ModifiedFieldIndicator />}
                     {...form.getInputProps('username')}
                 />
                 <PasswordInput
                     data-autofocus
                     label={t('form.addServer.input', {
-                        context: 'password',
+                        context: form.values.type === ServerType.PLEX ? 'plexToken' : 'password',
                     })}
                     {...form.getInputProps('password')}
                 />

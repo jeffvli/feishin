@@ -297,7 +297,8 @@ export const ItemCardControls = ({
             {controls?.onRating &&
                 showRating &&
                 (item?._serverType === ServerType.NAVIDROME ||
-                    item?._serverType === ServerType.SUBSONIC) && (
+                    item?._serverType === ServerType.SUBSONIC ||
+                    item?._serverType === ServerType.PLEX) && (
                     <RatingButton
                         onChange={ratingChangeHandler}
                         rating={(item as { userRating: number }).userRating}

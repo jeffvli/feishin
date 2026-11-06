@@ -497,7 +497,9 @@ export const MobileFullscreenPlayer = () => {
     const showRating =
         showRatingsSetting &&
         isSongDefined &&
-        (server?.type === ServerType.NAVIDROME || server?.type === ServerType.SUBSONIC);
+        (server?.type === ServerType.NAVIDROME ||
+            server?.type === ServerType.SUBSONIC ||
+            server?.type === ServerType.PLEX);
 
     return (
         <MobilePlayerContainer

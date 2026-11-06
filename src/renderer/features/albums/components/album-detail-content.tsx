@@ -184,7 +184,10 @@ const AlbumMetadataTags = ({ album }: AlbumMetadataTagsProps) => {
         if (!album?.recordLabels || album.recordLabels.length === 0) return [];
 
         return album.recordLabels.map((label) => {
-            if (album._serverType === ServerType.SUBSONIC) {
+            if (
+                album._serverType === ServerType.SUBSONIC ||
+                album._serverType === ServerType.PLEX
+            ) {
                 return { id: label, label: label, url: null };
             }
 

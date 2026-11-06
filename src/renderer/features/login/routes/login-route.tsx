@@ -17,12 +17,14 @@ import {
 import JellyfinIcon from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeIcon from '/@/renderer/features/servers/assets/navidrome.png';
 import SubsonicIcon from '/@/renderer/features/servers/assets/opensubsonic.png';
+import PlexIcon from '/@/renderer/features/servers/assets/plex.svg';
 import { IgnoreCorsSslSwitches } from '/@/renderer/features/servers/components/ignore-cors-ssl-switches';
 import { JellyfinQuickConnectButton } from '/@/renderer/features/servers/components/jellyfin-quick-connect-button';
 import {
     JellyfinSignInMethod,
     JellyfinSignInMethodPicker,
 } from '/@/renderer/features/servers/components/jellyfin-sign-in-method-picker';
+import { PlexOAuthButton } from '/@/renderer/features/servers/components/plex-oauth-button';
 import { useJellyfinQuickConnect } from '/@/renderer/features/servers/hooks/use-jellyfin-quick-connect';
 import { AnimatedPage } from '/@/renderer/features/shared/components/animated-page';
 import { PageErrorBoundary } from '/@/renderer/features/shared/components/page-error-boundary';
@@ -53,18 +55,21 @@ const localSettings = isElectron() ? window.api.localSettings : null;
 const SERVER_ICONS: Record<ServerType, string> = {
     [ServerType.JELLYFIN]: JellyfinIcon,
     [ServerType.NAVIDROME]: NavidromeIcon,
+    [ServerType.PLEX]: PlexIcon,
     [ServerType.SUBSONIC]: SubsonicIcon,
 };
 
 const SERVER_NAMES: Record<ServerType, string> = {
     [ServerType.JELLYFIN]: 'Jellyfin',
     [ServerType.NAVIDROME]: 'Navidrome',
+    [ServerType.PLEX]: 'Plex',
     [ServerType.SUBSONIC]: 'OpenSubsonic',
 };
 
 const LoginRoute = () => {
     const { t } = useTranslation();
     const [isLoading, setIsLoading] = useState(false);
+    const [plexManual, setPlexManual] = useState(false);
     const { addServer, deleteServer, setCurrentServer, updateServer } = useAuthStoreActions();
     const currentServer = useCurrentServer();
     const serverList = useServerList();
@@ -94,7 +99,7 @@ const LoginRoute = () => {
             value: serverName,
         },
         {
-            isValid: serverUrl !== '',
+            isValid: serverType === ServerType.PLEX || serverUrl !== '',
             key: 'SERVER_URL',
             value: serverUrl,
         },
@@ -114,6 +119,7 @@ const LoginRoute = () => {
 
     const [signInMethod, setSignInMethod] = useState<JellyfinSignInMethod>('password');
     const showQuickConnect = serverType === ServerType.JELLYFIN && signInMethod === 'quickConnect';
+    const isPlexAccount = serverType === ServerType.PLEX && !plexManual;
 
     const {
         code: quickConnectCode,
@@ -193,7 +199,12 @@ const LoginRoute = () => {
         );
     }
 
-    const handleSubmit = form.onSubmit(async (values) => {
+    const submit = async (
+        values: typeof form.values,
+        authentication?: AuthenticationResponse,
+        resolvedUrl = serverUrl,
+        resolvedName = serverName,
+    ) => {
         const authFunction = api.controller.authenticate;
 
         if (!authFunction) {
@@ -204,15 +215,17 @@ const LoginRoute = () => {
 
         try {
             setIsLoading(true);
-            const data: AuthenticationResponse | undefined = await authFunction(
-                serverUrl,
-                {
-                    legacy: legacyAuth,
-                    password: values.password,
-                    username: values.username,
-                },
-                serverType as ServerType,
-            );
+            const data: AuthenticationResponse | undefined =
+                authentication ??
+                (await authFunction(
+                    serverUrl,
+                    {
+                        legacy: legacyAuth,
+                        password: values.password,
+                        username: values.username,
+                    },
+                    serverType as ServerType,
+                ));
 
             if (!data) {
                 return toast.error({
@@ -220,7 +233,7 @@ const LoginRoute = () => {
                 });
             }
 
-            const normalizedUrl = normalizeServerUrl(serverUrl);
+            const normalizedUrl = normalizeServerUrl(resolvedUrl);
             const normalizedRemoteURL = normalizeServerUrl(remoteUrl);
             const existingServer = serverLock
                 ? findExistingServerLockServer(serverList, normalizedUrl, serverType)
@@ -231,7 +244,8 @@ const LoginRoute = () => {
                 credential: data.credential,
                 id: serverId,
                 isAdmin: data.isAdmin,
-                name: serverName,
+                name: resolvedName,
+                plexServerId: data.plexServerId,
                 remoteUrl: normalizedRemoteURL,
                 type: serverType as ServerType,
                 url: normalizedUrl,
@@ -243,7 +257,8 @@ const LoginRoute = () => {
                 const updates: Partial<ServerListItemWithCredential> = {
                     credential: data.credential,
                     isAdmin: data.isAdmin,
-                    name: serverName,
+                    name: resolvedName,
+                    plexServerId: data.plexServerId,
                     remoteUrl: normalizedRemoteURL,
                     url: normalizedUrl,
                     userId: data.userId,
@@ -275,7 +290,7 @@ const LoginRoute = () => {
                 message: t('form.addServer.success'),
             });
 
-            if (localSettings && values.password) {
+            if (localSettings && values.password && !authentication) {
                 const saved = await localSettings.passwordSet(values.password, serverId);
                 if (!saved) {
                     toast.error({
@@ -291,9 +306,13 @@ const LoginRoute = () => {
         }
 
         return setIsLoading(false);
-    });
+    };
 
-    const isSubmitDisabled = !showQuickConnect && (!form.values.username || !form.values.password);
+    const handleSubmit = form.onSubmit((values) => submit(values));
+
+    const isSubmitDisabled =
+        !showQuickConnect &&
+        ((serverType !== ServerType.PLEX && !form.values.username) || !form.values.password);
     const serverIcon = SERVER_ICONS[serverType as ServerType];
     const serverDisplayName = SERVER_NAMES[serverType as ServerType];
 
@@ -334,28 +353,71 @@ const LoginRoute = () => {
                                 )}
                                 {!showQuickConnect && (
                                     <>
-                                        <TextInput
-                                            data-autofocus
-                                            label={t('form.addServer.input', {
-                                                context: 'username',
-                                            })}
-                                            required
-                                            variant="filled"
-                                            {...form.getInputProps('username')}
-                                        />
-                                        <PasswordInput
-                                            label={t('form.addServer.input', {
-                                                context: 'password',
-                                            })}
-                                            required
-                                            variant="filled"
-                                            {...form.getInputProps('password')}
-                                        />
+                                        {isPlexAccount ? (
+                                            <>
+                                                <PlexOAuthButton
+                                                    disabled={isLoading}
+                                                    onAuthenticated={async (data) => {
+                                                        await submit(
+                                                            form.values,
+                                                            data,
+                                                            data.url,
+                                                            serverName || data.name,
+                                                        );
+                                                    }}
+                                                    onLoadingChange={setIsLoading}
+                                                    url={serverUrl}
+                                                />
+                                                <Button
+                                                    onClick={() => setPlexManual(true)}
+                                                    type="button"
+                                                    variant="subtle"
+                                                >
+                                                    {t('form.addServer.input', {
+                                                        context: 'plexOAuthOrToken',
+                                                    })}
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {serverType === ServerType.PLEX && (
+                                                    <Button
+                                                        onClick={() => setPlexManual(false)}
+                                                        type="button"
+                                                        variant="subtle"
+                                                    >
+                                                        {t('form.addServer.input', {
+                                                            context: 'plexOAuth',
+                                                        })}
+                                                    </Button>
+                                                )}
+                                                <TextInput
+                                                    data-autofocus
+                                                    label={t('form.addServer.input', {
+                                                        context: 'username',
+                                                    })}
+                                                    required={serverType !== ServerType.PLEX}
+                                                    variant="filled"
+                                                    {...form.getInputProps('username')}
+                                                />
+                                                <PasswordInput
+                                                    label={t('form.addServer.input', {
+                                                        context:
+                                                            serverType === ServerType.PLEX
+                                                                ? 'plexToken'
+                                                                : 'password',
+                                                    })}
+                                                    required
+                                                    variant="filled"
+                                                    {...form.getInputProps('password')}
+                                                />
+                                            </>
+                                        )}
                                     </>
                                 )}
                             </Stack>
 
-                            {!showQuickConnect && (
+                            {!showQuickConnect && !isPlexAccount && (
                                 <Button
                                     disabled={isSubmitDisabled}
                                     fullWidth

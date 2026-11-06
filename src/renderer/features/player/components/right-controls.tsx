@@ -513,7 +513,9 @@ const RatingButton = () => {
     const isSongDefined = Boolean(currentSong?.id);
     const showRating =
         isSongDefined &&
-        (server?.type === ServerType.NAVIDROME || server?.type === ServerType.SUBSONIC);
+        (server?.type === ServerType.NAVIDROME ||
+            server?.type === ServerType.SUBSONIC ||
+            server?.type === ServerType.PLEX);
     const handleUpdateRating = (rating: number) => {
         if (!currentSong) return;
         setRating(currentSong._serverId, [currentSong.id], LibraryItem.SONG, rating);

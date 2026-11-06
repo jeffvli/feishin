@@ -22,7 +22,11 @@ export const SetRatingAction = ({ ids, itemType }: SetRatingActionProps) => {
     const setRating = useSetRating();
 
     const isRatingSupported = useMemo(() => {
-        return server?.type === ServerType.NAVIDROME || server?.type === ServerType.SUBSONIC;
+        return (
+            server?.type === ServerType.NAVIDROME ||
+            server?.type === ServerType.SUBSONIC ||
+            server?.type === ServerType.PLEX
+        );
     }, [server?.type]);
 
     const onRating = (rating: number) => {

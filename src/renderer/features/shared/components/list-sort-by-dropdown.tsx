@@ -301,6 +301,23 @@ export const CLIENT_SIDE_ALBUM_FILTERS = [
     },
 ];
 
+const plexFilters = (values: string[]) =>
+    values.map((value) => ({
+        defaultOrder: [
+            'duration',
+            'playCount',
+            'rating',
+            'recentlyAdded',
+            'recentlyPlayed',
+            'releaseDate',
+            'year',
+        ].includes(value)
+            ? SortOrder.DESC
+            : SortOrder.ASC,
+        name: i18n.t(`filter.${value === 'updatedAt' ? 'recentlyUpdated' : value}`),
+        value,
+    }));
+
 const ALBUM_LIST_FILTERS: Partial<
     Record<ServerType, Array<{ defaultOrder: SortOrder; name: string; value: string }>>
 > = {
@@ -418,6 +435,17 @@ const ALBUM_LIST_FILTERS: Partial<
             value: AlbumListSort.YEAR,
         },
     ],
+    [ServerType.PLEX]: plexFilters([
+        'name',
+        'albumArtist',
+        'year',
+        'releaseDate',
+        'recentlyAdded',
+        'recentlyPlayed',
+        'playCount',
+        'rating',
+        'random',
+    ]),
     [ServerType.SUBSONIC]: [
         {
             defaultOrder: SortOrder.ASC,
@@ -609,6 +637,18 @@ const SONG_LIST_FILTERS: Partial<
             value: SongListSort.YEAR,
         },
     ],
+    [ServerType.PLEX]: plexFilters([
+        'name',
+        'album',
+        'albumArtist',
+        'duration',
+        'year',
+        'recentlyAdded',
+        'recentlyPlayed',
+        'playCount',
+        'rating',
+        'random',
+    ]),
     [ServerType.SUBSONIC]: [
         {
             defaultOrder: SortOrder.ASC,
@@ -637,6 +677,7 @@ const FOLDER_LIST_FILTERS: Partial<
         },
         ...(SONG_LIST_FILTERS[ServerType.NAVIDROME] || []),
     ],
+    [ServerType.PLEX]: plexFilters(['name']),
     [ServerType.SUBSONIC]: [
         {
             defaultOrder: SortOrder.ASC,
@@ -652,6 +693,7 @@ const PLAYLIST_SONG_LIST_FILTERS: Partial<
 > = {
     [ServerType.JELLYFIN]: CLIENT_SIDE_SONG_FILTERS,
     [ServerType.NAVIDROME]: CLIENT_SIDE_SONG_FILTERS,
+    [ServerType.PLEX]: CLIENT_SIDE_SONG_FILTERS,
     [ServerType.SUBSONIC]: CLIENT_SIDE_SONG_FILTERS,
 };
 
@@ -717,6 +759,7 @@ const ALBUM_ARTIST_LIST_FILTERS: Partial<
             value: AlbumArtistListSort.SONG_COUNT,
         },
     ],
+    [ServerType.PLEX]: plexFilters(['name', 'recentlyAdded', 'rating', 'random']),
     [ServerType.SUBSONIC]: [
         {
             defaultOrder: SortOrder.DESC,
@@ -803,6 +846,7 @@ const ARTIST_LIST_FILTERS: Partial<
             value: ArtistListSort.SONG_COUNT,
         },
     ],
+    [ServerType.PLEX]: plexFilters(['name', 'recentlyAdded', 'rating', 'random']),
     [ServerType.SUBSONIC]: [
         {
             defaultOrder: SortOrder.DESC,
@@ -854,6 +898,7 @@ const GENRE_LIST_FILTERS: Partial<
             value: GenreListSort.SONG_COUNT,
         },
     ],
+    [ServerType.PLEX]: plexFilters(['name']),
     [ServerType.SUBSONIC]: [
         {
             defaultOrder: SortOrder.ASC,
@@ -925,6 +970,7 @@ const PLAYLIST_LIST_FILTERS: Partial<
             value: PlaylistListSort.UPDATED_AT,
         },
     ],
+    [ServerType.PLEX]: plexFilters(['name', 'duration', 'songCount', 'updatedAt']),
     [ServerType.SUBSONIC]: [
         {
             defaultOrder: SortOrder.ASC,
@@ -961,6 +1007,7 @@ const RADIO_LIST_FILTERS: Partial<
             value: RadioListSort.NAME,
         },
     ],
+    [ServerType.PLEX]: plexFilters(['name']),
     [ServerType.SUBSONIC]: [
         {
             defaultOrder: SortOrder.ASC,

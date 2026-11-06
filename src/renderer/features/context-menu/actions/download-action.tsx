@@ -19,7 +19,7 @@ export const DownloadAction = ({ ids }: DownloadActionProps) => {
     const onSelect = useCallback(async () => {
         try {
             for (const id of ids) {
-                const downloadUrl = api.controller.getDownloadUrl({
+                const downloadUrl = await api.controller.getDownloadUrl({
                     apiClientProps: { serverId: server.id },
                     query: { id },
                 });

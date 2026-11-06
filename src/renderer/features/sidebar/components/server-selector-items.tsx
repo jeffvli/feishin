@@ -9,6 +9,7 @@ import { isServerLock } from '/@/renderer/features/action-required/utils/window-
 import JellyfinLogo from '/@/renderer/features/servers/assets/jellyfin.png';
 import NavidromeLogo from '/@/renderer/features/servers/assets/navidrome.png';
 import OpenSubsonicLogo from '/@/renderer/features/servers/assets/opensubsonic.png';
+import PlexLogo from '/@/renderer/features/servers/assets/plex.svg';
 import { EditServerForm } from '/@/renderer/features/servers/components/edit-server-form';
 import { ServerList } from '/@/renderer/features/servers/components/server-list';
 import { sharedQueries } from '/@/renderer/features/shared/api/shared-api';
@@ -167,14 +168,19 @@ export const ServerSelectorItems = () => {
                 const isJellyfinExpired = server.type === ServerType.JELLYFIN && !server.credential;
                 const isSubsonicExpired = server.type === ServerType.SUBSONIC && !server.credential;
                 const isSessionExpired =
-                    isNavidromeExpired || isJellyfinExpired || isSubsonicExpired;
+                    isNavidromeExpired ||
+                    isJellyfinExpired ||
+                    isSubsonicExpired ||
+                    (server.type === ServerType.PLEX && !server.credential);
 
                 const logo =
                     server.type === ServerType.NAVIDROME
                         ? NavidromeLogo
                         : server.type === ServerType.JELLYFIN
                           ? JellyfinLogo
-                          : OpenSubsonicLogo;
+                          : server.type === ServerType.PLEX
+                            ? PlexLogo
+                            : OpenSubsonicLogo;
 
                 return (
                     <DropdownMenu.Item

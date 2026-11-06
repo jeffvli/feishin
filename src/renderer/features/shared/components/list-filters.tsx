@@ -187,6 +187,10 @@ const FILTERS = {
         [LibraryItem.ALBUM]: NavidromeAlbumFilters,
         [LibraryItem.SONG]: NavidromeSongFilters,
     },
+    [ServerType.PLEX]: {
+        [LibraryItem.ALBUM]: SubsonicAlbumFilters,
+        [LibraryItem.SONG]: SubsonicSongFilters,
+    },
     [ServerType.SUBSONIC]: {
         [LibraryItem.ALBUM]: SubsonicAlbumFilters,
         [LibraryItem.SONG]: SubsonicSongFilters,

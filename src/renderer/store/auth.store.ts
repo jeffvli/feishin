@@ -142,6 +142,7 @@ export const useCurrentServer = () =>
             isAdmin: state.currentServer?.isAdmin,
             musicFolderId: state.currentServer?.musicFolderId,
             name: state.currentServer?.name,
+            plexServerId: state.currentServer?.plexServerId,
             preferInstantMix: state.currentServer?.preferInstantMix,
             preferRemoteUrl: state.currentServer?.preferRemoteUrl,
             remoteUrl: state.currentServer?.remoteUrl,

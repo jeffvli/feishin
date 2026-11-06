@@ -253,7 +253,10 @@ export const AlbumArtistDetailHeader = forwardRef<HTMLDivElement, AlbumArtistDet
             type: 'header',
         });
 
-        const showRating = showRatings && detailQuery?.data?._serverType === ServerType.NAVIDROME;
+        const showRating =
+            showRatings &&
+            (detailQuery?.data?._serverType === ServerType.NAVIDROME ||
+                detailQuery?.data?._serverType === ServerType.PLEX);
 
         const canUploadArtistImage =
             hasFeature(server, ServerFeature.ARTIST_IMAGE_UPLOAD) &&

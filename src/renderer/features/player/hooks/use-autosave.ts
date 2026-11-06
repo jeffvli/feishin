@@ -13,7 +13,10 @@ export const useAutosave = () => {
     const { mutate: savePlayQueue } = useSaveQueue();
 
     useEffect(() => {
-        if (enabled && server?.type && server.type !== ServerType.JELLYFIN) {
+        if (
+            enabled &&
+            (server?.type === ServerType.NAVIDROME || server?.type === ServerType.SUBSONIC)
+        ) {
             if (currentSong?._uniqueId !== priorSongId.current) {
                 if (songCount.current === count) {
                     savePlayQueue();

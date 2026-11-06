@@ -29,7 +29,11 @@ export const getOptimizedListCount = async <
 }: OptimizedListCountOptions<TQuery, TListQuery, TResponse>): Promise<null | number> => {
     const server = getServerById(serverId);
 
-    if (server?.type !== ServerType.NAVIDROME && server?.type !== ServerType.JELLYFIN) {
+    if (
+        server?.type !== ServerType.NAVIDROME &&
+        server?.type !== ServerType.JELLYFIN &&
+        server?.type !== ServerType.PLEX
+    ) {
         return null;
     }
 

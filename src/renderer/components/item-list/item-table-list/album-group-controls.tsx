@@ -15,7 +15,9 @@ import { Rating } from '/@/shared/components/rating/rating';
 import { LibraryItem, ServerType } from '/@/shared/types/domain-types';
 
 const isRatingSupported = (serverType: ServerType | undefined) =>
-    serverType === ServerType.NAVIDROME || serverType === ServerType.SUBSONIC;
+    serverType === ServerType.NAVIDROME ||
+    serverType === ServerType.SUBSONIC ||
+    serverType === ServerType.PLEX;
 
 const useAlbumGroupAlbum = (albumId: string | undefined, serverId: string | undefined) => {
     const enabled = !!albumId && !!serverId && !albumId.startsWith('dummy/');

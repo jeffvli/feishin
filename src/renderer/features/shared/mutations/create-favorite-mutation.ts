@@ -12,8 +12,14 @@ import {
     restoreFavoriteQueryData,
 } from '/@/renderer/features/shared/mutations/favorite-optimistic-updates';
 import { MutationHookArgs } from '/@/renderer/lib/react-query';
+import { getServerById } from '/@/renderer/store/auth.store';
 import { toast } from '/@/shared/components/toast/toast';
-import { FavoriteArgs, FavoriteResponse, LibraryItem } from '/@/shared/types/domain-types';
+import {
+    FavoriteArgs,
+    FavoriteResponse,
+    LibraryItem,
+    ServerType,
+} from '/@/shared/types/domain-types';
 
 const remote = isElectron() ? window.api.remote : null;
 
@@ -61,6 +67,19 @@ export const useCreateFavorite = (args: MutationHookArgs) => {
             return applyFavoriteOptimisticUpdates(queryClient, variables, true);
         },
         onSuccess: (_data, variables) => {
+            const serverId = variables.apiClientProps.serverId;
+            if (getServerById(serverId)?.type === ServerType.PLEX) {
+                // Plex favorites and ratings share the same server-side field.
+                eventEmitter.emit('USER_RATING', {
+                    id: variables.query.id,
+                    itemType: variables.query.type,
+                    rating: 5,
+                    serverId,
+                });
+                queryClient.invalidateQueries({
+                    predicate: (query) => query.queryKey[0] === serverId,
+                });
+            }
             if (variables.query.type === LibraryItem.SONG) {
                 remote?.updateFavorite(true, variables.apiClientProps.serverId, variables.query.id);
             }
