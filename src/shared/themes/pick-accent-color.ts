@@ -4,8 +4,6 @@ export type AccentCandidate = { algorithm: AccentAlgorithm; rgb: RgbColor };
 
 export type RgbColor = [number, number, number];
 
-export const ACCENT_ALGORITHMS: AccentAlgorithm[] = ['dominant', 'sqrt', 'simple'];
-
 type Band = { maxLightness: number; minLightness: number; minSaturation: number };
 
 const STAGE_BANDS: Record<'dark' | 'light', Band[]> = {
@@ -27,6 +25,13 @@ const MAX_HUE = 360;
 const MAX_PERCENT = 100;
 const MIN_BACKGROUND_DIFFERENCE = 15;
 const MIN_SATURATION_FOR_HUE = 10;
+const PIXEL_BIN_SHIFT = 5;
+const PIXEL_MAX_CANDIDATES = 3;
+const PIXEL_MAX_LIGHTNESS = 90;
+const PIXEL_MIN_ALPHA = 8;
+const PIXEL_MIN_CLUSTER_RATIO = 0.02;
+const PIXEL_MIN_LIGHTNESS = 15;
+const PIXEL_MIN_SATURATION = 20;
 
 interface HslColor {
     hue: number;
@@ -149,6 +154,76 @@ const percentageDifferent = (a: RgbColor, b: RgbColor): number => {
 
     return (largest + average) / 2;
 };
+
+interface PixelCluster {
+    blue: number;
+    count: number;
+    green: number;
+    red: number;
+}
+
+// Whole-cover averages wash out when artwork is mostly plain with a small pop
+// of color, so candidates come from the most common vivid color groups of a
+// downsampled cover instead. Bins are 32 units wide per channel; near-grey,
+// near-black and near-white bins are dropped before any scoring happens.
+export function pickAccentClusters(pixels: Uint8ClampedArray): AccentCandidate[] {
+    const clusters = new Map<number, PixelCluster>();
+    let opaqueCount = 0;
+
+    for (let i = 0; i < pixels.length; i += 4) {
+        if (pixels[i + 3] < PIXEL_MIN_ALPHA) {
+            continue;
+        }
+
+        opaqueCount += 1;
+        const key =
+            ((pixels[i] >> PIXEL_BIN_SHIFT) << 10) |
+            ((pixels[i + 1] >> PIXEL_BIN_SHIFT) << 5) |
+            (pixels[i + 2] >> PIXEL_BIN_SHIFT);
+
+        const cluster = clusters.get(key) ?? { blue: 0, count: 0, green: 0, red: 0 };
+        cluster.count += 1;
+        cluster.red += pixels[i];
+        cluster.green += pixels[i + 1];
+        cluster.blue += pixels[i + 2];
+        clusters.set(key, cluster);
+    }
+
+    if (opaqueCount === 0) {
+        return [];
+    }
+
+    const minCount = Math.max(4, Math.ceil(opaqueCount * PIXEL_MIN_CLUSTER_RATIO));
+    const survivors: { count: number; hsl: HslColor; rgb: RgbColor }[] = [];
+
+    for (const cluster of clusters.values()) {
+        if (cluster.count < minCount) {
+            continue;
+        }
+
+        const rgb: RgbColor = [
+            Math.round(cluster.red / cluster.count),
+            Math.round(cluster.green / cluster.count),
+            Math.round(cluster.blue / cluster.count),
+        ];
+        const hsl = toHsl(rgb);
+
+        if (
+            hsl.saturation >= PIXEL_MIN_SATURATION &&
+            hsl.lightness >= PIXEL_MIN_LIGHTNESS &&
+            hsl.lightness <= PIXEL_MAX_LIGHTNESS
+        ) {
+            survivors.push({ count: cluster.count, hsl, rgb });
+        }
+    }
+
+    survivors.sort((a, b) => b.count - a.count);
+
+    return survivors.slice(0, PIXEL_MAX_CANDIDATES).map((survivor, index) => ({
+        algorithm: index === 0 ? 'dominant' : 'simple',
+        rgb: survivor.rgb,
+    }));
+}
 
 // ponytail: three samples per cover and one fixed set of weights. The upgrade
 // path is a tuned weight table or a richer palette, not more machinery here.

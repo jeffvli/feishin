@@ -1,7 +1,7 @@
 import { FastAverageColor, FastAverageColorIgnoredColor } from 'fast-average-color';
 import { useEffect, useRef, useState } from 'react';
 
-import { ACCENT_ALGORITHMS, AccentCandidate, RgbColor } from '/@/shared/themes/pick-accent-color';
+import { AccentCandidate, pickAccentClusters } from '/@/shared/themes/pick-accent-color';
 
 const ignoredColors: FastAverageColorIgnoredColor = [
     [255, 255, 255, 255, 90], // White
@@ -36,38 +36,55 @@ export const getFastAverageColor = async (args: {
     });
 };
 
-// ponytail: one decode per algorithm, so three per cover. The art accent
-// collector dedupes by image key, so a cover is sampled once per play.
+const ART_SAMPLE_SIZE = 64;
+
+// Decodes the cover into a small canvas so clustering can inspect the actual
+// pixels; a tainted canvas (third-party art without CORS) or a dead url
+// rejects so the collector logs it and stops retrying that cover.
+const getCoverPixels = (src: string): Promise<Uint8ClampedArray> => {
+    return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.crossOrigin = 'anonymous';
+
+        image.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = ART_SAMPLE_SIZE;
+            canvas.height = ART_SAMPLE_SIZE;
+
+            const context = canvas.getContext('2d', { willReadFrequently: true });
+            if (!context) {
+                reject(new Error('no 2d canvas context'));
+                return;
+            }
+
+            context.drawImage(image, 0, 0, ART_SAMPLE_SIZE, ART_SAMPLE_SIZE);
+
+            try {
+                resolve(context.getImageData(0, 0, ART_SAMPLE_SIZE, ART_SAMPLE_SIZE).data);
+            } catch (error) {
+                reject(error);
+            }
+        };
+
+        image.onerror = () => {
+            reject(new Error(`album art failed to load: ${src}`));
+        };
+
+        image.src = src;
+    });
+};
+
+// ponytail: one 64x64 decode per cover and coarse color bins, no palette
+// library. The art accent collector dedupes by image key, so a cover is
+// sampled once per play.
 export const getArtColorCandidates = async (src: null | string): Promise<AccentCandidate[]> => {
     if (!src) {
         return [];
     }
 
-    const fac = new FastAverageColor();
+    const pixels = await getCoverPixels(src);
 
-    const results = await Promise.allSettled(
-        ACCENT_ALGORITHMS.map(async (algorithm) => {
-            const color = await fac.getColorAsync(src, {
-                algorithm,
-                ignoredColor: ignoredColors,
-                mode: 'speed',
-            });
-
-            return [{ algorithm, rgb: color.value.slice(0, 3) as RgbColor }];
-        }),
-    );
-
-    fac.destroy();
-
-    // Partial success still yields usable candidates; if every algorithm
-    // failed (dead url, CORS, decode error) throw so callers can log it
-    // instead of silently treating a broken cover as a colorless one.
-    const failures = results.filter((result) => result.status === 'rejected');
-    if (failures.length === results.length) {
-        throw failures[0].reason;
-    }
-
-    return results.flatMap((result) => (result.status === 'fulfilled' ? result.value : []));
+    return pickAccentClusters(pixels);
 };
 
 export const useFastAverageColor = (args: {
