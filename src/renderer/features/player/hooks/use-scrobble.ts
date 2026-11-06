@@ -126,6 +126,7 @@ export const useScrobble = () => {
     const isScrobbleEnabled = scrobbleSettings?.enabled;
     const isPrivateModeEnabled = useAppStore((state) => state.privateMode);
     const sendScrobble = useSendScrobble();
+    const { mutate: sendPlaybackReport } = sendScrobble;
     const currentSong = usePlayerSong();
     const playbackRate = usePlayerSpeed();
 
@@ -152,6 +153,65 @@ export const useScrobble = () => {
     const lastSeekEventRef = useRef<number>(0);
     const songChangeTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
     const notifyTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+    useEffect(() => {
+        if (!isScrobbleEnabled || isPrivateModeEnabled) return;
+        // Plex needs regular timeline reports to keep playing and paused sessions visible.
+        const interval = setInterval(() => {
+            const song = usePlayerStore.getState().getCurrentSong();
+            const status = usePlayerStore.getState().player.status;
+            if (
+                song?._serverType !== ServerType.PLEX ||
+                (status !== PlayerStatus.PLAYING && status !== PlayerStatus.PAUSED)
+            )
+                return;
+            sendPlaybackReport({
+                apiClientProps: { serverId: song._serverId },
+                query: {
+                    albumId: song.albumId,
+                    duration: song.duration,
+                    event: status === PlayerStatus.PAUSED ? 'pause' : 'timeupdate',
+                    id: song.id,
+                    mediaType: song._itemType.includes('song') ? 'song' : 'podcast',
+                    playbackRate,
+                    position: getPositionValue(useTimestampStoreBase.getState().timestamp, false),
+                    submission: false,
+                },
+            });
+        }, 10000);
+        return () => clearInterval(interval);
+    }, [isScrobbleEnabled, isPrivateModeEnabled, playbackRate, sendPlaybackReport]);
+
+    useEffect(
+        () => () => {
+            clearTimeout(songChangeTimeoutRef.current);
+            clearTimeout(notifyTimeoutRef.current);
+            const song = usePlayerStore.getState().getCurrentSong();
+            const status = usePlayerStore.getState().player.status;
+            if (
+                song?._serverType === ServerType.PLEX &&
+                (status === PlayerStatus.PLAYING || status === PlayerStatus.PAUSED)
+            ) {
+                // End the public session when scrobbling is disabled, privacy is enabled or the player unmounts.
+                sendPlaybackReport({
+                    apiClientProps: { serverId: song._serverId },
+                    query: {
+                        duration: song.duration,
+                        event: 'stop',
+                        id: song.id,
+                        mediaType: song._itemType.includes('song') ? 'song' : 'podcast',
+                        playbackRate: 1,
+                        position: getPositionValue(
+                            useTimestampStoreBase.getState().timestamp,
+                            false,
+                        ),
+                        submission: false,
+                    },
+                });
+            }
+        },
+        [sendPlaybackReport],
+    );
 
     useEffect(() => {
         imageUrlRef.current = imageUrl;
@@ -220,6 +280,7 @@ export const useScrobble = () => {
                     apiClientProps: { serverId: song._serverId || '' },
                     query: {
                         albumId: song.albumId,
+                        duration: song.duration,
                         event: 'unpause',
                         id: song.id,
                         mediaType: song._itemType.includes('song') ? 'song' : 'podcast',
@@ -316,6 +377,7 @@ export const useScrobble = () => {
                             apiClientProps: { serverId: currentSong._serverId || '' },
                             query: {
                                 albumId: currentSong.albumId,
+                                duration: currentSong.duration,
                                 event: 'timeupdate',
                                 id: currentSong.id,
                                 mediaType: mediaType,
@@ -352,6 +414,7 @@ export const useScrobble = () => {
                             apiClientProps: { serverId: currentSong._serverId || '' },
                             query: {
                                 albumId: currentSong.albumId,
+                                duration: currentSong.duration,
                                 id: currentSong.id,
                                 mediaType: mediaType,
                                 playbackRate: playbackRate,
@@ -455,6 +518,7 @@ export const useScrobble = () => {
                             apiClientProps: { serverId: previousSong._serverId || '' },
                             query: {
                                 albumId: previousSong.albumId,
+                                duration: previousSong.duration,
                                 event: 'stop',
                                 id: previousSong.id,
                                 mediaType: previousMediaType,
@@ -483,11 +547,18 @@ export const useScrobble = () => {
                             apiClientProps: { serverId: currentSong._serverId || '' },
                             query: {
                                 albumId: currentSong.albumId,
+                                duration: currentSong.duration,
                                 event: 'start',
                                 id: currentSong.id,
                                 mediaType: mediaType,
                                 playbackRate: playbackRate,
-                                position: 0,
+                                position:
+                                    currentSong._serverType === ServerType.PLEX
+                                        ? getPositionValue(
+                                              useTimestampStoreBase.getState().timestamp,
+                                              false,
+                                          )
+                                        : 0,
                                 submission: false,
                             },
                         },
@@ -546,7 +617,7 @@ export const useScrobble = () => {
                 lastProgressEventRef.current = 0;
             }
 
-            // Position scrobbles are only relevant for Jellyfin
+            // Only servers advertising playback reporting receive seek updates.
             if (!hasPlaybackReport) {
                 flushScrobbleDebug();
                 return;
@@ -577,6 +648,7 @@ export const useScrobble = () => {
                     apiClientProps: { serverId: currentSong._serverId || '' },
                     query: {
                         albumId: currentSong.albumId,
+                        duration: currentSong.duration,
                         event: currentStatus === PlayerStatus.PLAYING ? 'unpause' : 'pause',
                         id: currentSong.id,
                         mediaType: mediaType,
@@ -615,7 +687,7 @@ export const useScrobble = () => {
                 return;
             }
 
-            // Only apply to Jellyfin controller scrobble
+            // Only servers advertising playback reporting receive status updates.
             if (!hasPlaybackReport) {
                 return;
             }
@@ -629,6 +701,7 @@ export const useScrobble = () => {
                         apiClientProps: { serverId: currentSong._serverId || '' },
                         query: {
                             albumId: currentSong.albumId,
+                            duration: currentSong.duration,
                             event: 'pause',
                             id: currentSong.id,
                             mediaType: mediaType,
@@ -654,6 +727,7 @@ export const useScrobble = () => {
                         apiClientProps: { serverId: currentSong._serverId || '' },
                         query: {
                             albumId: currentSong.albumId,
+                            duration: currentSong.duration,
                             event: 'unpause',
                             id: currentSong.id,
                             mediaType: mediaType,
@@ -684,6 +758,7 @@ export const useScrobble = () => {
                         apiClientProps: { serverId: currentSong._serverId || '' },
                         query: {
                             albumId: currentSong.albumId,
+                            duration: currentSong.duration,
                             event: 'start',
                             id: currentSong.id,
                             mediaType: mediaType,
@@ -713,6 +788,7 @@ export const useScrobble = () => {
                         apiClientProps: { serverId: currentSong._serverId || '' },
                         query: {
                             albumId: currentSong.albumId,
+                            duration: currentSong.duration,
                             event: 'stop',
                             id: currentSong.id,
                             mediaType: mediaType,
@@ -761,6 +837,7 @@ export const useScrobble = () => {
                 apiClientProps: { serverId: currentSong._serverId || '' },
                 query: {
                     albumId: currentSong.albumId,
+                    duration: currentSong.duration,
                     event: 'start',
                     id: currentSong.id,
                     mediaType: mediaType,
@@ -822,6 +899,7 @@ export const useScrobble = () => {
                         apiClientProps: { serverId: song._serverId || '' },
                         query: {
                             albumId: song.albumId,
+                            duration: song.duration,
                             id: song.id,
                             mediaType: mediaType,
                             playbackRate: playbackRate,

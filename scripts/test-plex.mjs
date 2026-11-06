@@ -256,6 +256,8 @@ const direct = new URL(
 );
 assert.equal(direct.pathname, '/proxy/library/parts/30/file.flac');
 assert.equal(direct.searchParams.get('X-Plex-Token'), server.credential);
+assert.equal(direct.searchParams.get('X-Plex-Client-Identifier'), 'test-device');
+assert.equal(direct.searchParams.get('X-Plex-Product'), 'Feishin');
 const remote = new URL(
     await api.getStreamUrl({
         apiClientProps: { ...apiClientProps, forceRemoteUrl: true },
@@ -269,6 +271,7 @@ const transcode = new URL(
 );
 assert.equal(transcode.pathname, '/proxy/music/:/transcode/universal/start.mp3');
 assert.equal(transcode.searchParams.get('audioBitrate'), '128');
+assert.equal(transcode.searchParams.get('X-Plex-Client-Identifier'), 'test-device');
 assert.equal(
     new URL(await api.getDownloadUrl({ apiClientProps, query: { id: '3' } })).searchParams.get(
         'download',
@@ -422,6 +425,98 @@ await api.scrobble({
 });
 assert.equal(new URL(calls.at(-1).url).pathname, '/proxy/:/scrobble');
 assert.equal(calls.at(-1).params.key, '3');
+const serverInfo = await api.getServerInfo({ apiClientProps });
+assert.deepEqual(serverInfo.features.reportPlayback, [1]);
+for (const [event, state] of [
+    ['start', 'playing'],
+    ['timeupdate', 'playing'],
+    ['pause', 'paused'],
+    ['unpause', 'playing'],
+    ['stop', 'stopped'],
+]) {
+    const beforeTimeline = calls.length;
+    await api.scrobble({
+        apiClientProps,
+        query: {
+            duration: track.duration,
+            event,
+            id: '3',
+            mediaType: 'song',
+            playbackRate: 1,
+            position: 12345.6,
+            submission: false,
+        },
+    });
+    assert.equal(calls.length, beforeTimeline + 1, 'Timeline reports need no extra metadata fetch');
+    assert.equal(new URL(calls.at(-1).url).pathname, '/proxy/:/timeline');
+    assert.equal(calls.at(-1).method, 'get');
+    assert.deepEqual(calls.at(-1).params, {
+        duration: track.duration,
+        identifier: 'com.plexapp.plugins.library',
+        key: '/library/metadata/3',
+        ratingKey: '3',
+        state,
+        time: 12346,
+    });
+}
+const noEvent = calls.length;
+await api.scrobble({
+    apiClientProps,
+    query: { id: '3', mediaType: 'song', playbackRate: 1, submission: false },
+});
+assert.equal(calls.length, noEvent, 'An empty event must not create a playing session');
+await api.scrobble({
+    apiClientProps,
+    query: { event: 'start', id: '3', mediaType: 'song', playbackRate: 1, submission: false },
+});
+assert.equal(calls.at(-1).params.duration, track.duration);
+assert.equal(calls.at(-1).params.time, 0);
+for (const values of [
+    { duration: -1, position: 0 },
+    { duration: track.duration, position: NaN },
+    { duration: Infinity, position: 0 },
+    { duration: track.duration, position: -1 },
+]) {
+    const invalidReport = calls.length;
+    await assert.rejects(
+        api.scrobble({
+            apiClientProps,
+            query: {
+                ...values,
+                event: 'timeupdate',
+                id: '3',
+                mediaType: 'song',
+                playbackRate: 1,
+                submission: false,
+            },
+        }),
+        /Invalid Plex playback position or duration/,
+    );
+    assert.equal(calls.length, invalidReport, 'Invalid timing must not be sent to Plex');
+}
+const submission = calls.length;
+await api.scrobble({
+    apiClientProps,
+    query: { event: 'stop', id: '3', mediaType: 'song', playbackRate: 1, submission: true },
+});
+assert.equal(calls.length, submission + 1);
+assert.equal(new URL(calls.at(-1).url).pathname, '/proxy/:/scrobble');
+unauthorized = true;
+await assert.rejects(
+    api.scrobble({
+        apiClientProps,
+        query: {
+            duration: track.duration,
+            event: 'start',
+            id: '3',
+            mediaType: 'song',
+            playbackRate: 1,
+            submission: false,
+        },
+    }),
+    { status: 401 },
+);
+unauthorized = false;
 await assert.rejects(
     api.setRating({ apiClientProps, query: { id: ['3'], rating: 99, type: 'song' } }),
 );

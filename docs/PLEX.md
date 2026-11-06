@@ -22,6 +22,7 @@ For a locked web deployment, set `SERVER_TYPE=plex` and `SERVER_LOCK=true`, opti
 - Music playlist browsing, creation, renaming, deletion, adding, removing and moving individual occurrences of a track.
 - Saving a reordered playlist moves existing occurrences instead of replacing them, preserving duplicates and playlist entry IDs. An unchanged order requires no writes.
 - Ratings and play-count submissions. Plex has no separate favorite flag: a five-star rating is shown as a favorite. Adding a favorite sets five stars; removing it clears the rating.
+- Listening activity in Plex's dashboard: playback start, pause, resume, seek and stop, with timeline updates every ten seconds while playing or paused. Reporting follows Feishin's scrobbling setting and private mode; disabling reporting closes the public session. Play-count submissions remain separate from timeline updates.
 
 ## Limitations
 
@@ -35,6 +36,8 @@ For a locked web deployment, set `SERVER_TYPE=plex` and `SERVER_LOCK=true`, opti
 ## Verification
 
 Run `node scripts/test-plex.mjs` with Node >=22.15 after installing dependencies. It uses a mocked HTTP adapter and checks endpoint-free browser/PIN authorization, discovery, connection fallback, identity validation, HTTPS restrictions, expiration, cancellation, shared-server tokens, normalization, pagination, streaming, artwork and playlist safety.
+
+Run `node scripts/test-plex-playback.mjs` to check the player event wiring with mocked hooks and timers: playback lifecycle, playing/paused heartbeats, seek, repeat, song changes, private mode, disabled scrobbling and existing Jellyfin progress behavior. The API checks above also cover Plex timeline request parameters and timing validation. A live Plex server is still required to verify dashboard activity and server-side listening history.
 
 After building Electron and installing its binary, run `node scripts/test-plex-login-ui.mjs` on Linux for a headless UI check with an isolated profile and mocked Plex responses. It checks the endpoint-free login screen, automatic browser opening, server selection and saved credentials. A live Plex account and server are still needed to verify browser approval, server-version-specific behavior and actual audio playback.
 

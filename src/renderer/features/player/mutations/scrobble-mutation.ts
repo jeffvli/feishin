@@ -53,6 +53,8 @@ export const useSendScrobble = (options?: MutationOptions) => {
                 });
             }
         },
+        // Keep stop/start and progress reports in playback order, including across hook remounts.
+        scope: { id: 'scrobble' },
         ...options,
     });
 };

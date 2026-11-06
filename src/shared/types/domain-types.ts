@@ -1470,6 +1470,8 @@ export type ScrobbleArgs = BaseEndpointArgs & {
 
 export type ScrobbleQuery = {
     albumId?: string;
+    /** Track duration in milliseconds, independent of the backend's position unit. */
+    duration?: number;
     event?: 'pause' | 'start' | 'stop' | 'timeupdate' | 'unpause';
     id: string;
     mediaType: 'podcast' | 'song';
