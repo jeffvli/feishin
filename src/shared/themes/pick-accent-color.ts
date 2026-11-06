@@ -11,18 +11,20 @@ type Band = { maxLightness: number; minLightness: number; minSaturation: number 
 const STAGE_BANDS: Record<'dark' | 'light', Band[]> = {
     dark: [
         { maxLightness: 80, minLightness: 30, minSaturation: 25 },
-        { maxLightness: 85, minLightness: 25, minSaturation: 15 },
-        { maxLightness: 88, minLightness: 20, minSaturation: 8 },
+        { maxLightness: 85, minLightness: 28, minSaturation: 20 },
+        { maxLightness: 88, minLightness: 25, minSaturation: 15 },
     ],
     light: [
         { maxLightness: 65, minLightness: 25, minSaturation: 25 },
-        { maxLightness: 70, minLightness: 20, minSaturation: 15 },
-        { maxLightness: 75, minLightness: 15, minSaturation: 8 },
+        { maxLightness: 65, minLightness: 20, minSaturation: 20 },
+        { maxLightness: 65, minLightness: 15, minSaturation: 15 },
     ],
 };
 
 const DOMINANT_BONUS = 8;
 const MAX_CHANNEL = 255;
+const MAX_HUE = 360;
+const MAX_PERCENT = 100;
 const MIN_BACKGROUND_DIFFERENCE = 15;
 const MIN_SATURATION_FOR_HUE = 10;
 
@@ -35,7 +37,7 @@ interface HslColor {
 export function parseRgb(value: null | string | undefined): null | RgbColor {
     const text = value?.trim() ?? '';
 
-    const hex = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(text);
+    const hex = /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.exec(text);
     if (hex) {
         const digits = hex[1];
         const pairs =
@@ -45,11 +47,23 @@ export function parseRgb(value: null | string | undefined): null | RgbColor {
         return [parseInt(pairs[0], 16), parseInt(pairs[1], 16), parseInt(pairs[2], 16)];
     }
 
-    const rgb = /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/.exec(text);
+    const rgb =
+        /^rgba?\(\s*(\d{1,3})[ ,]+(\d{1,3})[ ,]+(\d{1,3})\s*(?:[,/]\s*[\d.]+%?\s*)?\)$/.exec(text);
     if (rgb) {
         const channels = [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
         if (channels.every((channel) => channel <= MAX_CHANNEL)) {
             return [channels[0], channels[1], channels[2]];
+        }
+    }
+
+    const hsl =
+        /^hsla?\(\s*(\d{1,3})[ ,]+(\d{1,3})%[ ,]+(\d{1,3})%\s*(?:[,/]\s*[\d.]+\s*)?\)$/.exec(text);
+    if (hsl) {
+        const hue = Number(hsl[1]);
+        const saturation = Number(hsl[2]);
+        const lightness = Number(hsl[3]);
+        if (hue <= MAX_HUE && saturation <= MAX_PERCENT && lightness <= MAX_PERCENT) {
+            return hslToRgb(hue, saturation, lightness);
         }
     }
 
@@ -59,6 +73,32 @@ export function parseRgb(value: null | string | undefined): null | RgbColor {
 export function rgbString(color: RgbColor): string {
     return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
 }
+
+const hslToRgb = (hue: number, saturation: number, lightness: number): RgbColor => {
+    const chroma = (1 - Math.abs((2 * lightness) / MAX_PERCENT - 1)) * (saturation / MAX_PERCENT);
+    const hueSector = (hue % MAX_HUE) / 60;
+    const intermediate = chroma * (1 - Math.abs((hueSector % 2) - 1));
+    const match = lightness / MAX_PERCENT - chroma / 2;
+
+    const [red, green, blue] =
+        hueSector < 1
+            ? [chroma, intermediate, 0]
+            : hueSector < 2
+              ? [intermediate, chroma, 0]
+              : hueSector < 3
+                ? [0, chroma, intermediate]
+                : hueSector < 4
+                  ? [0, intermediate, chroma]
+                  : hueSector < 5
+                    ? [intermediate, 0, chroma]
+                    : [chroma, 0, intermediate];
+
+    return [
+        Math.round((red + match) * MAX_CHANNEL),
+        Math.round((green + match) * MAX_CHANNEL),
+        Math.round((blue + match) * MAX_CHANNEL),
+    ];
+};
 
 const toHsl = (color: RgbColor): HslColor => {
     const red = color[0] / MAX_CHANNEL;
