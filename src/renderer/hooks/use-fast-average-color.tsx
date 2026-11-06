@@ -57,6 +57,9 @@ const getCoverPixels = (src: string): Promise<Uint8ClampedArray> => {
                 return;
             }
 
+            // Nearest neighbor on purpose: smooth scaling blends thin vivid
+            // features (lettering, strokes) into the background and erases pops.
+            context.imageSmoothingEnabled = false;
             context.drawImage(image, 0, 0, ART_SAMPLE_SIZE, ART_SAMPLE_SIZE);
 
             try {
