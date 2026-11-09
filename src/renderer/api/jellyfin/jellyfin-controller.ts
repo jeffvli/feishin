@@ -1290,7 +1290,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             },
             query: {
                 Fields: JF_FIELDS.SONG,
-                GenreIds: query.genre ? query.genre : undefined,
+                GenreIds: query.genre?.id,
                 IncludeItemTypes: getSongItemTypes(apiClientProps.server),
                 IsPlayed:
                     query.played === Played.Never

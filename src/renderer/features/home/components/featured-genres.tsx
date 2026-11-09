@@ -158,7 +158,7 @@ const GenrePlayButton = ({ genre }: { genre: Genre }) => {
                     return api.controller.getRandomSongList({
                         apiClientProps: { serverId },
                         query: {
-                            genre: genre.id,
+                            genre: { id: genre.id, name: genre.name },
                             limit: 100,
                             played: Played.All,
                         },
