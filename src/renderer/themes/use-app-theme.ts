@@ -390,7 +390,12 @@ export const useAppThemeColors = () => {
     }, []);
 
     const appTheme: AppThemeConfiguration = useMemo(() => {
-        const themed = buildArtAwareTheme(selectedTheme, {
+        // The playerbar waveform reads this raw pick and has always shown the
+        // unshaded color (usePrimaryColor() before app themes existed, then this
+        // hook's copy of it). Whether it should instead follow the shaded
+        // --theme-colors-primary is a pre-existing upstream question that this
+        // feature deliberately leaves alone.
+        return buildArtAwareTheme(selectedTheme, {
             accent,
             accentFromArt,
             candidates,
@@ -398,23 +403,6 @@ export const useAppThemeColors = () => {
             useThemeAccentColor,
             useThemePrimaryShade,
         });
-
-        // Waveform and friends read --theme-colors-primary straight off this
-        // object, so export the same shade-resolved color that the DOM CSS
-        // variable carries in the main app instead of the raw picked color.
-        return {
-            ...themed,
-            colors: {
-                ...themed.colors,
-                primary: resolveThemePrimaryColor(selectedTheme, {
-                    accent,
-                    primaryColor: themed.colors?.primary ?? accent,
-                    primaryShade,
-                    useThemeAccentColor,
-                    useThemePrimaryShade,
-                }),
-            },
-        };
         // eslint-disable-next-line react-hooks/exhaustive-deps -- customThemes is read indirectly via getAppTheme's registry lookup, not referenced directly above
     }, [
         accent,
