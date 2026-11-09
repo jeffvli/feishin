@@ -165,8 +165,8 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
                         <ExplicitIndicator explicitStatus={item?.explicitStatus} />
                         {item.name as string}
                     </Text>
-                    <div className={styles.artists}>
-                        {'albumArtists' in item && (
+                    {'albumArtists' in item && (
+                        <div className={styles.artists}>
                             <JoinedArtists
                                 artistName={item.albumArtist}
                                 artists={item.albumArtists}
@@ -178,8 +178,8 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
                                     size: 'sm',
                                 }}
                             />
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
             </TableColumnContainer>
         );
