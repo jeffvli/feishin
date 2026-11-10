@@ -3,7 +3,6 @@ import { t } from 'i18next';
 import { memo, useCallback } from 'react';
 
 import { ExportImportSettingsModal } from '/@/renderer/components/export-import-settings-modal/export-import-settings-modal';
-import { getRadioStationsForExport } from '/@/renderer/features/radio/store/radio-store';
 import {
     SettingOption,
     SettingsSection,
@@ -15,11 +14,7 @@ export const ExportImportSettings = memo(() => {
     const settingForExport = useSettingsForExport();
 
     const onExportSettings = useCallback(() => {
-        const radioStations = getRadioStationsForExport();
-        const exportData =
-            radioStations.length > 0 ? { ...settingForExport, radioStations } : settingForExport;
-
-        const settingsFile = new File([JSON.stringify(exportData)], 'feishin-settings.json', {
+        const settingsFile = new File([JSON.stringify(settingForExport)], 'feishin-settings.json', {
             type: 'application/json',
         });
 
