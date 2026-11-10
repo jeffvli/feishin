@@ -80,14 +80,7 @@ export interface ItemListHandle {
 }
 
 export type ItemListItem =
-    | Album
-    | AlbumArtist
-    | Artist
-    | Folder
-    | Genre
-    | Playlist
-    | Song
-    | undefined;
+    Album | AlbumArtist | Artist | Folder | Genre | Playlist | Song | undefined;
 
 export interface ItemListTableComponentProps<TQuery> extends ItemListComponentProps<TQuery> {
     autoFitColumns?: boolean;

@@ -47,12 +47,7 @@ export enum SortOrder {
 export type AnyLibraryItem = Album | AlbumArtist | Artist | Playlist | QueueSong | Song;
 
 export type AnyLibraryItems =
-    | Album[]
-    | AlbumArtist[]
-    | Artist[]
-    | Playlist[]
-    | QueueSong[]
-    | Song[];
+    Album[] | AlbumArtist[] | Artist[] | Playlist[] | QueueSong[] | Song[];
 
 export interface PlayerData {
     currentSong: QueueSong | undefined;
