@@ -21,11 +21,7 @@ export interface ButtonProps
 }
 
 type ExtendedButtonVariant =
-    | 'state-error'
-    | 'state-info'
-    | 'state-success'
-    | 'state-warning'
-    | ButtonVariant;
+    'state-error' | 'state-info' | 'state-success' | 'state-warning' | ButtonVariant;
 
 export const _Button = forwardRef<HTMLButtonElement, ButtonProps>(
     (

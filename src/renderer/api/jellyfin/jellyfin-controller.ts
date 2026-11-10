@@ -658,8 +658,7 @@ export const JellyfinController: InternalControllerEndpoint = {
         const yearsFilter = yearsGroup.length ? yearsGroup.join(',') : undefined;
 
         let artistQuery:
-            | Omit<z.infer<typeof jfType._parameters.albumList>, 'IncludeItemTypes'>
-            | undefined;
+            Omit<z.infer<typeof jfType._parameters.albumList>, 'IncludeItemTypes'> | undefined;
 
         if (query.artistIds) {
             // Based mostly off of observation, this is the behavior I've seen:

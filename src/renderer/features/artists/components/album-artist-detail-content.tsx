@@ -1160,34 +1160,32 @@ const AlbumArtistMetadataSimilarArtists = ({
             return [];
         }
 
-        return relatedArtists.map(
-            (relatedArtist: RelatedArtist): AlbumArtist => ({
-                _itemType: LibraryItem.ALBUM_ARTIST,
-                _serverId: serverId || '',
-                _serverType: (server?.type as ServerType) || ServerType.JELLYFIN,
-                albumCount: null,
-                biography: null,
-                blurHash: null,
-                dominantColor: null,
-                duration: null,
-                genres: [],
-                id: relatedArtist.id,
-                imageId: relatedArtist.imageId,
-                imageUrl: relatedArtist.imageUrl,
-                lastPlayedAt: null,
-                mbz: null,
-                missing: null,
-                name: relatedArtist.name,
-                playCount: null,
-                ratedAt: null,
-                similarArtists: null,
-                songCount: null,
-                starredAt: null,
-                thumbHash: null,
-                userFavorite: relatedArtist.userFavorite,
-                userRating: relatedArtist.userRating,
-            }),
-        );
+        return relatedArtists.map((relatedArtist: RelatedArtist): AlbumArtist => ({
+            _itemType: LibraryItem.ALBUM_ARTIST,
+            _serverId: serverId || '',
+            _serverType: (server?.type as ServerType) || ServerType.JELLYFIN,
+            albumCount: null,
+            biography: null,
+            blurHash: null,
+            dominantColor: null,
+            duration: null,
+            genres: [],
+            id: relatedArtist.id,
+            imageId: relatedArtist.imageId,
+            imageUrl: relatedArtist.imageUrl,
+            lastPlayedAt: null,
+            mbz: null,
+            missing: null,
+            name: relatedArtist.name,
+            playCount: null,
+            ratedAt: null,
+            similarArtists: null,
+            songCount: null,
+            starredAt: null,
+            thumbHash: null,
+            userFavorite: relatedArtist.userFavorite,
+            userRating: relatedArtist.userRating,
+        }));
     }, [relatedArtists, server?.type, serverId]);
 
     const carouselTitle = useMemo(
