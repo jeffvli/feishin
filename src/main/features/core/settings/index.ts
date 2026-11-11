@@ -14,6 +14,7 @@ import Store from 'electron-store';
 import { promises as fs, watch as fsWatch } from 'fs';
 import path from 'path';
 
+import { isLinux } from '/@/main/env';
 import log from '/@/main/logger';
 import { Platform, type TitleTheme } from '/@/shared/types/types';
 
@@ -108,7 +109,10 @@ export const store = new Store<any>({
     defaults: {
         disable_auto_updates: false,
         enableNeteaseTranslation: false,
-        global_media_hotkeys: true,
+        // On Linux, Feishin is an MPRIS player, and desktops such as GNOME and KDE send media keys
+        // to it. Registering the keys as global shortcuts too makes GNOME on Wayland ask the user
+        // to approve them.
+        global_media_hotkeys: !isLinux(),
         lyrics: ['NetEase', 'lrclib.net'],
         mediaSession: false,
         playbackType: 'web',
