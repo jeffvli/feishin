@@ -11,6 +11,8 @@
         "createPlaylist": "Create $t(entity.playlist, {\"count\": 1})",
         "createPlaylistFromQueue": "Create $t(entity.playlist, {\"count\": 1}) from queue",
         "createRadioStation": "Create $t(entity.radioStation, {\"count\": 1})",
+        "exportRadioStations": "Export radio stations",
+        "importRadioStations": "Import radio stations",
         "deletePlaylist": "Delete $t(entity.playlist, {\"count\": 1})",
         "deleteRadioStation": "Delete $t(entity.radioStation, {\"count\": 1})",
         "selectAll": "Select all",
@@ -411,6 +413,19 @@
         "editRadioStation": {
             "success": "Radio station updated successfully"
         },
+        "exportRadioStations": {
+            "empty": "There are no radio stations to export",
+            "error_servers": "Could not read radio stations from: {{servers}}"
+        },
+        "importRadioStations": {
+            "description": "Choose a radio stations file exported from Feishin. The stations are added to {{server}}.",
+            "empty": "This file has no radio stations",
+            "error_invalidFile": "This is not a valid radio stations file",
+            "result": "Added {{added}} radio stations, skipped {{skipped}} that already exist",
+            "result_failed": "{{failed}} could not be added.",
+            "selectSources": "Choose the servers to import from. The stations are added to {{server}}, and stations with a stream URL that already exists are skipped.",
+            "submit": "Import"
+        },
         "deletePlaylist": {
             "input_confirm": "Type the name of the $t(entity.playlist, {\"count\": 1}) to confirm",
             "success": "$t(entity.playlist, {\"count\": 1}) deleted successfully",
@@ -513,6 +528,7 @@
             "title": "$t(entity.album, {\"count\": 2})"
         },
         "radioList": {
+            "localStorageNote": "Jellyfin has no radio stations of its own, so Feishin keeps these on this device only. Export them to keep a copy.",
             "title": "Radio stations"
         },
         "releasenotes": {
