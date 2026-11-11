@@ -36,9 +36,7 @@ interface LrcRedTrack {
     title: string;
 }
 
-const requestHeaders = () => ({
-    'User-Agent': USER_AGENT,
-});
+
 
 export async function getLyricsBySongId(isrc: string): Promise<null | string> {
     let result: AxiosResponse<LrcRedTrack>;
