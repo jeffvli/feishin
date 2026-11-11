@@ -282,8 +282,7 @@ export const useItemDragDropState = <TElement extends HTMLElement = HTMLDivEleme
                                   const sourceItems = (args.source.item || []) as Song[];
                                   if (sourceItems.length > 0) {
                                       const sourcePlaylistId = args.source.metadata?.playlistId as
-                                          | string
-                                          | undefined;
+                                          string | undefined;
                                       playerContext.addToQueueByData(
                                           sourceItems,
                                           {

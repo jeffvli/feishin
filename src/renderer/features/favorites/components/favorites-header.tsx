@@ -132,7 +132,7 @@ export const FavoritesHeader = ({ itemType }: FavoritesHeaderProps) => {
                                 </DropdownMenu.Dropdown>
                             </DropdownMenu>
                         </LibraryHeaderBar.Title>
-                        <LibraryHeaderBar.Badge isLoading={!itemCount}>
+                        <LibraryHeaderBar.Badge isLoading={itemCount === undefined}>
                             {itemCount}
                         </LibraryHeaderBar.Badge>
                     </LibraryHeaderBar>

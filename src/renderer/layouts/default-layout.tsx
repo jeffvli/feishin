@@ -10,7 +10,10 @@ import { WindowBar } from '/@/renderer/layouts/window-bar';
 import { useSettingsStore, useWindowBarStyle } from '/@/renderer/store/settings.store';
 import { Platform, PlayerType } from '/@/shared/types/types';
 
-if (!isElectron()) {
+// MPV and DLNA need the desktop app; the web and jukebox players also work in a browser
+const WEB_PLAYBACK_TYPES = [PlayerType.WEB, PlayerType.JUKEBOX];
+
+if (!isElectron() && !WEB_PLAYBACK_TYPES.includes(useSettingsStore.getState().playback.type)) {
     useSettingsStore.getState().actions.setSettings({
         playback: {
             type: PlayerType.WEB,

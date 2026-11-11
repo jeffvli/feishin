@@ -473,14 +473,32 @@
     }
 }
 
-.track-row.track-row-selected {
-    @mixin dark {
-        background-color: lighten(var(--theme-colors-surface), 5%);
-    }
+.track-row {
+    --row-overlay-color: transparent;
 
-    @mixin light {
-        background-color: darken(var(--theme-colors-surface), 5%);
-    }
+    position: relative;
+}
+
+.track-row::before {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    content: '';
+    background-color: var(--row-overlay-color);
+}
+
+.track-row > * {
+    position: relative;
+    z-index: 1;
+}
+
+.track-row.track-row-with-horizontal-border::before {
+    top: -1px;
+}
+
+.track-row.track-row-selected {
+    --row-overlay-color: var(--theme-colors-row-selected);
 }
 
 .track-row.track-row-with-horizontal-border {
@@ -492,7 +510,7 @@
 }
 
 .track-row.track-row-hover-highlight-enabled:hover:not(.track-row-selected) {
-    background-color: var(--theme-colors-surface);
+    --row-overlay-color: var(--theme-colors-row-hover);
 }
 
 .track-row.track-row-selected.track-row-horizontal-border-visible,

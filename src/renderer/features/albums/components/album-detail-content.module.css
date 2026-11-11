@@ -42,6 +42,10 @@
     overflow-x: hidden;
 }
 
+.disc-group-row-cell {
+    background-color: var(--theme-colors-surface);
+}
+
 .search-text-input {
     background: transparent;
     border-color: rgb(255 255 255 / 5%);

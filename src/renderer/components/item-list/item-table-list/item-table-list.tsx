@@ -743,6 +743,8 @@ const MemoizedVirtualizedTableGrid = memo(VirtualizedTableGrid, (prevProps, next
 MemoizedVirtualizedTableGrid.displayName = 'MemoizedVirtualizedTableGrid';
 
 export interface TableGroupHeader {
+    cellClassName?: string;
+    hideRowBorder?: boolean;
     itemCount: number;
     render: (props: {
         data: unknown[];

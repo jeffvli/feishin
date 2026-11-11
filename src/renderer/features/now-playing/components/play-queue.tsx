@@ -171,6 +171,7 @@ export const PlayQueue = forwardRef<ItemListHandle, QueueProps>(
             ].filter((section) => section.count > 0);
 
             return sections.map(({ count, label }) => ({
+                hideRowBorder: true,
                 itemCount: count,
                 render: () => (
                     <div className={styles.groupRow}>
