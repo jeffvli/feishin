@@ -163,6 +163,7 @@ const ENV_SETTING_SPECS: EnvSettingSpec[] = [
         transform: (s) => (RGB_ACCENT_REGEX.test(s) ? s : undefined),
         type: 'string',
     },
+    { key: 'FS_GENERAL_ACCENT_FROM_ART', path: ['general', 'accentFromArt'], type: 'bool' },
     { key: 'FS_GENERAL_ALBUM_BACKGROUND', path: ['general', 'albumBackground'], type: 'bool' },
     {
         key: 'FS_GENERAL_ALBUM_BACKGROUND_BLUR',
