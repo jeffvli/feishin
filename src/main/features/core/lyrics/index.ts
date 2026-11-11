@@ -9,6 +9,7 @@ import {
     parseLyricsTextTokens,
 } from './furigana';
 import { getLyricsBySongId as getGenius, getSearchResults as searchGenius } from './genius';
+import { getLyricsBySongId as getLrcRed, getSearchResults as searchLrcRed } from './lrc-red';
 import { getLyricsBySongId as getLrcLib, getSearchResults as searchLrcLib } from './lrclib';
 import { getLyricsBySongId as getNetease, getSearchResults as searchNetease } from './netease';
 import { orderSearchResults } from './shared';
@@ -22,6 +23,7 @@ import { Song } from '/@/shared/types/domain-types';
 
 export enum LyricSource {
     GENIUS = 'Genius',
+    LRC_RED = 'lrc.red',
     LRCLIB = 'lrclib.net',
     NETEASE = 'NetEase',
     SIMPMUSIC = 'SimpMusic',
@@ -77,6 +79,7 @@ type SearchFetcher = (
 
 const SEARCH_FETCHERS: Record<LyricSource, SearchFetcher> = {
     [LyricSource.GENIUS]: searchGenius,
+    [LyricSource.LRC_RED]: searchLrcRed,
     [LyricSource.LRCLIB]: searchLrcLib,
     [LyricSource.NETEASE]: searchNetease,
     [LyricSource.SIMPMUSIC]: searchSimpMusic,
@@ -84,6 +87,7 @@ const SEARCH_FETCHERS: Record<LyricSource, SearchFetcher> = {
 
 const GET_FETCHERS: Record<LyricSource, GetFetcher> = {
     [LyricSource.GENIUS]: getGenius,
+    [LyricSource.LRC_RED]: getLrcRed,
     [LyricSource.LRCLIB]: getLrcLib,
     [LyricSource.NETEASE]: getNetease,
     [LyricSource.SIMPMUSIC]: getSimpMusic,
@@ -204,6 +208,7 @@ const searchRemoteLyrics = async (params: LyricSearchQuery) => {
 
     const results: Record<LyricSource, InternetProviderLyricSearchResponse[]> = {
         [LyricSource.GENIUS]: [],
+        [LyricSource.LRC_RED]: [],
         [LyricSource.LRCLIB]: [],
         [LyricSource.NETEASE]: [],
         [LyricSource.SIMPMUSIC]: [],
