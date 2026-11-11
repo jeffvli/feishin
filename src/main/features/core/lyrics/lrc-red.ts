@@ -6,7 +6,7 @@ import { orderSearchResults } from './shared';
 import log from '/@/main/logger';
 
 const BASE_URL = 'https://lrc.red';
-const USER_AGENT = 'Feishin/1.17.0 (+https://github.com/jeffvli/feishin; feishin@users.noreply.github.com)';
+
 const TIMEOUT_MS = 5000;
 
 interface LrcRedSearchHit {
