@@ -30,6 +30,12 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
 
     const isPlaylistSong = props.itemType === LibraryItem.PLAYLIST_SONG;
 
+    // Row key (playlistItemId || id) keeps duplicate songs distinct
+    const getRowId = useCallback(
+        (d: unknown): string => props.internalState?.extractRowId(d) ?? (d as any).id,
+        [props.internalState],
+    );
+
     const {
         isDraggedOver,
         isDragging: isDraggingLocal,
@@ -127,8 +133,8 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
                     eventEmitter.emit('PLAYLIST_REORDER', {
                         edge: args.edge,
                         playlistId,
-                        sourceIds: args.source.id,
-                        targetId: targetItem.id,
+                        sourceIds: sourceItems.map(getRowId),
+                        targetId: getRowId(targetItem),
                     });
                 }
 
@@ -165,7 +171,7 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
 
         const validItems = getValidDataItems();
         const selectedItems = getDraggedItems(item as any, props.internalState);
-        const sourceIds = selectedItems.map((draggedItem) => draggedItem.id);
+        const sourceIds = selectedItems.map(getRowId);
 
         if (sourceIds.length === 0) {
             return;
@@ -173,7 +179,7 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
 
         let topmostIndex = validItems.length;
         for (const selectedItem of selectedItems) {
-            const index = validItems.findIndex((d) => (d as any).id === selectedItem.id);
+            const index = validItems.findIndex((d) => getRowId(d) === getRowId(selectedItem));
             if (index !== -1 && index < topmostIndex) {
                 topmostIndex = index;
             }
@@ -189,9 +195,17 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
             edge: 'top',
             playlistId,
             sourceIds,
-            targetId: (targetItem as any).id,
+            targetId: getRowId(targetItem),
         });
-    }, [item, isDataRow, isPlaylistSong, playlistId, getValidDataItems, props.internalState]);
+    }, [
+        item,
+        isDataRow,
+        isPlaylistSong,
+        playlistId,
+        getValidDataItems,
+        getRowId,
+        props.internalState,
+    ]);
 
     const handleMoveToTop = useCallback(() => {
         if (!item || !isDataRow || !isPlaylistSong || !playlistId) {
@@ -200,7 +214,7 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
 
         const validItems = getValidDataItems();
         const selectedItems = getDraggedItems(item as any, props.internalState);
-        const sourceIds = selectedItems.map((draggedItem) => draggedItem.id);
+        const sourceIds = selectedItems.map(getRowId);
 
         if (sourceIds.length === 0) {
             return;
@@ -209,7 +223,7 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
         const firstItem = validItems[0];
 
         const isAlreadyAtTop = selectedItems.some(
-            (selectedItem) => (selectedItem as any).id === (firstItem as any).id,
+            (selectedItem) => getRowId(selectedItem) === getRowId(firstItem),
         );
 
         if (!firstItem || isAlreadyAtTop) {
@@ -220,9 +234,17 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
             edge: 'top',
             playlistId,
             sourceIds,
-            targetId: (firstItem as any).id,
+            targetId: getRowId(firstItem),
         });
-    }, [item, isDataRow, isPlaylistSong, playlistId, getValidDataItems, props.internalState]);
+    }, [
+        item,
+        isDataRow,
+        isPlaylistSong,
+        playlistId,
+        getValidDataItems,
+        getRowId,
+        props.internalState,
+    ]);
 
     const handleMoveDown = useCallback(() => {
         if (!item || !isDataRow || !isPlaylistSong || !playlistId) {
@@ -231,7 +253,7 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
 
         const validItems = getValidDataItems();
         const selectedItems = getDraggedItems(item as any, props.internalState);
-        const sourceIds = selectedItems.map((draggedItem) => draggedItem.id);
+        const sourceIds = selectedItems.map(getRowId);
 
         if (sourceIds.length === 0) {
             return;
@@ -239,7 +261,7 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
 
         let bottommostIndex = -1;
         for (const selectedItem of selectedItems) {
-            const index = validItems.findIndex((d) => (d as any).id === selectedItem.id);
+            const index = validItems.findIndex((d) => getRowId(d) === getRowId(selectedItem));
             if (index !== -1 && index > bottommostIndex) {
                 bottommostIndex = index;
             }
@@ -255,9 +277,17 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
             edge: 'bottom',
             playlistId,
             sourceIds,
-            targetId: (targetItem as any).id,
+            targetId: getRowId(targetItem),
         });
-    }, [item, isDataRow, isPlaylistSong, playlistId, getValidDataItems, props.internalState]);
+    }, [
+        item,
+        isDataRow,
+        isPlaylistSong,
+        playlistId,
+        getValidDataItems,
+        getRowId,
+        props.internalState,
+    ]);
 
     const handleMoveToBottom = useCallback(() => {
         if (!item || !isDataRow || !isPlaylistSong || !playlistId) {
@@ -266,7 +296,7 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
 
         const validItems = getValidDataItems();
         const selectedItems = getDraggedItems(item as any, props.internalState);
-        const sourceIds = selectedItems.map((draggedItem) => draggedItem.id);
+        const sourceIds = selectedItems.map(getRowId);
 
         if (sourceIds.length === 0) {
             return;
@@ -275,7 +305,7 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
         const lastItem = validItems[validItems.length - 1];
 
         const isAlreadyAtBottom = selectedItems.some(
-            (selectedItem) => (selectedItem as any).id === (lastItem as any).id,
+            (selectedItem) => getRowId(selectedItem) === getRowId(lastItem),
         );
 
         if (!lastItem || isAlreadyAtBottom) {
@@ -286,9 +316,17 @@ const PlaylistReorderColumnBase = (props: ItemTableListInnerColumn) => {
             edge: 'bottom',
             playlistId,
             sourceIds,
-            targetId: (lastItem as any).id,
+            targetId: getRowId(lastItem),
         });
-    }, [item, isDataRow, isPlaylistSong, playlistId, getValidDataItems, props.internalState]);
+    }, [
+        item,
+        isDataRow,
+        isPlaylistSong,
+        playlistId,
+        getValidDataItems,
+        getRowId,
+        props.internalState,
+    ]);
 
     const upButtonHandlers = useLongPress<HTMLButtonElement>({
         onClick: handleMoveUp,
