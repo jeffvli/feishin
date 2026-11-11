@@ -39,16 +39,24 @@ export const LyricLine = memo(
             <Box className={clsx(styles.lyricLine, className)} style={style} {...props}>
                 <Stack gap={0}>
                     {lines.map((line, index) => (
-                        <span dangerouslySetInnerHTML={{ __html: sanitize(line) }} key={index} />
+                        <span
+                            dangerouslySetInnerHTML={{ __html: sanitize(line) }}
+                            data-lyric-text
+                            key={index}
+                        />
                     ))}
                     {romajiText && (
                         <span
                             className={styles.romajiLine}
                             dangerouslySetInnerHTML={{ __html: sanitize(romajiText) }}
+                            data-lyric-text
                         />
                     )}
                     {translatedText && translatedText !== text && (
-                        <span dangerouslySetInnerHTML={{ __html: sanitize(translatedText) }} />
+                        <span
+                            dangerouslySetInnerHTML={{ __html: sanitize(translatedText) }}
+                            data-lyric-text
+                        />
                     )}
                 </Stack>
             </Box>

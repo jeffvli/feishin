@@ -10,6 +10,8 @@ import isElectron from 'is-electron';
 import { lazy, memo, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
 import i18n from '/@/i18n/i18n';
+import { DesktopLyricsControls } from '/@/renderer/features/lyrics/desktop-lyrics-controls';
+import { useDesktopLyrics } from '/@/renderer/features/lyrics/use-desktop-lyrics';
 import { WebAudioContext } from '/@/renderer/features/player/context/webaudio-context';
 import { useCheckForUpdates } from '/@/renderer/hooks/use-check-for-updates';
 import { useFullscreenAutoOpen } from '/@/renderer/hooks/use-fullscreen-auto-open';
@@ -91,6 +93,7 @@ const AppShell = memo(function AppShell() {
     return (
         <>
             <AppEffects />
+            <DesktopLyricsControls recovery />
             <Notifications
                 containerWidth="300px"
                 position="bottom-center"
@@ -113,6 +116,7 @@ const AppShell = memo(function AppShell() {
 
 const AppEffects = () => (
     <>
+        <DesktopLyricsEffect />
         <SyncSettingsEffect />
         <UpdateCheckEffect />
         <CustomCssFileEffect />
@@ -125,6 +129,13 @@ const AppEffects = () => (
         <InputFocusEffect />
     </>
 );
+
+const DesktopLyricsEffect = () => (isElectron() ? <DesktopLyricsBridge /> : null);
+
+const DesktopLyricsBridge = () => {
+    useDesktopLyrics();
+    return null;
+};
 
 const SyncSettingsEffect = () => {
     useSyncSettingsToMain();
