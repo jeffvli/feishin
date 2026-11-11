@@ -161,6 +161,9 @@ const getSettingsProperties = (): SettingsProperties => {
         'settings.lyrics.sources.genius': ignoreWeb(
             settings.lyrics.sources.includes(LyricSource.GENIUS),
         ),
+        'settings.lyrics.sources.lrc.red': ignoreWeb(
+            settings.lyrics.sources.includes(LyricSource.LRC_RED),
+        ),
         'settings.lyrics.sources.lrclib': ignoreWeb(
             settings.lyrics.sources.includes(LyricSource.LRCLIB),
         ),
