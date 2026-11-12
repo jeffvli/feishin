@@ -50,6 +50,29 @@ export const toCamelotKey = (value: string): null | string => {
     return null;
 };
 
+// Camelot wheel colors by number (1A/1B, 2A/2B, ...), from Mixxx's "Mixed In Key - Key Colors" palette.
+const CAMELOT_COLORS = [
+    '#00EECB',
+    '#20EF7F',
+    '#7FF448',
+    '#E0CA6D',
+    '#FDA078',
+    '#FF8693',
+    '#FD7EB3',
+    '#F17EDB',
+    '#D18BFD',
+    '#9EB4FD',
+    '#4DD3F8',
+    '#01EAEC',
+];
+
+/** Wheel color of a Camelot key ("8A"), or null for anything else. */
+export const getCamelotKeyColor = (key: string): null | string => {
+    const match = /^(1[0-2]|[1-9])[AB]$/.exec(key);
+
+    return match ? CAMELOT_COLORS[Number(match[1]) - 1] : null;
+};
+
 /** Camelot key of the song's key tag, or the raw tag when it can't be converted. */
 export const getSongCamelotKey = (song: Pick<Song, 'tags'>): null | string => {
     const key = song.tags?.key?.[0]?.trim();
