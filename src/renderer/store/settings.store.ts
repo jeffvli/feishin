@@ -522,6 +522,7 @@ export const GeneralSettingsSchema = z.object({
     artistItems: z.array(SortableItemSchema(ArtistItemSchema)),
     artistRadioCount: z.number(),
     artistReleaseTypeItems: z.array(SortableItemSchema(ArtistReleaseTypeItemSchema)),
+    autoDetectSongKeys: z.boolean().optional(),
     autoSave: AutoSaveSchema,
     blurExplicitImages: z.boolean(),
     buttonSize: z.number(),
@@ -1344,6 +1345,7 @@ const initialState: SettingsState = {
         artistItems,
         artistRadioCount: 20,
         artistReleaseTypeItems,
+        autoDetectSongKeys: false,
         autoSave: {
             count: 10,
             enabled: false,
@@ -3168,6 +3170,9 @@ export const usePlayerbarOpenDrawer = () =>
     useSettingsStore((state) => state.general.playerbarOpenDrawer, shallow);
 
 export const useShowRatings = () => useSettingsStore((state) => state.general.showRatings, shallow);
+
+export const useAutoDetectSongKeys = () =>
+    useSettingsStore((state) => state.general.autoDetectSongKeys, shallow);
 
 export const useShowFavorites = () =>
     useSettingsStore((state) => state.general.showFavorites, shallow);

@@ -5,17 +5,16 @@ import {
     TableColumnContainer,
 } from '/@/renderer/components/item-list/item-table-list/item-table-list-column';
 import { CamelotKeyBadge } from '/@/renderer/features/key-detection/components/camelot-key-badge';
-import { getSongCamelotKey } from '/@/renderer/utils/camelot-key';
+import { useSongCamelotKey } from '/@/renderer/features/key-detection/song-key-detection';
 import { Song } from '/@/shared/types/domain-types';
 
 export const CamelotKeyColumn = (props: ItemTableListInnerColumn) => {
     const rowItem = props.getRowItem?.(props.rowIndex) ?? (props.data as any[])[props.rowIndex];
+    const key = useSongCamelotKey(rowItem as Song | undefined);
 
     if (!rowItem) {
         return <ColumnSkeletonFixed {...props} />;
     }
-
-    const key = getSongCamelotKey(rowItem as Song);
 
     if (!key) {
         return <ColumnNullFallback {...props} />;
