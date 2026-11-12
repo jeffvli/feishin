@@ -3,7 +3,8 @@ import type { Song } from '/@/shared/types/domain-types';
 const PITCH_CLASS: Record<string, number> = { A: 9, B: 11, C: 0, D: 2, E: 4, F: 5, G: 7 };
 const ACCIDENTAL: Record<string, number> = { '': 0, '#': 1, '♭': -1, '♯': 1, b: -1 };
 
-const STANDARD_KEY = /^([A-G])([#♯b♭]?)\s*(m|min|minor|maj|major)?$/i;
+// Groups: note, accidental, minor marker
+const STANDARD_KEY = /^([A-G])([#♯b♭]?)\s*(?:(m|min|minor)|maj|major)?$/i;
 const CAMELOT_KEY = /^0?(1[0-2]|[1-9])\s*([AB])$/i;
 const OPEN_KEY = /^(1[0-2]|[1-9])\s*([dm])$/i;
 
@@ -31,9 +32,10 @@ const parseKey = (value: string): null | string => {
 
     const pitchClass =
         PITCH_CLASS[standard[1].toUpperCase()] + ACCIDENTAL[standard[2].toLowerCase()];
-    const isMinor = /^m(in|inor)?$/i.test(standard[3] ?? '');
 
-    return isMinor ? `${toCamelotNumber(pitchClass + 3)}A` : `${toCamelotNumber(pitchClass + 12)}B`;
+    return standard[3]
+        ? `${toCamelotNumber(pitchClass + 3)}A`
+        : `${toCamelotNumber(pitchClass + 12)}B`;
 };
 
 /** Converts a musical key tag ("Am", "C# minor", "8A", "1m", "8A - Am") to Camelot notation. */

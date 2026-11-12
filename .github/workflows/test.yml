@@ -19,6 +19,9 @@ jobs:
             - name: Lint Files
               run: pnpm run lint
 
+            - name: Run Tests
+              run: pnpm test
+
     commitlint:
         runs-on: ubuntu-latest
 
