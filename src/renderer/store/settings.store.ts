@@ -522,6 +522,7 @@ export const GeneralSettingsSchema = z.object({
     artistItems: z.array(SortableItemSchema(ArtistItemSchema)),
     artistRadioCount: z.number(),
     artistReleaseTypeItems: z.array(SortableItemSchema(ArtistReleaseTypeItemSchema)),
+    autoDetectSongKeys: z.boolean().optional(),
     autoSave: AutoSaveSchema,
     blurExplicitImages: z.boolean(),
     buttonSize: z.number(),
@@ -1344,6 +1345,7 @@ const initialState: SettingsState = {
         artistItems,
         artistRadioCount: 20,
         artistReleaseTypeItems,
+        autoDetectSongKeys: false,
         autoSave: {
             count: 10,
             enabled: false,
@@ -2933,10 +2935,39 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     });
                 }
 
+                if (version < 35) {
+                    // Add CAMELOT_KEY next to BPM in every song column config
+                    for (const listConfig of Object.values(state.lists)) {
+                        for (const columns of [
+                            listConfig?.table?.columns,
+                            listConfig?.detail?.columns,
+                        ]) {
+                            if (
+                                !columns ||
+                                columns.some((col) => col.id === TableColumn.CAMELOT_KEY)
+                            ) {
+                                continue;
+                            }
+
+                            const bpmIndex = columns.findIndex((col) => col.id === TableColumn.BPM);
+                            if (bpmIndex >= 0) {
+                                columns.splice(bpmIndex + 1, 0, {
+                                    align: 'center',
+                                    autoSize: false,
+                                    id: TableColumn.CAMELOT_KEY,
+                                    isEnabled: false,
+                                    pinned: null,
+                                    width: 100,
+                                });
+                            }
+                        }
+                    }
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 34,
+            version: 35,
         },
     ),
 );
@@ -3139,6 +3170,9 @@ export const usePlayerbarOpenDrawer = () =>
     useSettingsStore((state) => state.general.playerbarOpenDrawer, shallow);
 
 export const useShowRatings = () => useSettingsStore((state) => state.general.showRatings, shallow);
+
+export const useAutoDetectSongKeys = () =>
+    useSettingsStore((state) => state.general.autoDetectSongKeys, shallow);
 
 export const useShowFavorites = () =>
     useSettingsStore((state) => state.general.showFavorites, shallow);

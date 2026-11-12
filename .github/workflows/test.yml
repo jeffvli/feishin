@@ -1,6 +1,6 @@
 name: Test
 
-on: [push, pull_request]
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
     lint:
@@ -10,6 +10,12 @@ jobs:
             - name: Check out Git repository
               uses: actions/checkout@v6
 
+            # The tests run the TypeScript sources directly, which needs Node 22.18 or later
+            - name: Install Node.js
+              uses: actions/setup-node@v7
+              with:
+                  node-version: 24
+
             - name: Install Node.js and PNPM
               uses: pnpm/action-setup@v4
 
@@ -18,6 +24,9 @@ jobs:
 
             - name: Lint Files
               run: pnpm run lint
+
+            - name: Run Tests
+              run: pnpm test
 
     commitlint:
         runs-on: ubuntu-latest
