@@ -129,9 +129,10 @@ const getRemoteLyrics = async (song: Song) => {
         }
     }
 
+    const artist = song.artists?.[0]?.name || song.artistName || song.albumArtistName;
     const params: LyricSearchQuery = {
         album: song.album || song.name,
-        artist: song.artists[0].name,
+        ...(artist && { artist }),
         duration: song.duration / 1000.0,
         name: song.name,
     };
