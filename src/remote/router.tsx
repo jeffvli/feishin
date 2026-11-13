@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router';
 
 import { RemoteContainer } from '/@/remote/components/remote-container';
 import { LibraryPage } from '/@/remote/pages/library-page';
+import { LyricsPage } from '/@/remote/pages/lyrics-page';
 import { PlaylistsPage } from '/@/remote/pages/playlists-page';
 import { QueuePage } from '/@/remote/pages/queue-page';
 import { RadioPage } from '/@/remote/pages/radio-page';
@@ -14,6 +15,7 @@ export const RemoteRoutes = () => {
             <Route element={<PlaylistsPage />} path="playlists" />
             <Route element={<RadioPage />} path="radio" />
             <Route element={<QueuePage />} path="queue" />
+            <Route element={<LyricsPage />} path="lyrics" />
         </Routes>
     );
 };

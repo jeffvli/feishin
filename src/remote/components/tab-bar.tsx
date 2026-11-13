@@ -5,6 +5,7 @@ import {
     RiMusic2Line,
     RiPlayListLine,
     RiRadioLine,
+    RiFileTextLine,
 } from 'react-icons/ri';
 import { NavLink } from 'react-router';
 
@@ -22,6 +23,7 @@ const TABS: Tab[] = [
     { icon: <RiPlayListLine size={22} />, label: 'Playlists', to: '/playlists' },
     { icon: <RiRadioLine size={22} />, label: 'Radio', to: '/radio' },
     { icon: <RiListOrdered2 size={22} />, label: 'Queue', to: '/queue' },
+    { icon: <RiFileTextLine size={22} />, label: 'Lyrics', to: '/lyrics' },
 ];
 
 export const TabBar = () => {
