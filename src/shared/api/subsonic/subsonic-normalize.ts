@@ -24,7 +24,7 @@ const getArtistList = (
     artistName?: string,
     participants?: null | Record<string, RelatedArtist[]>,
 ) => {
-    if (!artists && !participants) {
+    if (!artists?.length && !participants?.['remixer']?.length) {
         return [
             {
                 id: artistId?.toString() || '',
