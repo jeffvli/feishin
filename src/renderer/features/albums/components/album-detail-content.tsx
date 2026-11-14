@@ -791,7 +791,8 @@ const AlbumDetailSongsTable = ({ songs }: AlbumDetailSongsTableProps) => {
             return undefined;
         }
 
-        if (discGroups.length <= 1) {
+        // A single disc only gets a header when it has a subtitle to show
+        if (discGroups.length <= 1 && !discGroups[0]?.discSubtitle) {
             return undefined;
         }
 
