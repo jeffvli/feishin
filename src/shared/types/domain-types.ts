@@ -520,6 +520,7 @@ export const SortKeyRandom = 'random';
 
 export enum AlbumListSort {
     ALBUM_ARTIST = 'albumArtist',
+    ALBUM_ARTIST_YEAR_ALBUM = 'albumArtistYearAlbum',
     ARTIST = 'artist',
     COMMUNITY_RATING = 'communityRating',
     CRITIC_RATING = 'criticRating',
@@ -576,6 +577,7 @@ type AlbumListSortMap = {
 export const albumListSortMap: AlbumListSortMap = {
     jellyfin: {
         albumArtist: JFAlbumListSort.ALBUM_ARTIST,
+        albumArtistYearAlbum: JFAlbumListSort.ALBUM_ARTIST_YEAR_ALBUM,
         artist: undefined,
         communityRating: JFAlbumListSort.COMMUNITY_RATING,
         criticRating: JFAlbumListSort.CRITIC_RATING,
@@ -596,6 +598,9 @@ export const albumListSortMap: AlbumListSortMap = {
     },
     navidrome: {
         albumArtist: NDAlbumListSort.ALBUM_ARTIST,
+        // No server-side equivalent: the controller pre-sorts by album
+        // artist and refines the order client-side.
+        albumArtistYearAlbum: undefined,
         artist: NDAlbumListSort.ARTIST,
         communityRating: undefined,
         criticRating: undefined,
@@ -617,6 +622,7 @@ export const albumListSortMap: AlbumListSortMap = {
     },
     subsonic: {
         albumArtist: undefined,
+        albumArtistYearAlbum: undefined,
         artist: undefined,
         communityRating: undefined,
         criticRating: undefined,

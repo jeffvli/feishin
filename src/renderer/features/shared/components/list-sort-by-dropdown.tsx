@@ -236,6 +236,11 @@ export const CLIENT_SIDE_ALBUM_FILTERS = [
     },
     {
         defaultOrder: SortOrder.ASC,
+        name: i18n.t('filter.albumArtistYearAlbum'),
+        value: AlbumListSort.ALBUM_ARTIST_YEAR_ALBUM,
+    },
+    {
+        defaultOrder: SortOrder.ASC,
         name: i18n.t('filter.id'),
         value: AlbumListSort.ID,
     },
@@ -312,6 +317,11 @@ const ALBUM_LIST_FILTERS: Partial<
         },
         {
             defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.albumArtistYearAlbum'),
+            value: AlbumListSort.ALBUM_ARTIST_YEAR_ALBUM,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
             name: i18n.t('filter.id'),
             value: AlbumListSort.ID,
         },
@@ -356,6 +366,11 @@ const ALBUM_LIST_FILTERS: Partial<
             defaultOrder: SortOrder.ASC,
             name: i18n.t('filter.albumArtist'),
             value: AlbumListSort.ALBUM_ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.albumArtistYearAlbum'),
+            value: AlbumListSort.ALBUM_ARTIST_YEAR_ALBUM,
         },
         {
             defaultOrder: SortOrder.ASC,
@@ -423,6 +438,11 @@ const ALBUM_LIST_FILTERS: Partial<
             defaultOrder: SortOrder.ASC,
             name: i18n.t('filter.albumArtist'),
             value: AlbumListSort.ALBUM_ARTIST,
+        },
+        {
+            defaultOrder: SortOrder.ASC,
+            name: i18n.t('filter.albumArtistYearAlbum'),
+            value: AlbumListSort.ALBUM_ARTIST_YEAR_ALBUM,
         },
         {
             defaultOrder: SortOrder.ASC,
