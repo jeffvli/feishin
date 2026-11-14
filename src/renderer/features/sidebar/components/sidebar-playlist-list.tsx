@@ -1,5 +1,5 @@
 import { openContextModal } from '@mantine/modals';
-import { useQuery } from '@tanstack/react-query';
+import { useIsFetching, useQuery, useQueryClient } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { motion } from 'motion/react';
 import { createContext, memo, MouseEvent, useCallback, useContext, useMemo, useState } from 'react';
@@ -9,6 +9,7 @@ import { generatePath, Link } from 'react-router';
 import collapsedSidebarItemStyles from './collapsed-sidebar-item.module.css';
 import styles from './sidebar-playlist-list.module.css';
 
+import { queryKeys } from '/@/renderer/api/query-keys';
 import { ItemImage, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import imageColumnStyles from '/@/renderer/components/item-list/item-table-list/columns/image-column.module.css';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
@@ -22,6 +23,7 @@ import {
     LONG_PRESS_PLAY_BEHAVIOR,
     PlayTooltip,
 } from '/@/renderer/features/shared/components/play-button-group';
+import { RefreshButton } from '/@/renderer/features/shared/components/refresh-button';
 import {
     collectFolderPaths,
     PlaylistFolderDragExpandProvider,
@@ -440,6 +442,24 @@ const handlePlaylistContextMenu = (e: MouseEvent<HTMLAnchorElement>, playlist: P
     });
 };
 
+const SidebarPlaylistRefreshButton = () => {
+    const server = useCurrentServer();
+    const queryClient = useQueryClient();
+    const listKey = queryKeys.playlists.list(server?.id || '');
+    const isFetching = useIsFetching({ queryKey: listKey }) > 0;
+
+    return (
+        <RefreshButton
+            loading={isFetching}
+            onClick={(e) => {
+                e.stopPropagation();
+                queryClient.invalidateQueries({ queryKey: listKey });
+            }}
+            size="xs"
+        />
+    );
+};
+
 const useSidebarPlaylistItems = (scope: 'owned' | 'shared') => {
     const server = useCurrentServer();
     const sidebarPlaylistSorting = useSidebarPlaylistSorting();
@@ -616,6 +636,7 @@ export const SidebarPlaylistList = () => {
                         </Text>
                     </Group>
                     <Group gap="xs" wrap="nowrap">
+                        <SidebarPlaylistRefreshButton />
                         <ActionIcon
                             icon="add"
                             iconProps={{
@@ -777,6 +798,9 @@ export const CollapsedSidebarPlaylistList = () => {
                         tooltip={{ label: t(isOpen ? 'common.collapse' : 'common.expand') }}
                         variant="subtle"
                     />
+                </Group>
+                <Group gap="xs" justify="center" wrap="nowrap">
+                    <SidebarPlaylistRefreshButton />
                     <ActionIcon
                         icon="add"
                         iconProps={{ size: 'lg' }}
