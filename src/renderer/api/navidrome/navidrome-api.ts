@@ -391,7 +391,7 @@ axiosClient.interceptors.response.use(
                             // Hopefully the delay was sufficient for authentication.
                             // Otherwise, it will require manual intervention
                             if (authSuccess) {
-                                return axiosClient.request(error.config);
+                                return;
                             }
 
                             throw error;
@@ -437,8 +437,6 @@ axiosClient.interceptors.response.use(
                         error.config.headers['x-nd-authorization'] = `Bearer ${newCredential}`;
 
                         authSuccess = true;
-
-                        return axiosClient.request(error.config);
                     })
                     .catch((newError: any) => {
                         if (newError !== TIMEOUT_ERROR) {
@@ -455,6 +453,10 @@ axiosClient.interceptors.response.use(
 
                         // make sure to pass the error so axios will error later on
                         throw newError;
+                    })
+                    .then(() => {
+                        // Resource failures must bypass the login catch; keep the delay until the retry settles.
+                        return axiosClient.request(error.config);
                     })
                     .finally(() => {
                         shouldDelay = false;
