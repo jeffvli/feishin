@@ -103,14 +103,7 @@ interface CreateFuseOptions {
 }
 
 type FuseSearchableItem =
-    | Album
-    | AlbumArtist
-    | Artist
-    | Genre
-    | InternetRadioStation
-    | Playlist
-    | QueueSong
-    | Song;
+    Album | AlbumArtist | Artist | Genre | InternetRadioStation | Playlist | QueueSong | Song;
 
 export const createFuseForLibraryItem = <T extends FuseSearchableItem>(
     items: T[],

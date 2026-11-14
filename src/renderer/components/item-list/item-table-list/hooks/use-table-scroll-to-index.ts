@@ -46,11 +46,9 @@ export const useTableScrollToIndex = ({
         (offset: number) => {
             const mainContainer = rowRef.current?.childNodes[0] as HTMLDivElement | undefined;
             const pinnedLeftContainer = pinnedLeftColumnRef.current?.childNodes[0] as
-                | HTMLDivElement
-                | undefined;
+                HTMLDivElement | undefined;
             const pinnedRightContainer = pinnedRightColumnRef.current?.childNodes[0] as
-                | HTMLDivElement
-                | undefined;
+                HTMLDivElement | undefined;
 
             const behavior = 'instant';
 
