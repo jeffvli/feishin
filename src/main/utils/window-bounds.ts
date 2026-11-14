@@ -6,6 +6,7 @@ export type WindowRect = {
 };
 
 export const DEFAULT_WINDOW_BOUNDS = { height: 900, width: 1440 };
+export const WINDOW_MIN_SIZE = { height: 120, width: 480 };
 
 const isFiniteNumber = (value: unknown): value is number => {
     return typeof value === 'number' && Number.isFinite(value);
@@ -60,4 +61,43 @@ export const resolveWindowBounds = (
     }
 
     return { height, width, x: saved.x, y: saved.y };
+};
+
+export const MINI_PLAYER_DEFAULT_BOUNDS = { height: 140, width: 400 };
+export const MINI_PLAYER_MIN_SIZE = { height: 100, width: 280 };
+
+const MINI_PLAYER_SCREEN_MARGIN = 16;
+
+// Mini player bounds are kept separate from the full window bounds. Use the saved
+// ones when they still fit on screen, otherwise dock to the bottom-right corner.
+export const resolveMiniPlayerBounds = (
+    saved: Partial<WindowRect> | undefined,
+    workArea: WindowRect,
+): WindowRect => {
+    const size =
+        saved &&
+        isFiniteNumber(saved.width) &&
+        isFiniteNumber(saved.height) &&
+        saved.width >= 1 &&
+        saved.height >= 1
+            ? { height: saved.height, width: saved.width }
+            : MINI_PLAYER_DEFAULT_BOUNDS;
+    const width = Math.min(size.width, workArea.width);
+    const height = Math.min(size.height, workArea.height);
+
+    if (
+        saved &&
+        isFiniteNumber(saved.x) &&
+        isFiniteNumber(saved.y) &&
+        !isOffScreen({ x: saved.x, y: saved.y }, workArea)
+    ) {
+        return { height, width, x: saved.x, y: saved.y };
+    }
+
+    return {
+        height,
+        width,
+        x: workArea.x + Math.max(workArea.width - width - MINI_PLAYER_SCREEN_MARGIN, 0),
+        y: workArea.y + Math.max(workArea.height - height - MINI_PLAYER_SCREEN_MARGIN, 0),
+    };
 };
