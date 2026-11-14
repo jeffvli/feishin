@@ -1,6 +1,6 @@
 import { openModal } from '@mantine/modals';
 import isElectron from 'is-electron';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import packageJson from '../../../package.json';
@@ -14,10 +14,12 @@ import {
     useAppStoreActions,
     useCommandPalette,
     useCurrentServer,
+    useLanguage,
     usePlayerHydrated,
     usePlayerRepeat,
     usePlayerShuffle,
     usePlayerStatus,
+    useSettingsStore,
 } from '/@/renderer/store';
 import { PlayerShuffle } from '/@/shared/types/types';
 
@@ -34,6 +36,26 @@ export const useNativeMenuSync = () => {
     const playerRepeat = usePlayerRepeat();
     const playerShuffle = usePlayerShuffle();
     const playerStatus = usePlayerStatus();
+    const language = useLanguage();
+    const [settingsHydrated, setSettingsHydrated] = useState(() =>
+        useSettingsStore.persist.hasHydrated(),
+    );
+
+    useEffect(() => {
+        if (settingsHydrated) return undefined;
+
+        return useSettingsStore.persist.onFinishHydration(() => {
+            setSettingsHydrated(true);
+        });
+    }, [settingsHydrated]);
+
+    useEffect(() => {
+        if (!isElectron() || !settingsHydrated) {
+            return undefined;
+        }
+
+        ipc?.send('update-menu-language', language);
+    }, [language, settingsHydrated]);
 
     useEffect(() => {
         if (!isElectron()) {
