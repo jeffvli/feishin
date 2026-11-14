@@ -28,6 +28,11 @@ let mpvInstance: MpvAPI | null = null;
 // alongside the one being started.
 let mpvCreatePromise: null | Promise<MpvAPI> = null;
 let currentPlayerData: null | PlayerData = null;
+// Set when the current song fails to load (e.g. reload right after resume, before the network is
+// back). The renderer is told to stop, so its next play reloads the queue.
+let loadFailed = false;
+// Bumped per set-queue so a load aborted by a newer one is not mistaken for a failure.
+let setQueueGeneration = 0;
 const socketPath = isWindows() ? `\\\\.\\pipe\\mpvserver-${pid}` : `/tmp/node-mpv-${pid}.sock`;
 
 // While quitting/restarting mpv, playlist-pos goes to -1 and node-mpv emits stopped/paused/
@@ -203,7 +208,8 @@ const createMpv = async (data: {
 
             // mpv uses playlist-pos = -1 when nothing is playing (ended, cleared, load failure, etc).
             if (currentPos === -1) {
-                if (previousPlaylistPos === 0) {
+                // A failed load also ends here; that is not a track end, so do not advance the queue.
+                if (previousPlaylistPos === 0 && !loadFailed) {
                     sendIfCurrent('renderer-player-track-ended');
                 }
                 mpv?.pause();
@@ -479,6 +485,9 @@ ipcMain.on('player-seek-to', async (_event, time: number) => {
 
 // Sets the queue in position 0 and 1 to the given data. Used when manually starting a song or using the next/prev buttons
 ipcMain.on('player-set-queue', async (_event, current?: string, next?: string, pause?: boolean) => {
+    const generation = ++setQueueGeneration;
+    loadFailed = false;
+
     if (!current && !next) {
         try {
             await getMpvInstance()?.clearPlaylist();
@@ -489,20 +498,20 @@ ipcMain.on('player-set-queue', async (_event, current?: string, next?: string, p
         }
     }
 
-    // When pause is requested (e.g. preload after reload while UI is STOPPED/PAUSED), mpv still
-    // briefly resumes on load. Suppress those events so they do not overwrite renderer status.
-    const shouldSuppressLoadEvents = pause === true;
-    if (shouldSuppressLoadEvents) {
-        suppressRendererPlaybackEvents = true;
-    }
+    // Loading emits transient pause/resume and playlist-pos changes (a failed load looks like a
+    // track end). The renderer already knows the intended state, so suppress them while loading.
+    suppressRendererPlaybackEvents = true;
 
     try {
         if (current) {
             try {
                 await getMpvInstance()?.load(current, 'replace');
             } catch (error: any | NodeMpvError) {
-                mpvLog({ action: `Failed to load current song` }, error);
-                await getMpvInstance()?.play();
+                if (generation === setQueueGeneration) {
+                    mpvLog({ action: `Failed to load current song` }, error);
+                    loadFailed = true;
+                }
+                return;
             }
 
             if (next) {
@@ -519,8 +528,11 @@ ipcMain.on('player-set-queue', async (_event, current?: string, next?: string, p
     } catch (err: any | NodeMpvError) {
         mpvLog({ action: `Failed to set play queue` }, err);
     } finally {
-        if (shouldSuppressLoadEvents) {
+        if (generation === setQueueGeneration) {
             suppressRendererPlaybackEvents = false;
+            if (loadFailed) {
+                sendRendererPlaybackEvent('renderer-player-stop');
+            }
         }
     }
 });
@@ -799,7 +811,17 @@ const cleanupMpv = async (force = false) => {
 // (the connection silently dropped while the network adapter was suspended). Tell
 // the renderer to reload mpv so it reconnects with a fresh stream instead of staying
 // stuck on the old, now-dead connection until the app is manually restarted.
+// Electron on Linux emits 'resume' twice per wake (observed 1-6 ms apart).
+// Reloading twice spawns two mpv instances whose listeners both forward events, so every track
+// change triggers auto-next twice and skips a song (#2532).
+const RESUME_DEBOUNCE_MS = 2000;
+let lastResumeAt = 0;
 powerMonitor.on('resume', () => {
+    const now = Date.now();
+    if (now - lastResumeAt < RESUME_DEBOUNCE_MS) {
+        return;
+    }
+    lastResumeAt = now;
     mpvLog({ action: 'System resumed from sleep, notifying renderer to reconnect mpv' });
     getMainWindow()?.webContents.send('renderer-mpv-reconnect');
 });
