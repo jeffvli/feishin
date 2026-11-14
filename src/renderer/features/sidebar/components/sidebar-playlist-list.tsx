@@ -798,6 +798,8 @@ export const CollapsedSidebarPlaylistList = () => {
                         tooltip={{ label: t(isOpen ? 'common.collapse' : 'common.expand') }}
                         variant="subtle"
                     />
+                </Group>
+                <Group gap="xs" justify="center" wrap="nowrap">
                     <SidebarPlaylistRefreshButton />
                     <ActionIcon
                         icon="add"
