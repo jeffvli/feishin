@@ -112,22 +112,33 @@ export const useAuthStore = createWithEqualityFn<AuthSlice>()(
                     },
                     updateServer: (id: string, args: Partial<ServerListItemWithCredential>) => {
                         const existingServer = get().serverList[id];
+                        const headersChanged =
+                            args.customHeaders !== undefined &&
+                            !areCustomHeadersEqual(
+                                existingServer?.customHeaders,
+                                args.customHeaders,
+                            );
+                        const urlChanged =
+                            args.url !== undefined && args.url !== existingServer?.url;
+                        const remoteUrlChanged =
+                            args.remoteUrl !== undefined &&
+                            args.remoteUrl !== existingServer?.remoteUrl;
                         if (
                             isElectron() &&
                             window.api?.serverHeaders &&
                             existingServer &&
-                            args.customHeaders !== undefined &&
-                            !areCustomHeadersEqual(existingServer.customHeaders, args.customHeaders)
+                            (headersChanged || urlChanged || remoteUrlChanged)
                         ) {
-                            if (existingServer.url) {
-                                window.api.serverHeaders
-                                    .clearCookies(existingServer.url)
-                                    .catch(() => {});
-                            }
-                            if (existingServer.remoteUrl) {
-                                window.api.serverHeaders
-                                    .clearCookies(existingServer.remoteUrl)
-                                    .catch(() => {});
+                            const urlsToClear = new Set(
+                                [
+                                    existingServer.url,
+                                    existingServer.remoteUrl,
+                                    args.url,
+                                    args.remoteUrl,
+                                ].filter((u): u is string => Boolean(u)),
+                            );
+                            for (const url of urlsToClear) {
+                                window.api.serverHeaders.clearCookies(url).catch(() => {});
                             }
                         }
 

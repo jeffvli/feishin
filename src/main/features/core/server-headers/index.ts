@@ -1,12 +1,11 @@
+import type { ServerHeaderRule } from '/@/shared/utils/server-headers';
+
 import { app, ipcMain, session } from 'electron';
 
 import { getMainWindow } from '/@/main/index';
 import log from '/@/main/logger';
 
-export type ServerHeaderRule = {
-    baseUrl: string;
-    headers: Record<string, string>;
-};
+export type { ServerHeaderRule };
 
 let serverHeaderRules: ServerHeaderRule[] = [];
 // Rules for servers that are not saved yet (e.g. while adding a server). They take

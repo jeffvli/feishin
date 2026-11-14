@@ -41,7 +41,7 @@ import { useFocusTrap } from '/@/shared/hooks/use-focus-trap';
 import { useForm } from '/@/shared/hooks/use-form';
 import { AuthenticationResponse, ServerListItemWithCredential } from '/@/shared/types/domain-types';
 import { DiscoveredServerItem, ServerType, toServerType } from '/@/shared/types/types';
-import { HEADER_NAME_PATTERN, normalizeCustomHeaders } from '/@/shared/utils/server-headers';
+import { hasInvalidCustomHeader, normalizeCustomHeaders } from '/@/shared/utils/server-headers';
 
 const autodiscover = isElectron() ? window.api.autodiscover : null;
 const localSettings = isElectron() ? window.api.localSettings : null;
@@ -218,15 +218,7 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
             });
         }
 
-        const invalidHeader = values.customHeaders.find((entry) => {
-            const key = entry.key.trim();
-            const value = entry.value.trim();
-            if (!key && !value) return false;
-            if (!key || !value) return true;
-            return !HEADER_NAME_PATTERN.test(key);
-        });
-
-        if (invalidHeader) {
+        if (hasInvalidCustomHeader(values.customHeaders)) {
             return toast.error({
                 message: t('form.addServer.error_customHeaderInvalid'),
             });
@@ -487,6 +479,12 @@ export const AddServerForm = ({ onCancel }: AddServerFormProps) => {
                             disabled={!form.values.name || !form.values.url}
                             isLoading={isQuickConnectLoading}
                             onStart={async () => {
+                                if (hasInvalidCustomHeader(form.values.customHeaders)) {
+                                    toast.error({
+                                        message: t('form.addServer.error_customHeaderInvalid'),
+                                    });
+                                    return;
+                                }
                                 await setPendingServerHeaders(
                                     form.values.url,
                                     normalizeCustomHeaders(form.values.customHeaders),

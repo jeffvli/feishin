@@ -1,9 +1,8 @@
+import type { ServerHeaderRule } from '/@/shared/utils/server-headers';
+
 import { ipcRenderer } from 'electron';
 
-export type ServerHeaderRule = {
-    baseUrl: string;
-    headers: Record<string, string>;
-};
+export type { ServerHeaderRule };
 
 const sync = (rules: ServerHeaderRule[]): Promise<void> => {
     return ipcRenderer.invoke('server-headers-sync', rules);

@@ -14,6 +14,7 @@ import { getMpvProperties } from '/@/renderer/features/settings/components/playb
 import {
     getServerById,
     setMpvInitialized,
+    useCurrentServer,
     useMpvInitialized,
     usePlaybackSettings,
     usePlayerActions,
@@ -273,6 +274,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
     }, [isInitialized, preservePitch]);
 
     // Update custom HTTP headers for MPV
+    const currentServerHeaders = useCurrentServer()?.customHeaders;
     useEffect(() => {
         if (!mpvPlayer || !isInitialized) {
             return;
@@ -287,7 +289,7 @@ export const MpvPlayerEngine = (props: MpvPlayerEngineProps) => {
         mpvPlayer.setProperties({
             'http-header-fields': getMpvHeaderFields(currentSong?._serverId),
         });
-    }, [currentSong?.id, currentSong?._serverId, isInitialized]);
+    }, [currentServerHeaders, currentSong?.id, currentSong?._serverId, isInitialized]);
 
     // Handle play/pause status
     useEffect(() => {

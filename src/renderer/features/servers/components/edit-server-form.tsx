@@ -10,7 +10,9 @@ import { setPendingServerHeaders } from '/@/renderer/api/server-headers';
 import { CustomHeadersInput } from '/@/renderer/features/servers/components/custom-headers-input';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { getServerById, useAuthStoreActions } from '/@/renderer/store';
+import { normalizeServerUrl } from '/@/renderer/utils/normalize-server-url';
 import { Checkbox } from '/@/shared/components/checkbox/checkbox';
+import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
 import { ModalButton } from '/@/shared/components/modal/model-shared';
@@ -27,7 +29,7 @@ import {
     ServerListItemWithCredential,
     ServerType,
 } from '/@/shared/types/domain-types';
-import { HEADER_NAME_PATTERN, normalizeCustomHeaders } from '/@/shared/utils/server-headers';
+import { hasInvalidCustomHeader, normalizeCustomHeaders } from '/@/shared/utils/server-headers';
 
 const localSettings = isElectron() ? window.api.localSettings : null;
 
@@ -88,15 +90,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
         try {
             setIsLoading(true);
 
-            const invalidHeader = values.customHeaders.find((entry) => {
-                const key = entry.key.trim();
-                const value = entry.value.trim();
-                if (!key && !value) return false;
-                if (!key || !value) return true;
-                return !HEADER_NAME_PATTERN.test(key);
-            });
-
-            if (invalidHeader) {
+            if (hasInvalidCustomHeader(values.customHeaders)) {
                 setIsLoading(false);
                 return toast.error({
                     message: t('form.addServer.error_customHeaderInvalid'),
@@ -104,11 +98,12 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
             }
 
             const normalizedCustomHeaders = normalizeCustomHeaders(values.customHeaders);
+            const normalizedUrl = normalizeServerUrl(values.url);
 
             // Check if we can skip authentication
             const usernameChanged = values.username !== server.username;
             const passwordProvided = values.password && values.password.trim() !== '';
-            const urlChanged = values.url !== server.url;
+            const urlChanged = normalizedUrl !== normalizeServerUrl(server.url);
             const typeChanged = values.type !== server.type;
 
             // Skip authentication if username hasn't changed, password is empty, and URL/type haven't changed
@@ -122,6 +117,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 // Use existing server credentials
                 const existingServer = getServerById(server.id);
                 if (!existingServer) {
+                    setIsLoading(false);
                     return toast.error({
                         message: t('error.invalidServer'),
                     });
@@ -133,21 +129,22 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     id: server.id,
                     name: values.name,
                     type: values.type,
-                    url: values.url,
+                    url: normalizedUrl,
                 };
             } else {
                 // Need to authenticate
                 const authFunction = api.controller.authenticate;
 
                 if (!authFunction) {
+                    setIsLoading(false);
                     return toast.error({
                         message: t('error.invalidServer'),
                     });
                 }
 
-                await setPendingServerHeaders(values.url, normalizedCustomHeaders);
+                await setPendingServerHeaders(normalizedUrl, normalizedCustomHeaders);
                 data = await authFunction(
-                    values.url,
+                    normalizedUrl,
                     {
                         legacy: values.legacyAuth,
                         password: values.password,
@@ -157,6 +154,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                 );
 
                 if (!data) {
+                    setIsLoading(false);
                     return toast.error({
                         message: t('error.authenticationFailed'),
                     });
@@ -169,7 +167,7 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     isAdmin: data.isAdmin,
                     name: values.name,
                     type: values.type,
-                    url: values.url,
+                    url: normalizedUrl,
                     userId: data.userId,
                     username: data.username,
                 };
@@ -295,14 +293,18 @@ export const EditServerForm = ({ isUpdate, onCancel, password, server }: EditSer
                     </Group>
                 )}
                 {isElectron() && (
-                    <CustomHeadersInput
-                        entries={form.values.customHeaders}
-                        keyLabel={t('form.addServer.input_customHeaderKey')}
-                        onAddLabel={t('form.addServer.input_customHeaderAdd')}
-                        onChange={(entries) => form.setFieldValue('customHeaders', entries)}
-                        onRemoveLabel={t('form.addServer.input_customHeaderRemove')}
-                        valueLabel={t('form.addServer.input_customHeaderValue')}
-                    />
+                    <>
+                        <Divider />
+                        <CustomHeadersInput
+                            entries={form.values.customHeaders}
+                            keyLabel={t('form.addServer.input_customHeaderKey')}
+                            onAddLabel={t('form.addServer.input_customHeaderAdd')}
+                            onChange={(entries) => form.setFieldValue('customHeaders', entries)}
+                            onRemoveLabel={t('form.addServer.input_customHeaderRemove')}
+                            valueLabel={t('form.addServer.input_customHeaderValue')}
+                        />
+                        <Divider />
+                    </>
                 )}
                 <TextInput
                     label={t('form.addServer.input', {
