@@ -14,6 +14,7 @@ import {
     getSongsByFolder,
 } from '/@/renderer/features/player/utils';
 import { playlistsQueries } from '/@/renderer/features/playlists/api/playlists-api';
+import { usePlaylistsContainingSongs } from '/@/renderer/features/playlists/hooks/use-playlists-containing-songs';
 import { useRecentPlaylists } from '/@/renderer/features/playlists/hooks/use-recent-playlists';
 import { useAddToPlaylist } from '/@/renderer/features/playlists/mutations/add-to-playlist-mutation';
 import { useCurrentServer, useCurrentServerId } from '/@/renderer/store';
@@ -163,6 +164,66 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
         },
         [queryClient, server],
     );
+
+    const isSongItem =
+        itemType === LibraryItem.SONG ||
+        itemType === LibraryItem.PLAYLIST_SONG ||
+        itemType === LibraryItem.QUEUE_SONG;
+
+    const songPlaylists = useMemo(() => playlists ?? [], [playlists]);
+
+    const { inPlaylist, isReady } = usePlaylistsContainingSongs({
+        playlists: songPlaylists,
+        serverId,
+        songIds: isSongItem ? items : undefined,
+    });
+
+    const playlistMapQuery = useQuery({
+        enabled: !isSongItem && !!playlists && !!serverId && items.length > 0,
+        queryFn: async () => {
+            const playlistMap = await Promise.all(
+                (playlists ?? []).map(async (playlist) => {
+                    const playlistSongs = await getSongsByPlaylist(playlist.id);
+
+                    return [
+                        playlist.id,
+                        items.some((songId) =>
+                            playlistSongs?.items?.some((song) => song.id === songId),
+                        ),
+                    ] as const;
+                }),
+            );
+
+            return new Map(playlistMap);
+        },
+        queryKey: ['context-menu-playlist-membership', serverId, itemType, items, playlists],
+    });
+
+    const isInPlaylist = (playlistId: string) =>
+        isSongItem
+            ? inPlaylist[songPlaylists.findIndex((p) => p.id === playlistId)]
+            : playlistMapQuery.data?.get(playlistId);
+
+    // Unknown until this playlist's ids load. Duplicates are still skipped when adding
+    const isChecking = (playlistId: string) =>
+        isSongItem && !isReady && isInPlaylist(playlistId) === undefined;
+
+    const getMembershipProps = (playlistId: string) => {
+        if (isChecking(playlistId)) {
+            return {
+                rightIcon: 'spinner' as const,
+                tooltip: t('form.addToPlaylist.checkingPlaylist'),
+            };
+        }
+
+        return isInPlaylist(playlistId)
+            ? {
+                  disabled: skipDuplicates,
+                  rightIcon: 'check' as const,
+                  tooltip: t('form.addToPlaylist.alreadyInPlaylist'),
+              }
+            : {};
+    };
 
     const handleAddToPlaylist = useCallback(
         async (playlistId: string, playlistName: string) => {
@@ -404,6 +465,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                             onSelect={() =>
                                 handleAddToPlaylist(recentPlaylist.id, recentPlaylist.name)
                             }
+                            {...getMembershipProps(recentPlaylist.id)}
                         >
                             {recentPlaylist.name}
                         </ContextMenu.Item>
@@ -417,6 +479,7 @@ export const AddToPlaylistAction = ({ items, itemType }: AddToPlaylistActionProp
                     <ContextMenu.Item
                         key={playlist.id}
                         onSelect={() => handleAddToPlaylist(playlist.id, playlist.name)}
+                        {...getMembershipProps(playlist.id)}
                     >
                         {playlist.name}
                     </ContextMenu.Item>

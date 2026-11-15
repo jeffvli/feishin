@@ -42,6 +42,9 @@ export const useDeletePlaylist = (args: MutationHookArgs) => {
             ...options,
             onSuccess: (data, variables, context) => {
                 const { serverId } = variables.apiClientProps;
+                queryClient.removeQueries({
+                    queryKey: queryKeys.playlists.songListIds(serverId, variables.query.id),
+                });
                 queryClient.invalidateQueries({
                     exact: false,
                     queryKey: queryKeys.playlists.root(serverId),

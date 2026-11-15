@@ -33,6 +33,10 @@ export const useUpdatePlaylistTracks = (args: MutationHookArgs) => {
                 queryClient.invalidateQueries({
                     queryKey: queryKeys.playlists.songList(serverId, body.id),
                 });
+                // No id delta to patch with, drop it so the next check refetches this playlist
+                queryClient.removeQueries({
+                    queryKey: queryKeys.playlists.songListIds(serverId, body.id),
+                });
             }
         },
         ...options,

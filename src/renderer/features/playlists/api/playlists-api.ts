@@ -53,6 +53,20 @@ export const playlistsQueries = {
             ...args.options,
         });
     },
+    playlistSongIds: (args: QueryHookArgs<PlaylistSongListQuery>) => {
+        return queryOptions({
+            gcTime: Infinity,
+            queryFn: ({ signal }) => {
+                return api.controller.getPlaylistSongIds({
+                    apiClientProps: { serverId: args.serverId, signal },
+                    query: args.query,
+                });
+            },
+            queryKey: queryKeys.playlists.songListIds(args.serverId || '', args.query.id),
+            staleTime: Infinity,
+            ...args.options,
+        });
+    },
     songList: (args: QueryHookArgs<PlaylistSongListQuery>) => {
         return queryOptions({
             queryFn: ({ signal }) => {
