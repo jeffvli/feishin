@@ -691,8 +691,7 @@ export type LeafNode = {
 export type PlaylistFolderScope = 'owned' | 'shared';
 
 export type PlaylistGroup =
-    | { item: Playlist; type: 'root' }
-    | { items: Playlist[]; name: string; type: 'folder' };
+    { item: Playlist; type: 'root' } | { items: Playlist[]; name: string; type: 'folder' };
 
 export type TreeNode = FolderNode | LeafNode;
 

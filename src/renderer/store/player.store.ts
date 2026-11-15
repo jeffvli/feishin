@@ -1301,7 +1301,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 (i) => i.albumId !== currentItem.albumId,
                             );
 
-                            nextIndex = nextIndexWithNextAlbum;
+                            nextIndex = Math.max(0, nextIndexWithNextAlbum);
                         } else {
                             const queueStartingFromCurrent = queue.items.slice(currentIndex);
                             const nextIndexWithNextAlbum = queueStartingFromCurrent.findIndex(
