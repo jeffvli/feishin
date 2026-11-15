@@ -1,3 +1,6 @@
+/* Keep this file name unique: CSS module classes are named fs-[name]-[local], so a
+   same-named module elsewhere would share (and override) these class names. */
+
 .group {
     flex-wrap: nowrap;
     gap: var(--theme-spacing-sm) var(--theme-spacing-xs);
