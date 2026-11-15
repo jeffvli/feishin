@@ -1226,7 +1226,8 @@ export const NavidromeController: InternalControllerEndpoint = {
     search: async (args) => {
         const { apiClientProps, query } = args;
 
-        if (!query.musicFolderId?.length) {
+        // Subsonic controller can handle single folder query (string, or string[1])
+        if (!Array.isArray(query.musicFolderId) || query.musicFolderId.length === 1) {
             return SubsonicController.search(args);
         }
 
