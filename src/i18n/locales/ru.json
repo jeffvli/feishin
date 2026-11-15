@@ -185,7 +185,7 @@
     },
     "entity": {
         "album_one": "Альбом",
-        "album_few": "Альбома",
+        "album_few": "Альбомы",
         "album_many": "Альбомов",
         "genre_one": "Жанр",
         "genre_few": "Жанра",

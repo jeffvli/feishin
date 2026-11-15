@@ -52,7 +52,9 @@
         "scrobbleForceSubmit": "Forzar scrobble",
         "sleepTimer_endOfAlbum": "Fin del álbum actual",
         "nextAlbum": "Alt+clic para el siguiente álbum",
-        "previousAlbum": "Alt+clic para el álbum anterior"
+        "previousAlbum": "Alt+clic para el álbum anterior",
+        "queueSection_queue": "Cola",
+        "queueSection_upNext": "Próximamente"
     },
     "setting": {
         "crossfadeStyle_description": "Selecciona el estilo de crossfade a usar por el reproductor de audio",
@@ -543,7 +545,9 @@
         "imagePlaceholderPriority": "Prioridad del marcador de posición de la imagen",
         "imagePlaceholderPriority_description": "Establece el tipo de marcador de posición de imagen a usar mientras se carga si está disponible",
         "imagePlaceholderPriority_optionBlurhash": "BlurHash",
-        "imagePlaceholderPriority_optionThumbhash": "ThumbHash"
+        "imagePlaceholderPriority_optionThumbhash": "ThumbHash",
+        "upNextQueue_description": "Reproducir a continuación añade canciones a la sección Próximamente tras la canción actual, en el orden en que fueron añadidas. Próximamente permanece en su lugar cuando se mezcla o se sustituye la cola. Desactivar para insertar cada canción de Reproducir a continuación directamente tras la canción actual",
+        "upNextQueue": "Cola Próximamente"
     },
     "action": {
         "editPlaylist": "Editar $t(entity.playlist, {\"count\": 1})",

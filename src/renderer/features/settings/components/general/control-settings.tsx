@@ -181,6 +181,27 @@ export const ControlSettings = memo(() => {
         {
             control: (
                 <Switch
+                    aria-label="Up Next queue"
+                    defaultChecked={settings.upNextQueue}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                upNextQueue: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.upNextQueue', {
+                context: 'description',
+            }),
+            isHidden: false,
+            title: t('setting.upNextQueue'),
+        },
+        {
+            control: (
+                <Switch
                     aria-label="Follow current song"
                     defaultChecked={settings.followCurrentSong}
                     onChange={(e) =>

@@ -47,12 +47,7 @@ export enum SortOrder {
 export type AnyLibraryItem = Album | AlbumArtist | Artist | Playlist | QueueSong | Song;
 
 export type AnyLibraryItems =
-    | Album[]
-    | AlbumArtist[]
-    | Artist[]
-    | Playlist[]
-    | QueueSong[]
-    | Song[];
+    Album[] | AlbumArtist[] | Artist[] | Playlist[] | QueueSong[] | Song[];
 
 export interface PlayerData {
     currentSong: QueueSong | undefined;
@@ -68,6 +63,8 @@ export interface PlayerData {
 
 export interface QueueData {
     default: string[];
+    // Up Next: _uniqueIds added with "Play next", kept in order directly after the current song
+    priority: string[];
     shuffled: number[];
     songs: Record<string, QueueSong>;
 }
@@ -1438,7 +1435,7 @@ export type RandomSongListArgs = BaseEndpointArgs & {
 };
 
 export type RandomSongListQuery = {
-    genre?: string;
+    genre?: Pick<Genre, 'id' | 'name'>;
     limit?: number;
     maxYear?: number;
     minYear?: number;

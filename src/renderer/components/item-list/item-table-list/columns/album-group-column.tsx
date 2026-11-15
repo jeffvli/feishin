@@ -21,13 +21,16 @@ export const AlbumGroupColumn = (props: ItemTableListInnerColumn) => {
         (playType: Play) => {
             if (!item || !props.controls?.onDoubleClick) return;
 
-            const isHeaderEnabled = !!props.enableHeader;
-            const index = isHeaderEnabled ? props.rowIndex - 1 : props.rowIndex;
+            // Resolve the data index through the row id like the other cells,
+            // since the display row index no longer matches the data index
+            // when group header rows are present.
+            const rowId = props.internalState.extractRowId(item);
+            const index = rowId ? props.internalState.findItemIndex(rowId) : -1;
 
             props.controls.onDoubleClick({
                 event: null,
                 index,
-                internalState: (props as any).internalState,
+                internalState: props.internalState,
                 item,
                 itemType: props.itemType,
                 meta: { playType },

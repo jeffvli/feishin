@@ -52,7 +52,9 @@
         "scrobbleForceSubmit": "Forcer le scrobble",
         "sleepTimer_endOfAlbum": "Fin de l'album actuel",
         "nextAlbum": "Alt+clic pour l'album suivant",
-        "previousAlbum": "Alt+clic pour l'album précédent"
+        "previousAlbum": "Alt+clic pour l'album précédent",
+        "queueSection_queue": "file d'attente",
+        "queueSection_upNext": "À suivre"
     },
     "action": {
         "editPlaylist": "Éditer $t(entity.playlist, {\"count\": 1})",
@@ -822,10 +824,10 @@
         "discordDisplayType_songname": "Nom du titre",
         "discordDisplayType_artistname": "Nom(s) d’artiste",
         "hotkey_navigateHome": "Aller à l'accueil",
-        "preventSleepOnPlayback_description": "Empêcher l’écran de s’éteindre pendant la lecture de la musique",
+        "preventSleepOnPlayback_description": "Empêcher l’écran de s’éteindre pendant la lecture de musique",
         "preventSleepOnPlayback": "Empêche la mise en veille lors de la lecture",
         "discordLinkType": "Lien du statut d'activité {{discord}}",
-        "discordLinkType_description": "Ajoute des liens externes vers {{lastfm}} ou {{musicbrainz}} aux champs titre et artiste du statut d'activité {{discord}}. {{musicbrainz}} est la méthode la plus précise, mais nécessite des balises et ne fournit pas de liens vers les artistes, tandis que {{lastfm}} devrait toujours fournir un lien. aucune requête réseau supplémentaire n'est effectuée",
+        "discordLinkType_description": "Ajoute les liens {{lastfm}} ou {{musicbrainz}} au statut d'activité {{discord}}. {{musicbrainz}} est la méthode la plus précise, mais nécessite des balises et ne fournit pas de liens vers les artistes, tandis que {{lastfm}} devrait toujours fournir un lien. aucune requête réseau supplémentaire n'est effectuée",
         "discordLinkType_none": "$t(common.none)",
         "discordLinkType_mbz_lastfm": "{{musicbrainz}} avec {{lastfm}} comme solution de repli",
         "artistBackground": "Image d'arrière-plan de l'artiste",
@@ -1081,7 +1083,9 @@
         "playerbarWaveformStretch": "Étirement de l'onde",
         "sidebarImageEnabled_description": "Affiche un bouton sur la pochette d'album de la barre du lecteur pour l'agrandir dans la barre latérale. Désactiver cette option masque aussi le bouton et réduit la pochette si elle est actuellement agrandie",
         "microtonalPitchControls": "Contrôles de hauteur microtonale",
-        "microtonalPitchControls_description": "Ajoute d'autres contrôles de hauteur pour passer d'un demi-ton à un autre"
+        "microtonalPitchControls_description": "Ajoute d'autres contrôles de hauteur pour passer d'un demi-ton à un autre",
+        "upNextQueue_description": "Jouer ensuite ajoute les titres à une section À suivre après le titre actuel, dans l'odre dans lequel ils sont été ajouté. À suivre reste le suivant lorsque la file d'attente est mélangée ou remplacée. Désactiver pour insérer chaque lecture suivant directement après la chanson actuelle",
+        "upNextQueue": "File d'attente à suivre"
     },
     "form": {
         "deletePlaylist": {

@@ -1139,7 +1139,9 @@
         "imagePlaceholderPriority_optionBlurhash": "BlurHash",
         "imagePlaceholderPriority_optionDominantColor": "Color dominant",
         "imagePlaceholderPriority_optionOff": "Desactivat",
-        "imagePlaceholderPriority_optionThumbhash": "ThumbHash"
+        "imagePlaceholderPriority_optionThumbhash": "ThumbHash",
+        "upNextQueue_description": "Reprodueix a continuació afegeix cançons a la secció A continuació després de la cançó actual, en l'ordre en què es van afegir. A continuació es queda següent quan es barreja o se substitueix la cua. Desactiva per inserir cada reproducció directament després de la cançó actual",
+        "upNextQueue": "Cua a continuació"
     },
     "table": {
         "column": {
@@ -1362,7 +1364,9 @@
         "scrobbleForceSubmit": "Força l'scrobble",
         "sleepTimer_endOfAlbum": "Final de l'àlbum actual",
         "nextAlbum": "Alt+clic pel següent àlbum",
-        "previousAlbum": "Alt+clic per l'àlbum anterior"
+        "previousAlbum": "Alt+clic per l'àlbum anterior",
+        "queueSection_queue": "Cua",
+        "queueSection_upNext": "A continuació"
     },
     "error": {
         "credentialsRequired": "Credencials requerides",

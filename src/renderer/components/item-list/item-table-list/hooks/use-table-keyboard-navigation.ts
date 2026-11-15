@@ -89,8 +89,7 @@ export const useTableKeyboardNavigation = ({
 
             const mainContainer = rowRef.current?.childNodes[0] as HTMLDivElement | undefined;
             const pinnedRightContainer = pinnedRightColumnRef.current?.childNodes[0] as
-                | HTMLDivElement
-                | undefined;
+                HTMLDivElement | undefined;
 
             // Use right pinned column scroll position if right-pinned columns exist
             const scrollContainer =

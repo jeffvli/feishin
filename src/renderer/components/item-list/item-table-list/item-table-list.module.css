@@ -103,6 +103,11 @@
     border-bottom: 1px solid var(--theme-colors-border);
 }
 
+/* Play queue group bands paint the full row surface without border lines */
+.sticky-group-row-band {
+    background-color: var(--theme-colors-surface);
+}
+
 .sticky-group-row-content {
     display: flex;
     flex-direction: row;

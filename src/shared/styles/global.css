@@ -125,7 +125,6 @@ button {
     font-display: swap;
 }
 
-
 @font-face {
     font-family: Inter;
     font-weight: 100 1000;
@@ -330,9 +329,13 @@ button {
 
     @mixin light-root {
         --theme-colors-border: rgb(0 0 0 / 5%);
+        --theme-colors-row-hover: rgb(0 0 0 / 3%);
+        --theme-colors-row-selected: rgb(0 0 0 / 6%);
     }
 
     @mixin dark-root {
         --theme-colors-border: rgb(255 255 255 / 10%);
+        --theme-colors-row-hover: rgb(255 255 255 / 3%);
+        --theme-colors-row-selected: rgb(255 255 255 / 6%);
     }
 }

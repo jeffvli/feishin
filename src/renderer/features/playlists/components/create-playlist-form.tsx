@@ -48,6 +48,7 @@ export const CreatePlaylistForm = ({ onCancel, songs }: CreatePlaylistFormProps)
         initialValues: {
             comment: '',
             name: '',
+            public: false,
             queryBuilderRules: undefined,
         },
     });

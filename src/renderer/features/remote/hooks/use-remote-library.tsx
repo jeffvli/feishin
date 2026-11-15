@@ -13,7 +13,7 @@ import { songsQueries } from '/@/renderer/features/songs/api/songs-api';
 import { queryClient } from '/@/renderer/lib/react-query';
 import { useArtistRadioCount } from '/@/renderer/store';
 import { useAuthStore } from '/@/renderer/store/auth.store';
-import { usePlayerStoreBase } from '/@/renderer/store/player.store';
+import { isUpNextQueueBoundaryDrop, usePlayerStoreBase } from '/@/renderer/store/player.store';
 import { useRemoteSettings } from '/@/renderer/store/settings.store';
 import {
     Album,
@@ -463,7 +463,12 @@ export const useRemoteLibrary = () => {
         remote.requestReorderQueue(({ edge, targetUniqueId, uniqueId }) => {
             const movedSong = getQueue().find((item) => item._uniqueId === uniqueId);
             if (!movedSong) return;
-            moveSelectedTo([movedSong], edge, targetUniqueId);
+            moveSelectedTo(
+                [movedSong],
+                edge,
+                targetUniqueId,
+                isUpNextQueueBoundaryDrop(targetUniqueId, edge),
+            );
         });
 
         remote.requestPlayRadio(async ({ id }) => {
