@@ -11,6 +11,7 @@ import { store } from '../settings';
 
 import { isMacOS, isWindows } from '/@/main/env';
 import { PlayerData } from '/@/shared/types/domain-types';
+import { sanitizeForDiagnostics } from '/@/shared/utils/sanitize-for-diagnostics';
 
 declare module 'node-mpv';
 
@@ -310,7 +311,10 @@ const setAudioPlayerFallback = (isError: boolean) => {
 };
 
 ipcMain.on('player-set-properties', async (_event, data: Record<string, any>) => {
-    mpvLog({ action: `Setting properties: ${JSON.stringify(data)}`, level: 'debug' });
+    mpvLog({
+        action: `Setting properties: ${JSON.stringify(sanitizeForDiagnostics(data))}`,
+        level: 'debug',
+    });
     if (data.length === 0) {
         return;
     }
@@ -322,7 +326,12 @@ ipcMain.on('player-set-properties', async (_event, data: Record<string, any>) =>
             getMpvInstance()?.setMultipleProperties(data);
         }
     } catch (err: any | NodeMpvError) {
-        mpvLog({ action: `Failed to set properties: ${JSON.stringify(data)}` }, err);
+        mpvLog(
+            {
+                action: `Failed to set properties: ${JSON.stringify(sanitizeForDiagnostics(data))}`,
+            },
+            err,
+        );
     }
 });
 
@@ -331,7 +340,7 @@ ipcMain.handle(
     async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
         try {
             mpvLog({
-                action: `Attempting to initialize mpv with parameters: ${JSON.stringify(data)}`,
+                action: `Attempting to initialize mpv with parameters: ${JSON.stringify(sanitizeForDiagnostics(data))}`,
                 level: 'debug',
             });
 
@@ -366,7 +375,7 @@ ipcMain.handle(
     async (_event, data: { extraParameters?: string[]; properties?: Record<string, any> }) => {
         try {
             mpvLog({
-                action: `Attempting to initialize mpv with parameters: ${JSON.stringify(data)}`,
+                action: `Attempting to initialize mpv with parameters: ${JSON.stringify(sanitizeForDiagnostics(data))}`,
                 level: 'debug',
             });
             mpvCreatePromise = createMpv(data);

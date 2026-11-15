@@ -5,6 +5,7 @@ import './lyrics';
 import './player';
 import './remote';
 import './settings';
+import './server-headers';
 import './discord-rpc';
 import './tag-editor';
 import './visualizer';
