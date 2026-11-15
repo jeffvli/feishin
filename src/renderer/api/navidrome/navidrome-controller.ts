@@ -784,7 +784,7 @@ export const NavidromeController: InternalControllerEndpoint = {
         const res = await ssApiClient(apiClientProps).getRandomSongListMultipleFolderIds({
             query: {
                 fromYear: query.minYear,
-                genre: query.genre,
+                genre: query.genre?.name,
                 musicFolderId: query.musicFolderId,
                 size: query.limit,
                 toYear: query.maxYear,
