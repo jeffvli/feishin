@@ -152,7 +152,7 @@
         "validate-color": "^2.2.4",
         "wavesurfer.js": "^7.12.12",
         "ws": "^8.22.2",
-        "zod": "^3.25.76",
+        "zod": "^4.6.6",
         "zustand": "^5.1.0"
     },
     "devDependencies": {
