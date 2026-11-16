@@ -229,7 +229,7 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
             if (!isLiveSlot(slot)) {
                 if (isNetworkError && networkRetryCountRef.current < MAX_NETWORK_RETRIES) {
                     networkRetryCountRef.current += 1;
-                    setTimeout(() => target.load(), NETWORK_RETRY_DELAY_MS);
+                    setTimeout(() => !isLiveSlot(slot) && target.load(), NETWORK_RETRY_DELAY_MS);
                 }
                 logger.warn('Preload error on inactive player', {
                     code,
@@ -300,6 +300,18 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
         networkRetryCount1.current = 0;
         networkRetryCount2.current = 0;
     }, [src1, src2]);
+
+    useEffect(() => {
+        const [ref, retryCount] =
+            playerNum === 1 ? [player1Ref, networkRetryCount1] : [player2Ref, networkRetryCount2];
+        const audio = ref.current?.getInternalPlayer();
+        if (!audio?.error) {
+            return;
+        }
+
+        retryCount.current = 0;
+        audio.load();
+    }, [playerNum]);
 
     // When not playing, always pause both players — even during a transition
     useEffect(() => {
