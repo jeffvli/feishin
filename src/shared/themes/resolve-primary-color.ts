@@ -5,27 +5,34 @@ import { AppTheme } from '/@/shared/themes/app-theme-types';
 
 export interface PrimaryColorSettings {
     accent: string;
+    primaryColor?: string;
     primaryShade: number;
     useThemeAccentColor: boolean;
     useThemePrimaryShade: boolean;
 }
 
-// Mirrors the `--theme-colors-primary`-setting effect in
-// src/renderer/themes/use-app-theme.ts — kept as its own small pure function
-// rather than imported from there (that hook does a lot more: font
-// stylesheets, custom-theme registry lookups, DOM mutation timing tied to
-// its own component lifecycle) so this stays safe to call from a context
-// that never mounts that hook, like computing what value to push to the
-// remote for a specific theme regardless of which one is locally active.
-// Keep in sync with that effect if the shade-resolution logic ever changes.
+// Single shade-resolution shared by the useAppTheme --theme-colors-primary
+// effect, the useAppThemeColors export (waveform playerbar reads the color
+// straight from it), and remote settings push, which needs to know what to
+// push to the remote for a specific theme regardless of which one is locally
+// active. The primaryColor override lets callers pass an already-chosen raw
+// primary, such as the one picked from album art.
 export function resolveThemePrimaryColor(
-    overrideTheme: AppTheme,
-    { accent, primaryShade, useThemeAccentColor, useThemePrimaryShade }: PrimaryColorSettings,
+    overrideTheme: AppTheme | string,
+    {
+        accent,
+        primaryColor: primaryColorOverride,
+        primaryShade,
+        useThemeAccentColor,
+        useThemePrimaryShade,
+    }: PrimaryColorSettings,
 ): string {
     const themeProperties = getAppTheme(overrideTheme);
-    const primaryColor = useThemeAccentColor
-        ? themeProperties.colors?.primary || themeProperties.colors?.['state-info'] || accent
-        : accent;
+    const primaryColor =
+        primaryColorOverride ??
+        (useThemeAccentColor
+            ? themeProperties.colors?.primary || themeProperties.colors?.['state-info'] || accent
+            : accent);
     const effectivePrimaryShade = useThemePrimaryShade
         ? themeProperties.mantineOverride?.primaryShade
         : { dark: primaryShade, light: primaryShade };
