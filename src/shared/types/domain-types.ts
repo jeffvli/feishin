@@ -1562,6 +1562,7 @@ export const instanceOfCancellationError = (error: any) => {
 
 export enum LyricSource {
     GENIUS = 'Genius',
+    LRC_RED = 'lrc.red',
     LRCLIB = 'lrclib.net',
     NETEASE = 'NetEase',
     SIMPMUSIC = 'SimpMusic',
