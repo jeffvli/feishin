@@ -382,6 +382,10 @@ export const ApplicationSettings = memo(() => {
                                 ...settings,
                                 resume: e.currentTarget.checked,
                             },
+                            // Resume on start has nothing to resume without the saved queue
+                            ...(!e.currentTarget.checked && {
+                                playback: { resumeAfterStart: false },
+                            }),
                         });
                     }}
                 />
