@@ -1,4 +1,5 @@
 import { t } from 'i18next';
+import isElectron from 'is-electron';
 import { useCallback, useEffect, useMemo, useState, WheelEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -9,6 +10,10 @@ import { PlayerConfig } from '/@/renderer/features/player/components/player-conf
 import { CustomPlayerbarSlider } from '/@/renderer/features/player/components/playerbar-slider';
 import { SleepTimerButton } from '/@/renderer/features/player/components/sleep-timer-button';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
+import {
+    setMiniPlayer,
+    useMiniPlayerStore,
+} from '/@/renderer/features/player/store/mini-player.store';
 import { useAudioDevices } from '/@/renderer/features/settings/components/playback/audio-settings';
 import {
     ListConfigBooleanControl,
@@ -102,6 +107,7 @@ export const RightControls = () => {
                 <LyricsButton />
                 {showFavorites && <FavoriteButton />}
                 <QueueButton />
+                {isElectron() && <MiniPlayerButton />}
                 {playbackType === PlayerType.DLNA ? <DlnaVolumeButton /> : <VolumeButton />}
             </Group>
             <Group h="calc(100% / 3)" />
@@ -380,6 +386,30 @@ const QueueButton = () => {
                 handleToggleQueue();
             }}
             opened={popoverOpened}
+        />
+    );
+};
+
+const MiniPlayerButton = () => {
+    const { bindings } = useHotkeySettings();
+    const handleToggle = () => setMiniPlayer(!useMiniPlayerStore.getState().enabled);
+
+    useHotkeys([[bindings.toggleMiniPlayer.hotkey, handleToggle]]);
+
+    return (
+        <ActionIcon
+            icon="pictureInPicture"
+            iconProps={{ size: 'lg' }}
+            onClick={(e) => {
+                e.stopPropagation();
+                handleToggle();
+            }}
+            size="sm"
+            tooltip={{
+                label: t('player.miniPlayer'),
+                openDelay: 0,
+            }}
+            variant="subtle"
         />
     );
 };

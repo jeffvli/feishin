@@ -94,6 +94,8 @@ const BINDINGS_MAP: Record<BindingActions, string> = {
     toggleFullscreenPlayer: i18n.t('setting.hotkey', {
         context: 'toggleFullScreenPlayer',
     }),
+    // Mini player is desktop-only; an empty label hides it from the list
+    toggleMiniPlayer: isElectron() ? i18n.t('setting.hotkey', { context: 'toggleMiniPlayer' }) : '',
     toggleQueue: i18n.t('setting.hotkey', { context: 'toggleQueue' }),
     toggleRepeat: i18n.t('setting.hotkey', {
         context: 'toggleRepeat',
