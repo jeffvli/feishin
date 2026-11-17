@@ -748,7 +748,7 @@ async function createWindow(first = true): Promise<void> {
         mainWindow?.webContents.downloadURL(url);
     });
 
-    const globalMediaKeysEnabled = store.get('global_media_hotkeys', true) as boolean;
+    const globalMediaKeysEnabled = store.get('global_media_hotkeys', !isLinux()) as boolean;
 
     if (globalMediaKeysEnabled) {
         enableMediaKeys(mainWindow);
@@ -1044,7 +1044,7 @@ ipcMain.on(
             rebuildMainMenu();
         }
 
-        const globalMediaKeysEnabled = store.get('global_media_hotkeys', true) as boolean;
+        const globalMediaKeysEnabled = store.get('global_media_hotkeys', !isLinux()) as boolean;
 
         if (globalMediaKeysEnabled) {
             enableMediaKeys(mainWindow);
