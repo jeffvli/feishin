@@ -10,7 +10,9 @@ import { NDRadioListSort, NDSongListSort } from '/@/shared/api/navidrome/navidro
 import { ssNormalize } from '/@/shared/api/subsonic/subsonic-normalize';
 import { getFeatures, hasFeature, hasFeatureWithVersion, VersionInfo } from '/@/shared/api/utils';
 import {
+    AlbumArtistListSort,
     albumArtistListSortMap,
+    AlbumListSort,
     albumListSortMap,
     DeleteArtistImageArgs,
     DeleteArtistImageResponse,
@@ -778,7 +780,34 @@ export const NavidromeController: InternalControllerEndpoint = {
 
         return SubsonicController.getPlayQueue(args);
     },
-    getRandomSongList: SubsonicController.getRandomSongList,
+    getRandomSongList: async (args) => {
+        const { apiClientProps, query } = args;
+
+        const res = await ssApiClient(apiClientProps).getRandomSongListMultipleFolderIds({
+            query: {
+                fromYear: query.minYear,
+                genre: query.genre?.name,
+                musicFolderId: query.musicFolderId,
+                size: query.limit,
+                toYear: query.maxYear,
+            },
+        });
+
+        if (res.status !== 200) {
+            throw new Error('Failed to get random songs');
+        }
+
+        const results = res.body.randomSongs?.song || [];
+        const normalizedResults = results.map((song) =>
+            ssNormalize.song(song, apiClientProps.server),
+        );
+
+        return {
+            items: normalizedResults,
+            startIndex: 0,
+            totalRecordCount: normalizedResults.length,
+        };
+    },
     getRoles: async ({ apiClientProps }) =>
         hasFeature(apiClientProps.server, ServerFeature.BFR) ? NAVIDROME_ROLES : [],
     getScanStatus: SubsonicController.getScanStatus,
@@ -1221,7 +1250,58 @@ export const NavidromeController: InternalControllerEndpoint = {
         return SubsonicController.savePlayQueue(args);
     },
     scrobble: SubsonicController.scrobble,
-    search: SubsonicController.search,
+    search: async (args) => {
+        const { apiClientProps, query } = args;
+
+        // Subsonic controller can handle single folder query (string, or string[1])
+        if (!Array.isArray(query.musicFolderId) || query.musicFolderId.length === 1) {
+            return SubsonicController.search(args);
+        }
+
+        const [albumArtists, albums, songs] = await Promise.all([
+            query.albumArtistLimit === 0
+                ? []
+                : NavidromeController.getAlbumArtistList({
+                      apiClientProps,
+                      query: {
+                          limit: query.albumArtistLimit ?? 20,
+                          musicFolderId: query.musicFolderId,
+                          searchTerm: query.query,
+                          sortBy: AlbumArtistListSort.NAME,
+                          sortOrder: SortOrder.ASC,
+                          startIndex: query.albumArtistStartIndex ?? 0,
+                      },
+                  }).then((result) => result.items),
+            query.albumLimit === 0
+                ? []
+                : NavidromeController.getAlbumList({
+                      apiClientProps,
+                      query: {
+                          limit: query.albumLimit ?? 20,
+                          musicFolderId: query.musicFolderId,
+                          searchTerm: query.query,
+                          sortBy: AlbumListSort.NAME,
+                          sortOrder: SortOrder.ASC,
+                          startIndex: query.albumStartIndex ?? 0,
+                      },
+                  }).then((result) => result.items),
+            query.songLimit === 0
+                ? []
+                : NavidromeController.getSongList({
+                      apiClientProps,
+                      query: {
+                          limit: query.songLimit ?? 20,
+                          musicFolderId: query.musicFolderId,
+                          searchTerm: query.query,
+                          sortBy: SongListSort.NAME,
+                          sortOrder: SortOrder.ASC,
+                          startIndex: query.songStartIndex ?? 0,
+                      },
+                  }).then((result) => result.items),
+        ]);
+
+        return { albumArtists, albums, songs };
+    },
     setPlaylistSongs: SubsonicController.setPlaylistSongs,
     setRating: SubsonicController.setRating,
     shareItem: async (args) => {
