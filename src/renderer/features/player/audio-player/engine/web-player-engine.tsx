@@ -1,7 +1,14 @@
 import type { RefObject } from 'react';
 import type ReactPlayer from 'react-player';
 
-import { useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import {
+    useCallback,
+    useEffect,
+    useImperativeHandle,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from 'react';
 
 import { AudioPlayer, PlayerOnProgressProps } from '/@/renderer/features/player/audio-player/types';
 import { convertToLogVolume } from '/@/renderer/features/player/audio-player/utils/player-utils';
@@ -85,7 +92,7 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
     const player2Ref = useRef<null | ReactPlayer>(null);
     const networkRetryCount1 = useRef(0);
     const networkRetryCount2 = useRef(0);
-    const activeRef = useRef({ isTransitioning, playerNum, playerStatus });
+    const activeRef = useRef({ playerNum, playerStatus });
     const [ReactPlayerComponent, setReactPlayerComponent] = useState<any>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -195,14 +202,11 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
         }
     };
 
-    useEffect(() => {
-        activeRef.current = { isTransitioning, playerNum, playerStatus };
-    }, [isTransitioning, playerNum, playerStatus]);
+    useLayoutEffect(() => {
+        activeRef.current = { playerNum, playerStatus };
+    }, [playerNum, playerStatus]);
 
-    const isLiveSlot = (slot: 1 | 2) => {
-        const active = activeRef.current;
-        return slot === active.playerNum || active.isTransitioning;
-    };
+    const isActiveSlot = (slot: 1 | 2) => slot === activeRef.current.playerNum;
 
     const handleOnError = (
         slot: 1 | 2,
@@ -226,10 +230,10 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                 code === MediaError.MEDIA_ERR_NETWORK ||
                 code === MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED;
 
-            if (!isLiveSlot(slot)) {
+            if (!isActiveSlot(slot)) {
                 if (isNetworkError && networkRetryCountRef.current < MAX_NETWORK_RETRIES) {
                     networkRetryCountRef.current += 1;
-                    setTimeout(() => !isLiveSlot(slot) && target.load(), NETWORK_RETRY_DELAY_MS);
+                    setTimeout(() => !isActiveSlot(slot) && target.load(), NETWORK_RETRY_DELAY_MS);
                 }
                 logger.warn('Preload error on inactive player', {
                     code,
@@ -250,7 +254,7 @@ export const WebPlayerEngine = (props: WebPlayerEngineProps) => {
                     const audio = target;
                     setTimeout(() => {
                         const shouldPlay =
-                            isLiveSlot(slot) &&
+                            isActiveSlot(slot) &&
                             activeRef.current.playerStatus === PlayerStatus.PLAYING;
 
                         audio.load();
