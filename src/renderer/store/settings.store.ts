@@ -327,6 +327,7 @@ const DiscordSettingsSchema = z.object({
     linkType: DiscordLinkTypeSchema,
     showAsListening: z.boolean(),
     showPaused: z.boolean(),
+    showPublicCover: z.boolean(),
     showServerImage: z.boolean(),
     showStateIcon: z.boolean(),
 });
@@ -1322,6 +1323,7 @@ const initialState: SettingsState = {
         linkType: DiscordLinkType.NONE,
         showAsListening: false,
         showPaused: true,
+        showPublicCover: false,
         showServerImage: false,
         showStateIcon: true,
     },
@@ -2933,10 +2935,16 @@ export const useSettingsStore = createWithEqualityFn<SettingsSlice>()(
                     });
                 }
 
+                if (version < 35) {
+                    if (state.discord && state.discord.showPublicCover === undefined) {
+                        state.discord.showPublicCover = false;
+                    }
+                }
+
                 return persistedState;
             },
             name: 'store_settings',
-            version: 34,
+            version: 35,
         },
     ),
 );

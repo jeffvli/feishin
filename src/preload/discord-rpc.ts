@@ -24,10 +24,20 @@ const quit = () => {
     ipcRenderer.invoke('discord-rpc-quit');
 };
 
+const lookupCover = (query: {
+    album?: string;
+    albumArtist?: string;
+    artist?: string;
+    mbzAlbumId?: string;
+}): Promise<null | string> => {
+    return ipcRenderer.invoke('discord-rpc-lookup-cover', query);
+};
+
 export const discordRpc = {
     clearActivity,
     initialize,
     isConnected,
+    lookupCover,
     quit,
     setActivity,
 };

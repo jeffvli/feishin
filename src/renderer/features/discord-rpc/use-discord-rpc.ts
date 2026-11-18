@@ -301,14 +301,36 @@ export const useDiscordRpc = () => {
                 song?.album &&
                 song?.albumArtists.length
             ) {
-                const albumInfo = await fetch(
-                    `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${lastfmApiKey}&artist=${encodeURIComponent(song.albumArtists[0].name)}&album=${encodeURIComponent(song.album)}&format=json`,
-                );
+                try {
+                    const albumInfo = await fetch(
+                        `https://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=${lastfmApiKey}&artist=${encodeURIComponent(song.albumArtists[0].name)}&album=${encodeURIComponent(song.album)}&format=json`,
+                    );
 
-                const albumInfoJson = await albumInfo.json();
+                    const albumInfoJson = await albumInfo.json();
 
-                if (albumInfoJson.album?.image?.[3]['#text']) {
-                    activity.largeImageKey = albumInfoJson.album.image[3]['#text'];
+                    if (albumInfoJson.album?.image?.[3]['#text']) {
+                        activity.largeImageKey = albumInfoJson.album.image[3]['#text'];
+                    }
+                } catch {
+                    /* empty */
+                }
+            }
+
+            // Keyless public lookup (Cover Art Archive -> iTunes -> Deezer), done in the main process
+            if (activity.largeImageKey === undefined && discordSettings.showPublicCover) {
+                try {
+                    const coverUrl = await discordRpc?.lookupCover({
+                        album: song.album || undefined,
+                        albumArtist: song.albumArtists?.[0]?.name || song.albumArtistName,
+                        artist: song.artists?.[0]?.name || song.artistName,
+                        mbzAlbumId: song.mbzAlbumId || undefined,
+                    });
+
+                    if (coverUrl && coverUrl.length <= MAX_URL_LENGTH) {
+                        activity.largeImageKey = coverUrl;
+                    }
+                } catch {
+                    /* empty */
                 }
             }
 
@@ -348,6 +370,7 @@ export const useDiscordRpc = () => {
         [
             discordSettings.showAsListening,
             discordSettings.showServerImage,
+            discordSettings.showPublicCover,
             discordSettings.showStateIcon,
             discordSettings.showPaused,
             lastfmApiKey,

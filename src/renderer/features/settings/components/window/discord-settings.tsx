@@ -236,6 +236,28 @@ export const DiscordSettings = memo(() => {
         },
         {
             control: (
+                <Switch
+                    checked={settings.showPublicCover}
+                    onChange={(e) => {
+                        setSettings({
+                            discord: {
+                                showPublicCover: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.discordPublicCover', {
+                context: 'description',
+                discord: 'Discord',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.discordPublicCover', {
+                discord: 'Discord',
+            }),
+        },
+        {
+            control: (
                 <TextInput
                     defaultValue={generalSettings.lastfmApiKey}
                     onBlur={(e) => {
