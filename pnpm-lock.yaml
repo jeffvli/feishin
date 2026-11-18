@@ -219,8 +219,8 @@ importers:
         specifier: ^2.2.2
         version: 2.2.2
       taglib-wasm:
-        specifier: ^1.8.3
-        version: 1.8.3(typescript@5.9.3)
+        specifier: ^2.4.1
+        version: 2.4.1(typescript@5.9.3)
       validate-color:
         specifier: ^2.2.4
         version: 2.2.4
@@ -5397,8 +5397,8 @@ packages:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
     engines: {node: '>=20'}
 
-  taglib-wasm@1.8.3:
-    resolution: {integrity: sha512-zrHpZ58PFZ3Z5YnhsvWknHpGGPuhj4hdXEuu1DucyyfPQR8SMcdAWCrQJSmQXuwIJ8BkEeCpv0uMuISCbHKdZA==}
+  taglib-wasm@2.4.1:
+    resolution: {integrity: sha512-GmEHzes4ddeJejXXTuwzxBz78WYwj4wk8enO4nP45iGiz8w5nHJfGtTeiX39H3XvEZo8X/V2+hjERHFUKFqpBA==}
     engines: {node: '>=24.0.0'}
     peerDependencies:
       typescript: '>=4.5.0'
@@ -11496,7 +11496,7 @@ snapshots:
 
   tagged-tag@1.0.0: {}
 
-  taglib-wasm@1.8.3(typescript@5.9.3):
+  taglib-wasm@2.4.1(typescript@5.9.3):
     dependencies:
       '@msgpack/msgpack': 3.1.3
     optionalDependencies:
