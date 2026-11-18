@@ -148,6 +148,7 @@ export const LeftControls = () => {
                                             enableViewport={false}
                                             fetchPriority="high"
                                             id={currentStationArt?.imageId ?? undefined}
+                                            isCurrentSong
                                             itemType={LibraryItem.RADIO_STATION}
                                             serverId={currentStationArt?.serverId}
                                             src={currentStationArt?.imageUrl ?? ''}
@@ -175,6 +176,7 @@ export const LeftControls = () => {
                                             explicitStatus={currentSong?.explicitStatus}
                                             fetchPriority="high"
                                             id={currentSong?.imageId}
+                                            isCurrentSong
                                             itemType={LibraryItem.SONG}
                                             serverId={currentSong?._serverId}
                                             thumbHash={currentSong?.thumbHash}

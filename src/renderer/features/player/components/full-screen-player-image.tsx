@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './full-screen-player-image.module.css';
 
-import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { useAnimateCovers, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { SharedFullscreenPlayerMetadata } from '/@/renderer/features/player/components/shared-full-screen-player-metadata';
 import {
     useIsRadioActive,
@@ -24,6 +24,7 @@ import { Badge } from '/@/shared/components/badge/badge';
 import { Center } from '/@/shared/components/center/center';
 import { Flex } from '/@/shared/components/flex/flex';
 import { Icon } from '/@/shared/components/icon/icon';
+import { useStillImageSrc } from '/@/shared/components/image/image';
 import { useSetState } from '/@/shared/hooks/use-set-state';
 import { ExplicitStatus, LibraryItem } from '/@/shared/types/domain-types';
 
@@ -64,6 +65,7 @@ const ImageWithPlaceholder = ({
 }) => {
     const nativeAspectRatio = useNativeAspectRatio();
     const useImageAspectRatio = useFullScreenPlayerStore((state) => state.useImageAspectRatio);
+    const stillSrc = useStillImageSrc(props.src, !useAnimateCovers(true));
 
     if (!props.src) {
         return (
@@ -90,6 +92,7 @@ const ImageWithPlaceholder = ({
                 width: nativeAspectRatio || useImageAspectRatio ? 'auto' : '100%',
             }}
             {...props}
+            src={stillSrc ?? props.src}
         />
     );
 };

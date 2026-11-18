@@ -87,6 +87,12 @@ const SIDE_QUEUE_LAYOUT_OPTIONS = [
     },
 ];
 
+const ANIMATED_COVERS_OPTIONS = [
+    { label: t('setting.animatedCovers', { context: 'optionAll' }), value: 'all' },
+    { label: t('setting.animatedCovers', { context: 'optionCurrentSong' }), value: 'currentSong' },
+    { label: t('setting.animatedCovers', { context: 'optionNone' }), value: 'none' },
+];
+
 const IMAGE_PLACEHOLDER_PRIORITY_OPTIONS = [
     {
         label: t('setting.imagePlaceholderPriority', {
@@ -669,6 +675,70 @@ export const ApplicationSettings = memo(() => {
             }),
             isHidden: false,
             title: t('setting.blurExplicitImages'),
+        },
+        {
+            control: (
+                <Select
+                    data={ANIMATED_COVERS_OPTIONS}
+                    defaultValue={settings.animatedCovers}
+                    onChange={(e) => {
+                        if (!e) return;
+                        setSettings({
+                            general: {
+                                ...settings,
+                                animatedCovers: e as typeof settings.animatedCovers,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.animatedCovers', {
+                context: 'description',
+            }),
+            isHidden: false,
+            title: t('setting.animatedCovers'),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label={t('setting.animatedCoversOnBattery')}
+                    defaultChecked={settings.animatedCoversOnBattery}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                animatedCoversOnBattery: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.animatedCoversOnBattery', {
+                context: 'description',
+            }),
+            isHidden: settings.animatedCovers === 'none',
+            title: t('setting.animatedCoversOnBattery'),
+        },
+        {
+            control: (
+                <Switch
+                    aria-label={t('setting.pauseAnimatedCoversWhenUnfocused')}
+                    defaultChecked={settings.pauseAnimatedCoversWhenUnfocused}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                pauseAnimatedCoversWhenUnfocused: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.pauseAnimatedCoversWhenUnfocused', {
+                context: 'description',
+            }),
+            isHidden: settings.animatedCovers === 'none',
+            title: t('setting.pauseAnimatedCoversWhenUnfocused'),
         },
         {
             control: (

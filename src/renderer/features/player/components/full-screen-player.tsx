@@ -13,7 +13,7 @@ import { useLocation } from 'react-router';
 
 import styles from './full-screen-player.module.css';
 
-import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { useAnimateCovers, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { FullScreenPlayerImage } from '/@/renderer/features/player/components/full-screen-player-image';
 import {
     FullScreenPlayerControls,
@@ -32,6 +32,7 @@ import {
     usePlayerSong,
 } from '/@/renderer/store';
 import { Group } from '/@/shared/components/group/group';
+import { useStillImageSrc } from '/@/shared/components/image/image';
 import { LibraryItem } from '/@/shared/types/domain-types';
 
 const mainBackground = 'var(--theme-colors-background)';
@@ -89,6 +90,10 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
     const previousSongRef = useRef<string | undefined>(currentSong?._uniqueId);
     const imageStateRef = useRef(imageState);
 
+    const freezeImages = !useAnimateCovers(true);
+    const topStill = useStillImageSrc(imageState.topImage, freezeImages);
+    const bottomStill = useStillImageSrc(imageState.bottomImage, freezeImages);
+
     // Keep ref in sync
     useEffect(() => {
         imageStateRef.current = imageState;
@@ -144,13 +149,15 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
                     key={`top-${topSongId || 'none'}`}
                     style={
                         {
-                            backgroundImage: imageState.topImage
-                                ? `url("${getBackgroundImageUrl(
-                                      imageState.topImage,
-                                      topSong?.id,
-                                      topSong?.albumId,
-                                  )}"), url("${imageState.topImage}")`
-                                : undefined,
+                            backgroundImage: topStill
+                                ? `url("${topStill}")`
+                                : imageState.topImage
+                                  ? `url("${getBackgroundImageUrl(
+                                        imageState.topImage,
+                                        topSong?.id,
+                                        topSong?.albumId,
+                                    )}"), url("${imageState.topImage}")`
+                                  : undefined,
                         } as CSSProperties
                     }
                     variants={backgroundImageVariants}
@@ -167,13 +174,15 @@ const BackgroundImage = memo(({ dynamicBackground, dynamicIsImage }: BackgroundI
                     key={`bottom-${bottomSongId || 'none'}`}
                     style={
                         {
-                            backgroundImage: imageState.bottomImage
-                                ? `url("${getBackgroundImageUrl(
-                                      imageState.bottomImage,
-                                      bottomSong?.id,
-                                      bottomSong?.albumId,
-                                  )}"), url("${imageState.bottomImage}")`
-                                : undefined,
+                            backgroundImage: bottomStill
+                                ? `url("${bottomStill}")`
+                                : imageState.bottomImage
+                                  ? `url("${getBackgroundImageUrl(
+                                        imageState.bottomImage,
+                                        bottomSong?.id,
+                                        bottomSong?.albumId,
+                                    )}"), url("${imageState.bottomImage}")`
+                                  : undefined,
                         } as CSSProperties
                     }
                     variants={backgroundImageVariants}

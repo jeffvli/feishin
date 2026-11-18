@@ -34,6 +34,8 @@ export interface ImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 's
     includeLoader?: boolean;
     includeUnloader?: boolean;
     isExplicit?: boolean;
+    // When false, animated images (WebP/APNG/GIF) show their first frame instead
+    playAnimation?: boolean;
     src: string | undefined;
     unloaderIcon?: keyof typeof AppIcon;
 }
@@ -71,6 +73,7 @@ export function BaseImage({
     isExplicit = false,
     onError,
     onLoad,
+    playAnimation = true,
     src,
     unloaderIcon = 'emptyImage',
     ...props
@@ -140,7 +143,11 @@ export function BaseImage({
                     fetchPriority={fetchPriority}
                     onError={onError}
                     onLoad={onLoad}
-                    src={nativeImage.displaySrc}
+                    src={
+                        playAnimation
+                            ? nativeImage.displaySrc
+                            : (nativeImage.stillSrc ?? nativeImage.displaySrc)
+                    }
                     {...props}
                 />
             ) : !src ? (
@@ -157,6 +164,14 @@ export function BaseImage({
 }
 
 export const Image = memo(BaseImage);
+
+// For plain <img>/CSS backgrounds: returns a first-frame URL when `wantStill` and the image is
+// animated, otherwise undefined (callers keep their original URL).
+export function useStillImageSrc(src: string | undefined, wantStill: boolean) {
+    const request = useMemo(() => (src ? { cacheKey: src, url: src } : undefined), [src]);
+    const { stillSrc } = useNativeImage({ enabled: wantStill, request });
+    return wantStill ? stillSrc : undefined;
+}
 
 const ImageContainer = forwardRef(
     (

@@ -1,10 +1,11 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useSyncExternalStore } from 'react';
 import z from 'zod';
 
 import { api } from '/@/renderer/api';
 import {
     GeneralSettingsSchema,
     getServerById,
+    useAnimatedCoversSettings,
     useAuthStore,
     useCurrentServerId,
     useGeneralSettings,
@@ -35,12 +36,57 @@ const getUnloaderIcon = (itemType: LibraryItem) => {
     }
 };
 
+const subscribeWindowFocus = (onChange: () => void) => {
+    window.addEventListener('focus', onChange);
+    window.addEventListener('blur', onChange);
+    return () => {
+        window.removeEventListener('focus', onChange);
+        window.removeEventListener('blur', onChange);
+    };
+};
+
+// Battery Status API (UPower on Linux). Desktops without a battery report `charging: true`.
+type BatteryManager = EventTarget & { charging: boolean };
+let isOnBattery = false;
+const batteryListeners = new Set<() => void>();
+(navigator as Navigator & { getBattery?: () => Promise<BatteryManager> })
+    .getBattery?.()
+    .then((battery) => {
+        const update = () => {
+            isOnBattery = !battery.charging;
+            batteryListeners.forEach((listener) => listener());
+        };
+        battery.addEventListener('chargingchange', update);
+        update();
+    })
+    .catch(() => {});
+const subscribeBattery = (onChange: () => void) => {
+    batteryListeners.add(onChange);
+    return () => {
+        batteryListeners.delete(onChange);
+    };
+};
+
+// Animated covers are decoded every frame on the CPU, even when the window is only covered.
+export const useAnimateCovers = (isCurrentSong = false) => {
+    const { animatedCovers, animatedCoversOnBattery, pauseWhenUnfocused } =
+        useAnimatedCoversSettings();
+    const isFocused = useSyncExternalStore(subscribeWindowFocus, () => document.hasFocus());
+    const onBattery = useSyncExternalStore(subscribeBattery, () => isOnBattery);
+
+    if (animatedCovers === 'none') return false;
+    if (onBattery && !animatedCoversOnBattery) return false;
+    if (animatedCovers === 'currentSong' && !isCurrentSong) return false;
+    return isFocused || !pauseWhenUnfocused;
+};
+
 const BaseItemImage = (
     props: Omit<ImageProps, 'id' | 'src'> & {
         blurHash?: null | string;
         dominantColor?: null | string;
         explicitStatus?: ExplicitStatus | null;
         id?: null | string;
+        isCurrentSong?: boolean;
         itemType: LibraryItem;
         serverId?: null | string;
         size?: number;
@@ -49,8 +95,18 @@ const BaseItemImage = (
         type?: keyof z.infer<typeof GeneralSettingsSchema>['imageRes'];
     },
 ) => {
-    const { blurHash, dominantColor, explicitStatus, serverId, size, src, thumbHash, ...rest } =
-        props;
+    const {
+        blurHash,
+        dominantColor,
+        explicitStatus,
+        isCurrentSong,
+        serverId,
+        size,
+        src,
+        thumbHash,
+        ...rest
+    } = props;
+    const playAnimation = useAnimateCovers(isCurrentSong);
     const { blurExplicitImages } = useGeneralSettings();
     const imagePlaceholderPriority = useImagePlaceholderPriority();
     const hashUrl = useImageHashUrl(thumbHash, blurHash, dominantColor, imagePlaceholderPriority);
@@ -80,6 +136,7 @@ const BaseItemImage = (
             hashUrl={hashUrl}
             imageRequest={imageRequest}
             isExplicit={isExplicit}
+            playAnimation={playAnimation}
             src={imageUrl}
             unloaderIcon={getUnloaderIcon(props.itemType)}
             {...rest}

@@ -6,7 +6,7 @@ import { Fragment, Suspense, useCallback, useRef } from 'react';
 
 import styles from './expanded-album-list-item.module.css';
 
-import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { useAnimateCovers, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { getDraggedItems } from '/@/renderer/components/item-list/helpers/get-dragged-items';
 import { useDefaultItemListControls } from '/@/renderer/components/item-list/helpers/item-list-controls';
 import {
@@ -25,6 +25,7 @@ import { useDragDrop } from '/@/renderer/hooks/use-drag-drop';
 import { useSetGlobalExpanded } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
+import { useStillImageSrc } from '/@/shared/components/image/image';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Separator } from '/@/shared/components/separator/separator';
 import { Spinner } from '/@/shared/components/spinner/spinner';
@@ -227,6 +228,7 @@ const ExpandedAlbumListItemContent = ({ albumData }: ExpandedAlbumListItemConten
         itemType: LibraryItem.ALBUM,
         type: 'itemCard',
     });
+    const stillImageUrl = useStillImageSrc(imageUrl, !useAnimateCovers());
 
     const color = useFastAverageColor({
         algorithm: 'sqrt',
@@ -302,7 +304,7 @@ const ExpandedAlbumListItemContent = ({ albumData }: ExpandedAlbumListItemConten
                         className={styles.backgroundImage}
                         style={{
                             ['--bg-color' as string]: color?.background,
-                            backgroundImage: `url(${imageUrl})`,
+                            backgroundImage: `url(${stillImageUrl ?? imageUrl})`,
                         }}
                     />
                     {songs && songs.length > 0 && (
