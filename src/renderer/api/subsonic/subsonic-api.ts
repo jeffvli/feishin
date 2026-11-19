@@ -191,6 +191,16 @@ export const contract = c.router({
             200: ssType._response.randomSongList,
         },
     },
+    // This is not an official OpenSubsonic endpoint (multiple folder IDs is not currently supported)
+    // Unless/until that is the case, use this for Navidrome's quirk only
+    getRandomSongListMultipleFolderIds: {
+        method: 'GET',
+        path: 'getRandomSongs.view',
+        query: ssType._parameters.randomSongListMultipleFolderIds,
+        responses: {
+            200: ssType._response.randomSongList,
+        },
+    },
     getScanStatus: {
         method: 'GET',
         path: 'getScanStatus.view',

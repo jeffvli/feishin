@@ -77,7 +77,7 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
         });
     };
 
-    if (item && 'name' in item && 'imageUrl' in item && 'artists' in item) {
+    if (item && 'name' in item && 'imageUrl' in item) {
         const rowHeight = props.getRowHeight(props.rowIndex, props);
         const path = getTitlePath(props.itemType, (rowItem as any).id as string);
         const align = props.columns[props.columnIndex]?.align || 'start';
@@ -165,19 +165,21 @@ export const DefaultTitleCombinedColumn = (props: ItemTableListInnerColumn) => {
                         <ExplicitIndicator explicitStatus={item?.explicitStatus} />
                         {item.name as string}
                     </Text>
-                    <div className={styles.artists}>
-                        <JoinedArtists
-                            artistName={item.albumArtist}
-                            artists={item.albumArtists}
-                            linkProps={{ fw: 400, isMuted: true }}
-                            rootTextProps={{
-                                className: styles.artists,
-                                fw: 400,
-                                isMuted: true,
-                                size: 'sm',
-                            }}
-                        />
-                    </div>
+                    {'albumArtists' in item && (
+                        <div className={styles.artists}>
+                            <JoinedArtists
+                                artistName={item.albumArtist}
+                                artists={item.albumArtists}
+                                linkProps={{ fw: 400, isMuted: true }}
+                                rootTextProps={{
+                                    className: styles.artists,
+                                    fw: 400,
+                                    isMuted: true,
+                                    size: 'sm',
+                                }}
+                            />
+                        </div>
+                    )}
                 </div>
             </TableColumnContainer>
         );

@@ -398,6 +398,14 @@ const randomSongListParameters = z.object({
     toYear: z.number().optional(),
 });
 
+const randomSongListMultipleFolderIdsParameters = z.object({
+    fromYear: z.number().optional(),
+    genre: z.string().optional(),
+    musicFolderId: z.union([z.string(), z.array(z.string())]).optional(),
+    size: z.number().optional(),
+    toYear: z.number().optional(),
+});
+
 const randomSongList = z.object({
     randomSongs: z
         .object({
@@ -938,6 +946,7 @@ export const ssType = {
         getTranscodeStream: getTranscodeStreamParameters,
         jukeboxControl: jukeboxControlParameters,
         randomSongList: randomSongListParameters,
+        randomSongListMultipleFolderIds: randomSongListMultipleFolderIdsParameters,
         removeFavorite: removeFavoriteParameters,
         reportPlayback: reportPlaybackParameters,
         savePlayQueueByIndex: savePlayQueueByIndexParameters,
