@@ -789,7 +789,9 @@
         "sleepTimer_cancel": "Tühista taimer",
         "scrobbleForceSubmit": "Sunnitud kraasimine",
         "nextAlbum": "Alt+klõps järgmise albumi esituseks",
-        "previousAlbum": "Alt+klõps eelmise albumi esituseks"
+        "previousAlbum": "Alt+klõps eelmise albumi esituseks",
+        "queueSection_queue": "Järjekord",
+        "queueSection_upNext": "Järgmisena"
     },
     "queryBuilder": {
         "standardTags": "Standardsildid",
@@ -1305,7 +1307,8 @@
         "sidebarImageEnabled": "Plaadiümbrise suurendamise nupp",
         "sidebarImageEnabled_description": "Kuvab pleieririba plaadiümbrisel nuppu selle laiendamiseks külgribale. Funktsiooni väljalülitamisel peidetakse nupp ning ahendatakse kaanepilt, kui see oli varem laiendatud",
         "scrobbleMinimumMode_optionSeconds": "Sekundit",
-        "scrobbleMinimumMode_optionPercentage": "Protsent"
+        "scrobbleMinimumMode_optionPercentage": "Protsent",
+        "upNextQueue": "'Järgmisena' järjekord"
     },
     "datetime": {
         "minuteShort": "m",

@@ -658,8 +658,7 @@ export const JellyfinController: InternalControllerEndpoint = {
         const yearsFilter = yearsGroup.length ? yearsGroup.join(',') : undefined;
 
         let artistQuery:
-            | Omit<z.infer<typeof jfType._parameters.albumList>, 'IncludeItemTypes'>
-            | undefined;
+            Omit<z.infer<typeof jfType._parameters.albumList>, 'IncludeItemTypes'> | undefined;
 
         if (query.artistIds) {
             // Based mostly off of observation, this is the behavior I've seen:
@@ -1290,7 +1289,7 @@ export const JellyfinController: InternalControllerEndpoint = {
             },
             query: {
                 Fields: JF_FIELDS.SONG,
-                GenreIds: query.genre ? query.genre : undefined,
+                GenreIds: query.genre?.id,
                 IncludeItemTypes: getSongItemTypes(apiClientProps.server),
                 IsPlayed:
                     query.played === Played.Never

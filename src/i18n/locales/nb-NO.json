@@ -333,7 +333,18 @@
             "input_preferInstantMixDescription": "Bruk bare øyeblikkelig miks for innhenting av lignende sanger. nyttig hvis du har tilleggsmoduler som endrer funksjonaliteten",
             "input_preferRemoteUrl": "Foretrekk offentlig url",
             "input_remoteUrl": "Offentlig url",
-            "input_remoteUrlPlaceholder": "Valgfritt: offentlig nettadresse for eksterne funksjoner"
+            "input_remoteUrlPlaceholder": "Valgfritt: offentlig nettadresse for eksterne funksjoner",
+            "input_enableAudiobooks": "Aktiver lydbøker",
+            "input_enableAudiobooksDescription": "Vis lydbok-innhold fra \"Books\"-bibliotek",
+            "input_jellyfinQuickConnect": "Hurtigkobling",
+            "input_jellyfinQuickConnectCode": "Skriv inn følgende kode i Jellyfin Web for å bli autorisert",
+            "input_jellyfinQuickConnectCodeCopied": "Kopiert",
+            "input_jellyfinQuickConnectCodeCopy": "Kopier kode",
+            "input_jellyfinQuickConnectOpen": "Åpne hurtigkobling",
+            "input_jellyfinQuickConnectWaiting": "Vent på godkjenning fra din Jellyfin server…",
+            "input_jellyfinSignInMethod": "Logg inn med",
+            "input_jellyfinSignInMethodPassword": "Passord",
+            "input_jellyfinSignInMethodQuickConnect": "Hurtigkobling"
         },
         "addToPlaylist": {
             "success": "La $t(entity.trackWithCount, {\"count\": {{message}} }) til $t(entity.playlistWithCount, {\"count\": {{numOfPlaylists}} })",

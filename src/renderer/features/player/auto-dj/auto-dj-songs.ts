@@ -112,7 +112,7 @@ const collectSongsSimilar = async (args: AutoDjSongCollectArgs): Promise<Song[]>
             const genreSimilarSongs = await args.queryClient.fetchQuery({
                 ...songsQueries.random({
                     query: {
-                        genre: genre.id,
+                        genre: { id: genre.id, name: genre.name },
                         limit: genreLimit,
                         played: Played.All,
                     },

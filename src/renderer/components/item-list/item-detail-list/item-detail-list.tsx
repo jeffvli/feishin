@@ -1221,9 +1221,7 @@ const DetailListHeader = memo(
                                 justifyContent: colTypeToJustifyContentMap[col.align],
                                 minWidth: isFixedColumn ? fixedWidth : 0,
                                 textAlign: colTypeToAlignMap[col.align] as
-                                    | 'center'
-                                    | 'left'
-                                    | 'right',
+                                    'center' | 'left' | 'right',
                             };
 
                             return (

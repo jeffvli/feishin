@@ -1328,7 +1328,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 (i) => i.albumId !== currentItem.albumId,
                             );
 
-                            nextIndex = nextIndexWithNextAlbum;
+                            nextIndex = Math.max(0, nextIndexWithNextAlbum);
                         } else {
                             const queueStartingFromCurrent = queue.items.slice(currentIndex);
                             const nextIndexWithNextAlbum = queueStartingFromCurrent.findIndex(
@@ -1565,7 +1565,10 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                     }
 
                     const currentTimestamp = useTimestampStoreBase.getState().timestamp;
-                    const newTimestamp = Math.min(duration - 1, currentTimestamp + timeToSkip);
+                    const newTimestamp = Math.min(
+                        duration / 1000 - 1,
+                        currentTimestamp + timeToSkip,
+                    );
 
                     // See mediaSkipBackward: update the timestamp store right away to
                     // avoid the stale-read left by the ~500ms engine poll.
