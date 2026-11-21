@@ -467,15 +467,10 @@ axiosClient.interceptors.response.use(
     },
     (error) => {
         if (error.response && error.response.status === 401) {
-            const currentServer = useAuthStore.getState().currentServer;
-
-            if (currentServer) {
-                useAuthStore
-                    .getState()
-                    .actions.updateServer(currentServer.id, { credential: undefined });
-            }
-
-            authenticationFailure(currentServer);
+            authenticationFailure({
+                credential: error.config?.authCredential,
+                serverId: error.config?.authServerId,
+            });
         }
 
         return Promise.reject(error);
@@ -525,6 +520,8 @@ export const jfApiClient = (args: {
 
             try {
                 const result = await axiosClient.request({
+                    authCredential: token,
+                    authServerId: server?.id,
                     data: body,
                     headers: {
                         ...headers,
