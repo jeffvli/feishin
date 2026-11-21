@@ -241,6 +241,15 @@ export const useMediaSession = () => {
         }
     }, [radioMetadata, isRadioPlaying, isMediaSessionEnabled, debouncedUpdateMetadata]);
 
+    // Publish a restored track even when no track-change event follows mounting.
+    useEffect(() => {
+        if (!isMediaSessionEnabled || isRadioActiveRef.current) {
+            return;
+        }
+
+        debouncedUpdateMetadata(usePlayerStore.getState().getCurrentSong());
+    }, [isMediaSessionEnabled, debouncedUpdateMetadata]);
+
     // Subscribe directly to the player store instead of using usePlayerEvents.
     // usePlayerEvents receives inline handler objects that cause it to re-subscribe on every
     // render, which destroys and recreates the media session on play/pause and track changes.
