@@ -17,11 +17,19 @@ const BATCH_CONCURRENCY = 8;
 /**
  * Known PROPERTIES stay camelCase for the taglib-wasm JS API. Custom tags use
  * TagLib's ALL_CAPS wire form so read/write/settings keys stay consistent.
+ * LYRICS is the lowercase `lyrics` key so the editor uses its textarea and the
+ * unsynchronized-lyrics API.
  */
+const isLyricsPropertyKey = (key: string): boolean => key.toUpperCase() === 'LYRICS';
+
 const canonicalizePropertyKey = (key: string): string => {
+    if (isLyricsPropertyKey(key)) return 'lyrics';
     if (key in PROPERTIES) return key;
     return key.toUpperCase();
 };
+
+/** Joins lyric values so embedded newlines and blank lines stay intact. */
+const lyricsTextFromValues = (values: string[]): string => values.join('\n');
 
 /** Returns an error entry for each path that is missing or not writable by the current process. */
 export async function checkPathsWritable(paths: string[]): Promise<BatchFileError[]> {
@@ -56,12 +64,28 @@ function normalizeProperties(
     props: Record<string, string[] | undefined>,
 ): Record<string, TagValue> {
     const normalized: Record<string, TagValue> = {};
+    let lyrics: string | undefined;
     for (const [key, values] of Object.entries(props)) {
-        if (values && values.length > 0 && values[0] !== '') {
+        if (!values || values.length === 0) continue;
+
+        if (isLyricsPropertyKey(key)) {
+            const text = lyricsTextFromValues(values);
+            // Prefer the lowercase key filled from getLyrics(); keep a wire-form
+            // value only when that key did not already supply text.
+            if (key === 'lyrics') {
+                if (text.length > 0) lyrics = text;
+            } else if (text.length > 0 && lyrics === undefined) {
+                lyrics = text;
+            }
+            continue;
+        }
+
+        if (values[0] !== '') {
             const canonicalKey = canonicalizePropertyKey(key);
             normalized[canonicalKey] = values.length === 1 ? values[0] : [...values];
         }
     }
+    if (lyrics) normalized.lyrics = lyrics;
     const coveredByUpperCase = new Set(
         Object.keys(normalized)
             .filter((k) => k !== k.toUpperCase())
@@ -156,7 +180,7 @@ export async function readFilesMetadataBatch(
                     const embeddedLyrics = file.getLyrics();
                     if (embeddedLyrics.length > 0) {
                         rawProperties.lyrics = [
-                            embeddedLyrics.map(({ text }) => text).join('\n\n'),
+                            lyricsTextFromValues(embeddedLyrics.map(({ text }) => text)),
                         ];
                     }
                     const normalized = normalizeProperties(rawProperties);
@@ -272,8 +296,10 @@ export async function writeFilesTags(
     await mapWithConcurrency(writablePaths, BATCH_CONCURRENCY, async (path) => {
         try {
             await taglib.edit(path, (file) => {
-                const propertyEdits = Object.entries(edits).filter(([key]) => key !== 'lyrics');
-                const propertyRemovals = removed.filter((key) => key !== 'lyrics');
+                const propertyEdits = Object.entries(edits).filter(
+                    ([key]) => !isLyricsPropertyKey(key),
+                );
+                const propertyRemovals = removed.filter((key) => !isLyricsPropertyKey(key));
 
                 if (propertyEdits.length > 0 || propertyRemovals.length > 0) {
                     const properties = file.properties();
@@ -291,14 +317,16 @@ export async function writeFilesTags(
                     file.setProperties(properties);
                 }
 
-                if (removed.includes('lyrics')) {
+                const lyricsEdit = Object.entries(edits).find(([key]) => isLyricsPropertyKey(key));
+                if (removed.some((key) => isLyricsPropertyKey(key))) {
                     file.setLyrics([]);
-                } else if (edits.lyrics !== undefined) {
+                } else if (lyricsEdit) {
+                    const lyricsValue = lyricsEdit[1];
                     file.setLyrics([
                         {
-                            text: Array.isArray(edits.lyrics)
-                                ? edits.lyrics.join('\n\n')
-                                : edits.lyrics,
+                            text: Array.isArray(lyricsValue)
+                                ? lyricsTextFromValues(lyricsValue)
+                                : lyricsValue,
                         },
                     ]);
                 }
