@@ -937,6 +937,8 @@
         "discordPausedStatus": "Show rich presence when paused",
         "discordRichPresence": "{{discord}} rich presence",
         "discordRichPresence_description": "Enable playback status in {{discord}} rich presence. Image keys are: {{icon}}, {{playing}}, and {{paused}}",
+        "discordPublicCover": "Look up {{discord}} album covers online",
+        "discordPublicCover_description": "When no other cover is available, find the album cover on Cover Art Archive, iTunes or Deezer (no API key needed). Album and artist names are sent to these services",
         "discordServeImage": "Serve {{discord}} images from server",
         "discordServeImage_description": "Share cover art for {{discord}} rich presence from server itself, only available for Jellyfin and Navidrome. {{discord}} uses a bot to fetch images, so your server must be reachable from the public internet",
         "discordStateIcon": "Show playing icon",

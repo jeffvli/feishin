@@ -90,6 +90,7 @@ These variables override app settings **on first run** when no persisted setting
 | `discord.linkType` | `none` | `FS_DISCORD_LINK_TYPE` | `last_fm` / `musicbrainz` / `musicbrainz_last_fm` / `none`. |
 | `discord.showAsListening` | `false` | `FS_DISCORD_SHOW_AS_LISTENING` | `true` / `false`. |
 | `discord.showPaused` | `true` | `FS_DISCORD_SHOW_PAUSED` | `true` / `false` — Show paused state. |
+| `discord.showPublicCover` | `false` | `FS_DISCORD_SHOW_PUBLIC_COVER` | `true` / `false` - Look up album covers on Cover Art Archive / iTunes / Deezer. |
 | `discord.showServerImage` | `false` | `FS_DISCORD_SHOW_SERVER_IMAGE` | `true` / `false`. |
 | `discord.showStateIcon` | `true` | `FS_DISCORD_SHOW_STATE_ICON` | `true` / `false`. |
 
