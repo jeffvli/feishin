@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { generatePath, Link } from 'react-router';
 
-import styles from './genre-badge-column.module.css';
+import styles from './genre-badge-detail-column.module.css';
 import { ItemDetailListCellProps } from './types';
 
 import { AppRoute } from '/@/renderer/router/routes';
