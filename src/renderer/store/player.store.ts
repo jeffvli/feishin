@@ -704,6 +704,12 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             break;
                         }
                         case Play.NOW: {
+                            const currentSongId = get().getCurrentSong()?.id;
+                            const isSameSong = Boolean(
+                                (playSongId && playSongId === currentSongId) ||
+                                newItems[0]?.id === currentSongId,
+                            );
+
                             clearActiveRadio();
 
                             set((state) => {
@@ -759,10 +765,16 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 syncUpNext(state);
                             });
 
+                            if (isSameSong) {
+                                eventEmitter.emit('PLAYER_SEEK_TO_TIMESTAMP', { timestamp: 0 });
+                            }
+
                             emitPlayerPlayEvent(targetSongUniqueId, set, get);
                             break;
                         }
                         case Play.SHUFFLE: {
+                            const currentSongId = get().getCurrentSong()?.id;
+
                             clearActiveRadio();
 
                             set((state) => {
@@ -786,6 +798,16 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 syncUpNext(state);
                             });
 
+                            const targetSong = get().getQueue().items[0];
+                            const isSameSong = Boolean(
+                                (playSongId && playSongId === currentSongId) ||
+                                targetSong?.id === currentSongId,
+                            );
+
+                            if (isSameSong) {
+                                eventEmitter.emit('PLAYER_SEEK_TO_TIMESTAMP', { timestamp: 0 });
+                            }
+
                             emitPlayerPlayEvent(targetSongUniqueId, set, get);
                             break;
                         }
@@ -800,6 +822,7 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         ? newItems.find((item) => item.id === playSongId)?._uniqueId
                         : undefined;
                     const currentSongUniqueId = get().getCurrentSong()?._uniqueId;
+                    const isSameSong = playSongId && playSongId === get().getCurrentSong()?.id;
 
                     set((state) => {
                         // Add new songs to songs object
@@ -915,6 +938,10 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                                 setTimestampStore(0);
                             }
                         });
+
+                        if (isSameSong) {
+                            eventEmitter.emit('PLAYER_SEEK_TO_TIMESTAMP', { timestamp: 0 });
+                        }
 
                         // Emit PLAYER_PLAY event if playback was started
                         if (playIndex !== undefined) {
@@ -1350,6 +1377,14 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 mediaPlay: (id?: string) => {
                     let playIndex: number | undefined;
 
+                    const currentSongId = get().getCurrentSong()?._uniqueId;
+                    const isSameSong = Boolean(id && currentSongId && id === currentSongId);
+
+                    if (isSameSong) {
+                        setTimestampStore(0);
+                        eventEmitter.emit('PLAYER_SEEK_TO_TIMESTAMP', { timestamp: 0 });
+                    }
+
                     // Playing a specific queue song should dismiss radio first.
                     if (id) {
                         clearActiveRadio();
@@ -1463,7 +1498,8 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                         previousIndex = queue.items.length - 1;
                     } else if (player.repeat === PlayerRepeat.NONE && isFirstTrack) {
                         // Repeat none: stay on first track if already there
-                        previousIndex = currentIndex;
+                        eventEmitter.emit('PLAYER_SEEK_TO_TIMESTAMP', { timestamp: 0 });
+                        return;
                     } else if (toPreviousAlbum) {
                         previousIndex = Math.max(
                             0,
