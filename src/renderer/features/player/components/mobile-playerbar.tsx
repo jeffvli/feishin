@@ -112,6 +112,7 @@ export const MobilePlayerbar = () => {
                                                     ? currentStationArt?.imageId
                                                     : currentSong.imageId
                                             }
+                                            isCurrentSong
                                             itemType={LibraryItem.SONG}
                                             thumbHash={isRadioActive ? null : currentSong.thumbHash}
                                             type="table"

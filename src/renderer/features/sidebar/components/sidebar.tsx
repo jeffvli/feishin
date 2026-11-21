@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import styles from './sidebar.module.css';
 
-import { useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import { useAnimateCovers, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
 import { ContextMenuController } from '/@/renderer/features/context-menu/context-menu-controller';
 import {
     useIsRadioActive,
@@ -43,7 +43,7 @@ import { Center } from '/@/shared/components/center/center';
 import { Divider } from '/@/shared/components/divider/divider';
 import { Group } from '/@/shared/components/group/group';
 import { Icon } from '/@/shared/components/icon/icon';
-import { ImageUnloader } from '/@/shared/components/image/image';
+import { ImageUnloader, useStillImageSrc } from '/@/shared/components/image/image';
 import { ScrollArea } from '/@/shared/components/scroll-area/scroll-area';
 import { Text } from '/@/shared/components/text/text';
 import { Tooltip } from '/@/shared/components/tooltip/tooltip';
@@ -190,6 +190,8 @@ const SidebarImage = () => {
         imagePlaceholderPriority,
     );
 
+    const stillImageUrl = useStillImageSrc(imageUrl, !useAnimateCovers(true));
+
     const radioImageUrl = useItemImageUrl({
         id: isRadioActive ? currentStationArt?.imageId || undefined : undefined,
         imageUrl: isRadioActive ? currentStationArt?.imageUrl || undefined : undefined,
@@ -258,7 +260,7 @@ const SidebarImage = () => {
                                 blurExplicitImages,
                         })}
                         loading="eager"
-                        src={imageUrl}
+                        src={stillImageUrl ?? imageUrl}
                         style={
                             songHashUrl
                                 ? {

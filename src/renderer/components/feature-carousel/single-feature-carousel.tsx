@@ -6,7 +6,11 @@ import { generatePath, Link } from 'react-router';
 
 import styles from './feature-carousel.module.css';
 
-import { ItemImage, useItemImageUrl } from '/@/renderer/components/item-image/item-image';
+import {
+    ItemImage,
+    useAnimateCovers,
+    useItemImageUrl,
+} from '/@/renderer/components/item-image/item-image';
 import { usePlayer } from '/@/renderer/features/player/context/player-context';
 import { BackgroundOverlay } from '/@/renderer/features/shared/components/library-background-overlay';
 import { calculateTitleSize } from '/@/renderer/features/shared/components/library-header';
@@ -16,6 +20,7 @@ import { AppRoute } from '/@/renderer/router/routes';
 import { useCurrentServer } from '/@/renderer/store';
 import { ActionIcon } from '/@/shared/components/action-icon/action-icon';
 import { Group } from '/@/shared/components/group/group';
+import { useStillImageSrc } from '/@/shared/components/image/image';
 import { Separator } from '/@/shared/components/separator/separator';
 import { Stack } from '/@/shared/components/stack/stack';
 import { TextTitle } from '/@/shared/components/text-title/text-title';
@@ -70,6 +75,7 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
         itemType: LibraryItem.ALBUM,
         type: 'itemCard',
     });
+    const stillImageUrl = useStillImageSrc(imageUrl, !useAnimateCovers());
 
     const { background: backgroundColor } = useFastAverageColor({
         algorithm: 'dominant',
@@ -98,7 +104,7 @@ const CarouselItem = ({ album }: CarouselItemProps) => {
                 <div
                     className={styles.blurredBackground}
                     style={{
-                        backgroundImage: `url(${imageUrl})`,
+                        backgroundImage: `url(${stillImageUrl ?? imageUrl})`,
                         filter: 'blur(3rem)',
                     }}
                 />

@@ -517,6 +517,8 @@ export const GeneralSettingsSchema = z.object({
     albumGroupItems: z.array(SortableItemSchema(AlbumGroupItemSchema)),
     albumGroupShowFavoriteRating: z.boolean(),
     albumGroupVerticalLayout: z.boolean(),
+    animatedCovers: z.enum(['all', 'currentSong', 'none']),
+    animatedCoversOnBattery: z.boolean(),
     artistBackground: z.boolean(),
     artistBackgroundBlur: z.number(),
     artistItems: z.array(SortableItemSchema(ArtistItemSchema)),
@@ -557,6 +559,7 @@ export const GeneralSettingsSchema = z.object({
     passwordStore: z.string().optional(),
     pathReplace: z.string(),
     pathReplaceWith: z.string(),
+    pauseAnimatedCoversWhenUnfocused: z.boolean(),
     playButtonBehavior: z.nativeEnum(Play),
     playerbarOpenDrawer: z.boolean(),
     playerbarSlider: PlayerbarSliderSchema,
@@ -1339,6 +1342,8 @@ const initialState: SettingsState = {
         albumGroupItems,
         albumGroupShowFavoriteRating: true,
         albumGroupVerticalLayout: true,
+        animatedCovers: 'all',
+        animatedCoversOnBattery: false,
         artistBackground: true,
         artistBackgroundBlur: 6,
         artistItems,
@@ -1382,6 +1387,7 @@ const initialState: SettingsState = {
         passwordStore: undefined,
         pathReplace: '',
         pathReplaceWith: '',
+        pauseAnimatedCoversWhenUnfocused: true,
         playButtonBehavior: Play.NOW,
         playerbarOpenDrawer: false,
         playerbarSlider: {
@@ -3038,6 +3044,16 @@ export const useAccent = () => useSettingsStore((state) => state.general.accent,
 
 export const useNativeAspectRatio = () =>
     useSettingsStore((state) => state.general.nativeAspectRatio, shallow);
+
+export const useAnimatedCoversSettings = () =>
+    useSettingsStore(
+        (state) => ({
+            animatedCovers: state.general.animatedCovers,
+            animatedCoversOnBattery: state.general.animatedCoversOnBattery,
+            pauseWhenUnfocused: state.general.pauseAnimatedCoversWhenUnfocused,
+        }),
+        shallow,
+    );
 
 export const useImagePlaceholderPriority = () =>
     useSettingsStore((state) => state.general.imagePlaceholderPriority);
