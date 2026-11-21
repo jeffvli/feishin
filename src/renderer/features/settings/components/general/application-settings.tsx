@@ -652,6 +652,27 @@ export const ApplicationSettings = memo(() => {
         {
             control: (
                 <Switch
+                    aria-label={t('setting.autoDetectSongKeys')}
+                    defaultChecked={settings.autoDetectSongKeys}
+                    onChange={(e) =>
+                        setSettings({
+                            general: {
+                                ...settings,
+                                autoDetectSongKeys: e.currentTarget.checked,
+                            },
+                        })
+                    }
+                />
+            ),
+            description: t('setting.autoDetectSongKeys', {
+                context: 'description',
+            }),
+            isHidden: false,
+            title: t('setting.autoDetectSongKeys'),
+        },
+        {
+            control: (
+                <Switch
                     aria-label={t('setting.blurExplicitImages')}
                     defaultChecked={settings.blurExplicitImages}
                     onChange={(e) =>

@@ -9,6 +9,7 @@ import { ArtistColumn } from './artist-column';
 import { BitDepthColumn } from './bit-depth-column';
 import { BitRateColumn } from './bit-rate-column';
 import { BpmColumn } from './bpm-column';
+import { CamelotKeyColumn } from './camelot-key-column';
 import { ChannelsColumn } from './channels-column';
 import { CodecColumn } from './codec-column';
 import { CommentColumn } from './comment-column';
@@ -50,6 +51,7 @@ const COLUMN_MAP: Partial<Record<TableColumn, CellComponent>> = {
     [TableColumn.BIT_DEPTH]: BitDepthColumn,
     [TableColumn.BIT_RATE]: BitRateColumn,
     [TableColumn.BPM]: BpmColumn,
+    [TableColumn.CAMELOT_KEY]: CamelotKeyColumn,
     [TableColumn.CHANNELS]: ChannelsColumn,
     [TableColumn.CODEC]: CodecColumn,
     [TableColumn.COMMENT]: CommentColumn,
@@ -104,6 +106,7 @@ export {
     BitDepthColumn,
     BitRateColumn,
     BpmColumn,
+    CamelotKeyColumn,
     ChannelsColumn,
     CodecColumn,
     CommentColumn,

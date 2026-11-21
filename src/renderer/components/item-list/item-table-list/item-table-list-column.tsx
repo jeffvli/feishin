@@ -31,6 +31,7 @@ import { AlbumArtistsColumn } from '/@/renderer/components/item-list/item-table-
 import { AlbumColumn } from '/@/renderer/components/item-list/item-table-list/columns/album-column';
 import { AlbumGroupColumn } from '/@/renderer/components/item-list/item-table-list/columns/album-group-column';
 import { ArtistsColumn } from '/@/renderer/components/item-list/item-table-list/columns/artists-column';
+import { CamelotKeyColumn } from '/@/renderer/components/item-list/item-table-list/columns/camelot-key-column';
 import { CodecColumn } from '/@/renderer/components/item-list/item-table-list/columns/codec-column';
 import { ComposerColumn } from '/@/renderer/components/item-list/item-table-list/columns/composer-column';
 import { CountColumn } from '/@/renderer/components/item-list/item-table-list/columns/count-column';
@@ -248,6 +249,11 @@ const ItemTableListColumnBase = (props: ItemTableListColumn) => {
             case TableColumn.DISC_NUMBER:
             case TableColumn.SAMPLE_RATE:
                 return <NumericColumn {...props} {...dragProps} controls={controls} type={type} />;
+
+            case TableColumn.CAMELOT_KEY:
+                return (
+                    <CamelotKeyColumn {...props} {...dragProps} controls={controls} type={type} />
+                );
 
             case TableColumn.CODEC:
                 return <CodecColumn {...props} {...dragProps} controls={controls} type={type} />;
@@ -1297,6 +1303,9 @@ export const columnLabelMap: Record<TableColumn, ReactNode | string> = {
     }) as string,
     [TableColumn.BIT_RATE]: i18n.t('table.column.bitrate', { postProcess: 'upperCase' }) as string,
     [TableColumn.BPM]: i18n.t('table.column.bpm', { postProcess: 'upperCase' }) as string,
+    [TableColumn.CAMELOT_KEY]: i18n.t('table.column.camelotKey', {
+        postProcess: 'upperCase',
+    }) as string,
     [TableColumn.CHANNELS]: i18n.t('table.column.channels', { postProcess: 'upperCase' }) as string,
     [TableColumn.CODEC]: i18n.t('table.column.codec', { postProcess: 'upperCase' }) as string,
     [TableColumn.COMMENT]: i18n.t('table.column.comment', { postProcess: 'upperCase' }) as string,

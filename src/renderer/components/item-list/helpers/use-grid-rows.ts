@@ -55,6 +55,7 @@ const getRowIdFromTableColumn = (tableColumn: TableColumn): null | string => {
         [TableColumn.BIT_DEPTH]: 'bitDepth',
         [TableColumn.BIT_RATE]: null,
         [TableColumn.BPM]: null,
+        [TableColumn.CAMELOT_KEY]: null,
         [TableColumn.CHANNELS]: null,
         [TableColumn.CODEC]: null,
         [TableColumn.COMMENT]: null,

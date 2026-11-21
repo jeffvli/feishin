@@ -5,6 +5,7 @@ const FIXED_TRACK_COLUMN_WIDTHS: Partial<Record<TableColumn, number>> = {
     [TableColumn.BIT_DEPTH]: 88,
     [TableColumn.BIT_RATE]: 88,
     [TableColumn.BPM]: 56,
+    [TableColumn.CAMELOT_KEY]: 56,
     [TableColumn.CHANNELS]: 80,
     [TableColumn.CODEC]: 80,
     [TableColumn.DATE]: 128,

@@ -175,6 +175,7 @@ export enum TableColumn {
     BIT_DEPTH = 'bitDepth',
     BIT_RATE = 'bitRate',
     BPM = 'bpm',
+    CAMELOT_KEY = 'camelotKey',
     CHANNELS = 'channels',
     CODEC = 'container',
     COMMENT = 'comment',
