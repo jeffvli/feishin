@@ -33,6 +33,7 @@ export function RadioWebPlayer() {
     );
     const [player1Source, setPlayer1Source] = useState<MediaElementAudioSourceNode | null>(null);
     const processedMediaElementRef = useRef<HTMLMediaElement | null>(null);
+    const mediaElementRef = useRef<HTMLMediaElement | null>(null);
     const player1SourceRef = useRef<MediaElementAudioSourceNode | null>(null);
 
     usePlayerEvents(
@@ -53,9 +54,17 @@ export function RadioWebPlayer() {
         setPlayerStatus(isPlaying ? PlayerStatus.PLAYING : PlayerStatus.PAUSED);
     }, [isPlaying]);
 
-    // Cleanup source only on unmount
+    // Cleanup source and release the stream only on unmount
     useEffect(() => {
         return () => {
+            const media = mediaElementRef.current;
+            if (media) {
+                // Removing the src alone does not abort the download, load() does
+                media.pause();
+                media.removeAttribute('src');
+                media.load();
+                mediaElementRef.current = null;
+            }
             if (player1SourceRef.current) {
                 try {
                     player1SourceRef.current.disconnect();
@@ -83,10 +92,12 @@ export function RadioWebPlayer() {
 
     const handlePlayer1Start = useCallback(
         async (player: ReactPlayer) => {
-            if (!webAudio) return;
-
             const internal = player.getInternalPlayer() as HTMLMediaElement | undefined;
             if (!internal) return;
+
+            mediaElementRef.current = internal;
+
+            if (!webAudio) return;
 
             // If we've already processed this exact media element, reuse the existing source
             if (processedMediaElementRef.current === internal && player1Source) {
