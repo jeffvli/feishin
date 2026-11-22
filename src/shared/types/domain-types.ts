@@ -82,6 +82,7 @@ export interface SavedCollection {
 }
 
 export type ServerListItem = {
+    customHeaders?: Record<string, string>;
     enableAudiobooks?: boolean;
     features?: ServerFeatures;
     id: string;

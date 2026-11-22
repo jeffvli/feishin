@@ -1,3 +1,4 @@
+import isElectron from 'is-electron';
 import merge from 'lodash/merge';
 import { nanoid } from 'nanoid/non-secure';
 import { devtools, persist } from 'zustand/middleware';
@@ -6,6 +7,7 @@ import { shallow } from 'zustand/shallow';
 import { createWithEqualityFn } from 'zustand/traditional';
 
 import { ServerListItem, ServerListItemWithCredential } from '/@/shared/types/domain-types';
+import { areCustomHeadersEqual } from '/@/shared/utils/server-headers';
 
 export interface AuthSlice extends AuthState {
     actions: {
@@ -36,6 +38,18 @@ export const useAuthStore = createWithEqualityFn<AuthSlice>()(
                         });
                     },
                     deleteServer: (id) => {
+                        const server = get().serverList[id];
+                        if (isElectron() && window.api?.serverHeaders && server) {
+                            if (server.url) {
+                                window.api.serverHeaders.clearCookies(server.url).catch(() => {});
+                            }
+                            if (server.remoteUrl) {
+                                window.api.serverHeaders
+                                    .clearCookies(server.remoteUrl)
+                                    .catch(() => {});
+                            }
+                        }
+
                         set((state) => {
                             delete state.serverList[id];
 
@@ -50,13 +64,27 @@ export const useAuthStore = createWithEqualityFn<AuthSlice>()(
                         return null;
                     },
                     logout: () => {
+                        const currentServer = get().currentServer;
+                        if (isElectron() && window.api?.serverHeaders && currentServer) {
+                            if (currentServer.url) {
+                                window.api.serverHeaders
+                                    .clearCookies(currentServer.url)
+                                    .catch(() => {});
+                            }
+                            if (currentServer.remoteUrl) {
+                                window.api.serverHeaders
+                                    .clearCookies(currentServer.remoteUrl)
+                                    .catch(() => {});
+                            }
+                        }
+
                         set((state) => {
-                            const currentServer = state.currentServer;
-                            if (!currentServer) {
+                            const activeServer = state.currentServer;
+                            if (!activeServer) {
                                 return;
                             }
 
-                            const server = state.serverList[currentServer.id];
+                            const server = state.serverList[activeServer.id];
                             if (server) {
                                 server.credential = '';
                                 server.ndCredential = undefined;
@@ -83,6 +111,37 @@ export const useAuthStore = createWithEqualityFn<AuthSlice>()(
                         });
                     },
                     updateServer: (id: string, args: Partial<ServerListItemWithCredential>) => {
+                        const existingServer = get().serverList[id];
+                        const headersChanged =
+                            args.customHeaders !== undefined &&
+                            !areCustomHeadersEqual(
+                                existingServer?.customHeaders,
+                                args.customHeaders,
+                            );
+                        const urlChanged =
+                            args.url !== undefined && args.url !== existingServer?.url;
+                        const remoteUrlChanged =
+                            args.remoteUrl !== undefined &&
+                            args.remoteUrl !== existingServer?.remoteUrl;
+                        if (
+                            isElectron() &&
+                            window.api?.serverHeaders &&
+                            existingServer &&
+                            (headersChanged || urlChanged || remoteUrlChanged)
+                        ) {
+                            const urlsToClear = new Set(
+                                [
+                                    existingServer.url,
+                                    existingServer.remoteUrl,
+                                    args.url,
+                                    args.remoteUrl,
+                                ].filter((u): u is string => Boolean(u)),
+                            );
+                            for (const url of urlsToClear) {
+                                window.api.serverHeaders.clearCookies(url).catch(() => {});
+                            }
+                        }
+
                         set((state) => {
                             const updatedServer = {
                                 ...state.serverList[id],
@@ -136,6 +195,7 @@ export const useCurrentServer = () =>
         }
 
         return {
+            customHeaders: state.currentServer?.customHeaders,
             enableAudiobooks: state.currentServer?.enableAudiobooks,
             features: state.currentServer?.features,
             id: state.currentServer?.id,
@@ -193,3 +253,30 @@ export const usePermissions = () => {
         userId: userId,
     };
 };
+
+if (isElectron() && window.api?.serverHeaders) {
+    const syncServerHeaders = (serverList: Record<string, ServerListItemWithCredential>) => {
+        const rules: { baseUrl: string; headers: Record<string, string> }[] = [];
+        for (const server of Object.values(serverList || {})) {
+            if (server.customHeaders && Object.keys(server.customHeaders).length > 0) {
+                if (server.url) {
+                    rules.push({ baseUrl: server.url, headers: server.customHeaders });
+                }
+                if (server.remoteUrl) {
+                    rules.push({ baseUrl: server.remoteUrl, headers: server.customHeaders });
+                }
+            }
+        }
+        window.api.serverHeaders.sync(rules).catch(() => {});
+    };
+
+    // Initial sync
+    syncServerHeaders(useAuthStore.getState().serverList);
+
+    // Subscribe to state changes
+    useAuthStore.subscribe((state, prevState) => {
+        if (state.serverList !== prevState.serverList) {
+            syncServerHeaders(state.serverList);
+        }
+    });
+}
