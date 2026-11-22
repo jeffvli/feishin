@@ -147,8 +147,8 @@ export const PlaylistDetailAlbumView = ({ data }: { data: PlaylistSongListRespon
     }, [setItemCount, totalAlbumCount]);
 
     useEffect(() => {
-        setListData?.(filteredAndSortedSongs);
-    }, [filteredAndSortedSongs, setListData]);
+        setListData?.(sortedAlbums.flatMap((row) => row._playlistSongs ?? []));
+    }, [sortedAlbums, setListData]);
 
     const { handleOnScrollEnd, scrollOffset } = useItemListScrollPersist({ enabled: true });
     const { handleColumnReordered } = useItemListColumnReorder({
