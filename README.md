@@ -26,6 +26,9 @@
       alt="Matrix">
     </a>
   </p>
+  <p align="center">
+    <a href="https://app.railyard.run/deploy?repo=https://github.com/jeffvli/feishin"><img src="https://app.railyard.run/deploy/badge" alt="Deploy to Railyard"></a>
+  </p>
 
 ---
 
