@@ -90,6 +90,27 @@ export const WindowSettings = memo(() => {
         {
             control: (
                 <Switch
+                    aria-label="Toggle mini player always on top"
+                    defaultChecked={settings.miniPlayerAlwaysOnTop}
+                    onChange={(e) => {
+                        if (!e) return;
+                        setSettings({
+                            window: {
+                                miniPlayerAlwaysOnTop: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.miniPlayerAlwaysOnTop', {
+                context: 'description',
+            }),
+            isHidden: !isElectron(),
+            title: t('setting.miniPlayerAlwaysOnTop'),
+        },
+        {
+            control: (
+                <Switch
                     aria-label="toggle hiding tray"
                     defaultChecked={settings.tray}
                     disabled={!isElectron()}
