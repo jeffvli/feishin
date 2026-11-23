@@ -6,8 +6,11 @@ import { RadioListHeaderFilters } from '/@/renderer/features/radio/components/ra
 import { FilterBar } from '/@/renderer/features/shared/components/filter-bar';
 import { LibraryHeaderBar } from '/@/renderer/features/shared/components/library-header-bar';
 import { ListSearchInput } from '/@/renderer/features/shared/components/list-search-input';
+import { useCurrentServer } from '/@/renderer/store';
 import { Group } from '/@/shared/components/group/group';
 import { Stack } from '/@/shared/components/stack/stack';
+import { Text } from '/@/shared/components/text/text';
+import { ServerType } from '/@/shared/types/domain-types';
 
 interface RadioListHeaderProps {
     title?: string;
@@ -16,6 +19,7 @@ interface RadioListHeaderProps {
 export const RadioListHeader = ({ title }: RadioListHeaderProps) => {
     const { t } = useTranslation();
 
+    const server = useCurrentServer();
     const { itemCount } = useListContext();
     const pageTitle = title || t('page.radioList.title');
 
@@ -34,6 +38,11 @@ export const RadioListHeader = ({ title }: RadioListHeaderProps) => {
             </PageHeader>
             <FilterBar>
                 <RadioListHeaderFilters />
+                {server?.type === ServerType.JELLYFIN && (
+                    <Text isMuted pt="xs" size="sm">
+                        {t('page.radioList.localStorageNote')}
+                    </Text>
+                )}
             </FilterBar>
         </Stack>
     );
