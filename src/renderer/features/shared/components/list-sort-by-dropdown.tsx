@@ -22,6 +22,7 @@ import { ItemListKey } from '/@/shared/types/types';
 interface ListSortByDropdownProps {
     defaultSortByValue: string;
     disabled?: boolean;
+    filterKey?: string;
     includeId?: boolean;
     itemType: LibraryItem;
     listKey: ItemListKey;
@@ -32,6 +33,7 @@ interface ListSortByDropdownProps {
 export const ListSortByDropdown = ({
     defaultSortByValue,
     disabled,
+    filterKey,
     itemType,
     listKey,
     onChange,
@@ -39,7 +41,7 @@ export const ListSortByDropdown = ({
 }: ListSortByDropdownProps) => {
     const server = useCurrentServer();
 
-    const { setSortBy, sortBy } = useSortByFilter(defaultSortByValue, listKey);
+    const { setSortBy, sortBy } = useSortByFilter(defaultSortByValue, listKey, filterKey);
 
     const sortByLabel =
         (itemType && FILTERS[itemType][server.type].find((f) => f.value === sortBy)?.name) || '—';

@@ -9,32 +9,32 @@ import { runInUrlTransition } from '/@/renderer/utils/url-transition';
 import { SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
-export const useSortOrderFilter = (defaultValue: null | string, listKey: ItemListKey) => {
+export const useSortOrderFilter = (
+    defaultValue: null | string,
+    listKey: ItemListKey,
+    filterKey: string = FILTER_KEYS.SHARED.SORT_ORDER,
+) => {
     const server = useCurrentServer();
     const { getFilter, setFilter } = useListFilterPersistence(server.id, listKey);
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const persisted = getFilter(FILTER_KEYS.SHARED.SORT_ORDER);
+    const persisted = getFilter(filterKey);
 
     const sortOrder = useMemo(() => {
-        const value = parseStringParam(searchParams, FILTER_KEYS.SHARED.SORT_ORDER);
+        const value = parseStringParam(searchParams, filterKey);
         return (value ?? persisted ?? defaultValue ?? undefined) as SortOrder;
-    }, [searchParams, persisted, defaultValue]);
+    }, [defaultValue, filterKey, persisted, searchParams]);
 
     const handleSetSortOrder = (sortOrder: SortOrder) => {
         runInUrlTransition(() => {
             setSearchParams(
                 (prev) => {
-                    const newParams = setSearchParam(
-                        prev,
-                        FILTER_KEYS.SHARED.SORT_ORDER,
-                        sortOrder,
-                    );
+                    const newParams = setSearchParam(prev, filterKey, sortOrder);
                     return newParams;
                 },
                 { replace: true },
             );
-            setFilter(FILTER_KEYS.SHARED.SORT_ORDER, sortOrder);
+            setFilter(filterKey, sortOrder);
         });
     };
 
