@@ -25,7 +25,11 @@ const getFiniteDuration = (wavesurfer: { getDuration: () => number }) => {
     return Number.isFinite(duration) ? duration : 0;
 };
 
-export const PlayerbarWaveform = () => {
+// Wavesurfer decodes the whole file, which can hang the UI on very long/large tracks
+const MAX_WAVEFORM_DURATION_MS = 10 * 60 * 1000; // 10 minutes
+const MAX_WAVEFORM_SIZE_BYTES = 100 * 1024 * 1024; // 100 MB
+
+const Waveform = () => {
     const currentSong = usePlayerSong();
     const playerbarSlider = usePlayerbarSlider();
     const currentTime = usePlayerTimestamp();
@@ -437,4 +441,18 @@ export const PlayerbarWaveform = () => {
             )}
         </div>
     );
+};
+
+export const PlayerbarWaveform = () => {
+    const currentSong = usePlayerSong();
+
+    const isLargeFile =
+        (currentSong?.duration ?? 0) > MAX_WAVEFORM_DURATION_MS ||
+        (currentSong?.size ?? 0) > MAX_WAVEFORM_SIZE_BYTES;
+
+    if (isLargeFile) {
+        return <PlayerbarSeekSlider max={(currentSong?.duration ?? 0) / 1000} min={0} />;
+    }
+
+    return <Waveform />;
 };
