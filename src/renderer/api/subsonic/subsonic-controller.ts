@@ -31,6 +31,7 @@ import {
 } from '/@/shared/api/utils';
 import {
     AlbumListSort,
+    AuthMode,
     GenreListSort,
     ImageArgs,
     ImageRequest,
@@ -324,20 +325,41 @@ export const SubsonicController: InternalControllerEndpoint = {
 
         let credential: string;
         let credentialParams: {
+            apiKey?: string;
             p?: string;
             s?: string;
             t?: string;
-            u: string;
+            u?: string;
         };
 
         const cleanServerUrl = `${url.replace(/\/$/, '')}/rest`;
 
-        if (body.legacy) {
+        if (body.auth === AuthMode.LEGACY) {
             credential = `u=${encodeURIComponent(body.username)}&p=${encodeURIComponent(body.password)}`;
             credentialParams = {
                 p: body.password,
                 u: body.username,
             };
+        } else if (body.auth === AuthMode.API_KEY) {
+            credential = `apiKey=${encodeURIComponent(body.password)}`;
+            credentialParams = {
+                apiKey: body.password,
+            };
+
+            const tokenInfo = await ssApiClient({ server: null, url: cleanServerUrl }).tokenInfo({
+                query: {
+                    apiKey: body.password,
+                    c: 'Feishin',
+                    f: 'json',
+                    v: '1.13.0',
+                },
+            });
+
+            if (tokenInfo.status !== 200) {
+                throw new Error('Failed to log in');
+            }
+
+            body.username = tokenInfo.body.tokenInfo.username;
         } else {
             const salt = randomString(12);
             const hash = md5(body.password + salt);
