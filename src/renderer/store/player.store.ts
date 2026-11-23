@@ -1349,6 +1349,8 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                 },
                 mediaPlay: (id?: string) => {
                     let playIndex: number | undefined;
+                    // Same as mediaTogglePlayPause: from STOPPED, mpv needs the track reloaded.
+                    const wasStopped = get().player.status === PlayerStatus.STOPPED;
 
                     // Playing a specific queue song should dismiss radio first.
                     if (id) {
@@ -1395,6 +1397,8 @@ export const usePlayerStoreBase = createWithEqualityFn<PlayerState>()(
                             id,
                             index: playIndex,
                         });
+                    } else if (!id && wasStopped) {
+                        emitPlayerPlayEvent(undefined, set, get);
                     }
                 },
                 mediaPlayByIndex: (index: number) => {
