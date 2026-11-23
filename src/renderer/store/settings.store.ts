@@ -1485,7 +1485,7 @@ const initialState: SettingsState = {
             zoomIn: { allowGlobal: true, hotkey: '', isGlobal: false },
             zoomOut: { allowGlobal: true, hotkey: '', isGlobal: false },
         },
-        globalMediaHotkeys: true,
+        globalMediaHotkeys: !utils?.isLinux(),
     },
     lists: {
         ['albumDetail']: {

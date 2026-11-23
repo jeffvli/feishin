@@ -997,7 +997,7 @@
         "gaplessAudio_description": "Sets the gapless audio setting for mpv",
         "gaplessAudio_optionWeak": "Weak (recommended)",
         "gaplessAudio": "Gapless audio",
-        "globalMediaHotkeys_description": "Enable or disable the usage of your system media hotkeys to control playback",
+        "globalMediaHotkeys_description": "Register the media keys as global shortcuts that control playback. On Linux, desktops such as GNOME and KDE already send media keys to Feishin without this setting",
         "globalMediaHotkeys": "Global media hotkeys",
         "homeConfiguration_description": "Configure what items are shown, and in what order, on the home page",
         "homeConfiguration": "Home page configuration",
