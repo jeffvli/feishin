@@ -9,11 +9,12 @@ import { Icon } from '/@/shared/components/icon/icon';
 
 export interface AccordionProps extends Omit<
     MantineAccordionProps,
-    'defaultValue' | 'multiple' | 'onChange'
+    'defaultValue' | 'multiple' | 'onChange' | 'value'
 > {
     defaultValue?: string | string[];
     multiple?: boolean;
     onChange?: (value: null | string | string[]) => void;
+    value?: string | string[];
 }
 
 export const Accordion = ({ children, classNames, ...props }: AccordionProps) => {
