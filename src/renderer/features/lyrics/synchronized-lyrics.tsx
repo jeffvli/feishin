@@ -21,6 +21,7 @@ import { subscribePlayerStatus, usePlayerStoreBase } from '/@/renderer/store';
 import { subscribePlayerProgress, useTimestampStoreBase } from '/@/renderer/store/timestamp.store';
 import {
     FullLyricsMetadata,
+    LyricSource,
     SynchronizedLyrics as SynchronizedLyricsData,
 } from '/@/shared/types/domain-types';
 import { PlayerStatus } from '/@/shared/types/types';
@@ -271,7 +272,11 @@ export const SynchronizedLyrics = ({
                     <LyricLine
                         alignment={settings.alignment}
                         fontSize={effectiveFontSize}
-                        text={`${source}`}
+                        text={
+                            source === LyricSource.LRC_RED
+                                ? 'Synced lyrics provided by <a href="https://lrc.red">lrc.red</a>'
+                                : `${source}`
+                        }
                     />
                 )}
                 {settings.showMatch && (
