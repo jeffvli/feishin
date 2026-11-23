@@ -11,6 +11,7 @@ import { lazy, memo, Suspense, useEffect, useMemo, useRef, useState } from 'reac
 
 import i18n from '/@/i18n/i18n';
 import { WebAudioContext } from '/@/renderer/features/player/context/webaudio-context';
+import { ArtAccentEffect } from '/@/renderer/hooks/use-art-accent';
 import { useCheckForUpdates } from '/@/renderer/hooks/use-check-for-updates';
 import { useFullscreenAutoOpen } from '/@/renderer/hooks/use-fullscreen-auto-open';
 import { useFullscreenToggle } from '/@/renderer/hooks/use-fullscreen-toggle';
@@ -123,6 +124,7 @@ const AppEffects = () => (
         <FullscreenToggleEffect />
         <FullscreenAutoOpenEffect />
         <InputFocusEffect />
+        <ArtAccentEffect />
     </>
 );
 

@@ -1,6 +1,8 @@
 import { FastAverageColor, FastAverageColorIgnoredColor } from 'fast-average-color';
 import { useEffect, useRef, useState } from 'react';
 
+import { AccentCandidate, pickAccentClusters } from '/@/shared/themes/pick-accent-color';
+
 const ignoredColors: FastAverageColorIgnoredColor = [
     [255, 255, 255, 255, 90], // White
     [255, 255, 255, 255, 50], // Light gray
@@ -32,6 +34,60 @@ export const getFastAverageColor = async (args: {
                 });
         });
     });
+};
+
+const ART_SAMPLE_SIZE = 64;
+
+// Decodes the cover into a small canvas so clustering can inspect the actual
+// pixels; a tainted canvas (third-party art without CORS) or a dead url
+// rejects so the collector logs it and stops retrying that cover.
+const getCoverPixels = (src: string): Promise<Uint8ClampedArray> => {
+    return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.crossOrigin = 'anonymous';
+
+        image.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = ART_SAMPLE_SIZE;
+            canvas.height = ART_SAMPLE_SIZE;
+
+            const context = canvas.getContext('2d', { willReadFrequently: true });
+            if (!context) {
+                reject(new Error('no 2d canvas context'));
+                return;
+            }
+
+            // Nearest neighbor on purpose: smooth scaling blends thin vivid
+            // features (lettering, strokes) into the background and erases pops.
+            context.imageSmoothingEnabled = false;
+            context.drawImage(image, 0, 0, ART_SAMPLE_SIZE, ART_SAMPLE_SIZE);
+
+            try {
+                resolve(context.getImageData(0, 0, ART_SAMPLE_SIZE, ART_SAMPLE_SIZE).data);
+            } catch (error) {
+                reject(error);
+            }
+        };
+
+        image.onerror = () => {
+            reject(new Error(`album art failed to load: ${src}`));
+        };
+
+        image.src = src;
+    });
+};
+
+// ponytail: one 64x64 decode per cover and coarse color bins, no palette
+// library. The art accent collector dedupes by image key, so a cover is
+// sampled once per play.
+export const getArtColorCandidates = async (src: null | string): Promise<AccentCandidate[]> => {
+    if (!src) {
+        return [];
+    }
+
+    const pixels = await getCoverPixels(src);
+
+    return pickAccentClusters(pixels);
 };
 
 export const useFastAverageColor = (args: {

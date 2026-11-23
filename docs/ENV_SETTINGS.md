@@ -11,6 +11,7 @@ These variables override app settings **on first run** when no persisted setting
 | Setting | Default | Env variable | Available values / Description |
 |-------------|---------|--------------|--------------------------------|
 | `general.accent` | `rgb(53, 116, 252)` | `FS_GENERAL_ACCENT` | CSS `rgb(r, g, b)` string (e.g. `rgb(53, 116, 252)`). Invalid values are ignored. |
+| `general.accentFromArt` | `false` | `FS_GENERAL_ACCENT_FROM_ART` | `true` / `false`: set the accent color from the currently playing album cover. |
 | `general.albumBackground` | `false` | `FS_GENERAL_ALBUM_BACKGROUND` | `true` / `false` — Show album background image. |
 | `general.albumBackgroundBlur` | `3` | `FS_GENERAL_ALBUM_BACKGROUND_BLUR` | Blur amount for album background (number). |
 | `general.artistBackground` | `true` | `FS_GENERAL_ARTIST_BACKGROUND` | `true` / `false` — Show artist background image. |

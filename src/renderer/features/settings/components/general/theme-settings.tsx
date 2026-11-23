@@ -355,6 +355,25 @@ export const ThemeSettings = memo(() => {
         {
             control: (
                 <Switch
+                    checked={settings.accentFromArt}
+                    onChange={(e) => {
+                        setSettings({
+                            general: {
+                                accentFromArt: e.currentTarget.checked,
+                            },
+                        });
+                    }}
+                />
+            ),
+            description: t('setting.accentFromArt', {
+                context: 'description',
+            }),
+            isHidden: false,
+            title: t('setting.accentFromArt'),
+        },
+        {
+            control: (
+                <Switch
                     checked={settings.useThemePrimaryShade}
                     onChange={(e) => {
                         setSettings({
