@@ -7,7 +7,7 @@ import orderBy from 'lodash/orderBy';
 import md5 from 'md5';
 import { z } from 'zod';
 
-import { contract, ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
+import { contract, sortFavoriteSongs, ssApiClient } from '/@/renderer/api/subsonic/subsonic-api';
 import { mapStructuredLyric } from '/@/renderer/api/subsonic/subsonic-structured-lyrics';
 import {
     getDefaultTranscodingProfiles,
@@ -1606,10 +1606,11 @@ export const SubsonicController: InternalControllerEndpoint = {
                 throw new Error('Failed to get song list');
             }
 
-            let allResults =
-                (res.body.starred?.song || []).map((song) =>
-                    ssNormalize.song(song, apiClientProps.server),
-                ) || [];
+            const starredSongs = res.body.starred?.song || [];
+            const sortByFavoriteDate = query.sortBy === SongListSort.FAVORITED;
+            let allResults = (
+                sortByFavoriteDate ? sortFavoriteSongs(starredSongs, query.sortOrder) : starredSongs
+            ).map((song) => ssNormalize.song(song, apiClientProps.server));
 
             const filterArtistIds = query.albumArtistIds || query.artistIds;
 
@@ -1623,7 +1624,7 @@ export const SubsonicController: InternalControllerEndpoint = {
             return sortAndPaginate(allResults, {
                 limit: query.limit,
                 sortBy: query.sortBy,
-                sortFn: sortSongList,
+                sortFn: sortByFavoriteDate ? undefined : sortSongList,
                 sortOrder: query.sortOrder,
                 startIndex: query.startIndex,
             });

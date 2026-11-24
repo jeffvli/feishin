@@ -6,6 +6,7 @@ import { FILTER_KEYS } from '/@/renderer/features/shared/utils';
 import { useCurrentServer } from '/@/renderer/store';
 import { parseStringParam, setSearchParam } from '/@/renderer/utils/query-params';
 import { runInUrlTransition } from '/@/renderer/utils/url-transition';
+import { SortOrder } from '/@/shared/types/domain-types';
 import { ItemListKey } from '/@/shared/types/types';
 
 export const useSortByFilter = <TSortBy>(defaultValue: string, listKey: ItemListKey) => {
@@ -20,16 +21,21 @@ export const useSortByFilter = <TSortBy>(defaultValue: string, listKey: ItemList
         return (value ?? persisted ?? defaultValue ?? undefined) as TSortBy;
     }, [searchParams, persisted, defaultValue]);
 
-    const handleSetSortBy = (sortBy: string) => {
+    const handleSetSortBy = (sortBy: string, sortOrder?: SortOrder) => {
         runInUrlTransition(() => {
             setSearchParams(
                 (prev) => {
                     const newParams = setSearchParam(prev, FILTER_KEYS.SHARED.SORT_BY, sortBy);
-                    return newParams;
+                    return sortOrder
+                        ? setSearchParam(newParams, FILTER_KEYS.SHARED.SORT_ORDER, sortOrder)
+                        : newParams;
                 },
                 { replace: true },
             );
             setFilter(FILTER_KEYS.SHARED.SORT_BY, sortBy);
+            if (sortOrder) {
+                setFilter(FILTER_KEYS.SHARED.SORT_ORDER, sortOrder);
+            }
         });
     };
 

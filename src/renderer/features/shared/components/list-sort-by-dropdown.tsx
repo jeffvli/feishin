@@ -26,6 +26,7 @@ interface ListSortByDropdownProps {
     itemType: LibraryItem;
     listKey: ItemListKey;
     onChange?: (value: string) => void;
+    showFavoriteDate?: boolean;
     target?: React.ReactNode;
 }
 
@@ -35,18 +36,29 @@ export const ListSortByDropdown = ({
     itemType,
     listKey,
     onChange,
+    showFavoriteDate,
     target,
 }: ListSortByDropdownProps) => {
     const server = useCurrentServer();
 
     const { setSortBy, sortBy } = useSortByFilter(defaultSortByValue, listKey);
 
-    const sortByLabel =
-        (itemType && FILTERS[itemType][server.type].find((f) => f.value === sortBy)?.name) || '—';
+    const filters: Array<{ name: string; value: string }> = FILTERS[itemType]?.[server.type] ?? [];
+    const availableFilters =
+        showFavoriteDate && server.type === ServerType.SUBSONIC
+            ? [...filters, SONG_FAVORITE_DATE_SORT]
+            : filters;
+    const selectedFilter =
+        availableFilters.find((filter) => filter.value === sortBy) ||
+        availableFilters.find((filter) => filter.value === defaultSortByValue);
 
-    const handleSortByChange = (sortBy: string) => {
-        setSortBy(sortBy);
-        onChange?.(sortBy);
+    const handleSortByChange = (value: string) => {
+        const defaultOrder =
+            itemType === LibraryItem.SONG && value === SONG_FAVORITE_DATE_SORT.value
+                ? SONG_FAVORITE_DATE_SORT.defaultOrder
+                : undefined;
+        setSortBy(value, defaultOrder);
+        onChange?.(value);
     };
 
     return (
@@ -56,14 +68,14 @@ export const ListSortByDropdown = ({
                     target
                 ) : (
                     <Button disabled={disabled} variant="subtle">
-                        {sortByLabel}
+                        {selectedFilter?.name || '-'}
                     </Button>
                 )}
             </DropdownMenu.Target>
             <DropdownMenu.Dropdown>
-                {FILTERS[itemType][server.type].map((f) => (
+                {availableFilters.map((f) => (
                     <DropdownMenu.Item
-                        isSelected={f.value === sortBy}
+                        isSelected={f === selectedFilter}
                         key={`filter-${f.name}`}
                         onClick={() => handleSortByChange(f.value)}
                         value={f.value}
@@ -467,6 +479,12 @@ const ALBUM_LIST_FILTERS: Partial<
     ],
 };
 
+const SONG_FAVORITE_DATE_SORT = {
+    defaultOrder: SortOrder.DESC,
+    name: i18n.t('filter.favoriteDate'),
+    value: SongListSort.FAVORITED,
+};
+
 const SONG_LIST_FILTERS: Partial<
     Record<ServerType, Array<{ defaultOrder: SortOrder; name: string; value: string }>>
 > = {
@@ -558,11 +576,7 @@ const SONG_LIST_FILTERS: Partial<
             name: i18n.t('filter.duration'),
             value: SongListSort.DURATION,
         },
-        {
-            defaultOrder: SortOrder.DESC,
-            name: i18n.t('filter.isFavorited'),
-            value: SongListSort.FAVORITED,
-        },
+        SONG_FAVORITE_DATE_SORT,
         {
             defaultOrder: SortOrder.ASC,
             name: i18n.t('filter.genre'),
