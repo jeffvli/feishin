@@ -182,7 +182,7 @@ ipcMain.on(
                 'mpris:artUrl': imageUrl || null,
                 'mpris:length': song.duration ? Math.round((song.duration || 0) * 1e3) : null,
                 'mpris:trackid': song.id
-                    ? mprisPlayer.objectPath(`track/${song.id?.replace('-', '')}`)
+                    ? mprisPlayer.objectPath(`track/${song.id.replace(/[^A-Za-z0-9_]/g, '_')}`)
                     : '',
                 'xesam:album': song.album || null,
                 'xesam:albumArtist': song.albumArtists?.length
