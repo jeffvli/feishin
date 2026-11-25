@@ -273,6 +273,7 @@
         "dateAdded": "Date added",
         "disc": "Disc",
         "duration": "Duration",
+        "favoriteDate": "Favorite date",
         "favorited": "Favorited",
         "fromYear": "From year",
         "genre": "$t(entity.genre, {\"count\": 1})",

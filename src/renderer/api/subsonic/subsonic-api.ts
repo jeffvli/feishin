@@ -1,5 +1,6 @@
 import { initClient, initContract } from '@ts-rest/core';
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse, isAxiosError } from 'axios';
+import orderBy from 'lodash/orderBy';
 import qs from 'qs';
 import { z } from 'zod';
 
@@ -11,7 +12,7 @@ import { getServerUrl } from '/@/renderer/utils/normalize-server-url';
 import { ssType } from '/@/shared/api/subsonic/subsonic-types';
 import { hasFeature } from '/@/shared/api/utils';
 import { toast } from '/@/shared/components/toast/toast';
-import { ServerListItemWithCredential } from '/@/shared/types/domain-types';
+import { ServerListItemWithCredential, SortOrder } from '/@/shared/types/domain-types';
 import { ServerFeature } from '/@/shared/types/features-types';
 
 const SUBSONIC_AUTH_ERROR_CODE = 40;
@@ -484,6 +485,26 @@ const silentlyTransformResponse = (data: any) => {
     }
 
     return jsonBody;
+};
+
+export const sortFavoriteSongs = (
+    songs: z.infer<typeof ssType._response.song>[],
+    sortOrder: SortOrder,
+) => {
+    const newestFirst = sortOrder === SortOrder.DESC;
+    const undated = newestFirst ? -Infinity : Infinity;
+
+    return orderBy(
+        songs,
+        [
+            (song) => {
+                const date = typeof song.starred === 'string' ? Date.parse(song.starred) : NaN;
+                return Number.isNaN(date) ? undated : date;
+            },
+            (song) => song.id.toString(),
+        ],
+        [newestFirst ? 'desc' : 'asc', 'asc'],
+    );
 };
 
 export const ssApiClient = (args: {

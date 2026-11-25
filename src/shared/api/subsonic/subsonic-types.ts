@@ -207,7 +207,7 @@ const song = z.object({
     replayGain: songGain.optional(),
     samplingRate: z.number().optional(),
     size: z.number(),
-    starred: z.boolean().optional(),
+    starred: z.union([z.string(), z.boolean()]).optional(),
     suffix: z.string(),
     title: z.string(),
     track: z.number().optional(),

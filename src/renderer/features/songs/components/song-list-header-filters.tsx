@@ -32,9 +32,12 @@ export const SongListHeaderFilters = ({ toggleGenreTarget }: { toggleGenreTarget
     const target = useGenreTarget();
     const { setGenreBehavior } = useSettingsStoreActions();
     const albumFilters = useAlbumListFilters();
-    const songFilters = useSongListFilters();
-
-    const { pageKey } = useListContext();
+    const { customFilters, pageKey } = useListContext();
+    const songFilters = useSongListFilters(pageKey as ItemListKey);
+    const showFavoriteDate =
+        (customFilters?.favorite ?? songFilters.query.favorite) === true &&
+        !(customFilters?.genreIds ?? songFilters.query.genreIds) &&
+        !(customFilters?.searchTerm ?? songFilters.query.searchTerm);
 
     const handleToggleGenreTarget = useCallback(() => {
         // Clear all filter query states
@@ -83,6 +86,7 @@ export const SongListHeaderFilters = ({ toggleGenreTarget }: { toggleGenreTarget
                     defaultSortByValue={SongListSort.NAME}
                     itemType={LibraryItem.SONG}
                     listKey={pageKey as ItemListKey}
+                    showFavoriteDate={showFavoriteDate}
                 />
                 <Divider orientation="vertical" />
                 <ListSortOrderToggleButton
