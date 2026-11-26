@@ -4,16 +4,22 @@ const exit = () => {
     ipcRenderer.send('window-close');
 };
 
-const maximize = () => {
-    ipcRenderer.send('window-maximize');
+const toggleMaximize = () => {
+    ipcRenderer.send('window-toggle-maximize');
+};
+
+const onMaximizedChange = (cb: (maximized: boolean) => void) => {
+    const listener = (_event: Electron.IpcRendererEvent, maximized: boolean) => cb(maximized);
+    ipcRenderer.on('renderer-window-maximized', listener);
+    return () => ipcRenderer.removeListener('renderer-window-maximized', listener);
+};
+
+const isMaximized = (): Promise<boolean> => {
+    return ipcRenderer.invoke('window-is-maximized');
 };
 
 const minimize = () => {
     ipcRenderer.send('window-minimize');
-};
-
-const unmaximize = () => {
-    ipcRenderer.send('window-unmaximize');
 };
 
 const quit = () => {
@@ -32,10 +38,11 @@ export const browser = {
     clearCache,
     devtools,
     exit,
-    maximize,
+    isMaximized,
     minimize,
+    onMaximizedChange,
     quit,
-    unmaximize,
+    toggleMaximize,
 };
 
 export type Browser = typeof browser;

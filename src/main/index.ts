@@ -689,13 +689,15 @@ async function createWindow(first = true): Promise<void> {
         mainWindow?.webContents.openDevTools();
     });
 
-    ipcMain.on('window-maximize', () => {
-        mainWindow?.maximize();
+    ipcMain.on('window-toggle-maximize', () => {
+        if (mainWindow?.isMaximized()) {
+            mainWindow.unmaximize();
+        } else {
+            mainWindow?.maximize();
+        }
     });
 
-    ipcMain.on('window-unmaximize', () => {
-        mainWindow?.unmaximize();
-    });
+    ipcMain.handle('window-is-maximized', () => mainWindow?.isMaximized() ?? false);
 
     ipcMain.on('window-minimize', () => {
         if (store.get('window_minimize_to_tray') === true) {
@@ -804,6 +806,7 @@ async function createWindow(first = true): Promise<void> {
         log.info('Main window closed');
         ipcMain.removeHandler('window-clear-cache');
         ipcMain.removeHandler('app-check-for-updates');
+        ipcMain.removeHandler('window-is-maximized');
         mainWindow = null;
     });
 
@@ -838,6 +841,13 @@ async function createWindow(first = true): Promise<void> {
             });
         }
     });
+
+    const sendMaximized = () => {
+        mainWindow?.webContents.send('renderer-window-maximized', mainWindow.isMaximized());
+    };
+
+    mainWindow.on('maximize', sendMaximized);
+    mainWindow.on('unmaximize', sendMaximized);
 
     if (isWindows()) {
         app.setAppUserModelId('org.jeffvli.feishin');
