@@ -106,22 +106,31 @@ const AlbumArtistDetailRouteContent = () => {
                 }}
                 ref={scrollAreaRef}
             >
-                {showBlurredImage ? (
-                    <LibraryBackgroundImage
-                        blur={artistBackgroundBlur}
-                        headerRef={headerRef}
-                        imageUrl={libraryBackgroundImageUrl || ''}
-                    />
-                ) : (
-                    <LibraryBackgroundOverlay backgroundColor={background} headerRef={headerRef} />
-                )}
-                <LibraryContainer>
-                    <AlbumArtistDetailHeader
-                        albumsQuery={albumsQuery}
-                        ref={headerRef as React.Ref<HTMLDivElement>}
-                    />
-                    <AlbumArtistDetailContent albumsQuery={albumsQuery} detailQuery={detailQuery} />
-                </LibraryContainer>
+                {/* Stable wrapper: OverlayScrollbars reparents NativeScrollArea's children so swapping direct child types breaks React's insertBefore (while on library). */}
+                <div>
+                    {showBlurredImage ? (
+                        <LibraryBackgroundImage
+                            blur={artistBackgroundBlur}
+                            headerRef={headerRef}
+                            imageUrl={libraryBackgroundImageUrl || ''}
+                        />
+                    ) : (
+                        <LibraryBackgroundOverlay
+                            backgroundColor={background}
+                            headerRef={headerRef}
+                        />
+                    )}
+                    <LibraryContainer>
+                        <AlbumArtistDetailHeader
+                            albumsQuery={albumsQuery}
+                            ref={headerRef as React.Ref<HTMLDivElement>}
+                        />
+                        <AlbumArtistDetailContent
+                            albumsQuery={albumsQuery}
+                            detailQuery={detailQuery}
+                        />
+                    </LibraryContainer>
+                </div>
             </NativeScrollArea>
         </AnimatedPage>
     );

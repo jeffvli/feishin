@@ -70,15 +70,21 @@ const AlbumDetailRoute = () => {
                 }}
                 ref={scrollAreaRef}
             >
-                {showBlurredImage ? (
-                    <LibraryBackgroundImage
-                        blur={albumBackgroundBlur}
-                        headerRef={headerRef}
-                        imageUrl={imageUrl}
-                    />
-                ) : (
-                    <LibraryBackgroundOverlay backgroundColor={background} headerRef={headerRef} />
-                )}
+                {/* Stable wrapper: OverlayScrollbars reparents NativeScrollArea's children so swapping direct child types breaks React's insertBefore (while on library). */}
+                <div>
+                    {showBlurredImage ? (
+                        <LibraryBackgroundImage
+                            blur={albumBackgroundBlur}
+                            headerRef={headerRef}
+                            imageUrl={imageUrl}
+                        />
+                    ) : (
+                        <LibraryBackgroundOverlay
+                            backgroundColor={background}
+                            headerRef={headerRef}
+                        />
+                    )}
+                </div>
                 <LibraryContainer>
                     <AlbumDetailHeader ref={headerRef as React.Ref<HTMLDivElement>} />
                     <AlbumDetailContent />
