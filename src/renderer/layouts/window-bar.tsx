@@ -2,7 +2,12 @@ import clsx from 'clsx';
 import isElectron from 'is-electron';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RiCheckboxBlankLine, RiCloseLine, RiSubtractLine } from 'react-icons/ri';
+import {
+    RiCheckboxBlankLine,
+    RiCheckboxMultipleBlankLine,
+    RiCloseLine,
+    RiSubtractLine,
+} from 'react-icons/ri';
 
 import appIcon from '../../../assets/icons/32x32.png';
 import macCloseHover from './assets/close-mac-hover.png';
@@ -14,6 +19,7 @@ import macMin from './assets/min-mac.png';
 import styles from './window-bar.module.css';
 
 import { useRadioPlayer } from '/@/renderer/features/radio/hooks/use-radio-player';
+import { useWindowMaximized } from '/@/renderer/hooks/use-window-maximized';
 import {
     useAppStore,
     usePlayerData,
@@ -24,13 +30,10 @@ import {
 import { Text } from '/@/shared/components/text/text';
 import { Platform, PlayerStatus } from '/@/shared/types/types';
 
-const localSettings = isElectron() ? window.api.localSettings : null;
-
 const browser = isElectron() ? window.api.browser : null;
 const close = () => browser?.exit();
 const minimize = () => browser?.minimize();
-const maximize = () => browser?.maximize();
-const unmaximize = () => browser?.unmaximize();
+const toggleMaximize = () => browser?.toggleMaximize();
 
 interface WindowBarControlsProps {
     controls: {
@@ -43,6 +46,7 @@ interface WindowBarControlsProps {
 
 const WindowsControls = ({ controls, title }: WindowBarControlsProps) => {
     const { handleClose, handleMaximize, handleMinimize } = controls;
+    const maximized = useWindowMaximized();
 
     return (
         <div className={styles.windowsContainer}>
@@ -57,7 +61,11 @@ const WindowsControls = ({ controls, title }: WindowBarControlsProps) => {
                     <RiSubtractLine size={19} />
                 </div>
                 <div className={styles.windowsButton} onClick={handleMaximize} role="button">
-                    <RiCheckboxBlankLine size={13} />
+                    {maximized ? (
+                        <RiCheckboxMultipleBlankLine size={13} />
+                    ) : (
+                        <RiCheckboxBlankLine size={13} />
+                    )}
                 </div>
                 <div
                     className={clsx(styles.windowsButton, styles.exit)}
@@ -145,16 +153,8 @@ export const WindowBar = () => {
     const { currentSong, index, queueLength } = usePlayerData();
     const { isPlaying: isRadioPlaying, metadata, stationName } = useRadioPlayer();
     const isRadioActive = Boolean(stationName || metadata);
-    const [max, setMax] = useState(localSettings?.env.START_MAXIMIZED || false);
 
-    const handleMaximize = useCallback(() => {
-        if (max) {
-            unmaximize();
-        } else {
-            maximize();
-        }
-        setMax(!max);
-    }, [max]);
+    const handleMaximize = useCallback(() => toggleMaximize(), []);
 
     const handleClose = useCallback(() => close(), []);
 
