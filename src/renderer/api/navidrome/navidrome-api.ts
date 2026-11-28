@@ -427,7 +427,7 @@ axiosClient.interceptors.response.use(
                         }
 
                         const newCredential = res.data.token;
-                        const subsonicCredential = `u=${currentServer.username}&s=${res.data.subsonicSalt}&t=${res.data.subsonicToken}`;
+                        const subsonicCredential = `u=${encodeURIComponent(currentServer.username)}&s=${res.data.subsonicSalt}&t=${res.data.subsonicToken}`;
 
                         useAuthStore.getState().actions.updateServer(currentServer.id, {
                             credential: subsonicCredential,
